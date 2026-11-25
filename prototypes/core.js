@@ -130,123 +130,23 @@ async function textures() {
   await Promise.all(Object.entries(window.TEXTURES).map(([k, src]) => new Promise((ok) => { const im = new Image(); im.onload = () => { const c = document.createElement('canvas'); c.width = c.height = 224; const g = c.getContext('2d', { willReadFrequently: true }); g.drawImage(im, 0, 0); out[k] = g.getImageData(0, 0, 224, 224).data; ok(); }; im.src = src; })));
   return out;
 }
-/** One value per pixel: terrain index with wandering borders, so coasts and forests look natural. */
-function field(warp) {
-  const N = W * CELL, kinds = ['ocean', 'forest', 'grassland', 'mountains', 'desert', 'tundra'], f = new Uint8Array(N * N);
-  for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
-    let c = Math.floor(y / CELL) * W + Math.floor(x / CELL);
-    if (!D.open[c]) { f[y * N + x] = 255; continue; }
-    if (warp) {
-      const wx = x + (noise(x / 26, y / 26) - 0.5) * 40 + (noise(x / 9 + 50, y / 9) - 0.5) * 12, wy = y + (noise(x / 26 + 90, y / 26 + 40) - 0.5) * 40 + (noise(x / 9, y / 9 + 70) - 0.5) * 12;
-      const q = Math.min(W - 1, Math.max(0, Math.floor(wy / CELL))) * W + Math.min(W - 1, Math.max(0, Math.floor(wx / CELL)));
-      if (D.open[q]) c = q;
-    }
-    f[y * N + x] = kinds.indexOf(D.terrain[c]);
-  }
-  return { f, N, kinds };
-}
-/** Distance in pixels to the nearest land (for sea) or sea (for land). */
-function distances(f, N) {
-  const run = (isGoal) => {
-    const d = new Float32Array(N * N).fill(1e4);
-    for (let i = 0; i < N * N; i++) if (isGoal(f[i])) d[i] = 0;
-    for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) { const i = y * N + x; if (x) d[i] = Math.min(d[i], d[i - 1] + 1); if (y) { d[i] = Math.min(d[i], d[i - N] + 1); if (x) d[i] = Math.min(d[i], d[i - N - 1] + 1.41); if (x < N - 1) d[i] = Math.min(d[i], d[i - N + 1] + 1.41); } }
-    for (let y = N - 1; y >= 0; y--) for (let x = N - 1; x >= 0; x--) { const i = y * N + x; if (x < N - 1) d[i] = Math.min(d[i], d[i + 1] + 1); if (y < N - 1) { d[i] = Math.min(d[i], d[i + N] + 1); if (x) d[i] = Math.min(d[i], d[i + N - 1] + 1.41); if (x < N - 1) d[i] = Math.min(d[i], d[i + N + 1] + 1.41); } }
-    return d;
-  };
-  return { toLand: run((v) => v > 0 && v < 6), toSea: run((v) => v === 0) };
-}
-const mix = (a, b, k) => a.map((v, i) => v + (b[i] - v) * k);
-async function drawMap(canvas, style) {
-  const tex = style === 'chart' ? null : await textures();
-  const { f, N, kinds } = field(style !== 'tile'), { toLand, toSea } = distances(f, N);
-  canvas.width = canvas.height = N;
-  const g = canvas.getContext('2d'), im = g.createImageData(N, N), o = im.data;
-  for (let i = 0; i < N * N; i++) {
-    const x = i % N, y = (i / N) | 0, v = f[i];
-    let c;
-    if (style === 'painted') {
-      if (v === 255) { const n = noise(x / 60, y / 60) * 0.6 + noise(x / 22 + 9, y / 22) * 0.4; c = mix([20, 58, 58], [58, 104, 98], n); }
-      else {
-        const s = (((y * 1.5) | 0) % 224) * 224 + (((x * 1.5) | 0) % 224), k = tex[kinds[v]];
-        c = [k[s * 4], k[s * 4 + 1], k[s * 4 + 2]];
-        if (v === 0) { const d = toLand[i]; c = mix(c, [88, 178, 176], Math.max(0, 0.62 - d / 62)); c = mix(c, [10, 44, 78], Math.min(0.42, d / 420)); if (d < 2.2) c = mix(c, [240, 246, 236], 0.75); else if (d > 6 && d < 7.6) c = mix(c, [225, 242, 238], 0.35); }
-        else { const d = toSea[i]; if (d < 4) c = mix(c, [226, 205, 150], 0.8 - d * 0.14); c = mix(c, [255, 246, 214], 0.06); }
-      }
-      if (D.zone[((y / CELL) | 0) * W + ((x / CELL) | 0)] === 'europe') c = mix(c, [12, 36, 52], 0.5);
-    } else if (style === 'chart') {
-      if (v === 255) c = (x + y) % 9 < 1.2 ? [196, 206, 208] : [250, 250, 247];
-      else if (v === 0) { const d = toLand[i]; c = d < 9 ? [160, 205, 214] : d < 22 ? [190, 221, 227] : d < 40 ? [213, 233, 236] : [236, 244, 244]; if (Math.abs(d - 9) < 0.7 || Math.abs(d - 22) < 0.6 || Math.abs(d - 40) < 0.5) c = [112, 160, 172]; }
-      else { c = { forest: [205, 214, 158], grassland: [240, 224, 170], mountains: [226, 199, 146], desert: [246, 234, 196], tundra: [226, 227, 208] }[kinds[v]]; const d = toSea[i]; if (d < 1.9) c = [40, 52, 60]; else if (d < 5) c = mix(c, [200, 170, 110], 0.4); }
-      if (D.zone[((y / CELL) | 0) * W + ((x / CELL) | 0)] === 'europe') c = mix(c, [214, 190, 214], 0.35);
-    } else {
-      if (v === 255) { const ex = x % 192, ey = y % 192; c = mix([96, 112, 118], [116, 132, 136], noise(x / 8, y / 8)); void ex; void ey; }
-      else { const s = (((y * 1.75) | 0) % 224) * 224 + (((x * 1.75) | 0) % 224), k = tex[kinds[v]]; c = [k[s * 4], k[s * 4 + 1], k[s * 4 + 2]]; }
-      if (D.zone[((y / CELL) | 0) * W + ((x / CELL) | 0)] === 'europe') c = mix(c, [24, 30, 48], 0.45);
-    }
-    o[i * 4] = c[0]; o[i * 4 + 1] = c[1]; o[i * 4 + 2] = c[2]; o[i * 4 + 3] = 255;
-  }
-  g.putImageData(im, 0, 0);
-  if (style === 'chart') chartGlyphs(g);
-  return canvas;
-}
-function chartGlyphs(g) {
-  g.lineCap = 'round';
-  for (let c = 0; c < W * W; c++) {
-    if (!D.open[c] || D.terrain[c] === 'ocean') continue;
-    const x0 = (c % W) * CELL, y0 = Math.floor(c / W) * CELL;
-    for (let k = 0; k < 7; k++) {
-      const x = x0 + 8 + rnd(c, k) * 48, y = y0 + 10 + rnd(k, c + 9) * 46;
-      g.strokeStyle = '#4d5a44'; g.fillStyle = '#7f9462'; g.lineWidth = 1.1; g.beginPath();
-      if (D.terrain[c] === 'forest') { g.arc(x, y, 4.2, 0, 7); g.fill(); g.stroke(); g.beginPath(); g.moveTo(x, y + 4); g.lineTo(x, y + 8); g.stroke(); }
-      else if (D.terrain[c] === 'mountains' && k < 4) { g.strokeStyle = '#6a5134'; g.moveTo(x - 9, y + 7); g.lineTo(x, y - 8); g.lineTo(x + 9, y + 7); for (let h = 1; h < 4; h++) { g.moveTo(x + h * 2, y - 8 + h * 4); g.lineTo(x + h * 2 - 2, y + 5); } g.stroke(); }
-      else if (D.terrain[c] === 'grassland' && k < 4) { g.strokeStyle = '#9a8a4e'; g.moveTo(x - 3, y); g.lineTo(x - 4, y - 5); g.moveTo(x, y); g.lineTo(x, y - 6); g.moveTo(x + 3, y); g.lineTo(x + 4, y - 5); g.stroke(); }
-      else if (D.terrain[c] === 'desert') { g.fillStyle = '#b79a55'; g.arc(x, y, 1.1, 0, 7); g.fill(); }
-      else if (D.terrain[c] === 'tundra' && k < 5) { g.strokeStyle = '#8a9088'; g.moveTo(x - 4, y); g.lineTo(x + 4, y); g.stroke(); }
-    }
-  }
-}
 /* Cloth texture and shadow for nation emblems: white charge on the nation's colour. */
 const DEFS = '<defs><pattern id="weave" width="4" height="4" patternUnits="userSpaceOnUse"><path d="M0 .5H4M0 2.5H4" stroke="#fff" stroke-opacity=".1"/><path d="M.5 0V4M2.5 0V4" stroke="#000" stroke-opacity=".13"/></pattern><filter id="lift" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="1.2" stdDeviation="1.1" flood-color="#000" flood-opacity=".55"/></filter></defs>';
 const roundel = (x, y, p, s, r = s / 2) => `<g><rect x="${x}" y="${y}" width="${s}" height="${s}" rx="${r}" fill="${D.players[p].color}"/><rect x="${x}" y="${y}" width="${s}" height="${s}" rx="${r}" fill="url(#weave)" stroke="#fff" stroke-width="${Math.max(1.5, s / 14)}"/><image filter="url(#lift)" href="${art.emblem(D.players[p].nation)}" x="${x + s * 0.14}" y="${y + s * 0.14}" width="${s * 0.72}" height="${s * 0.72}"/></g>`;
-/* Markers over the map, as SVG in map pixels. */
+/** Top left corner of a cell, in map units. */
 const at = (c) => [(c % W) * CELL, Math.floor(c / W) * CELL];
-function overlay(opts) {
-  const { card, action, sel, skin } = opts, out = [], ink = skin === 'chart' ? '#28343c' : '#fff8e6', hot = { chart: '#b0126b', painted: '#ffd75e', tile: '#ffffff' }[skin];
-  const N = W * CELL;
-  out.push(DEFS);
-  if (skin !== 'tile') for (let i = 2; i <= 14; i++) out.push(`<path d="M${i * CELL} ${2 * CELL}V${14 * CELL}M${2 * CELL} ${i * CELL}H${14 * CELL}" stroke="${skin === 'chart' ? '#6f8790' : '#ffffff'}" stroke-opacity="${i % 3 === 2 ? 0.32 : 0.13}"/>`);
-  else for (let i = 0; i <= 16; i++) out.push(`<path d="M${i * CELL} 0V${N}M0 ${i * CELL}H${N}" stroke="#101820" stroke-opacity="${i >= 2 && i <= 14 && (i - 2) % 3 === 0 ? 0.75 : 0.22}" stroke-width="${i >= 2 && i <= 14 && (i - 2) % 3 === 0 ? 3 : 1}"/>`);
-  const small = (x, y, n, s = 20) => `<svg x="${x}" y="${y}" width="${s}" height="${s}" viewBox="0 0 24 24">${SHAPES[n]}</svg>`;
-  D.bonus.forEach((b, c) => { if (!b) return; const [x, y] = at(c); out.push(`<g><circle cx="${x + 51}" cy="${y + 13}" r="12" fill="${skin === 'chart' ? '#fffdf4' : '#10262c'}" fill-opacity="${skin === 'chart' ? 0.95 : 0.6}" stroke="${ink}" stroke-opacity=".5"/>${small(x + 42, y + 4, { corn: 'food', leaf: 'crops' }[b] || b, 18)}</g>`); });
-  for (const [c, k] of Object.entries(D.poi)) { const [x, y] = at(+c); out.push(k === 'ruin' ? `<path d="M${x + 18} ${y + 46}V${y + 28}h6v18m8 0V${y + 28}h6v18m8 0V${y + 28}h-4M${x + 14} ${y + 28}h36v-6h-36Z" fill="${skin === 'chart' ? 'none' : '#e8dfc8'}" stroke="${skin === 'chart' ? ink : '#3a3326'}" stroke-width="2"/>` : `<path d="M${x + 14} ${y + 40}q18 12 36 0l-5-9-13 4-11-6Zm14-8 4-16 3 15" fill="${skin === 'chart' ? 'none' : '#8a6a45'}" stroke="${skin === 'chart' ? ink : '#2b1d10'}" stroke-width="2"/>`); }
-  const tg = targets(card, action);
-  for (const [c, n] of Object.entries(tg)) { const [x, y] = at(+c); if (action === 'moveShip' || action === 'moveInfantry') { out.push(`<circle cx="${x + 32}" cy="${y + 32}" r="${8 + n * 1.6}" fill="${hot}" fill-opacity="${skin === 'chart' ? 0.5 : 0.7}" stroke="${skin === 'chart' ? '#fff' : '#12262c'}" stroke-opacity=".5"/><text x="${x + 32}" y="${y + 37}" text-anchor="middle" font-size="14" font-weight="700" fill="${skin === 'chart' ? '#fff' : '#12262c'}">${n}</text>`); continue; } out.push(`<rect x="${x + 4}" y="${y + 4}" width="${CELL - 8}" height="${CELL - 8}" rx="${skin === 'tile' ? 2 : 10}" fill="${hot}" fill-opacity="${skin === 'chart' ? 0.14 : 0.2}" stroke="${hot}" stroke-width="${skin === 'chart' ? 2 : 3}" ${skin === 'chart' ? 'stroke-dasharray="6 4"' : ''}/>`); if (n !== '' && n !== undefined && n > 0) out.push(`<text x="${x + 10}" y="${y + 56}" font-size="17" font-weight="700" fill="${skin === 'chart' ? hot : '#fff'}" stroke="${skin === 'chart' ? '#fff' : '#12262c'}" stroke-width="3.500" paint-order="stroke">${action === 'produce' ? '+' : ''}${n}</text>`); }
-  for (const x of D.settlements) if (x.alive) {
-    const [a, b] = at(x.cell), col = x.hostility >= 4 ? '#c8442f' : x.hostility === 3 ? '#c98f2a' : '#4c8a57';
-    out.push(`<g><path d="M${a + 32} ${b + 8}L${a + 10} ${b + 50}h44Z" fill="${skin === 'chart' ? '#fffaf0' : '#f2e2bf'}" stroke="${skin === 'chart' ? ink : '#4a3418'}" stroke-width="2.500"/><path d="M${a + 32} ${b + 26}l-9 24h18Z" fill="${skin === 'chart' ? ink : '#4a3418'}"/><path d="M${a + 28} ${b + 2}l4 8 4-8" stroke="${skin === 'chart' ? ink : '#4a3418'}" stroke-width="2.500" fill="none"/><circle cx="${a + 52}" cy="${b + 50}" r="11" fill="${col}" stroke="#fff" stroke-width="2"/><text x="${a + 52}" y="${b + 55}" font-size="14" font-weight="700" text-anchor="middle" fill="#fff">${x.hostility}</text>${x.ally !== null ? `<circle cx="${a + 12}" cy="${b + 50}" r="8" fill="${D.players[x.ally].color}" stroke="#fff" stroke-width="2"/>` : ''}</g>`);
-  }
-  const flag = (x, y, p, s = 26) => roundel(x, y, p, s);
-  for (const c of D.colonies) { const [a, b] = at(c.cell); out.push(`<g><path d="M${a + 8} ${b + 54}V${b + 34}l11-10 11 10v20Zm22 0V${b + 26}l13-12 13 12v28Z" fill="${skin === 'chart' ? '#fffdf6' : '#f6ead0'}" stroke="${skin === 'chart' ? ink : '#3a2a17'}" stroke-width="2.500"/><path d="M${a + 5} ${b + 35}l14-13 12 11m-4-5 16-16 17 16" fill="none" stroke="${skin === 'chart' ? D.players[c.owner].color : '#9c3f2c'}" stroke-width="4.500"/>${flag(a + 36, b + 32, c.owner, 24)}</g>`); }
-  D.players.forEach((p, i) => {
-    if (typeof p.ship === 'number') { const [a, b] = at(p.ship); out.push(`<g><path d="M${a + 8} ${b + 42}h48l-8 14H${a + 17}Z" fill="${skin === 'chart' ? '#fffdf6' : '#7a4e2b'}" stroke="${skin === 'chart' ? ink : '#2c1a0b'}" stroke-width="2.500"/><path d="M${a + 31} ${b + 41}V${b + 6}M${a + 34} ${b + 10}q20 8 16 26H${a + 34}Zm-6 4q-16 8-14 22h14Z" fill="#fffaf0" stroke="${skin === 'chart' ? ink : '#2c1a0b'}" stroke-width="2"/>${flag(a + 32, b + 15, i, 20)}</g>`); }
-    if (typeof p.inf === 'number') { const [a, b] = at(p.inf), small = colonyAt(p.inf); out.push(`<g${small ? ` transform="translate(${a - 4} ${b + 24}) scale(.62) translate(${-a} ${-b})"` : ''}><path d="M${a + 14} ${b + 12}h36v20q0 18-18 26-18-8-18-26Z" fill="${p.color}"/><path d="M${a + 14} ${b + 12}h36v20q0 18-18 26-18-8-18-26Z" fill="url(#weave)" stroke="#fff" stroke-width="3"/><image filter="url(#lift)" href="${art.emblem(p.nation)}" x="${a + 19}" y="${b + 16}" width="26" height="26"/></g>`); }
-  });
-  if (sel !== null && sel !== undefined) { const [a, b] = at(sel); out.push(`<rect x="${a + 2}" y="${b + 2}" width="${CELL - 4}" height="${CELL - 4}" rx="${skin === 'tile' ? 0 : 12}" fill="none" stroke="${hot}" stroke-width="4"/>`); }
-  return out.join('');
-}
 /** Pan and zoom a map stage. */
-function stage(el, { zoom = 1, center = null, min = 0.45, max = 2.2, onCell, onMove, plane = false }) {
+function stage(el, { zoom = 1, center = null, min = 0.45, max = 2.2, onCell, onMove }) {
   const inner = el.querySelector('.map-inner'); let z = zoom, x = 0, y = 0, drag = null, moved = 0;
   // A tilted plane moves by its transform alone, so nothing is painted again. `un` goes from the screen to the flat stage, `proj` back with the local scale.
-  const T = { a: 0, d: 1500, up: 0 }, box = plane ? { left: 0, top: 0 } : null, R = () => { if (!box) return el.getBoundingClientRect(); box.width = innerWidth; box.height = innerHeight; return box; };
+  const T = { a: 0, d: 1500, up: 0 }, R = () => ({ left: 0, top: 0, width: innerWidth, height: innerHeight });
   const un = (cx, cy) => { const r = R(), w = r.width / 2, h = r.height / 2, sx = cx - r.left - w, sy = cy - r.top - h - T.up, c = Math.cos(T.a), s = Math.sin(T.a), py = (sy * T.d) / (T.d * c + sy * s), k = T.d / (T.d - py * s); return [w + sx / k, h + py]; };
   const proj = (px, py) => { const r = R(), w = r.width / 2, h = r.height / 2, v = py - h, k = T.d / (T.d - v * Math.sin(T.a)); return [r.left + w + (px - w) * k, r.top + h + v * Math.cos(T.a) * k + T.up, k * z]; };
   const cell = (cx, cy) => { const [a, b] = un(cx, cy), i = Math.floor((a - x) / z / CELL), j = Math.floor((b - y) / z / CELL); return i >= 0 && j >= 0 && i < W && j < W ? j * W + i : null; };
   const tilt = (deg, d = 1500, up = 0) => { T.a = (deg * Math.PI) / 180; T.d = d; T.up = up; put(); };
   const put = () => {
-    if (!plane) inner.style.transform = `translate(${x}px,${y}px) scale(${z})`;
-    else { const w = innerWidth / 2, h = innerHeight / 2; inner.style.transform = `translate(${w}px,${h + T.up}px) perspective(${T.d}px) rotateX(${T.a}rad) translate(${x - w}px,${y - h}px) scale(${z})`; }
+    const w = innerWidth / 2, h = innerHeight / 2;
+    inner.style.transform = `translate(${w}px,${h + T.up}px) perspective(${T.d}px) rotateX(${T.a}rad) translate(${x - w}px,${y - h}px) scale(${z})`;
     onMove?.();
   };
   const look = (c) => { const [a, b] = at(c), r = R(); x = r.width / 2 - (a + 32) * z; y = r.height / 2 - (b + 32) * z; put(); };
@@ -277,5 +177,5 @@ function logLine(e) {
   if (e.e === 'sell') return `${who}${pick(['sold', 'продаёт'])} ${e.n} ${icon(e.r, 14)} × ${e.price}`;
   return '';
 }
-window.Core = { D, W, CELL, me, P, pick, t, T, ACT, GROUPS, RES, ICON_RES, why, agent, art, icon, eduIcon, traits, roundel, DEFS, nbs, noise, rnd, textures, at, SHAPES, optionsOf, describe, targets, reach, points, tokenAt, colonyAt, settlementAt, drawMap, overlay, stage, logLine, spread, lang };
+window.Core = { D, W, CELL, me, P, pick, t, T, ACT, GROUPS, RES, ICON_RES, why, agent, art, icon, eduIcon, traits, roundel, DEFS, nbs, noise, rnd, textures, at, SHAPES, optionsOf, describe, targets, reach, points, tokenAt, colonyAt, settlementAt, stage, logLine, spread, lang };
 })();

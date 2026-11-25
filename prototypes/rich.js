@@ -1,4 +1,4 @@
-/* B2 and B3: a richer painted map, better sprites, and a light simulation so that choices have consequences. */
+/* The painted map, the sprites, and a light simulation so that choices have consequences. */
 (() => {
 const { D, W, CELL, me, P, noise, rnd, textures, roundel, art, nbs, at } = Core;
 const KINDS = ['ocean', 'forest', 'grassland', 'mountains', 'desert', 'tundra'];
@@ -207,5 +207,5 @@ function byPlace(card) {
   for (const y of D.yields[card] || []) (out.cells[y.cell] ??= []).push({ c: 'play', card, a: 'produce', cell: y.cell, icon: y.icon, n: y.n });
   return out;
 }
-window.Rich = { drawSea, drawRich, Sprite, preview, perform, undo, byPlace, history, notes, total, house, ring };
+window.Rich = { drawSea, drawRich, Sprite, preview, perform, undo, byPlace, history, notes, total };
 })();

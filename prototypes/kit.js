@@ -1,4 +1,4 @@
-/* Shared by B4 to B6: lifting an agent shows every place it can go, on the map and off it. */
+/* The agent in hand: what each place on the map and off it would do, lifting, hovering, dropping, and the war. */
 (() => {
 const { D, P, W, CELL, me, t, pick, icon, art, at, nbs, SHAPES, roundel } = Core, { Sprite } = Rich;
 const L = (en, ru) => pick([en, ru]);
@@ -94,32 +94,6 @@ function army() {
   return { ref: S.war >= 0 ? D.war.pool : D.ref, hostile, pool, loyal, targets: targets.length, per };
 }
 /* ---- map ---- */
-function marks(opt = {}) {
-  const o = [Core.DEFS], sp = spaces(S.card), lifted = !!S.card, A = army();
-  if (!lifted) D.bonus.forEach((b, c) => { if (!b) return; const [x, y] = at(c); o.push(`<g opacity=".92"><circle cx="${x + 52}" cy="${y + 52}" r="9.5" fill="#f7f1e1"/><svg x="${x + 45}" y="${y + 45}" width="14" height="14" viewBox="0 0 24 24">${SHAPES[ico(b)]}</svg></g>`); });
-  for (const [c, k] of Object.entries(D.poi)) { const [x, y] = at(+c); o.push(`<svg x="${x + 4}" y="${y + 2}" width="56" height="56" viewBox="0 0 64 64">${k === 'ruin' ? Sprite.ruin() : Sprite.wreck()}</svg>`); }
-  if (lifted) {
-    const r = {}; for (const [id, s] of Object.entries(sp)) if (id.startsWith('cell:') && s.options?.some((q) => q.a === 'moveShip' || q.a === 'moveInfantry')) r[id.slice(5)] = 1;
-    let d = ''; const inn = (q) => q in r || q === P.ship; for (const k of Object.keys(r)) { const c = +k, [x, y] = at(c); if (!inn(c - W)) d += `M${x} ${y}h64`; if (!inn(c + W)) d += `M${x} ${y + 64}h64`; if (!inn(c - 1)) d += `M${x} ${y}v64`; if (!inn(c + 1)) d += `M${x + 64} ${y}v64`; }
-    o.push(`<g>${Object.keys(r).map((c) => `<rect x="${at(+c)[0]}" y="${at(+c)[1]}" width="64" height="64" fill="#fff" fill-opacity=".1"/>`).join('')}<path d="${d}" stroke="#fff2c4" stroke-opacity=".8" stroke-width="2.5" stroke-dasharray="2 7" stroke-linecap="round" fill="none"/></g>`);
-    const h = S.over?.startsWith('cell:') ? +S.over.slice(5) : null;
-    if (h !== null && sp[S.over]?.options?.length) { const [x, y] = at(h); o.push(`<rect x="${x + 3}" y="${y + 3}" width="58" height="58" rx="14" fill="#ffe08a" fill-opacity=".35" stroke="#fff" stroke-width="4"/>`); const mv = sp[S.over].options.find((q) => q.a === 'moveShip' || q.a === 'moveInfantry'); if (mv) { const p = route(mv.a, h).map((c) => { const [a, b] = at(c); return `${a + 32},${b + 32}`; }); o.push(`<polyline points="${p.join(' ')}" fill="none" stroke="#fff6da" stroke-width="5" stroke-dasharray="2 11" stroke-linecap="round"/>`); } }
-  }
-  const glow = (c, r = 30) => { const [x, y] = at(c); return `<ellipse cx="${x + 32}" cy="${y + 48}" rx="${r}" ry="${r * 0.45}" fill="none" stroke="#ffe08a" stroke-width="4.5"/>`; };
-  const things = [];
-  const plate = (c, inner, w) => { const [x, y] = at(c); return `<g transform="translate(${x + 32 - w / 2} ${y + 57})"><rect width="${w}" height="17" rx="8.5" fill="#0f3436e6"/>${inner}</g>`; };
-  for (const x of D.settlements) if (x.alive) { const col = x.hostility >= 4 ? '#ee5a42' : x.hostility === 3 ? '#edb443' : '#7ccf86', [a, b] = at(x.cell), s = sp[`cell:${x.cell}`]; things.push([x.cell, `${s?.village ? glow(x.cell) : ''}<svg x="${a}" y="${b - 4}" width="64" height="64" viewBox="0 0 64 64">${Sprite.village(x)}</svg>${s?.village ? pill(a + 32, b + 64, s.options.map((q) => pick(Core.ACT[q.a])).join(' / ')) : plate(x.cell, [0, 1, 2, 3, 4].map((i) => `<circle cx="${9 + i * 10}" cy="8.500" r="3.400" fill="${i < x.hostility ? col : '#ffffff30'}"/>`).join(''), 58)}`]); }
-  for (const c of D.colonies) { const [a, b] = at(c.cell), war = opt.war?.(c) ?? null; things.push([c.cell, `<svg x="${a - 2}" y="${b - 6}" width="68" height="68" viewBox="0 0 64 64">${Sprite.colony(c)}</svg>${war ?? plate(c.cell, `${roundel(-4, -4, c.owner, 25)}<text x="28" y="13" font-size="14" font-weight="800" fill="#f7f1e1">${c.defence}</text><svg x="37" y="3" width="11" height="11" viewBox="0 0 24 24" color="#f7f1e1">${SHAPES.sword}</svg>`, 54)}`]); }
-  D.players.forEach((p, i) => {
-    if (typeof p.ship === 'number') { const [a, b] = at(p.ship); things.push([p.ship, `<svg x="${a}" y="${b - 3}" width="64" height="64" viewBox="0 0 64 64">${Sprite.ship(i)}</svg>`]); }
-    if (typeof p.inf === 'number') { const c = Core.colonyAt(p.inf), [x, y] = at(p.inf); things.push([p.inf + 0.5, `<svg x="${x + (c ? -22 : 0)}" y="${y + (c ? 2 : 0)}" width="${c ? 56 : 64}" height="${c ? 56 : 64}" viewBox="0 0 64 64">${Sprite.infantry(i)}</svg>`]); }
-  });
-  things.sort((a, b) => a[0] - b[0]).forEach((x) => o.push(x[1]));
-  for (const [id, s] of Object.entries(sp)) if (s.gather) { const c = +id.slice(5), [x, y] = at(c), best = [...s.gather].sort((a, b) => b.n - a.n), up = Core.tokenAt(c) || Core.colonyAt(c) ? 14 : 34, w = best.length * 33; o.push(`<g><rect x="${x + 32 - w / 2}" y="${y + up - 13}" width="${w}" height="27" rx="13.5" fill="${S.over === id ? '#ffe08a' : '#f7f1e1'}"/>${best.map((b, i) => `<svg x="${x + 36 - w / 2 + i * 33}" y="${y + up - 9}" width="17" height="17" viewBox="0 0 24 24">${SHAPES[ico(b.icon)]}</svg><text x="${x + 55 - w / 2 + i * 33}" y="${y + up + 6}" font-size="16" font-weight="800" fill="#1c2a2a">${b.n}</text>`).join('')}</g>`); }
-  for (const p of placed) if (p.space?.startsWith('cell:') && !opt.ownPlaced) { const [x, y] = at(+p.space.slice(5)); o.push(`<clipPath id="cl${p.space.slice(5)}"><circle cx="${x + 14}" cy="${y + 14}" r="12"/></clipPath><circle cx="${x + 14}" cy="${y + 14}" r="14" fill="#edb443"/><image href="${art.agent(p.card)}" x="${x + 1}" y="${y + 1}" width="26" height="36" clip-path="url(#cl${p.space.slice(5)})" preserveAspectRatio="xMidYMin slice"/>`); }
-  void A;
-  return o.join('') + (opt.extra?.(sp) || '');
-}
 const pill = (x, y, text) => { const w = text.length * 8.2 + 18; return `<g><rect x="${x - w / 2}" y="${y - 10}" width="${w}" height="22" rx="11" fill="#f7f1e1"/><text x="${x}" y="${y + 6}" text-anchor="middle" font-size="15" font-weight="800" fill="#1c2a2a">${text}</text></g>`; };
 function route(token, to) { const kind = token === 'moveShip' ? 'ship' : 'infantry', start = kind === 'ship' ? P.ship : P.inf, r = Core.reach(S.card, kind), path = [to]; let c = to, g = 0; while (c !== start && g++ < 14) { if (nbs(c).includes(start)) { path.push(start); break; } const n = nbs(c).filter((x) => x in r && r[x] > r[c]).sort((a, b) => dist(a, start) - dist(b, start)); if (!n.length) break; c = n[0]; path.push(c); } return path; }
 const dist = (a, b) => Math.hypot(Math.floor(a / W) - Math.floor(b / W), (a % W) - (b % W));
@@ -179,7 +153,7 @@ document.addEventListener('click', (e) => {
   else if ((x = q('[data-zoom]'))) K.stage.zoomBy(+x.dataset.zoom);
 });
 addEventListener('keydown', (e) => { if (e.key === 'Escape') { put(); if (S.pickAt) S.pickAt = null; else if (S.card) S.card = null; else if (S.war >= 0) K.war.exit(); else S.view = 'map'; bub().hidden = true; K.paint(); } if (/^[1-9]$/.test(e.key) && P.hand[+e.key - 1]) { S.card = P.hand[+e.key - 1]; S.pickAt = null; K.paint(); } });
-const K = { europe, route, S, away: () => (S.card && !inEurope() ? `<em class="aw">${AWAY()}</em>` : ''), spaces, effect, verb, face, label, commit, undo, tokens, army, marks, pill, home, inEurope, cargo, placed, L, ico, picker, sword: (n = 15) => icon('sword', n),
+const K = { europe, route, S, away: () => (S.card && !inEurope() ? `<em class="aw">${AWAY()}</em>` : ''), spaces, effect, verb, face, label, commit, undo, tokens, army, pill, home, inEurope, cargo, placed, L, ico, picker, sword: (n = 15) => icon('sword', n),
   /* War, one line per colony. */
   odds(x) { const n = Math.min(10, Math.max(0, x.attack.total - x.defence.total)), q = 2 / 3; return n === 0 ? 1 : D.war.tactic === 'extended_supply_lines' ? q ** n + (n * q ** (n - 1)) / 3 : q ** n; },
   part: (q) => ({ ref: t('ref'), tactic: t('tactic'), 'loyalist cards': t('loyalist'), colony: t('colony'), terrain: t('terrain'), tokens: L('Ship and infantry', 'Корабль и пехота'), army: L('Soldiers', 'Солдаты'), support: L('Militia and allies', 'Ополчение и союзники') })[q] || (D.buildings[q] ? pick(D.buildings[q]) : q),
@@ -196,14 +170,12 @@ const K = { europe, route, S, away: () => (S.card && !inEurope() ? `<em class="a
     nav(i) { const n = D.war.sieges.length; return `<nav class="wnav"><button data-war="${Math.max(0, i - 1)}">◂</button>${D.war.sieges.map((x, k) => `<button class="wd${k === i ? ' on' : ''}${k <= i && x.fell ? ' fell' : ''}" data-war="${k}">${K.em(x.owner, 28)}</button>`).join('')}<button class="wd tx${i >= n ? ' on' : ''}" data-war="${n}">${t('result')}</button><button data-war="${Math.min(n, i + 1)}">▸</button><button class="tx" data-peace>${t('close')}</button></nav>`; },
     head: () => `${t('tactic')}: <b>${pick(D.names.tactics[D.war.tactic])}</b>. <b>${D.war.pool}</b> ${t('cubes')}. ${t('loyalist')}: <b>${Panels.name(D.war.loyalist)}</b>`,
   },
-  start({ paint, marks: mk, draw, terrain, stage, K: scale = 1.5, map = {} }) {
-    const canvas = document.querySelector('canvas.terrain'), svg = document.querySelector('svg.marks');
-    svg?.setAttribute('viewBox', `0 0 ${W * 64} ${W * 64}`);
-    K.drawMarks = draw || (() => { svg.innerHTML = marks(mk?.() || {}); });
+  start({ paint, draw, terrain, stage }) {
+    K.drawMarks = draw;
     K.paint = () => { kept = null; document.body.classList.toggle('lift', !!S.card); document.body.dataset.view = S.view; document.body.classList.toggle('war', S.war >= 0); paint(); K.drawMarks(); picker(); document.querySelectorAll('[data-space]').forEach((e) => { const s = S.card ? spaces(S.card)[e.dataset.space] : null; e.classList.toggle('ok', !!s?.options?.length); e.classList.toggle('off', !!S.card && !s?.options?.length); }); };
     K.stage = Core.stage(document.querySelector('.map-stage'), { ...stage, onCell: (c) => { if (!S.card) { S.look = S.look === c ? null : c; K.onCell?.(c); K.paint(); } } });
     K.paint();
-    return terrain ? terrain() : Rich.drawRich(canvas, { K: scale, ...map });
+    return terrain();
   },
 };
 window.Kit = K;

@@ -1,6 +1,6 @@
 const $ = (i) => document.getElementById(i), { D, P, W, t, pick, icon, art, me, at } = Core, K = Kit, S = K.S, L = K.L, { Sprite } = Rich;
-/* ---- the view of the map: tilt, perspective and shift, remembered per page ---- */
-const KEY = `view:${document.title}`, view = { ...VIEW, ...JSON.parse(localStorage.getItem(KEY) || '{}') };
+/* ---- the view of the map: tilt, perspective and shift, remembered in the browser ---- */
+const VIEW = { tilt: 24, depth: 55, shift: -4 }, KEY = 'view', view = { ...VIEW, ...JSON.parse(localStorage.getItem(KEY) || '{}') };
 const lens = () => 3600 * (900 / 3600) ** (view.depth / 100);
 const up = () => 1 / Math.cos((view.tilt * Math.PI) / 180);
 function look() {
@@ -145,7 +145,7 @@ async function land() {
 const redraw = async () => { await drawing; Rich.drawRich(terrain, plan(SHARP)); };
 document.addEventListener('input', (e) => { const k = e.target.dataset.viewSet; if (!k) return; view[k] = +e.target.value; e.target.nextElementSibling.textContent = view[k] + e.target.dataset.unit; look(); });
 document.addEventListener('change', (e) => { if (!e.target.dataset.viewSet) return; localStorage.setItem(KEY, JSON.stringify(view)); if (e.target.dataset.viewSet === 'tilt') redraw(); });
-K.start({ paint, draw: drawMarks, terrain: land, stage: { plane: true, onMove: place, zoom: Math.min(2, Math.max(0.9, 1.34 * innerWidth / 1440)), center: Math.floor(K.home().cell / W) * W + (W - 1) / 2, min: 0.55, max: 2.8 } });
+K.start({ paint, draw: drawMarks, terrain: land, stage: { onMove: place, zoom: Math.min(2, Math.max(0.9, 1.34 * innerWidth / 1440)), center: Math.floor(K.home().cell / W) * W + (W - 1) / 2, min: 0.55, max: 2.8 } });
 look(); addEventListener('resize', look);
 // Pictures that first appear when an agent is lifted or a screen opens, ready beforehand.
 setTimeout(() => { for (const u of [...P.buildings.map(art.building), ...D.salon.map(art.father), ...D.pier.map(([x]) => art.agent(x)), art.building('shipyard'), 'art/crate.webp', 'art/europe.webp', art.nation(P.nation)]) { const i = new Image(); i.src = u; i.decode?.().catch(() => {}); (window.ready ||= []).push(i); } }, 400);

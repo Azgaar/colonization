@@ -9,7 +9,7 @@ Digital version and test bench for the board game. Start with [docs/PRD.md](docs
 | `packages/engine` | Rules engine: no interface, no I/O, seeded randomness |
 | `packages/bots` | AI players: random, and goal-driven with personalities |
 | `packages/lab` | Playing many games |
-| `prototypes/` | Interface iterations B1–B8 on one real position. Serve the folder and open `index.html` |
+| `prototypes/` | Official interface prototype on one real position. Run `python3 -m http.server 8765 --directory prototypes` and open http://localhost:8765 |
 | `rulesets/` | `board` (reference), `pc` (convertible changes), `alternatives` (sandbox) |
 
 `assets/` and `components/` are kept out of git.
