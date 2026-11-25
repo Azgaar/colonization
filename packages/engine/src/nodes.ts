@@ -85,9 +85,9 @@ decision('nodeChoice', {
   resolve(s, d, c) {
     const o = (d.opts as ChoiceOption[]).find((x) => x.id === c.id)!, pl = s.players[d.player], k = o.cost ?? {};
     log(s, { e: 'choice', p: d.player, id: d.id, option: c.id });
-    addGold(s, d.player, -(k.gold ?? 0));
-    if (k.bells) addBells(s, d.player, -k.bells);
-    if (k.crosses) addCrosses(s, d.player, -k.crosses);
+    addGold(s, d.player, -(k.gold ?? 0), 'poi');
+    if (k.bells) addBells(s, d.player, -k.bells, 'poi');
+    if (k.crosses) addCrosses(s, d.player, -k.crosses, 'poi');
     if (k.wholeHold) for (const r of RESOURCES) pl.hold[r] = 0;
     if (c.card) { removeOne(pl.hand, c.card); pl.discard.push(c.card); }
     then(s, o.do, { p: d.player, cell: d.cell });
@@ -124,18 +124,18 @@ decision('payResource', {
 
 const nodes: { [K in Node['n']]: Fn<K> } = {
   gain(s, n, { p }) {
-    addGold(s, p, n.gold ?? 0);
-    addBells(s, p, n.bells ?? 0);
-    addCrosses(s, p, n.crosses ?? 0);
+    addGold(s, p, n.gold ?? 0, s.event ?? 'poi');
+    addBells(s, p, n.bells ?? 0, s.event ?? 'poi');
+    addCrosses(s, p, n.crosses ?? 0, s.event ?? 'poi');
     for (const r of RESOURCES) {
       if (n.wh?.[r]) s.players[p].wh[r] += n.wh[r];
       if (n.hold?.[r]) addHold(s, p, r, n.hold[r]);
     }
   },
   lose(s, n, { p }) {
-    addGold(s, p, -(n.gold ?? 0));
-    addBells(s, p, -(n.bells ?? 0));
-    addCrosses(s, p, -(n.crosses ?? 0));
+    addGold(s, p, -(n.gold ?? 0), s.event ?? 'poi');
+    addBells(s, p, -(n.bells ?? 0), s.event ?? 'poi');
+    addCrosses(s, p, -(n.crosses ?? 0), s.event ?? 'poi');
   },
   endMove(s) { if (s.move) s.move.ended = true; },
   moves(s, n) { if (s.move && !s.move.ended) s.move.points += n.add; },
@@ -199,12 +199,12 @@ const nodes: { [K in Node['n']]: Fn<K> } = {
   // Events
   price(s, n) { for (const r of n.res) changePrice(s, r, n.add); },
   priceReset(s, n) { for (const r of n.res) s.price[r] = s.def.resources[r].price; },
-  gainIfStock(s, n) { for (const p of turnOrder(s)) if (s.players[p].wh[n.res] > 0) addBells(s, p, n.bells); },
+  gainIfStock(s, n) { for (const p of turnOrder(s)) if (s.players[p].wh[n.res] > 0) addBells(s, p, n.bells, 'event'); },
   gainPerBuilding(s, n) {
     for (const p of turnOrder(s)) {
       const v = s.players[p].buildings.map((b) => n.buildings[b] ?? 0);
       const k = n.once ? Math.max(0, ...v) : v.reduce((a, b) => a + b, 0);
-      if (n.what === 'bells') addBells(s, p, k); else addCrosses(s, p, k);
+      if (n.what === 'bells') addBells(s, p, k, 'event'); else addCrosses(s, p, k, 'event');
     }
   },
   sellOff(s, n) { eachPlayer(s, 'sellOff', { node: n, done: [], any: false }); },
@@ -373,7 +373,7 @@ decision('freeColony', {
 });
 decision('convertCrosses', {
   options: (s, d) => Array.from({ length: Math.min(d.max as number, s.players[d.player].crosses) + 1 }, (_, n) => ({ c: 'convert', n })),
-  resolve(s, d, c) { addCrosses(s, d.player, -c.n); addBells(s, d.player, c.n); },
+  resolve(s, d, c) { addCrosses(s, d.player, -c.n, 'bradford'); addBells(s, d.player, c.n, 'bradford'); },
 });
 decision('cheapestFather', {
   options(s) {
@@ -395,7 +395,7 @@ decision('sellOff', {
   resolve(s, d, c) {
     if (c.c === 'done') { if (d.any) addRef(s, d.node.refPerSeller ?? 0, 'smuggling'); return; }
     s.players[d.player].wh[c.r as Resource] -= c.n;
-    addGold(s, d.player, c.n * Math.max(0, s.price[c.r as Resource] + d.node.priceAdd));
+    addGold(s, d.player, c.n * Math.max(0, s.price[c.r as Resource] + d.node.priceAdd), 'event');
     addRef(s, c.n * (d.node.refPerUnit ?? 0), 'smuggling');
     push(s, { t: 'sellOff', p: d.player, node: d.node, done: [...d.done, c.r], any: true });
   },
@@ -405,16 +405,16 @@ decision('mayTake', {
   options: () => [{ c: 'yes' }, { c: 'no' }],
   resolve(s, d, c) {
     if (c.c === 'no') return;
-    addGold(s, d.player, -d.gold);
+    addGold(s, d.player, -d.gold, 'event');
     s.players[d.player].discard.push(takeCommon(s, d.agent)!);
   },
 });
 decision('payOrRef', {
   options: (s, d) => [...(s.players[d.player].gold >= (d.gold as number) ? [{ c: 'pay' }] : []), { c: 'refuse' }],
   resolve(s, d, c) {
-    if (c.c === 'pay') return addGold(s, d.player, -d.gold);
+    if (c.c === 'pay') return addGold(s, d.player, -d.gold, 'event');
     addRef(s, d.ref, s.event ?? 'event');
-    addBells(s, d.player, d.bells);
+    addBells(s, d.player, d.bells, 'event');
   },
 });
 task('sellAgents', (s, t) => {
@@ -426,7 +426,7 @@ decision('sellAgents', {
   resolve(s, d, c) {
     if (c.c === 'stop') return;
     loseTopCard(s, d.player);
-    addGold(s, d.player, d.node.gold);
+    addGold(s, d.player, d.node.gold, 'event');
     addRef(s, d.node.refEach, s.event ?? 'event');
     push(s, { t: 'sellAgents', p: d.player, node: d.node, left: d.left - 1 });
   },
@@ -435,7 +435,7 @@ task('joint', (s, t) => {
   const i = t._given.length;
   if (i < t.order.length) return ask(s, { kind: 'joint', player: t.order[i], order: t.order, _given: t._given, node: t.node });
   const sum = t._given.reduce((a: number, b: number) => a + b, 0);
-  t.order.forEach((p: number, k: number) => addCrosses(s, p, -t._given[k]));
+  t.order.forEach((p: number, k: number) => addCrosses(s, p, -t._given[k], 'event'));
   addRef(s, -Math.min(t.node.max, Math.floor(sum / t.node.per)), 'the_great_awakening');
 });
 decision('joint', {
@@ -449,7 +449,7 @@ decision('payPerBuilding', {
     return Array.from({ length: Math.min(pl.buildings.length, Math.floor(pl.gold / (d.gold as number))) + 1 }, (_, n) => ({ c: 'payFor', n }));
   },
   resolve(s, d, c) {
-    addGold(s, d.player, -c.n * d.gold);
+    addGold(s, d.player, -c.n * d.gold, 'event');
     addRef(s, (s.players[d.player].buildings.length - c.n) * d.ref, 'stamp_act');
   },
 });
@@ -465,7 +465,7 @@ decision('accuse', {
   options: (s) => s.players.map((_, player) => ({ c: 'accuse', player })),
   resolve(s, d, c) {
     const pl = s.players[c.player], learned = uniq(collection(pl).filter((x) => agent(s, x).edu === 2));
-    if (!learned.length) addCrosses(s, c.player, d.crosses);
+    if (!learned.length) addCrosses(s, c.player, d.crosses, 'event');
     else if (canRemove(s, pl)) ask(s, { kind: 'loseLearned', player: c.player });
   },
 });
@@ -480,7 +480,7 @@ task('payOrRemove', (s, t) => {
 decision('payOrRemove', {
   options: (s, d) => [...(s.players[d.player].gold >= (d.gold as number) ? [{ c: 'pay' }] : []), ...(canRemove(s, s.players[d.player]) ? [{ c: 'remove' }] : [])],
   resolve(s, d, c) {
-    if (c.c === 'pay') return addGold(s, d.player, -d.gold);
+    if (c.c === 'pay') return addGold(s, d.player, -d.gold, 'event');
     if (removeAgent(s, d.player, d.card)) addRef(s, d.ref, s.event ?? 'event');
   },
 });
@@ -491,7 +491,7 @@ decision('sacredForest', {
   },
   resolve(s, d, c) {
     if (c.c === 'goods') s.players[d.player].wh.goods -= d.goods;
-    else if (c.c === 'gold') addGold(s, d.player, -d.gold);
+    else if (c.c === 'gold') addGold(s, d.player, -d.gold, 'event');
     else for (const t of uniq(s.settlements.filter((x) => x.alive).map((x) => x.tribe))) setHostility(s, t, s.hostility[t] + d.hostility);
   },
 });
@@ -500,9 +500,9 @@ decision('boycott', {
   options: (s, d) => [...(s.players[d.player].gold >= (d.gold as number) * s.players[d.player].wh[d.res as Resource] ? [{ c: 'pay' }] : []), { c: 'boycott' }],
   resolve(s, d, c) {
     const pl = s.players[d.player], n = pl.wh[d.res as Resource];
-    if (c.c === 'pay') return addGold(s, d.player, -d.gold * n);
+    if (c.c === 'pay') return addGold(s, d.player, -d.gold * n, 'event');
     pl.wh[d.res as Resource] = 0;
-    addBells(s, d.player, n);
+    addBells(s, d.player, n, 'event');
     addRef(s, n * d.ref, 'the_boston_tea_party');
   },
 });
@@ -510,7 +510,7 @@ task('blockade', (s, t) => ask(s, { kind: 'blockade', player: t.p, gold: t.gold,
 decision('blockade', {
   options: (s, d) => [...(s.players[d.player].gold >= (d.gold as number) ? [{ c: 'pay' }] : []), { c: 'refuse' }],
   resolve(s, d, c) {
-    if (c.c === 'pay') return addGold(s, d.player, -d.gold);
+    if (c.c === 'pay') return addGold(s, d.player, -d.gold, 'event');
     for (const r of RESOURCES) s.players[d.player].hold[r] = 0;
     addRef(s, d.ref, 'pirate_blockade');
     push(s, { t: 'damage', p: d.player, amount: 1 });

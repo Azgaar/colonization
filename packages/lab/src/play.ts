@@ -21,7 +21,7 @@ export function playGame(o: PlayOptions): { state: State; choices: Choice[] } {
       if (choices.length >= (o.maxChoices ?? 20000)) throw new Error('the game does not end');
       const p = s.pending!.player;
       // Bots that only look at the list of choices can skip building the view.
-      const c = o.bots[p].choose(o.fastView ? { player: p, state: s, legal: legal(s) } : viewFor(s, p));
+      const c = o.bots[p].choose(o.fastView ? { player: p, state: s, legal: legal(s), collections: [] } : viewFor(s, p));
       choices.push(c);
       applyInPlace(s, c, !o.check);
     }

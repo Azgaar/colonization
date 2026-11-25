@@ -146,13 +146,13 @@ task('resolveCombat', (s) => {
   s.combat = null;
   if (st) setHostility(s, st.tribe, s.def.settings.natives.afterAttack);
   if (hits === 0) return;
-  addBells(s, c.attacker, set.victoryBells);
+  addBells(s, c.attacker, set.victoryBells, 'victory');
   const p = c.attacker;
   if (c.target === 'settlement') {
     const loot = s.def.tribes[st!.tribe].loot, f = mods(s, p, 'lootFactor').reduce((n2, m) => Math.max(n2, m.value), 1);
     reducePopulation(s, st!, 1);
     if (!st!.alive) {
-      if (loot.gold) addGold(s, p, loot.gold * f);
+      if (loot.gold) addGold(s, p, loot.gold * f, 'loot');
       if (loot.res) s.players[p].wh[loot.res] += loot.amount! * f;
       log(s, { e: 'loot', p, tribe: st!.tribe });
     }

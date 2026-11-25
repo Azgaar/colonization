@@ -26,6 +26,9 @@ importers:
 
   packages/bots:
     dependencies:
+      '@col/data':
+        specifier: workspace:*
+        version: link:../data
       '@col/engine':
         specifier: workspace:*
         version: link:../engine

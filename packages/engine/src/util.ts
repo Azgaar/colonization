@@ -105,12 +105,22 @@ export function addHold(s: State, p: number, r: Resource, n: number): number {
   s.players[p].hold[r] += k;
   return k;
 }
-export function addBells(s: State, p: number, n: number) { if (n) { s.players[p].bells = Math.max(0, s.players[p].bells + n); log(s, { e: 'bells', p, n }); } }
-export function addCrosses(s: State, p: number, n: number) {
-  const pl = s.players[p];
-  pl.crosses = Math.min(s.def.settings.crosses.max, Math.max(0, pl.crosses + n));
+/** Every gain and loss is logged with its source, for the test lab. */
+export function addBells(s: State, p: number, n: number, why: string) {
+  const pl = s.players[p], before = pl.bells;
+  pl.bells = Math.max(0, pl.bells + n);
+  if (pl.bells !== before) log(s, { e: 'bells', p, n: pl.bells - before, why });
 }
-export function addGold(s: State, p: number, n: number) { s.players[p].gold = Math.max(0, s.players[p].gold + n); }
+export function addCrosses(s: State, p: number, n: number, why: string) {
+  const pl = s.players[p], before = pl.crosses;
+  pl.crosses = Math.min(s.def.settings.crosses.max, Math.max(0, pl.crosses + n));
+  if (pl.crosses !== before) log(s, { e: 'crosses', p, n: pl.crosses - before, why });
+}
+export function addGold(s: State, p: number, n: number, why: string) {
+  const pl = s.players[p], before = pl.gold;
+  pl.gold = Math.max(0, pl.gold + n);
+  if (pl.gold !== before) log(s, { e: 'gold', p, n: pl.gold - before, why });
+}
 export function addRef(s: State, n: number, why: string) { if (n) { s.ref = Math.max(0, s.ref + n); log(s, { e: 'ref', n, why }); } }
 export function changePrice(s: State, r: Resource, n: number) {
   s.price[r] = Math.min(s.def.settings.market.maxPrice, Math.max(0, s.price[r] + n));

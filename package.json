@@ -11,6 +11,10 @@
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "fuzz": "node packages/lab/src/fuzz.ts",
+    "systems": "node packages/lab/src/systems.ts",
+    "watch": "node packages/lab/src/watch.ts",
+    "experiments": "node packages/lab/src/experiments.ts",
+    "tune": "node packages/lab/src/tune.ts",
     "check": "pnpm data:import && pnpm typecheck && pnpm test"
   },
   "devDependencies": {

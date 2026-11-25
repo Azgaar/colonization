@@ -8,6 +8,7 @@ export * from './types.ts';
 export { nextU32, seedRng } from './rng.ts';
 export { createGame, type GameConfig } from './setup.ts';
 export { applyInPlace, choiceKey, clone, IllegalChoice, legal } from './core.ts';
+export { components } from './turn.ts';
 export { viewFor, type View } from './view.ts';
 export { actionsFor, buildPrice, fatherLimit, foundCost, recruitCost, sellPrice, taxRate, year } from './turn.ts';
 export { attackOptions, buildingDefence, cardStrength, combatStrength } from './combat.ts';

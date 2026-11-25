@@ -88,7 +88,7 @@ export function buildingYield(s: State, p: number, card: string, id: string): Ex
 
 export function store(s: State, p: number, icon: Icon, n: number) {
   log(s, { e: 'produce', p, icon, n });
-  if (icon === 'bells') addBells(s, p, n);
-  else if (icon === 'crosses') addCrosses(s, p, n);
+  if (icon === 'bells') addBells(s, p, n, 'production');
+  else if (icon === 'crosses') addCrosses(s, p, n, 'production');
   else s.players[p].wh[ICON_RESOURCE[icon]] += n;
 }

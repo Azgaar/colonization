@@ -134,7 +134,7 @@ export function siegeStrength(s: State, x: Siege): { attack: Explained; defence:
 
 task('sieges', (s) => {
   const set = s.def.settings, war = s.war!, eff = tactic(s);
-  for (const [p, x] of Object.entries(war.spent)) { addBells(s, Number(p), -x.bells); addGold(s, Number(p), -x.gold); }
+  for (const [p, x] of Object.entries(war.spent)) { addBells(s, Number(p), -x.bells, 'militia'); addGold(s, Number(p), -x.gold, 'mercenaries'); }
   const faces = eff.t === 'successFrom' ? eff.faces : set.combat.successFaces, need = eff.t === 'minSuccesses' ? eff.value : 1;
   for (const x of war.sieges) {
     x.fell = false;

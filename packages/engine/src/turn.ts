@@ -1,4 +1,5 @@
 import type { Resource } from '@col/data';
+import { RESOURCES } from '@col/data';
 import type { Choice, State } from './types.ts';
 import { ask, decision, log, push, task } from './core.ts';
 import { dice } from './rng.ts';
@@ -11,11 +12,12 @@ import { adjacent, colonyProblem, inEurope } from './map.ts';
 import { attackOptions, startAttack } from './combat.ts';
 import { buildingYield, cellYields, docksYields, store } from './production.ts';
 import { canMove, startMove } from './moves.ts';
+import { scorePlayer } from './war.ts';
 
 // --- Round -----------------------------------------------------------------
 
 task('roundStart', (s) => {
-  log(s, { e: 'round', n: s.round });
+  if (s.logging) log(s, { e: 'round', n: s.round, scores: s.players.map((_, p) => scorePlayer(s, p).score), price: { ...s.price }, ref: s.ref, components: components(s) });
   for (const p of turnOrder(s)) {
     s.players[p].passed = false;
     drawTo(s, p, s.def.settings.hand.size);
@@ -23,6 +25,16 @@ task('roundStart', (s) => {
   s.current = s.first;
   push(s, { t: 'turnLoop' });
 });
+/** Physical pieces in use, to know how many to print. */
+export function components(s: State): Record<string, number> {
+  const out: Record<string, number> = { red: s.ref, black: 0, gold: 0, damage: 0, natives: 8 - s.nativesLeft };
+  for (const r of RESOURCES) out[r] = s.demand[r];
+  for (const pl of s.players) { out.gold += pl.gold; out.damage += pl.damage; for (const r of RESOURCES) out[r] += pl.wh[r] + pl.hold[r]; }
+  for (const x of s.settlements) if (x.alive) { out.black += x.pop; out.red += s.hostility[x.tribe]; }
+  out.red += out.damage;
+  out.black += Object.keys(s.poi).length;
+  return out;
+}
 function drawTo(s: State, p: number, n: number) {
   const pl = s.players[p];
   while (pl.hand.length < n) {
@@ -59,9 +71,9 @@ decision('tax', {
   resolve(s, d, c) {
     const set = s.def.settings.tax;
     log(s, { e: 'tax', p: d.player, pay: c.c === 'pay', rate: taxRate(s) });
-    if (c.c === 'pay') return addGold(s, d.player, -taxRate(s));
+    if (c.c === 'pay') return addGold(s, d.player, -taxRate(s), 'tax');
     addRef(s, s.players.length === 1 ? set.refuseRefSolo : set.refuseRef, 'tax');
-    addBells(s, d.player, set.refuseBells);
+    addBells(s, d.player, set.refuseBells, 'tax');
   },
 });
 task('roundEnd', (s) => {
@@ -204,7 +216,7 @@ decision('turn', {
       return push(s, { t: 'discardHand', p }, { t: 'endTurn', p });
     }
     if (c.c === 'recruit') {
-      addCrosses(s, p, -recruitCost(s));
+      addCrosses(s, p, -recruitCost(s), 'recruit');
       return push(s, { t: 'recruit', p }, { t: 'turnLoop' });
     }
     removeOne(pl.hand, c.card);
@@ -246,12 +258,12 @@ const actions: Record<string, (s: State, p: number, c: any) => void> = {
   },
   customs(s, p, c) {
     s.players[p].wh[c.r as Resource]--;
-    addGold(s, p, sellPrice(s, p, c.card, c.r));
+    addGold(s, p, sellPrice(s, p, c.card, c.r), 'customs');
     demand(s, c.r, 1);
   },
   smuggle(s, p, c) {
     s.players[p].wh[c.r as Resource]--;
-    addGold(s, p, Math.max(0, s.price[c.r as Resource] + mods(s, p, 'smuggle', c.card).reduce((n, m) => n + m.add, 0)));
+    addGold(s, p, Math.max(0, s.price[c.r as Resource] + mods(s, p, 'smuggle', c.card).reduce((n, m) => n + m.add, 0)), 'smuggle');
   },
   supply(s, p) {
     s.players[p].wh.food--;
@@ -275,7 +287,7 @@ const actions: Record<string, (s: State, p: number, c: any) => void> = {
   },
   preach(s, p, c) {
     const x = s.settlements[c.settlement - 1];
-    addCrosses(s, p, -preachCost(s, p, x.tribe, c.card));
+    addCrosses(s, p, -preachCost(s, p, x.tribe, c.card), 'preach');
     gainNative(s, p);
     if (!mods(s, p, 'preachCalm').length) setHostility(s, x.tribe, s.hostility[x.tribe] + 1);
     reducePopulation(s, x, 1);
@@ -318,7 +330,7 @@ decision('trade', {
     if (c.c === 'done') return finishTrade(s, d.sold);
     const r = c.r as Resource;
     s.players[d.player].hold[r] -= c.n;
-    addGold(s, d.player, c.n * sellPrice(s, d.player, d.card, r));
+    addGold(s, d.player, c.n * sellPrice(s, d.player, d.card, r), 'trade');
     log(s, { e: 'sell', p: d.player, r, n: c.n, price: sellPrice(s, d.player, d.card, r) });
     push(s, { t: 'trade', p: d.player, card: d.card, done: [...d.done, r], sold: { ...d.sold, [r]: c.n } });
   },
@@ -338,7 +350,7 @@ decision('hire', {
   resolve(s, d, c) {
     if (c.c === 'done') return;
     if (c.c === 'refresh') return refreshPier(s, () => true);
-    addGold(s, d.player, -hirePrice(s, d.player, d.card, c.agent));
+    addGold(s, d.player, -hirePrice(s, d.player, d.card, c.agent), 'hire');
     s.players[d.player].discard.push(takeFromPier(s, s.pier.findIndex((st) => st[0] === c.agent)));
     log(s, { e: 'hire', p: d.player, agent: c.agent });
     const bought = [...d.bought, c.agent];
@@ -363,7 +375,7 @@ decision('propaganda', {
   options: (s, d) => [...s.salon.filter((f) => s.def.fathers[f].bells <= s.players[d.player].bells).map((father) => ({ c: 'take', father })), ...((d.n as number) > 0 ? [{ c: 'done' }] : [])],
   resolve(s, d, c) {
     if (c.c === 'done') return fillSalon(s);
-    addBells(s, d.player, -s.def.fathers[c.father].bells);
+    addBells(s, d.player, -s.def.fathers[c.father].bells, 'fathers');
     push(s, d.n + 1 < s.def.settings.propaganda.maxFathers ? { t: 'propaganda', p: d.player, n: d.n + 1 } : { t: 'fillSalon' });
     gainFather(s, d.player, c.father);
   },

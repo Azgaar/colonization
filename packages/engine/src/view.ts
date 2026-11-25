@@ -1,7 +1,12 @@
 import type { Choice, State } from './types.ts';
 import { clone, legal } from './core.ts';
+import { collection } from './util.ts';
 
-export interface View { player: number; state: State; legal: Choice[] }
+export interface View {
+  player: number; state: State; legal: Choice[];
+  /** Every player's agents, sorted. Public: every card gained or lost is seen, only its place is not. */
+  collections: string[][];
+}
 const hide = (a: unknown[]) => a.map(() => '?');
 
 /** What one seat may know. Hidden cards become '?', unrevealed map cells become null. */
@@ -48,5 +53,5 @@ export function viewFor(s: State, p: number): View {
     v.pending = mine ? { ...v.pending! } : { kind: s.pending.kind, player: s.pending.player };
     if (mine) delete v.pending!._given;
   }
-  return { player: p, state: v, legal: mine ? legal(s) : [] };
+  return { player: p, state: v, legal: mine ? legal(s) : [], collections: s.players.map((pl, i) => [...collection(pl), ...(s.combat?.attacker === i ? s.combat.a : s.combat?.defender === i ? [...s.combat.d, ...(s.combat.top ? [s.combat.top] : [])] : [])].sort()) };
 }

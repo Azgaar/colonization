@@ -91,7 +91,7 @@ export function reveal(s: State, f: number, p: number) {
   }
   for (const m of mods(s, p, 'onReveal')) {
     if (m.ifLand && cells.every((c) => s.map.terrain[c] === 'ocean')) continue;
-    if (m.gold) addGold(s, p, m.gold);
+    if (m.gold) addGold(s, p, m.gold, 'explore');
     for (const [r, n] of Object.entries(m.hold ?? {})) addHold(s, p, r as 'crops', n!);
   }
 }
