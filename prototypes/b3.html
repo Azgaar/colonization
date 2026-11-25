@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>B3 One vista</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya+SC:wght@500;700;800&family=Alegreya+Sans:wght@400;500;700;800&display=swap">
+<style>
+/* B3. One vista, no panels. Europe on the horizon, the New World in the middle, home in the foreground, the way a governor would see it from the shore.
+   You drag an agent onto a place and the place decides what happens. The King's fleet gathers on the horizon as the threat grows; the sun crosses the sky once in ten rounds. */
+:root { --bone:#f9f2e0; --ink:#1b2829; --ochre:#f0b845; --scarlet:#c94533; --teal:#0f3b40; --sky1:#8fc6dd; --sky2:#f3e3bd; --haze:#d8e6df; --sea:#17618c; --dim:0; --sc:"Alegreya SC",Georgia,serif; --ui:"Alegreya Sans","Gill Sans",sans-serif; --hz:21vh; --hm:29vh; }
+*{box-sizing:border-box} html,body{height:100%;margin:0} body{background:var(--sea);color:var(--bone);font:500 17px/1.3 var(--ui);overflow:hidden;user-select:none} button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:left} :focus-visible{outline:3px solid var(--ochre);outline-offset:2px} h2,h3{font-family:var(--sc);margin:0;font-weight:800} .ic{vertical-align:-.22em;flex:none}
+.sky{position:fixed;left:0;right:0;top:0;height:var(--hz);background:linear-gradient(var(--sky1),var(--sky2) 88%);overflow:hidden;transition:height .45s;z-index:2} .sun{position:absolute;width:74px;height:74px;border-radius:50%;background:#fff3c4;box-shadow:0 0 60px 22px #fff0b8aa;transform:translate(-50%,-50%);transition:left .4s,top .4s,background .4s}
+.harbour{position:absolute;left:0;right:0;bottom:0;height:100%;background:url(art/europe.webp) 42% 34%/58% auto no-repeat;-webkit-mask:linear-gradient(90deg,#0000 17%,#000 34%,#000 58%,#0000 75%),linear-gradient(#0000 4%,#000 34%,#000 84%,#0000);mask:linear-gradient(90deg,#0000 17%,#000 34%,#000 58%,#0000 75%),linear-gradient(#0000 4%,#000 34%,#000 84%,#0000);-webkit-mask-composite:source-in;mask-composite:intersect;opacity:.95;transition:.45s} .sky::after{content:"";position:absolute;inset:auto 0 0;height:44%;background:linear-gradient(#0000,var(--haze));pointer-events:none} .night{position:fixed;inset:0;background:#1a1230;opacity:var(--dim);pointer-events:none;z-index:3;mix-blend-mode:multiply;transition:opacity .4s}
+.fleet{position:absolute;right:3vw;bottom:13%;width:29vw;height:62px;z-index:3;cursor:pointer} .fleet svg{position:absolute;overflow:visible} .fleet b{position:absolute;right:0;top:-26px;font:800 24px var(--sc);color:#8e1f14;text-shadow:0 0 8px #fff9,0 0 2px #fff}
+.year{position:absolute;left:26px;top:12px;font:800 38px/1 var(--sc);color:#17343c;text-shadow:0 0 14px #ffffffb0;z-index:4} .year small{display:block;font:700 17px/1.2 var(--ui)}
+.sea{position:fixed;left:0;right:0;top:calc(var(--hz) - 2px);bottom:0;overflow:hidden;background:linear-gradient(var(--haze),var(--sea) 26%);transition:top .45s;perspective:1150px;perspective-origin:50% -6%;cursor:grab;touch-action:none} .plane{position:absolute;left:50%;top:34%;width:1024px;height:1024px;margin:-512px 0 0 -512px;transform-style:flat;transform-origin:50% 50%} .plane>canvas,.plane>svg{position:absolute;inset:0;width:100%;height:100%} .plane>canvas{-webkit-mask:radial-gradient(closest-side,#000 84%,#0000 100%);mask:linear-gradient(90deg,#0000,#000 7% 93%,#0000),linear-gradient(#0000,#000 7% 93%,#0000);-webkit-mask-composite:source-in;mask-composite:intersect} .anchor{position:absolute;width:64px;height:2px;pointer-events:none} .deep{position:absolute;inset:-420px -900px;background:#1a5688} .mist{position:absolute;inset:0 0 auto;height:22%;background:linear-gradient(var(--haze),#0000);pointer-events:none}
+.sprites{position:fixed;inset:0;pointer-events:none;z-index:2;overflow:hidden} .sp{position:absolute;left:0;top:0;width:64px;height:64px;transform-origin:50% 88%;pointer-events:auto;cursor:pointer} .sp>svg{width:100%;height:100%;overflow:visible;filter:drop-shadow(0 2px 1px #0005)} .sp.inf{pointer-events:none} .sp .tag{position:absolute;left:50%;top:100%;transform:translate(-50%,-7px);display:flex;gap:3px;align-items:center;background:#0e2f34e0;border-radius:99px;padding:1px 8px 1px 2px;font-weight:800;font-size:13px;white-space:nowrap} .sp .tag.v{padding:4px 8px} .sp .tag i{width:7px;height:7px;border-radius:50%;background:#ffffff33} .sp.can::before{content:"";position:absolute;left:-4px;right:-4px;bottom:0;height:20px;border-radius:50%;border:4px solid var(--ochre);box-shadow:0 0 16px var(--ochre)} .sp.over::before{border-color:#fff;background:#fff5}
+.em{background-color:var(--c);background-image:repeating-linear-gradient(0deg,#ffffff1c 0 1px,#0000 1px 3px),repeating-linear-gradient(90deg,#0000001f 0 1px,#0000 1px 3px);border-radius:50%;display:grid;place-items:center;border:2.5px solid #fff;box-shadow:0 2px 7px #0007} .em img{width:70%;filter:drop-shadow(0 1.5px 1.5px #000a)} .tag .em{width:21px;height:21px;border-width:1.5px}
+.home{position:fixed;left:0;right:0;bottom:0;height:var(--hm);z-index:4;transition:height .45s;pointer-events:none} .ground{position:absolute;inset:-4vh 0 0;background:50% 66%/cover no-repeat;-webkit-mask:linear-gradient(#0000,#000 24%);mask:linear-gradient(#0000,#000 24%)} .ground::after{content:"";position:absolute;inset:0;background:linear-gradient(#0d2b2c00 20%,#0d2b2c8c 78%)} .home>.in{position:absolute;inset:0;display:grid;grid-template-columns:minmax(220px,1fr) auto minmax(330px,1fr);gap:26px;align-items:end;padding:0 26px 16px} .home>.in>*{pointer-events:auto}
+.store{display:flex;flex-direction:column;gap:9px;align-items:flex-start;text-shadow:0 2px 5px #000b} .heap{display:flex;flex-wrap:wrap;gap:1px;max-width:310px;align-items:flex-end;min-height:38px} .heap svg{width:34px;height:34px;filter:drop-shadow(0 3px 2px #0008)} .heap .gap{width:30px;height:9px;border-radius:50%;background:#0005;margin:0 2px 2px} .heap .new svg{animation:drop .45s} @keyframes drop{from{transform:translateY(-70px)}} .purse{display:flex;gap:18px;font:800 26px var(--ui)} .purse span{display:flex;gap:6px;align-items:center}
+.people{display:flex;gap:12px;align-items:flex-end} .who{position:relative;width:104px;height:150px;border-radius:52px 52px 12px 12px;overflow:hidden;border:4px solid var(--bone);background:var(--bone);box-shadow:0 7px 20px #0009;cursor:grab;transition:transform .16s;touch-action:none} .who img{width:100%;height:100%;object-fit:cover;object-position:50% 6%;pointer-events:none} .who span{position:absolute;left:0;right:0;bottom:0;background:var(--bone);color:var(--ink);font:800 15px/1 var(--sc);text-align:center;padding:5px 2px 4px} .who small{position:absolute;left:0;right:0;top:9px;text-align:center;font:800 14px var(--ui);color:#fff;text-shadow:0 1px 3px #000,0 0 7px #000} .who:hover{transform:translateY(-9px)} .who.sel,.who.drag{border-color:var(--ochre);transform:translateY(-14px)} .who.drag{opacity:.45} .who.can{box-shadow:0 0 0 4px var(--ochre),0 7px 20px #0009} .who.over{border-color:#fff;transform:scale(1.07)} .ghost{position:fixed;z-index:20;width:74px;height:74px;border-radius:50%;overflow:hidden;border:4px solid var(--ochre);transform:translate(-50%,-62%);pointer-events:none;box-shadow:0 9px 24px #000a} .ghost img{width:100%;height:150%;object-fit:cover;object-position:50% 0} .rest{font:800 19px/1.2 var(--sc);align-self:center;padding:10px 20px;background:#0e2f34c9;border-radius:14px} .pass{width:78px;height:78px;border-radius:50%;background:var(--scarlet);border:4px solid var(--bone);display:grid;place-items:center;font:800 18px/1 var(--sc);text-align:center;margin-left:6px}
+.lots{display:grid;grid-template-columns:repeat(3,minmax(0,118px));gap:9px;justify-content:end} .lot{position:relative;height:88px;border-radius:40px 40px 9px 9px;overflow:hidden;border:3px solid var(--bone);background:#0003;box-shadow:0 5px 14px #0008} .lot img{width:100%;height:100%;object-fit:cover} .lot span{position:absolute;left:0;right:0;bottom:0;background:#0e2f34e6;font-weight:800;font-size:13px;line-height:1.1;text-align:center;padding:3px 2px} .lot.empty{border-style:dashed;border-color:#fff8;display:grid;place-items:center} .lot.empty::before{content:"";width:34px;height:34px;opacity:.8;background:linear-gradient(#fff,#fff) 50%/4px 100% no-repeat,linear-gradient(#fff,#fff) 50%/100% 4px no-repeat;border-radius:4px} .lot.can{border-color:var(--ochre);box-shadow:0 0 18px var(--ochre)} .lot.over{border-color:#fff;transform:scale(1.05)}
+.say{position:fixed;z-index:21;pointer-events:none;background:var(--bone);color:var(--ink);border-radius:14px;padding:9px 15px 10px;box-shadow:0 8px 26px #000a;transform:translate(-50%,-100%);max-width:300px;font-size:17px} .say h3{font-size:20px;line-height:1.1} .say.no{background:#0e2f34f2;color:var(--bone)} .say .ch{display:flex;gap:6px;align-items:center;font-weight:800;margin-top:2px} .say[hidden]{display:none}
+.pickr{position:fixed;z-index:22;display:flex;gap:9px;transform:translate(-50%,-100%);justify-content:center;width:max-content;max-width:94vw} .pickr[hidden]{display:none} .pickr button{background:var(--bone);color:var(--ink);border-radius:16px;overflow:hidden;min-width:104px;box-shadow:0 8px 24px #000a;font-weight:800;text-align:center;padding:9px 13px} .pickr button.im{padding:0 0 8px;width:126px} .pickr img{width:100%;height:78px;object-fit:cover;display:block;margin-bottom:5px} .pickr button:hover{outline:4px solid var(--ochre)} .pickr .ch{display:flex;gap:5px;justify-content:center;align-items:center}
+.ctl{position:fixed;right:20px;top:14px;z-index:8;display:flex;gap:7px;align-items:center;color:var(--ink);font-weight:700} .ctl button{background:#fffbeecc;border-radius:99px;padding:4px 14px} .ctl button[hidden]{display:none} .ctl label{background:#fffbeecc;border-radius:99px;padding:4px 14px;display:flex;gap:9px;align-items:center} .ctl input{width:110px;accent-color:var(--scarlet)} .ctl .undo{background:var(--ochre)}
+.eu{position:absolute;inset:0;z-index:5;display:none;padding:74px 26px 40px;gap:24px;align-items:flex-end;justify-content:center} .lean-eu .eu{display:flex} .lean-eu{--hz:64vh;--hm:16vh} .lean-home{--hm:62vh;--hz:13vh} .lean-eu .fleet,.lean-eu .sun{opacity:0} .lean-eu .harbour{background-size:cover;background-position:50% 60%;-webkit-mask:linear-gradient(#000 86%,#0000);mask:linear-gradient(#000 86%,#0000);opacity:1;filter:brightness(.72)} .lean-eu .year{color:#fff;text-shadow:0 2px 8px #000} .lean-eu .sky::after{display:none} .lean-eu .lots{display:none} .lean-eu .home>.in{grid-template-columns:minmax(220px,1fr) auto minmax(220px,1fr)} .lean-eu .who{height:108px;width:88px} .quay{display:flex;gap:8px} .soul{position:relative;width:99px;height:140px;border-radius:56px 56px 10px 10px;overflow:hidden;border:3px solid var(--bone);background:var(--bone)} .soul img{width:100%;height:100%;object-fit:cover;object-position:50% 5%} .soul span{position:absolute;left:0;right:0;bottom:0;background:var(--bone);color:var(--ink);font:800 14.500px/1 var(--sc);text-align:center;padding:5px 2px} .soul b{position:absolute;right:50%;top:8px;transform:translateX(50%);background:#142b2ee6;border-radius:99px;padding:0 9px 0 4px;font-size:16px;white-space:nowrap} .soul.dear{filter:saturate(.25) brightness(.8)} .stall{background:#fff9eaf0;color:var(--ink);border-radius:16px;padding:13px 18px;display:grid;grid-template-columns:30px auto;gap:5px 12px;align-items:center;font:800 23px var(--ui)} .stall .p{display:flex;gap:4px} .stall .p i{width:15px;height:24px;border-radius:4px;background:#1b282918} .stall .p i.on{background:var(--scarlet)} .shelf{display:flex;flex-direction:column;gap:12px} .grp h3{font-size:22px;margin-bottom:7px;text-shadow:0 2px 6px #000}
+.fathers{display:none;position:absolute;left:26px;top:34px;gap:12px;pointer-events:auto} .lean-home .fathers{display:flex} .lean-home .lots{grid-template-columns:repeat(3,minmax(0,210px))} .lean-home .lot{height:152px} .lean-home .lot span{font-size:17px;padding:6px} .lean-home .home>.in{grid-template-columns:minmax(220px,auto) auto minmax(480px,1fr)} .lean-home .people{flex-wrap:wrap;max-width:360px}
+.war{position:fixed;inset:0;z-index:30;display:none;background:radial-gradient(120% 90% at 50% 8%,#f0a35a,#a13a2b 46%,#3a1220 92%);color:#fff6e6;padding:34px 48px;overflow:auto} .war.on{display:grid;grid-template-rows:auto 1fr auto;gap:16px} .war h2{font-size:40px;line-height:1} .war header{display:flex;justify-content:space-between;align-items:flex-start;gap:30px;font-size:19px} .field{display:grid;grid-template-columns:1fr 250px 1fr;gap:34px;align-items:center} .rank{display:flex;flex-direction:column;gap:10px} .rank.l{align-items:flex-end;text-align:right} .rank b.big{font:800 96px/.9 var(--sc)} .line{display:flex;gap:10px;align-items:center;font-size:18px;font-weight:700} .rank.l .line{flex-direction:row-reverse} .men{display:flex;flex-wrap:wrap;gap:2px;max-width:330px} .rank.l .men{justify-content:flex-end} .men i{width:13px;height:21px;border-radius:7px 7px 2px 2px;background:#fff1e0} .rank.l .men i{background:#e2432f;box-shadow:inset 0 6px 0 #7a1610} .mid{text-align:center} .mid .em{width:104px;height:104px;margin:0 auto 10px;border-width:5px} .mid h3{font-size:27px;line-height:1.05} .throw{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:14px 0} .throw i{font-style:normal;width:36px;height:36px;border-radius:9px;background:#fff6e6;color:var(--ink);font:800 22px/36px var(--ui);text-align:center} .throw i.hit{background:#1b1010;color:#ff8d72} .verdict{font:800 36px var(--sc)} .war footer{display:flex;gap:14px;align-items:center;justify-content:center} .war footer button,.war header button{background:#fff6e6;color:var(--ink);border-radius:99px;padding:8px 24px;font:800 19px var(--sc)} .dots{display:flex;gap:7px} .dots i{width:30px;height:30px;border-radius:50%;background:var(--c);border:3px solid #fff6e6;opacity:.5} .dots i.on{opacity:1;transform:scale(1.2)} .dots i.fell{box-shadow:inset 0 0 0 20px #0009} .score{max-width:760px;margin:0 auto;width:100%;font-size:20px} .score div{display:grid;grid-template-columns:52px 1fr auto 70px;gap:16px;align-items:center;padding:8px 0} .score .em{width:50px;height:50px} .score b{font:800 38px var(--sc);text-align:right} .score .out{opacity:.5}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style></head><body>
+<div class="sea" id="sea"><div class="plane" id="plane"><div class="deep"></div><canvas class="terrain"></canvas><svg class="marks" viewBox="0 0 1024 1024"></svg></div><div class="mist"></div></div>
+<div class="sprites" id="sprites"></div>
+<div class="sky" id="sky" data-zone="europe"><div class="sun" id="sun"></div><div class="harbour"></div><div class="year" id="year"></div><div class="eu" id="eu"></div><div class="fleet" id="fleet" data-war></div></div>
+<div class="home" id="home"><div class="ground" id="ground"></div><div class="fathers" id="fathers"></div><div class="in" id="front"></div></div><div class="night"></div>
+<div class="ctl" id="ctl"></div><div class="say" id="say" hidden role="status"></div><div class="pickr" id="pick" hidden></div><section class="war" id="war"></section>
+<script src="textures.js"></script><script src="snapshot.js"></script><script src="core.js"></script><script src="panels.js"></script><script src="rich.js"></script>
+<script>
+const $ = (i) => document.getElementById(i), { D, P, W, me, t, pick, icon, art, at } = Core, { Sprite, preview, perform, undo, byPlace } = Rich;
+const S = { card: null, drag: null, over: null, year: D.round, siege: 0, lean: '' };
+const plane = $('plane'), sea = $('sea'), canvas = document.querySelector('canvas'), svg = document.querySelector('svg.marks');
+const ico = (i) => ({ corn: 'food', leaf: 'crops' })[i] || i, home = () => D.colonies.find((c) => c.owner === me);
+/* ---- camera ---- */
+const cam = { x: at(home().cell)[0] + 200, y: at(home().cell)[1] + 60, z: 1.5 };
+const aim = () => { plane.style.transform = `rotateX(47deg) scale(${cam.z}) translate(${512 - cam.x}px,${512 - cam.y}px)`; place(); };
+let things = [];
+function build() {
+  things = [];
+  const add = (cell, cls, html, data) => things.push({ cell, cls, html, data });
+  for (const [c, k] of Object.entries(D.poi)) add(+c, 'poi', `<svg viewBox="0 0 64 64">${k === 'ruin' ? Sprite.ruin() : Sprite.wreck()}</svg>`);
+  for (const x of D.settlements) if (x.alive) add(x.cell, 'vil', `<svg viewBox="0 0 64 64">${Sprite.village(x)}</svg><span class="tag v">${[0, 1, 2, 3, 4].map((i) => `<i style="${i < x.hostility ? `background:${x.hostility >= 4 ? '#ff6a4d' : x.hostility === 3 ? '#f0b845' : '#84d68d'}` : ''}"></i>`).join('')}</span>`);
+  for (const c of D.colonies) add(c.cell, 'col', `<svg viewBox="0 0 64 64">${Sprite.colony(c)}</svg><span class="tag"><span class="em" style="--c:${D.players[c.owner].color}"><img src="${art.emblem(D.players[c.owner].nation)}" alt=""></span>${c.defence}</span>`);
+  D.players.forEach((p, i) => { if (typeof p.ship === 'number') add(p.ship, 'ship', `<svg viewBox="0 0 64 64">${Sprite.ship(i)}</svg>`, i === me ? 'ship' : ''); if (typeof p.inf === 'number') add(p.inf, 'inf', `<svg viewBox="0 0 64 64">${Sprite.infantry(i)}</svg>`); });
+  plane.querySelectorAll('.anchor').forEach((a) => a.remove());
+  $('sprites').innerHTML = things.map((x, i) => `<div class="sp ${x.cls}" data-i="${i}" ${x.cls === 'inf' ? '' : `data-zone="${x.data === 'ship' ? 'ship' : 'cell'}" data-cell="${x.cell}"`}>${x.html}</div>`).join('');
+  things.forEach((x, i) => { const a = document.createElement('div'), [l, u] = at(x.cell); a.className = 'anchor'; const shift = x.cls === 'inf' && Core.colonyAt(x.cell) ? -26 : 0; a.style.left = `${l + shift}px`; a.style.top = `${u + (x.cls === 'inf' ? 46 : 38)}px`; plane.append(a); x.a = a; x.el = $('sprites').children[i]; });
+  place();
+}
+function place() {
+  const top = sea.getBoundingClientRect().top;
+  for (const x of things) { const r = x.a.getBoundingClientRect(), s = r.width / 64, k = s * 1.04; x.el.style.transform = `translate(${r.left + r.width / 2 - 32}px,${r.top - 56}px) scale(${k})`; x.el.style.zIndex = Math.round(r.top); x.el.style.opacity = r.top < top + 14 ? 0 : 1; }
+}
+/* ---- meaning: what dropping this agent here would do ---- */
+function verbs(card, z) {
+  if (!card || !z) return null;
+  const pl = byPlace(card), none = (a, fb) => { const x = (D.actions[card] || []).find((q) => q.action === a); return { why: x?.why ? Core.why(x.why) : fb }; };
+  if (z.zone === 'europe') return pl.europe.length ? { list: pl.europe } : { why: pick(['Your ship must reach Europe first', 'Сначала корабль должен прийти в Европу']) };
+  if (z.zone === 'lot') {
+    const b = P.buildings[z.lot];
+    if (!b) { const l = pl.home.filter((o) => o.a === 'build'); return l.length ? { list: l, ask: true } : none('build', ''); }
+    const l = pl.home.filter((o) => (o.a === 'work' && o.building === b) || (o.a === 'docks' && b === 'docks')).slice(0, 1);
+    return l.length ? { list: l } : { why: D.buildings[b].work ? (D.buildings[b].work.consumes && P.wh[D.buildings[b].work.consumes.res] < 1 ? pick(['Needs crops', 'Нужно сырьё']) : none('work', '').why || pick(['Needs more education', 'Нужно образование'])) : pick(['Works by itself', 'Работает само']) };
+  }
+  if (z.zone === 'who') return z.card === card ? null : { list: pl.hand.filter((o) => o.other === z.card) };
+  const c = z.cell, out = [...(pl.villages[c] || [])];
+  if (pl.cells[c]) out.push(...[...pl.cells[c]].sort((a, b) => b.n - a.n));
+  if (z.zone === 'ship' && pl.ship) return { why: pick(['Drop on the water where the ship should go', 'Отпустите на воде, куда плыть']), soft: true };
+  if (pl.ship && c in Core.reach(card, 'ship') && D.terrain[c] === 'ocean') out.push({ c: 'play', card, a: 'moveShip', cell: c });
+  if (pl.inf && c in Core.reach(card, 'infantry')) out.push({ c: 'play', card, a: 'moveInfantry', cell: c });
+  if (out.length) return { list: out };
+  const col = Core.colonyAt(c);
+  if (col?.owner === me && pl.home.length) return { list: pl.home.filter((o) => o.a !== 'build'), ask: true };
+  if (Core.settlementAt(c)) return { why: pick(['Too far: bring the ship or infantry next to it', 'Далеко: подведите корабль или пехоту']) };
+  return { why: pick(['Out of reach this turn', 'Вне досягаемости']) };
+}
+const change = (o) => preview(o).rows.map((q) => `<span class="ch">${q.to - q.from > 0 ? '+' : ''}${Number.isFinite(q.to - q.from) ? q.to - q.from : `${q.from} ▸ ${q.to}`} ${icon(q.icon, 20)}</span>`).join('');
+function tell(x, y, v, z) {
+  const s = $('say');
+  if (!v || (!v.list?.length && !v.why)) { s.hidden = true; return; }
+  s.className = 'say' + (v.list?.length ? '' : ' no');
+  if (v.list?.length) { const names = [...new Set(v.list.map((o) => pick(Core.ACT[o.a])))]; s.innerHTML = v.list.length === 1 || (names.length === 1 && !v.ask) ? `<h3>${names[0]}${preview(v.list[0]).where ? `: ${preview(v.list[0]).where.toLowerCase()}` : ''}</h3>${v.list.map(change).join('')}` : `<h3>${names.join(pick([' or ', ' или ']))}</h3>`; } else s.textContent = v.why;
+  s.hidden = false; s.style.left = `${Math.min(innerWidth - 120, Math.max(120, x))}px`; s.style.top = `${Math.max(70, y - 58)}px`;
+}
+function zoneAt(x, y) {
+  for (const e of document.elementsFromPoint(x, y)) {
+    const z = e.closest('[data-zone]');
+    if (!z) continue;
+    if (z.dataset.zone === 'europe') return { zone: 'europe', el: z }; if (z.dataset.zone === 'lot') return { zone: 'lot', lot: +z.dataset.lot, el: z }; if (z.dataset.zone === 'who') return { zone: 'who', card: z.dataset.who, el: z };
+    return { zone: z.dataset.zone, cell: +z.dataset.cell, el: z };
+  }
+  return null;
+}
+const hit = (a, b) => a && b && a.zone === b.zone && a.cell === b.cell && a.lot === b.lot && a.card === b.card;
+function hover(x, y) { const z = zoneAt(x, y); if (!hit(z, S.over)) { document.querySelectorAll('.over').forEach((e) => e.classList.remove('over')); z?.el.classList?.add('over'); S.over = z; marks(); } tell(x, y, verbs(S.card, z), z); }
+function drop(x, y) {
+  const z = zoneAt(x, y), v = verbs(S.card, z);
+  $('say').hidden = true;
+  if (!v?.list?.length) return z && z.zone !== 'who' ? shake() : clear();
+  if (v.list.length === 1) return commit(v.list[0]);
+  const p = $('pick');
+  p.innerHTML = v.list.map((o) => { const q = preview(o), im = o.building ? art.building(o.building) : o.a === 'docks' ? art.building('docks') : null; return `<button class="${im ? 'im' : ''}" data-pick='${JSON.stringify(o)}'>${im ? `<img src="${im}" alt="">` : ''}${im && q.where ? q.where : pick(Core.ACT[o.a])}${change(o)}</button>`; }).join('');
+  p.hidden = false; p.style.left = `${Math.min(innerWidth - 290, Math.max(290, x))}px`; p.style.top = `${Math.max(150, y - 20)}px`;
+}
+function shake() { const w = document.querySelector('.who.sel'); w?.animate([{ transform: 'translateX(0) translateY(-14px)' }, { transform: 'translateX(-7px) translateY(-14px)' }, { transform: 'translateX(7px) translateY(-14px)' }, { transform: 'translateX(0) translateY(-14px)' }], 220); }
+function clear() { S.card = S.over = null; $('pick').hidden = true; $('say').hidden = true; paint(); }
+function commit(o) { perform(o); S.card = S.over = null; $('pick').hidden = true; build(); paint(); }
+/* ---- painting ---- */
+function marks() {
+  const o = [], pl = S.card ? byPlace(S.card) : null;
+  if (pl) {
+    const reach = {}; if (pl.ship) Object.assign(reach, Core.reach(S.card, 'ship')); if (pl.inf) Object.assign(reach, Core.reach(S.card, 'infantry'));
+    let d = ''; for (const k of Object.keys(reach)) { const c = +k, [x, y] = at(c), inn = (q) => q in reach || q === P.ship || q === P.inf; if (!inn(c - W)) d += `M${x} ${y}h64`; if (!inn(c + W)) d += `M${x} ${y + 64}h64`; if (!inn(c - 1)) d += `M${x} ${y}v64`; if (!inn(c + 1)) d += `M${x + 64} ${y}v64`; }
+    o.push(`<path d="${d}" stroke="#fff2c9" stroke-width="3.500" stroke-opacity=".75" stroke-dasharray="3 9" stroke-linecap="round" fill="none"/>`);
+    for (const [c, list] of Object.entries(pl.cells)) { const [x, y] = at(+c), w = list.length * 36; o.push(`<rect x="${x + 5}" y="${y + 5}" width="54" height="54" rx="16" fill="#ffe08a" fill-opacity=".24" stroke="#ffe08a" stroke-width="3"/><g transform="translate(${x + 32} ${y + 34}) scale(1 1.4)"><rect x="${-w / 2}" y="-13" width="${w}" height="26" rx="13" fill="#f9f2e0"/>${list.map((b, i) => `<svg x="${-w / 2 + 4 + i * 36}" y="-9" width="18" height="18" viewBox="0 0 24 24">${Core.SHAPES[ico(b.icon)]}</svg><text x="${-w / 2 + 24 + i * 36}" y="6" font-size="17" font-weight="800" fill="#1b2829">${b.n}</text>`).join('')}</g>`); }
+    if (S.over && S.over.cell !== undefined) { const [x, y] = at(S.over.cell), ok = verbs(S.card, S.over)?.list?.length; o.push(`<rect x="${x + 2}" y="${y + 2}" width="60" height="60" rx="14" fill="#fff" fill-opacity="${ok ? 0.35 : 0.1}" stroke="#fff" stroke-width="${ok ? 5 : 2}"/>`); }
+  } else D.bonus.forEach((b, c) => { if (!b) return; const [x, y] = at(c); o.push(`<g transform="translate(${x + 50} ${y + 50}) scale(1 1.22)"><circle r="10" fill="#f9f2e0" fill-opacity=".92"/><svg x="-7.500" y="-7.500" width="15" height="15" viewBox="0 0 24 24">${Core.SHAPES[ico(b)]}</svg></g>`); });
+  for (let c = 0; c < W * W; c++) { const [x, y] = at(c); o.push(`<rect x="${x}" y="${y}" width="64" height="64" fill="#000" fill-opacity="0" data-zone="cell" data-cell="${c}"/>`); }
+  svg.innerHTML = o.join('');
+}
+const SKY = [['#f2b8a0', '#fde6c0', '#f5dfc6', 0], ['#a9cfe0', '#fbeccb', '#e6ebdd', 0], ['#8cc6de', '#f1eedc', '#dbe9e4', 0], ['#7fc0de', '#e7f0ea', '#d3e6e6', 0], ['#86c2db', '#efedd6', '#d8e6df', 0], ['#8fbdd2', '#f6e2b4', '#e0e2d2', 0.02], ['#9fb0c4', '#f7cf92', '#e6d3b6', 0.06], ['#8d8fb0', '#f3a86d', '#dcb394', 0.16], ['#5f5f88', '#d8704f', '#b57f72', 0.3], ['#37344f', '#8f3a33', '#6e4b55', 0.46]];
+let had = [];
+function paint() {
+  document.body.className = S.lean ? `lean-${S.lean}` : '';
+  const sky = SKY[S.year - 1], r = document.documentElement.style; r.setProperty('--sky1', sky[0]); r.setProperty('--sky2', sky[1]); r.setProperty('--haze', sky[2]); r.setProperty('--dim', sky[3]);
+  const f = (S.year - 0.5) / 10; $('sun').style.left = `${8 + f * 84}%`; $('sun').style.top = `${78 - Math.sin(f * Math.PI) * 62}%`; $('sun').style.background = S.year > 7 ? '#ff9a5c' : '#fff3c4';
+  const yr = 1620 + (S.year - 1) * 20, ref = Math.round(D.ref * (S.year / D.round) ** 1.15);
+  $('year').innerHTML = `${yr}<small>${t('tax')} ${D.track[S.year - 1]} ${icon('gold', 18)}</small>`;
+  $('fleet').innerHTML = `<b>${ref}</b>` + Array.from({ length: Math.min(90, ref) }, (_, i) => { const a = Core.rnd(i, 3), b = Core.rnd(5, i), s = 15 + b * 17; return `<svg style="left:${(a * 96).toFixed(1)}%;bottom:${((1 - b) * 22).toFixed(0)}px;z-index:${Math.round(b * 20)}" width="${s}" height="${s}" viewBox="0 0 24 24"><path d="M3 17h18l-3 5H6Z" fill="#3b1512"/><path d="M11 16V2M6 5q6-2 10 0 2 5 0 9-5-2-10 0 2-4 0-9Z" fill="#cf3a29" stroke="#8e1f14" stroke-width=".8"/></svg>`; }).join('');
+  $('ground').style.backgroundImage = `url(${art.nation(P.nation)})`;
+  const pl = S.card ? byPlace(S.card) : null, heap = Core.RES.flatMap((q) => Array(P.wh[q]).fill(q)), seen = {};
+  const people = P.hand.length ? P.hand.map((c) => `<button class="who${S.card === c ? ' sel' : ''}${S.drag === c ? ' drag' : ''}${pl && c !== S.card && pl.hand.some((o) => o.other === c) ? '' : ''}" data-zone="who" data-who="${c}"><img src="${art.agent(c)}" alt="" draggable="false"><small>${Core.traits(c)[0] || ''}</small><span>${pick(D.agents[c])}</span></button>`).join('') + `<button class="pass" data-pass>${t('pass')}</button>` : `<span class="rest">${pick(['Your round is over', 'Ваш тур окончен'])}</span>`;
+  $('front').innerHTML = `<div class="store"><div class="heap" title="${t('warehouse')}">${heap.map((q) => { seen[q] = (seen[q] || 0) + 1; return `<span class="${had.length && seen[q] > had.filter((x) => x === q).length ? 'new' : ''}">${icon(q, 34)}</span>`; }).join('')}${Array.from({ length: Math.max(0, D.cap - heap.length) }, () => '<i class="gap"></i>').join('')}</div><div class="purse">${['gold', 'bells', 'crosses'].map((k) => `<span title="${t(k)}">${icon(k, 28)}${P[k]}</span>`).join('')}</div></div><div class="people">${people}</div><div class="lots">${Array.from({ length: 6 }, (_, i) => { const b = P.buildings[i], can = pl && (b ? pl.home.some((o) => (o.a === 'work' && o.building === b) || (o.a === 'docks' && b === 'docks')) : pl.home.some((o) => o.a === 'build')); return `<div class="lot${b ? '' : ' empty'}${can ? ' can' : ''}" data-zone="lot" data-lot="${i}" ${b ? `title="${pick(D.buildings[b])}"` : ''}>${b ? `<img src="${art.building(b)}" alt="" draggable="false"><span>${pick(D.buildings[b])}</span>` : ''}</div>`; }).join('')}</div>`;
+  had = heap;
+  $('fathers').innerHTML = P.fathers.map((x) => `<div class="soul"><img src="${art.father(x)}" alt=""><span>${pick(D.fathers[x])}</span></div>`).join('');
+  $('eu').innerHTML = `<div class="stall">${Core.RES.map((q) => `${icon(q, 28)}<span class="p">${[1, 2, 3, 4, 5].map((n) => `<i class="${n <= D.price[q] ? 'on' : ''}"></i>`).join('')}</span>`).join('')}</div><div class="shelf"><div class="grp"><h3>${t('pier')}</h3><div class="quay">${D.pier.map(([x]) => `<div class="soul${D.agents[x].price > P.gold ? ' dear' : ''}"><img src="${art.agent(x)}" alt=""><b>${icon('gold', 17)}${D.agents[x].price}</b><span>${pick(D.agents[x])}</span></div>`).join('')}</div></div></div><div class="grp"><h3>${t('salon')}</h3><div class="quay">${D.salon.map((x) => `<div class="soul${D.fathers[x].bells > P.bells ? ' dear' : ''}"><img src="${art.father(x)}" alt=""><b>${icon('bells', 17)}${D.fathers[x].bells}</b><span>${pick(D.fathers[x]).split(' ').at(-1)}</span></div>`).join('')}</div></div>`;
+  $('ctl').innerHTML = `<button class="undo" data-undo ${Rich.history.length ? '' : 'hidden'}>${t('undo')}</button>${S.lean ? `<button data-lean="">${t('map')}</button>` : `<button data-lean="eu">${t('europe')}</button><button data-lean="home">${t('colony')}</button>`}<label>${pick(['Years', 'Годы'])}<input type="range" min="1" max="10" value="${S.year}" id="years"></label><button data-lang>${Core.lang() === 'ru' ? 'EN' : 'RU'}</button>`;
+  document.querySelectorAll('.sp').forEach((e) => { const x = things[+e.dataset.i], c = x.cell; e.classList.toggle('can', !!pl && ((x.cls === 'vil' && !!pl.villages[c]) || (x.cls === 'col' && Core.colonyAt(c)?.owner === me && pl.home.length > 0) || (x.data === 'ship' && !!pl.ship))); });
+  marks(); war(); setTimeout(place, 470); place();
+}
+function war() {
+  const w = $('war'); if (!S.war) { w.classList.remove('on'); return; } w.classList.add('on');
+  const n = D.war.sieges.length, x = D.war.sieges[S.siege];
+  const head = `<header><div><h2>${t('war')}</h2>${t('tactic')}: <b>${pick(D.names.tactics[D.war.tactic])}</b>. ${t('loyalist')}: <b>${Panels.name(D.war.loyalist)}</b></div><button data-endwar>${t('back')}</button></header>`;
+  const label = (q) => ({ ref: t('ref'), tactic: t('tactic'), 'loyalist cards': t('loyalist'), colony: t('colony'), terrain: t('terrain'), tokens: pick(['Ship and infantry', 'Корабль и пехота']), army: pick(['Soldiers', 'Солдаты']), support: pick(['Militia and allies', 'Ополчение и союзники']) })[q] || (D.buildings[q] ? pick(D.buildings[q]) : q);
+  const rank = (e, cls) => `<div class="rank ${cls}"><b class="big">${e.total}</b>${e.parts.map((q) => `<div class="line"><span class="men">${'<i></i>'.repeat(Math.min(40, Math.max(0, q.value)))}</span><span>${label(q.label)}</span></div>`).join('')}</div>`;
+  const body = S.siege < n ? `<div class="field">${rank(x.attack, 'l')}<div class="mid"><span class="em" style="--c:${D.players[x.owner].color}"><img src="${art.emblem(D.players[x.owner].nation)}" alt=""></span><h3>${Panels.name(x.owner)}</h3><div class="throw">${(x.dice || []).map((d) => `<i class="${d === 4 || d === 5 ? 'hit' : ''}">${d}</i>`).join('')}</div><div class="verdict">${x.fell ? t('falls') : t('holds')}</div></div>${rank(x.defence, 'r')}</div>` : `<div class="score">${D.war.result.players.slice().sort((a, b) => b.qualifies - a.qualifies || b.score - a.score).map((q) => `<div class="${q.qualifies ? '' : 'out'}"><span class="em" style="--c:${D.players[q.player].color}"><img src="${art.emblem(D.players[q.player].nation)}" alt=""></span><span>${Panels.name(q.player)} <small>${t(q.side).toLowerCase()}</small></span><span>${q.colonies} ${pick(['colonies kept', 'колоний удержано'])}</span><b>${q.score}</b></div>`).join('')}</div>`;
+  w.innerHTML = head + body + `<footer><button data-step="-1">${t('back')}</button><span class="dots">${D.war.sieges.map((q, i) => `<i class="${i === S.siege ? 'on' : ''}${q.fell ? ' fell' : ''}" style="--c:${D.players[q.owner].color}"></i>`).join('')}</span><button data-step="1">${S.siege < n - 1 ? pick(['Next colony', 'Следующая']) : S.siege === n - 1 ? t('result') : pick(['Again', 'Сначала'])}</button></footer>`;
+}
+/* ---- input ---- */
+let press = null;
+addEventListener('pointerdown', (e) => {
+  const w = e.target.closest('[data-who]');
+  if (w && e.button === 0) { press = { card: w.dataset.who, x: e.clientX, y: e.clientY, on: false }; return; }
+  if (e.target.closest('#sea,.sp') && !S.card) press = { pan: true, x: e.clientX, y: e.clientY, cx: cam.x, cy: cam.y, on: false };
+});
+addEventListener('pointermove', (e) => {
+  if (press?.card) {
+    if (!press.on && Math.hypot(e.clientX - press.x, e.clientY - press.y) > 7) { press.on = true; S.card = S.drag = press.card; $('pick').hidden = true; paint(); const g = document.createElement('div'); g.className = 'ghost'; g.innerHTML = `<img src="${art.agent(press.card)}" alt="">`; document.body.append(g); press.g = g; }
+    if (press.on) { press.g.style.left = `${e.clientX}px`; press.g.style.top = `${e.clientY}px`; hover(e.clientX, e.clientY); }
+  } else if (press?.pan) { const dx = e.clientX - press.x, dy = e.clientY - press.y; if (Math.hypot(dx, dy) > 4) press.on = true; if (press.on) { cam.x = Math.min(900, Math.max(120, press.cx - dx / cam.z)); cam.y = Math.min(940, Math.max(120, press.cy - (dy * 1.5) / cam.z)); aim(); } }
+  else if (S.card && $('pick').hidden) hover(e.clientX, e.clientY);
+  else if (!S.card) { const z = zoneAt(e.clientX, e.clientY), v = z && z.cell !== undefined && Core.settlementAt(z.cell), c = z && z.cell !== undefined && Core.colonyAt(z.cell); const s = $('say'); if (v || (c && c.owner !== me)) { s.className = 'say'; s.innerHTML = v ? `<h3>${pick(D.names.tribes[v.tribe])}</h3>${icon('people', 18)} ${v.pop}. ${v.hostility >= 4 ? t('raid') : v.hostility === 3 ? t('calm') : t('gift')}` : `<h3>${Panels.name(c.owner)}</h3>${D.players[c.owner].score} ${t('score')}, ${D.players[c.owner].bells} ${icon('bells', 17)}`; s.hidden = false; s.style.left = `${e.clientX}px`; s.style.top = `${Math.max(90, e.clientY - 46)}px`; } else s.hidden = true; }
+});
+addEventListener('pointerup', (e) => {
+  const p = press; press = null;
+  if (p?.card) { p.g?.remove(); S.drag = null; if (p.on) { const before = S.card; drop(e.clientX, e.clientY); if (S.card === before && $('pick').hidden) clear(); } else { S.card = S.card === p.card ? null : p.card; $('pick').hidden = true; $('say').hidden = true; paint(); } return; }
+  if (p?.on) return;
+  const q = (s) => e.target.closest(s);
+  if (q('button') || q('input') || q('.pickr')) return;
+  if (S.card) return drop(e.clientX, e.clientY);
+  if (q('[data-war]')) { S.war = true; S.siege = 0; return paint(); }
+  if (q('#sky') && !S.lean) { S.lean = 'eu'; return paint(); }
+  if (q('.lot') && !S.lean) { S.lean = 'home'; return paint(); }
+});
+document.addEventListener('click', (e) => { const q = (s) => e.target.closest(s); let x; if ((x = q('[data-pick]'))) commit(JSON.parse(x.dataset.pick)); else if (q('[data-undo]')) { undo(); S.card = null; build(); paint(); } else if ((x = q('[data-lean]'))) { S.lean = x.dataset.lean; paint(); } else if (q('[data-lang]')) { document.documentElement.lang = Core.lang() === 'ru' ? 'en' : 'ru'; build(); paint(); } else if (q('[data-pass]')) { P.hand.splice(0); clear(); } else if ((x = q('[data-step]'))) { S.siege = Math.max(0, S.siege + +x.dataset.step); if (S.siege > D.war.sieges.length) S.siege = 0; war(); } else if (q('[data-endwar]')) { S.war = false; paint(); } });
+document.addEventListener('input', (e) => { if (e.target.id === 'years') { S.year = +e.target.value; paint(); $('years').focus(); } });
+sea.addEventListener('wheel', (e) => { e.preventDefault(); cam.z = Math.min(2.6, Math.max(0.95, cam.z * Math.exp(-e.deltaY * 0.0012))); aim(); }, { passive: false });
+addEventListener('keydown', (e) => { if (e.key === 'Escape') { if (S.war) { S.war = false; paint(); } else if (S.card) clear(); else if (S.lean) { S.lean = ''; paint(); } } if (/^[1-9]$/.test(e.key) && P.hand[+e.key - 1]) { S.card = P.hand[+e.key - 1]; paint(); } });
+addEventListener('resize', place);
+aim(); build(); paint(); Rich.drawRich(canvas, { K: 1.5, tall: 1.55, europe: false }).then(() => { const d = canvas.getContext('2d').getImageData(20, 20, 60, 60).data; let c = [0, 0, 0]; for (let i = 0; i < d.length; i += 4) for (let k = 0; k < 3; k++) c[k] += d[i + k]; const col = `rgb(${c.map((v) => Math.round(v / (d.length / 4)))})`; plane.querySelector('.deep').style.background = col; document.documentElement.style.setProperty('--sea', col); });
+// Keep the sprites on their places while the scene opens or closes.
+let until = 0; const follow = () => { place(); if (performance.now() < until) requestAnimationFrame(follow); };
+for (const e of ['transitionrun', 'transitionend']) document.addEventListener(e, (ev) => { if (ev.target === sea || ev.target === $('sky')) { until = performance.now() + 600; follow(); } });
+</script></body></html>

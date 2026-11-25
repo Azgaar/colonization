@@ -35,6 +35,17 @@
 | DD-29 | One action moves both ship and infantry only through embarking or disembarking |
 | DD-30 | Solo is won by keeping a colony |
 | DD-31 | Working in docks includes the cell's fish bonus (+1), and a fisherman adds +1 more |
+| DD-32 | Balance is not needed now; first check that the systems work in general |
+| DD-33 | Interface follows direction B, painted world. A and C are abandoned (kept in `prototypes/archive`) |
+| DD-34 | Nation emblems are white on the nation's colour, with shadow and texture |
+| DD-35 | B2's look is preferred. Map at least 80% of the screen in map view; colony west, Europe east |
+| DD-36 | Dragging an agent shows every possible action, off the map as well |
+| DD-37 | The King's army must be readable as an exact number. The war needs no full screen of its own |
+| DD-38 | Keep B2's large agent cards, full-screen Colony and Europe views, and Governors view |
+| DD-39 | Placed agents stay visible where they were placed until the round ends |
+| DD-40 | Warehouse and hold goods are both shown as heaps of goods. Dragging an agent never moves the camera |
+| DD-41 | Europe is not drawn as a place. The outer ring of cells on all four sides is marked as Europe cells, as in DD-12, and water fills the whole screen beyond it |
+| DD-42 | Colony preview at the left shows its goods, Europe preview at the right shows prices and the pier. Options are in their own menu |
 
 ## Proposed in this PRD, awaiting confirmation
 
@@ -47,6 +58,7 @@
 | PD-6 | Code identifiers in English, from `nickname` | Already in the workbook | Low |
 | PD-7 | Bots are conventional AI, not LLMs | Thousands of reproducible games are needed | Low |
 | PD-8 | Two rulesets, `board` and `pc`, with conversion labels; each `pc` change is promoted or dropped (PRD section 5) | Puts DD-10 into practice | Low |
+| PD-9 | B7 in `prototypes/` (B2 with the chosen ideas from B3–B6) and B8, the same with a tilted map | Design still iterating; nothing built yet | High after the interface is built |
 
 ## Open questions
 

@@ -290,12 +290,14 @@ Each milestone ends with something the designer can use.
 |---|---|---|---|
 | M0 | Specification | This document set, reviewed | Open questions in `decisions.md` answered or defaults accepted |
 | M1 (built) | Engine | Import, full `board` ruleset, random bot, replay | Every rule ID has a test; every card effect has a test; 10,000 random games clean at 1–5 players |
-| M2 | Evidence | Goal-driven bots, tuning, batch runner, first balance report | Tuned bots beat random bots in over 95% of two-player games; hypotheses H1–H13 each have a first verdict |
+| M2 (tools built, evidence deferred) | Evidence | Goal-driven bots, tuning, batch runner, first balance report | Tuned bots beat random bots in over 95% of two-player games; hypotheses H1–H13 each have a first verdict |
 | M3 | Playable | Full interface, replay viewer, art, both languages | A person completes solo and four-player games with no console; simulated games open as replays |
 | M4 | Design bench | Search AI, tweak panel, sweeps, sandbox, hot-seat | Search bot beats tuned bots significantly; designer completes a tweak-test-export cycle unaided |
 | M5 | Rule changes and polish | Convertible PC rule changes, promotion to `board`, tutorial, sound, optional desktop package | Agreed separately after M4 |
 
 M1 status (2026-11-25): all rule IDs and cards have tests; 20,000 random games at 1–5 players and 2,000 with alternative settings ran without failures. Not checked yet: identical results in a browser (no browser build exists), English card texts beyond names and option labels.
+
+M2 status (2026-11-25): goal-driven bots, eight personalities, war solver, batch runner, metrics, paired comparisons and self-play tuning work; see [system-check.md](system-check.md). **Not met:** bots are weaker than the designer's recorded solo games, so the exit criteria (95% against random bots, verdicts on H1–H13) are open. The designer asked to check that systems work first and leave balance for later.
 
 M2 comes before the interface on purpose. Balance evidence is the main reason to build this, and it may change rules that the interface would otherwise be designed around.
 

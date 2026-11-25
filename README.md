@@ -7,8 +7,9 @@ Digital version and test bench for the board game. Start with [docs/PRD.md](docs
 | `docs/` | Requirements, rules specification, decisions |
 | `packages/data` | Import of `Colonization.xlsx`, card effects (`src/effects.ts`), settings (`src/settings.ts`) |
 | `packages/engine` | Rules engine: no interface, no I/O, seeded randomness |
-| `packages/bots` | AI players (random so far) |
+| `packages/bots` | AI players: random, and goal-driven with personalities |
 | `packages/lab` | Playing many games |
+| `prototypes/` | Interface iterations B1–B8 on one real position. Serve the folder and open `index.html` |
 | `rulesets/` | `board` (reference), `pc` (convertible changes), `alternatives` (sandbox) |
 
 `assets/` and `components/` are kept out of git.
@@ -22,6 +23,9 @@ Digital version and test bench for the board game. Start with [docs/PRD.md](docs
 | `pnpm data:review` | Accept changed card texts, after checking `effects.ts` against them |
 | `pnpm test` | All tests |
 | `pnpm fuzz 10000` | Random games with every check on |
+| `pnpm systems 400` | Bot games that list which systems and cards were exercised |
+| `pnpm watch seed 3 trader,rebel` | One game as text |
+| `pnpm tune`, `pnpm experiments` | Self-play tuning and balance experiments (bots are not strong enough yet to trust the numbers) |
 | `pnpm check` | Import, type check and tests |
 
 ## Changing numbers
