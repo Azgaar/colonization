@@ -1,0 +1,23 @@
+{
+  "name": "colonization",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "data:import": "node packages/data/src/cli.ts",
+    "data:review": "node packages/data/src/cli.ts --review",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "fuzz": "node packages/lab/src/fuzz.ts",
+    "check": "pnpm data:import && pnpm typecheck && pnpm test"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.10",
+    "fast-check": "^4.11.0",
+    "read-excel-file": "^9.3.20",
+    "typescript": "^7.0.2",
+    "vitest": "^5.1.2"
+  }
+}

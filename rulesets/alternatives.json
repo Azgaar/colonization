@@ -1,0 +1,9 @@
+{
+  "id": "alternatives", "title": "Sandbox: every unclear rule read the other way", "sandbox": true,
+  "overrides": [{ "id": "all", "why": "robustness of the engine", "set": {
+    "settings.activation.giftMaxHostility": 1, "settings.activation.raidMinHostility": 3, "settings.activation.gift": 2, "settings.natives.preachMin": 1,
+    "settings.fort.replacesStockade": false, "settings.damage.sendsToEurope": false, "settings.ring.openSea": 0, "settings.market.maxPrice": 9,
+    "settings.propaganda.maxFathers": 1, "settings.cargo.costPer": "unit", "settings.combat.countPlayedCard": false, "settings.combat.supportFromCriminalSlave": false,
+    "settings.combat.diceCap": 10, "settings.europe.safe": false, "settings.explore.diagonal": true, "settings.production.emptyMeans": "noForeignToken",
+    "settings.war.refStrengthIncludesTactic": false, "settings.hire.max": 1 } }]
+}

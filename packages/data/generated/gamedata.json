@@ -1,0 +1,7829 @@
+{
+ "schema": 1,
+ "sourceHash": "fbfc7f4c59af896f",
+ "resources": {
+  "food": {
+   "id": "food",
+   "ru": "еда",
+   "en": "Food",
+   "price": 1
+  },
+  "timber": {
+   "id": "timber",
+   "ru": "древесина",
+   "en": "Timber",
+   "price": 1
+  },
+  "crops": {
+   "id": "crops",
+   "ru": "сырьё",
+   "en": "Crops",
+   "price": 3
+  },
+  "goods": {
+   "id": "goods",
+   "ru": "товары",
+   "en": "Goods",
+   "price": 5
+  },
+  "silver": {
+   "id": "silver",
+   "ru": "серебро",
+   "en": "Silver",
+   "price": 5
+  }
+ },
+ "terrain": {
+  "ocean": {
+   "id": "ocean",
+   "ru": "океан",
+   "en": "Ocean",
+   "yields": [
+    "fish"
+   ],
+   "defence": 0,
+   "move": 1
+  },
+  "forest": {
+   "id": "forest",
+   "ru": "лес",
+   "en": "Forest",
+   "yields": [
+    "timber",
+    "fur"
+   ],
+   "defence": 1,
+   "move": 2
+  },
+  "grassland": {
+   "id": "grassland",
+   "ru": "луг",
+   "en": "Grassland",
+   "yields": [
+    "corn",
+    "leaf"
+   ],
+   "defence": 0,
+   "move": 1
+  },
+  "mountains": {
+   "id": "mountains",
+   "ru": "горы",
+   "en": "Mountains",
+   "yields": [
+    "silver"
+   ],
+   "defence": 2,
+   "move": "all"
+  },
+  "desert": {
+   "id": "desert",
+   "ru": "пустыня",
+   "en": "Desert",
+   "yields": [],
+   "defence": 0,
+   "move": 2
+  },
+  "tundra": {
+   "id": "tundra",
+   "ru": "тундра",
+   "en": "Tundra",
+   "yields": [],
+   "defence": 0,
+   "move": 2
+  }
+ },
+ "agents": {
+  "criminal": {
+   "id": "criminal",
+   "base": "criminal",
+   "ru": "Преступник",
+   "en": "Criminal",
+   "kind": "common",
+   "unique": false,
+   "copies": 2,
+   "edu": 0,
+   "price": 0,
+   "mods": [
+    {
+     "mod": "onlyProduce"
+    }
+   ]
+  },
+  "slave": {
+   "id": "slave",
+   "base": "slave",
+   "ru": "Раб",
+   "en": "Slave",
+   "kind": "common",
+   "unique": false,
+   "copies": 2,
+   "edu": 0,
+   "price": 3,
+   "mods": [
+    {
+     "mod": "onlyProduce"
+    },
+    {
+     "mod": "production",
+     "add": 1
+    }
+   ]
+  },
+  "colonist": {
+   "id": "colonist",
+   "base": "colonist",
+   "ru": "Колонист",
+   "en": "Colonist",
+   "kind": "common",
+   "unique": false,
+   "copies": 2,
+   "edu": 1,
+   "price": 2,
+   "mods": []
+  },
+  "fisherman": {
+   "id": "fisherman",
+   "base": "fisherman",
+   "ru": "Рыбак",
+   "en": "Fisherman",
+   "kind": "common",
+   "unique": false,
+   "copies": 2,
+   "edu": 1,
+   "price": 3,
+   "mods": [
+    {
+     "mod": "production",
+     "icons": [
+      "fish"
+     ],
+     "add": 1
+    }
+   ]
+  },
+  "farmer": {
+   "id": "farmer",
+   "base": "farmer",
+   "ru": "Фермер",
+   "en": "Farmer",
+   "kind": "common",
+   "unique": false,
+   "copies": 2,
+   "edu": 1,
+   "price": 3,
+   "mods": [
+    {
+     "mod": "production",
+     "icons": [
+      "corn"
+     ],
+     "add": 1
+    }
+   ]
+  },
+  "lumberjack": {
+   "id": "lumberjack",
+   "base": "lumberjack",
+   "ru": "Лесоруб",
+   "en": "Lumberjack",
+   "kind": "common",
+   "unique": false,
+   "copies": 2,
+   "edu": 1,
+   "price": 3,
+   "mods": [
+    {
+     "mod": "production",
+     "icons": [
+      "timber"
+     ],
+     "add": 1
+    }
+   ]
+  },
+  "miner": {
+   "id": "miner",
+   "base": "miner",
+   "ru": "Рудокоп",
+   "en": "Miner",
+   "kind": "common",
+   "unique": false,
+   "copies": 2,
+   "edu": 1,
+   "price": 3,
+   "mods": [
+    {
+     "mod": "production",
+     "icons": [
+      "silver"
+     ],
+     "add": 1
+    }
+   ]
+  },
+  "scout": {
+   "id": "scout",
+   "base": "scout",
+   "ru": "Скаут",
+   "en": "Scout",
+   "kind": "common",
+   "unique": false,
+   "copies": 2,
+   "edu": 1,
+   "price": 4,
+   "mods": [
+    {
+     "mod": "move",
+     "token": "infantry",
+     "add": 2
+    },
+    {
+     "mod": "ignoreSkull"
+    },
+    {
+     "mod": "negotiator"
+    }
+   ]
+  },
+  "sailor": {
+   "id": "sailor",
+   "base": "sailor",
+   "ru": "Матрос",
+   "en": "Sailor",
+   "kind": "common",
+   "unique": false,
+   "copies": 2,
+   "edu": 1,
+   "price": 4,
+   "mods": [
+    {
+     "mod": "move",
+     "token": "ship",
+     "add": 2
+    }
+   ]
+  },
+  "builder": {
+   "id": "builder",
+   "base": "builder",
+   "ru": "Строитель",
+   "en": "Builder",
+   "kind": "common",
+   "unique": false,
+   "copies": 2,
+   "edu": 1,
+   "price": 4,
+   "mods": [
+    {
+     "mod": "cost",
+     "of": "build",
+     "add": -1
+    }
+   ]
+  },
+  "preacher": {
+   "id": "preacher",
+   "base": "preacher",
+   "ru": "Проповедник",
+   "en": "Preacher",
+   "kind": "common",
+   "unique": false,
+   "copies": 2,
+   "edu": 1,
+   "price": 4,
+   "mods": [
+    {
+     "mod": "production",
+     "icons": [
+      "crosses"
+     ],
+     "add": 1
+    }
+   ]
+  },
+  "recruiter": {
+   "id": "recruiter",
+   "base": "recruiter",
+   "ru": "Вербовщик",
+   "en": "Recruiter",
+   "kind": "common",
+   "unique": false,
+   "copies": 1,
+   "edu": 1,
+   "price": 4,
+   "mods": [
+    {
+     "mod": "cost",
+     "of": "hire",
+     "add": -1
+    }
+   ]
+  },
+  "priest": {
+   "id": "priest",
+   "base": "priest",
+   "ru": "Священник",
+   "en": "Priest",
+   "kind": "common",
+   "unique": false,
+   "copies": 1,
+   "edu": 2,
+   "price": 6,
+   "mods": [
+    {
+     "mod": "production",
+     "icons": [
+      "crosses"
+     ],
+     "add": 2
+    }
+   ]
+  },
+  "craftsman": {
+   "id": "craftsman",
+   "base": "craftsman",
+   "ru": "Мастер",
+   "en": "Craftsman",
+   "kind": "common",
+   "unique": false,
+   "copies": 2,
+   "edu": 1,
+   "price": 5,
+   "mods": [
+    {
+     "mod": "production",
+     "icons": [
+      "goods"
+     ],
+     "add": 1
+    }
+   ]
+  },
+  "trader": {
+   "id": "trader",
+   "base": "trader",
+   "ru": "Торговец",
+   "en": "Trader",
+   "kind": "common",
+   "unique": false,
+   "copies": 1,
+   "edu": 1,
+   "price": 6,
+   "mods": [
+    {
+     "mod": "sellPrice",
+     "add": 1
+    }
+   ]
+  },
+  "smuggler": {
+   "id": "smuggler",
+   "base": "smuggler",
+   "ru": "Контрабандист",
+   "en": "Smuggler",
+   "kind": "common",
+   "unique": false,
+   "copies": 1,
+   "edu": 0,
+   "price": 4,
+   "mods": [
+    {
+     "mod": "smuggle",
+     "add": -1
+    }
+   ]
+  },
+  "corsair": {
+   "id": "corsair",
+   "base": "corsair",
+   "ru": "Корсар",
+   "en": "Corsair",
+   "kind": "common",
+   "unique": false,
+   "copies": 1,
+   "edu": 0,
+   "price": 5,
+   "mods": [
+    {
+     "mod": "combat",
+     "token": "ship",
+     "add": 2
+    }
+   ]
+  },
+  "cannoneer": {
+   "id": "cannoneer",
+   "base": "cannoneer",
+   "ru": "Канонир",
+   "en": "Cannoneer",
+   "kind": "common",
+   "unique": false,
+   "copies": 2,
+   "edu": 1,
+   "price": 5,
+   "mods": [
+    {
+     "mod": "combat",
+     "token": "ship",
+     "add": 1
+    },
+    {
+     "mod": "bombard"
+    }
+   ]
+  },
+  "soldier": {
+   "id": "soldier",
+   "base": "soldier",
+   "ru": "Солдат",
+   "en": "Soldier",
+   "kind": "common",
+   "unique": false,
+   "copies": 6,
+   "edu": 1,
+   "price": 6,
+   "mods": [
+    {
+     "mod": "combat",
+     "token": "infantry",
+     "add": 2
+    }
+   ]
+  },
+  "dragoon": {
+   "id": "dragoon",
+   "base": "dragoon",
+   "ru": "Драгун",
+   "en": "Dragoon",
+   "kind": "common",
+   "unique": false,
+   "copies": 4,
+   "edu": 2,
+   "price": 8,
+   "mods": [
+    {
+     "mod": "combat",
+     "token": "infantry",
+     "add": 3
+    }
+   ]
+  },
+  "captain": {
+   "id": "captain",
+   "base": "captain",
+   "ru": "Капитан",
+   "en": "Captain",
+   "kind": "common",
+   "unique": false,
+   "copies": 4,
+   "edu": 2,
+   "price": 10,
+   "mods": [
+    {
+     "mod": "combat",
+     "token": "infantry",
+     "add": 3
+    },
+    {
+     "mod": "combat",
+     "token": "ship",
+     "add": 3
+    }
+   ]
+  },
+  "politician": {
+   "id": "politician",
+   "base": "politician",
+   "ru": "Политик",
+   "en": "Politician",
+   "kind": "common",
+   "unique": false,
+   "copies": 4,
+   "edu": 2,
+   "price": 10,
+   "mods": [
+    {
+     "mod": "production",
+     "icons": [
+      "bells"
+     ],
+     "add": 1
+    }
+   ]
+  },
+  "trapper_french": {
+   "id": "trapper_french",
+   "base": "trapper",
+   "ru": "Траппер",
+   "en": "Trapper",
+   "kind": "nation",
+   "unique": true,
+   "nation": "french",
+   "copies": 1,
+   "edu": 2,
+   "price": null,
+   "mods": [
+    {
+     "mod": "production",
+     "icons": [
+      "fur"
+     ],
+     "add": 1,
+     "terrain": "forest",
+     "enables": true
+    }
+   ]
+  },
+  "colonist_french": {
+   "id": "colonist_french",
+   "base": "colonist",
+   "ru": "Колонист",
+   "en": "Colonist",
+   "kind": "nation",
+   "unique": false,
+   "nation": "french",
+   "copies": 1,
+   "edu": 1,
+   "price": null,
+   "mods": []
+  },
+  "preacher_french": {
+   "id": "preacher_french",
+   "base": "preacher",
+   "ru": "Проповедник",
+   "en": "Preacher",
+   "kind": "nation",
+   "unique": false,
+   "nation": "french",
+   "copies": 1,
+   "edu": 1,
+   "price": null,
+   "mods": [
+    {
+     "mod": "production",
+     "icons": [
+      "crosses"
+     ],
+     "add": 1
+    }
+   ]
+  },
+  "sailor_french": {
+   "id": "sailor_french",
+   "base": "sailor",
+   "ru": "Матрос",
+   "en": "Sailor",
+   "kind": "nation",
+   "unique": false,
+   "nation": "french",
+   "copies": 1,
+   "edu": 1,
+   "price": null,
+   "mods": [
+    {
+     "mod": "move",
+     "token": "ship",
+     "add": 2
+    }
+   ]
+  },
+  "soldier_french": {
+   "id": "soldier_french",
+   "base": "soldier",
+   "ru": "Солдат",
+   "en": "Soldier",
+   "kind": "nation",
+   "unique": false,
+   "nation": "french",
+   "copies": 1,
+   "edu": 1,
+   "price": null,
+   "mods": [
+    {
+     "mod": "combat",
+     "token": "infantry",
+     "add": 2
+    }
+   ]
+  },
+  "negotiant_dutch": {
+   "id": "negotiant_dutch",
+   "base": "negotiant",
+   "ru": "Негоциант",
+   "en": "Negotiant",
+   "kind": "nation",
+   "unique": true,
+   "nation": "dutch",
+   "copies": 1,
+   "edu": 2,
+   "price": null,
+   "mods": [
+    {
+     "mod": "sellPrice",
+     "add": 1
+    }
+   ]
+  },
+  "colonist_dutch": {
+   "id": "colonist_dutch",
+   "base": "colonist",
+   "ru": "Колонист",
+   "en": "Colonist",
+   "kind": "nation",
+   "unique": false,
+   "nation": "dutch",
+   "copies": 1,
+   "edu": 1,
+   "price": null,
+   "mods": []
+  },
+  "preacher_dutch": {
+   "id": "preacher_dutch",
+   "base": "preacher",
+   "ru": "Проповедник",
+   "en": "Preacher",
+   "kind": "nation",
+   "unique": false,
+   "nation": "dutch",
+   "copies": 1,
+   "edu": 1,
+   "price": null,
+   "mods": [
+    {
+     "mod": "production",
+     "icons": [
+      "crosses"
+     ],
+     "add": 1
+    }
+   ]
+  },
+  "sailor_dutch": {
+   "id": "sailor_dutch",
+   "base": "sailor",
+   "ru": "Матрос",
+   "en": "Sailor",
+   "kind": "nation",
+   "unique": false,
+   "nation": "dutch",
+   "copies": 1,
+   "edu": 1,
+   "price": null,
+   "mods": [
+    {
+     "mod": "move",
+     "token": "ship",
+     "add": 2
+    }
+   ]
+  },
+  "soldier_dutch": {
+   "id": "soldier_dutch",
+   "base": "soldier",
+   "ru": "Солдат",
+   "en": "Soldier",
+   "kind": "nation",
+   "unique": false,
+   "nation": "dutch",
+   "copies": 1,
+   "edu": 1,
+   "price": null,
+   "mods": [
+    {
+     "mod": "combat",
+     "token": "infantry",
+     "add": 2
+    }
+   ]
+  },
+  "puritan_english": {
+   "id": "puritan_english",
+   "base": "puritan",
+   "ru": "Пуританин",
+   "en": "Puritan",
+   "kind": "nation",
+   "unique": true,
+   "nation": "english",
+   "copies": 1,
+   "edu": 2,
+   "price": null,
+   "mods": [
+    {
+     "mod": "production",
+     "icons": [
+      "crosses"
+     ],
+     "add": 2
+    }
+   ]
+  },
+  "slave_english": {
+   "id": "slave_english",
+   "base": "slave",
+   "ru": "Раб",
+   "en": "Slave",
+   "kind": "nation",
+   "unique": false,
+   "nation": "english",
+   "copies": 1,
+   "edu": 0,
+   "price": null,
+   "mods": [
+    {
+     "mod": "onlyProduce"
+    },
+    {
+     "mod": "production",
+     "add": 1
+    }
+   ]
+  },
+  "colonist_english": {
+   "id": "colonist_english",
+   "base": "colonist",
+   "ru": "Колонист",
+   "en": "Colonist",
+   "kind": "nation",
+   "unique": false,
+   "nation": "english",
+   "copies": 1,
+   "edu": 1,
+   "price": null,
+   "mods": []
+  },
+  "sailor_english": {
+   "id": "sailor_english",
+   "base": "sailor",
+   "ru": "Матрос",
+   "en": "Sailor",
+   "kind": "nation",
+   "unique": false,
+   "nation": "english",
+   "copies": 1,
+   "edu": 1,
+   "price": null,
+   "mods": [
+    {
+     "mod": "move",
+     "token": "ship",
+     "add": 2
+    }
+   ]
+  },
+  "soldier_english": {
+   "id": "soldier_english",
+   "base": "soldier",
+   "ru": "Солдат",
+   "en": "Soldier",
+   "kind": "nation",
+   "unique": false,
+   "nation": "english",
+   "copies": 1,
+   "edu": 1,
+   "price": null,
+   "mods": [
+    {
+     "mod": "combat",
+     "token": "infantry",
+     "add": 2
+    }
+   ]
+  },
+  "navigator_portuguese": {
+   "id": "navigator_portuguese",
+   "base": "navigator",
+   "ru": "Навигатор",
+   "en": "Navigator",
+   "kind": "nation",
+   "unique": true,
+   "nation": "portuguese",
+   "copies": 1,
+   "edu": 2,
+   "price": null,
+   "mods": [
+    {
+     "mod": "move",
+     "token": "ship",
+     "add": 4
+    }
+   ]
+  },
+  "slave_portuguese": {
+   "id": "slave_portuguese",
+   "base": "slave",
+   "ru": "Раб",
+   "en": "Slave",
+   "kind": "nation",
+   "unique": false,
+   "nation": "portuguese",
+   "copies": 1,
+   "edu": 0,
+   "price": null,
+   "mods": [
+    {
+     "mod": "onlyProduce"
+    },
+    {
+     "mod": "production",
+     "add": 1
+    }
+   ]
+  },
+  "colonist_portuguese": {
+   "id": "colonist_portuguese",
+   "base": "colonist",
+   "ru": "Колонист",
+   "en": "Colonist",
+   "kind": "nation",
+   "unique": false,
+   "nation": "portuguese",
+   "copies": 1,
+   "edu": 1,
+   "price": null,
+   "mods": []
+  },
+  "preacher_portuguese": {
+   "id": "preacher_portuguese",
+   "base": "preacher",
+   "ru": "Проповедник",
+   "en": "Preacher",
+   "kind": "nation",
+   "unique": false,
+   "nation": "portuguese",
+   "copies": 1,
+   "edu": 1,
+   "price": null,
+   "mods": [
+    {
+     "mod": "production",
+     "icons": [
+      "crosses"
+     ],
+     "add": 1
+    }
+   ]
+  },
+  "soldier_portuguese": {
+   "id": "soldier_portuguese",
+   "base": "soldier",
+   "ru": "Солдат",
+   "en": "Soldier",
+   "kind": "nation",
+   "unique": false,
+   "nation": "portuguese",
+   "copies": 1,
+   "edu": 1,
+   "price": null,
+   "mods": [
+    {
+     "mod": "combat",
+     "token": "infantry",
+     "add": 2
+    }
+   ]
+  },
+  "conquistador_spanish": {
+   "id": "conquistador_spanish",
+   "base": "conquistador",
+   "ru": "Конкистадор",
+   "en": "Conquistador",
+   "kind": "nation",
+   "unique": true,
+   "nation": "spanish",
+   "copies": 1,
+   "edu": 2,
+   "price": null,
+   "mods": [
+    {
+     "mod": "combat",
+     "token": "infantry",
+     "add": 2
+    },
+    {
+     "mod": "combat",
+     "token": "infantry",
+     "add": 2,
+     "vs": "native"
+    }
+   ]
+  },
+  "colonist_spanish": {
+   "id": "colonist_spanish",
+   "base": "colonist",
+   "ru": "Колонист",
+   "en": "Colonist",
+   "kind": "nation",
+   "unique": false,
+   "nation": "spanish",
+   "copies": 1,
+   "edu": 1,
+   "price": null,
+   "mods": []
+  },
+  "sailor_spanish": {
+   "id": "sailor_spanish",
+   "base": "sailor",
+   "ru": "Матрос",
+   "en": "Sailor",
+   "kind": "nation",
+   "unique": false,
+   "nation": "spanish",
+   "copies": 1,
+   "edu": 1,
+   "price": null,
+   "mods": [
+    {
+     "mod": "move",
+     "token": "ship",
+     "add": 2
+    }
+   ]
+  },
+  "preacher_spanish": {
+   "id": "preacher_spanish",
+   "base": "preacher",
+   "ru": "Проповедник",
+   "en": "Preacher",
+   "kind": "nation",
+   "unique": false,
+   "nation": "spanish",
+   "copies": 1,
+   "edu": 1,
+   "price": null,
+   "mods": [
+    {
+     "mod": "production",
+     "icons": [
+      "crosses"
+     ],
+     "add": 1
+    }
+   ]
+  },
+  "slave_spanish": {
+   "id": "slave_spanish",
+   "base": "slave",
+   "ru": "Раб",
+   "en": "Slave",
+   "kind": "nation",
+   "unique": false,
+   "nation": "spanish",
+   "copies": 1,
+   "edu": 0,
+   "price": null,
+   "mods": [
+    {
+     "mod": "onlyProduce"
+    },
+    {
+     "mod": "production",
+     "add": 1
+    }
+   ]
+  },
+  "settler_swedish": {
+   "id": "settler_swedish",
+   "base": "settler",
+   "ru": "Поселенец",
+   "en": "Settler",
+   "kind": "nation",
+   "unique": true,
+   "nation": "swedish",
+   "copies": 1,
+   "edu": 2,
+   "price": null,
+   "mods": [
+    {
+     "mod": "cost",
+     "of": "build",
+     "add": -1
+    }
+   ]
+  },
+  "soldier_swedish": {
+   "id": "soldier_swedish",
+   "base": "soldier",
+   "ru": "Солдат",
+   "en": "Soldier",
+   "kind": "nation",
+   "unique": false,
+   "nation": "swedish",
+   "copies": 1,
+   "edu": 1,
+   "price": null,
+   "mods": [
+    {
+     "mod": "combat",
+     "token": "infantry",
+     "add": 2
+    }
+   ]
+  },
+  "colonist_swedish": {
+   "id": "colonist_swedish",
+   "base": "colonist",
+   "ru": "Колонист",
+   "en": "Colonist",
+   "kind": "nation",
+   "unique": false,
+   "nation": "swedish",
+   "copies": 1,
+   "edu": 1,
+   "price": null,
+   "mods": []
+  },
+  "preacher_swedish": {
+   "id": "preacher_swedish",
+   "base": "preacher",
+   "ru": "Проповедник",
+   "en": "Preacher",
+   "kind": "nation",
+   "unique": false,
+   "nation": "swedish",
+   "copies": 1,
+   "edu": 1,
+   "price": null,
+   "mods": [
+    {
+     "mod": "production",
+     "icons": [
+      "crosses"
+     ],
+     "add": 1
+    }
+   ]
+  },
+  "planter_danish": {
+   "id": "planter_danish",
+   "base": "planter",
+   "ru": "Плантатор",
+   "en": "Planter",
+   "kind": "nation",
+   "unique": true,
+   "nation": "danish",
+   "copies": 1,
+   "edu": 2,
+   "price": null,
+   "mods": [
+    {
+     "mod": "production",
+     "icons": [
+      "leaf"
+     ],
+     "add": 1,
+     "island": 3,
+     "enables": true
+    }
+   ]
+  },
+  "sailor_danish": {
+   "id": "sailor_danish",
+   "base": "sailor",
+   "ru": "Матрос",
+   "en": "Sailor",
+   "kind": "nation",
+   "unique": false,
+   "nation": "danish",
+   "copies": 1,
+   "edu": 1,
+   "price": null,
+   "mods": [
+    {
+     "mod": "move",
+     "token": "ship",
+     "add": 2
+    }
+   ]
+  },
+  "preacher_danish": {
+   "id": "preacher_danish",
+   "base": "preacher",
+   "ru": "Проповедник",
+   "en": "Preacher",
+   "kind": "nation",
+   "unique": false,
+   "nation": "danish",
+   "copies": 1,
+   "edu": 1,
+   "price": null,
+   "mods": [
+    {
+     "mod": "production",
+     "icons": [
+      "crosses"
+     ],
+     "add": 1
+    }
+   ]
+  },
+  "slave_danish": {
+   "id": "slave_danish",
+   "base": "slave",
+   "ru": "Раб",
+   "en": "Slave",
+   "kind": "nation",
+   "unique": false,
+   "nation": "danish",
+   "copies": 1,
+   "edu": 0,
+   "price": null,
+   "mods": [
+    {
+     "mod": "onlyProduce"
+    },
+    {
+     "mod": "production",
+     "add": 1
+    }
+   ]
+  },
+  "cossack_russian": {
+   "id": "cossack_russian",
+   "base": "cossack",
+   "ru": "Казак",
+   "en": "Cossack",
+   "kind": "nation",
+   "unique": true,
+   "nation": "russian",
+   "copies": 1,
+   "edu": 2,
+   "price": null,
+   "mods": [
+    {
+     "mod": "combat",
+     "token": "infantry",
+     "add": 2
+    },
+    {
+     "mod": "production",
+     "icons": [
+      "fur"
+     ],
+     "add": 2,
+     "terrain": "tundra",
+     "enables": true
+    }
+   ]
+  },
+  "colonist_russian": {
+   "id": "colonist_russian",
+   "base": "colonist",
+   "ru": "Колонист",
+   "en": "Colonist",
+   "kind": "nation",
+   "unique": false,
+   "nation": "russian",
+   "copies": 1,
+   "edu": 1,
+   "price": null,
+   "mods": []
+  },
+  "sailor_russian": {
+   "id": "sailor_russian",
+   "base": "sailor",
+   "ru": "Матрос",
+   "en": "Sailor",
+   "kind": "nation",
+   "unique": false,
+   "nation": "russian",
+   "copies": 1,
+   "edu": 1,
+   "price": null,
+   "mods": [
+    {
+     "mod": "move",
+     "token": "ship",
+     "add": 2
+    }
+   ]
+  },
+  "preacher_russian": {
+   "id": "preacher_russian",
+   "base": "preacher",
+   "ru": "Проповедник",
+   "en": "Preacher",
+   "kind": "nation",
+   "unique": false,
+   "nation": "russian",
+   "copies": 1,
+   "edu": 1,
+   "price": null,
+   "mods": [
+    {
+     "mod": "production",
+     "icons": [
+      "crosses"
+     ],
+     "add": 1
+    }
+   ]
+  },
+  "adventurer_curonian": {
+   "id": "adventurer_curonian",
+   "base": "adventurer",
+   "ru": "Авантюрист",
+   "en": "Adventurer",
+   "kind": "nation",
+   "unique": true,
+   "nation": "curonian",
+   "copies": 1,
+   "edu": 2,
+   "price": null,
+   "mods": [
+    {
+     "mod": "cost",
+     "of": "hire",
+     "add": -2
+    }
+   ]
+  },
+  "soldier_curonian": {
+   "id": "soldier_curonian",
+   "base": "soldier",
+   "ru": "Солдат",
+   "en": "Soldier",
+   "kind": "nation",
+   "unique": false,
+   "nation": "curonian",
+   "copies": 1,
+   "edu": 1,
+   "price": null,
+   "mods": [
+    {
+     "mod": "combat",
+     "token": "infantry",
+     "add": 2
+    }
+   ]
+  },
+  "preacher_curonian": {
+   "id": "preacher_curonian",
+   "base": "preacher",
+   "ru": "Проповедник",
+   "en": "Preacher",
+   "kind": "nation",
+   "unique": false,
+   "nation": "curonian",
+   "copies": 1,
+   "edu": 1,
+   "price": null,
+   "mods": [
+    {
+     "mod": "production",
+     "icons": [
+      "crosses"
+     ],
+     "add": 1
+    }
+   ]
+  },
+  "sailor_curonian": {
+   "id": "sailor_curonian",
+   "base": "sailor",
+   "ru": "Матрос",
+   "en": "Sailor",
+   "kind": "nation",
+   "unique": false,
+   "nation": "curonian",
+   "copies": 1,
+   "edu": 1,
+   "price": null,
+   "mods": [
+    {
+     "mod": "move",
+     "token": "ship",
+     "add": 2
+    }
+   ]
+  },
+  "highlander_scottish": {
+   "id": "highlander_scottish",
+   "base": "highlander",
+   "ru": "Горец",
+   "en": "Highlander",
+   "kind": "nation",
+   "unique": true,
+   "nation": "scottish",
+   "copies": 1,
+   "edu": 2,
+   "price": null,
+   "mods": [
+    {
+     "mod": "combat",
+     "token": "infantry",
+     "add": 1
+    },
+    {
+     "mod": "combat",
+     "token": "infantry",
+     "add": 2,
+     "terrain": "mountains"
+    }
+   ]
+  },
+  "colonist_scottish": {
+   "id": "colonist_scottish",
+   "base": "colonist",
+   "ru": "Колонист",
+   "en": "Colonist",
+   "kind": "nation",
+   "unique": false,
+   "nation": "scottish",
+   "copies": 1,
+   "edu": 1,
+   "price": null,
+   "mods": []
+  },
+  "sailor_scottish": {
+   "id": "sailor_scottish",
+   "base": "sailor",
+   "ru": "Матрос",
+   "en": "Sailor",
+   "kind": "nation",
+   "unique": false,
+   "nation": "scottish",
+   "copies": 1,
+   "edu": 1,
+   "price": null,
+   "mods": [
+    {
+     "mod": "move",
+     "token": "ship",
+     "add": 2
+    }
+   ]
+  },
+  "preacher_scottish": {
+   "id": "preacher_scottish",
+   "base": "preacher",
+   "ru": "Проповедник",
+   "en": "Preacher",
+   "kind": "nation",
+   "unique": false,
+   "nation": "scottish",
+   "copies": 1,
+   "edu": 1,
+   "price": null,
+   "mods": [
+    {
+     "mod": "production",
+     "icons": [
+      "crosses"
+     ],
+     "add": 1
+    }
+   ]
+  },
+  "indian": {
+   "id": "indian",
+   "base": "indian",
+   "ru": "Индеец",
+   "en": "Indian",
+   "kind": "native",
+   "unique": false,
+   "copies": 8,
+   "edu": 0,
+   "price": null,
+   "mods": [
+    {
+     "mod": "production",
+     "icons": [
+      "leaf"
+     ],
+     "add": 1
+    }
+   ]
+  }
+ },
+ "nations": {
+  "french": {
+   "id": "french",
+   "ru": "Новая Франция",
+   "en": "French",
+   "deck": [
+    "trapper_french",
+    "colonist_french",
+    "preacher_french",
+    "sailor_french",
+    "soldier_french"
+   ],
+   "stars": 2,
+   "color": "#233e8b"
+  },
+  "dutch": {
+   "id": "dutch",
+   "ru": "Новые Нидерланды",
+   "en": "Dutch",
+   "deck": [
+    "negotiant_dutch",
+    "colonist_dutch",
+    "preacher_dutch",
+    "sailor_dutch",
+    "soldier_dutch"
+   ],
+   "stars": 1,
+   "color": "#cc5805"
+  },
+  "english": {
+   "id": "english",
+   "ru": "Новая Англия",
+   "en": "English",
+   "deck": [
+    "puritan_english",
+    "slave_english",
+    "colonist_english",
+    "sailor_english",
+    "soldier_english"
+   ],
+   "stars": 1,
+   "color": "#9b1212"
+  },
+  "portuguese": {
+   "id": "portuguese",
+   "ru": "Новая Португалия",
+   "en": "Portuguese",
+   "deck": [
+    "navigator_portuguese",
+    "slave_portuguese",
+    "colonist_portuguese",
+    "preacher_portuguese",
+    "soldier_portuguese"
+   ],
+   "stars": 1,
+   "color": "#306312"
+  },
+  "spanish": {
+   "id": "spanish",
+   "ru": "Новая Испания",
+   "en": "Spanish",
+   "deck": [
+    "conquistador_spanish",
+    "slave_spanish",
+    "colonist_spanish",
+    "preacher_spanish",
+    "sailor_spanish"
+   ],
+   "stars": 1,
+   "color": "#623b72"
+  },
+  "swedish": {
+   "id": "swedish",
+   "ru": "Новая Швеция",
+   "en": "Swedish",
+   "deck": [
+    "settler_swedish",
+    "colonist_swedish",
+    "preacher_swedish",
+    "soldier_swedish"
+   ],
+   "stars": 3,
+   "color": "#233e8b"
+  },
+  "danish": {
+   "id": "danish",
+   "ru": "Новая Дания",
+   "en": "Danish",
+   "deck": [
+    "planter_danish",
+    "slave_danish",
+    "sailor_danish",
+    "preacher_danish"
+   ],
+   "stars": 2,
+   "color": "#cc5805"
+  },
+  "russian": {
+   "id": "russian",
+   "ru": "Русская Америка",
+   "en": "Russian",
+   "deck": [
+    "cossack_russian",
+    "colonist_russian",
+    "preacher_russian",
+    "sailor_russian"
+   ],
+   "stars": 4,
+   "color": "#9b1212"
+  },
+  "curonian": {
+   "id": "curonian",
+   "ru": "Новая Курляндия",
+   "en": "Curonian",
+   "deck": [
+    "adventurer_curonian",
+    "preacher_curonian",
+    "sailor_curonian",
+    "soldier_curonian"
+   ],
+   "stars": 4,
+   "color": "#306312"
+  },
+  "scottish": {
+   "id": "scottish",
+   "ru": "Новая Шотландия",
+   "en": "Scottish",
+   "deck": [
+    "highlander_scottish",
+    "colonist_scottish",
+    "preacher_scottish",
+    "sailor_scottish"
+   ],
+   "stars": 5,
+   "color": "#623b72"
+  }
+ },
+ "buildings": {
+  "warehouse": {
+   "id": "warehouse",
+   "ru": "склад",
+   "en": "Warehouse",
+   "copies": 5,
+   "edu": 0,
+   "timber": 1,
+   "improvement": false,
+   "storage": 6
+  },
+  "docks": {
+   "id": "docks",
+   "ru": "причал",
+   "en": "Docks",
+   "copies": 5,
+   "edu": 0,
+   "timber": 1,
+   "improvement": false,
+   "work": {
+    "kind": "ocean",
+    "add": 1
+   }
+  },
+  "blacksmith_shop": {
+   "id": "blacksmith_shop",
+   "ru": "мастерская",
+   "en": "Blacksmith shop",
+   "copies": 5,
+   "edu": 1,
+   "timber": 2,
+   "improvement": false,
+   "work": {
+    "kind": "produce",
+    "icon": "goods",
+    "amount": 1,
+    "consumes": {
+     "res": "crops",
+     "amount": 1
+    }
+   }
+  },
+  "town_hall": {
+   "id": "town_hall",
+   "ru": "ратуша",
+   "en": "Town hall",
+   "copies": 5,
+   "edu": 1,
+   "timber": 2,
+   "improvement": false,
+   "work": {
+    "kind": "produce",
+    "icon": "bells",
+    "amount": 1
+   }
+  },
+  "chapel": {
+   "id": "chapel",
+   "ru": "часовня",
+   "en": "Chapel",
+   "copies": 5,
+   "edu": 1,
+   "timber": 2,
+   "improvement": false,
+   "work": {
+    "kind": "produce",
+    "icon": "crosses",
+    "amount": 1
+   }
+  },
+  "stockade": {
+   "id": "stockade",
+   "ru": "частокол",
+   "en": "Stockade",
+   "copies": 5,
+   "edu": 0,
+   "timber": 2,
+   "improvement": false,
+   "defence": 1
+  },
+  "school": {
+   "id": "school",
+   "ru": "школа",
+   "en": "School",
+   "copies": 5,
+   "edu": 1,
+   "timber": 3,
+   "improvement": false,
+   "work": {
+    "kind": "teach",
+    "maxEdu": 1
+   }
+  },
+  "custom_house": {
+   "id": "custom_house",
+   "ru": "таможня",
+   "en": "Custom house",
+   "copies": 1,
+   "edu": 2,
+   "timber": 4,
+   "improvement": true,
+   "requires": "warehouse",
+   "work": {
+    "kind": "sell",
+    "amount": 1
+   }
+  },
+  "shipyard": {
+   "id": "shipyard",
+   "ru": "верфь",
+   "en": "Shipyard",
+   "copies": 1,
+   "edu": 1,
+   "timber": 2,
+   "improvement": true,
+   "requires": "docks",
+   "work": {
+    "kind": "repair"
+   }
+  },
+  "factory": {
+   "id": "factory",
+   "ru": "фабрика",
+   "en": "Factory",
+   "copies": 1,
+   "edu": 1,
+   "timber": 4,
+   "improvement": true,
+   "requires": "blacksmith_shop",
+   "work": {
+    "kind": "produce",
+    "icon": "goods",
+    "amount": 2,
+    "consumes": {
+     "res": "crops",
+     "amount": 1
+    }
+   }
+  },
+  "newspaper": {
+   "id": "newspaper",
+   "ru": "газета",
+   "en": "Newspaper",
+   "copies": 1,
+   "edu": 2,
+   "timber": 4,
+   "improvement": true,
+   "requires": "town_hall",
+   "work": {
+    "kind": "produce",
+    "icon": "bells",
+    "amount": 3
+   }
+  },
+  "church": {
+   "id": "church",
+   "ru": "церковь",
+   "en": "Church",
+   "copies": 1,
+   "edu": 2,
+   "timber": 4,
+   "improvement": true,
+   "requires": "chapel",
+   "work": {
+    "kind": "produce",
+    "icon": "crosses",
+    "amount": 3
+   }
+  },
+  "fort": {
+   "id": "fort",
+   "ru": "форт",
+   "en": "Fort",
+   "copies": 1,
+   "edu": 0,
+   "timber": 5,
+   "improvement": true,
+   "requires": "stockade",
+   "defence": 2
+  },
+  "university": {
+   "id": "university",
+   "ru": "университет",
+   "en": "University",
+   "copies": 1,
+   "edu": 2,
+   "timber": 6,
+   "improvement": true,
+   "requires": "school",
+   "work": {
+    "kind": "teach",
+    "maxEdu": 2
+   }
+  }
+ },
+ "fathers": {
+  "christopher_columbus": {
+   "id": "christopher_columbus",
+   "ru": "Христофор Колумб",
+   "en": "Christopher Columbus",
+   "category": "exploration",
+   "bells": 2,
+   "mods": [
+    {
+     "mod": "onReveal",
+     "hold": {
+      "crops": 1
+     },
+     "ifLand": true
+    }
+   ],
+   "onGain": []
+  },
+  "jakob_fugger": {
+   "id": "jakob_fugger",
+   "ru": "Якоб Фуггер",
+   "en": "Jakob Fugger",
+   "category": "economy",
+   "bells": 3,
+   "mods": [
+    {
+     "mod": "goldPerPoint",
+     "value": 7
+    }
+   ],
+   "onGain": []
+  },
+  "pedro_cabral": {
+   "id": "pedro_cabral",
+   "ru": "Педру Кабрал",
+   "en": "Pedro Cabral",
+   "category": "exploration",
+   "bells": 3,
+   "mods": [
+    {
+     "mod": "move",
+     "token": "ship",
+     "add": 2
+    }
+   ],
+   "onGain": []
+  },
+  "ponce_de_leon": {
+   "id": "ponce_de_leon",
+   "ru": "Хуан Понсе де Леон",
+   "en": "Ponce de Leon",
+   "category": "exploration",
+   "bells": 2,
+   "mods": [],
+   "onGain": [
+    {
+     "n": "takeFromPier",
+     "amount": 2,
+     "to": "discard"
+    }
+   ]
+  },
+  "francisco_pizarro": {
+   "id": "francisco_pizarro",
+   "ru": "Франсиско Писарро",
+   "en": "Francisco Pizarro",
+   "category": "military",
+   "bells": 3,
+   "mods": [
+    {
+     "mod": "lootFactor",
+     "value": 2
+    }
+   ],
+   "onGain": []
+  },
+  "bartolome_de_las_casas": {
+   "id": "bartolome_de_las_casas",
+   "ru": "Бартоломе де лас Касас",
+   "en": "Bartolome de las Casas",
+   "category": "religious",
+   "bells": 2,
+   "mods": [
+    {
+     "mod": "noAttackNatives"
+    },
+    {
+     "mod": "preachFree"
+    }
+   ],
+   "onGain": []
+  },
+  "hernan_cortes": {
+   "id": "hernan_cortes",
+   "ru": "Эрнан Кортес",
+   "en": "Hernan Cortes",
+   "category": "military",
+   "bells": 2,
+   "mods": [
+    {
+     "mod": "battle",
+     "add": 2,
+     "vs": "native"
+    }
+   ],
+   "onGain": []
+  },
+  "juan_de_sepulveda": {
+   "id": "juan_de_sepulveda",
+   "ru": "Хуан де Сепульведа",
+   "en": "Juan de Sepulveda",
+   "category": "religious",
+   "bells": 2,
+   "mods": [],
+   "onGain": [
+    {
+     "n": "takeAgent",
+     "agent": "slave",
+     "amount": 2
+    }
+   ]
+  },
+  "francisco_de_orellana": {
+   "id": "francisco_de_orellana",
+   "ru": "Франсиско де Орельяна",
+   "en": "Francisco de Orellana",
+   "category": "exploration",
+   "bells": 2,
+   "mods": [
+    {
+     "mod": "onReveal",
+     "gold": 2
+    }
+   ],
+   "onGain": []
+  },
+  "francis_drake": {
+   "id": "francis_drake",
+   "ru": "Фрэнсис Дрейк",
+   "en": "Francis Drake",
+   "category": "military",
+   "bells": 3,
+   "mods": [
+    {
+     "mod": "battle",
+     "add": 2,
+     "token": "ship",
+     "role": "attack"
+    }
+   ],
+   "onGain": []
+  },
+  "walter_raleigh": {
+   "id": "walter_raleigh",
+   "ru": "Уолтер Рэли",
+   "en": "Walter Raleigh",
+   "category": "economy",
+   "bells": 2,
+   "mods": [],
+   "onGain": [
+    {
+     "n": "takeFromPier",
+     "amount": 1,
+     "to": "hand"
+    }
+   ]
+  },
+  "henry_hudson": {
+   "id": "henry_hudson",
+   "ru": "Генри Гудзон",
+   "en": "Henry Hudson",
+   "category": "exploration",
+   "bells": 2,
+   "mods": [],
+   "onGain": [
+    {
+     "n": "takeAgent",
+     "agent": "captain",
+     "amount": 1
+    }
+   ]
+  },
+  "samuel_de_champlain": {
+   "id": "samuel_de_champlain",
+   "ru": "Самюэль де Шамплен",
+   "en": "Samuel de Champlain",
+   "category": "economy",
+   "bells": 4,
+   "mods": [],
+   "onGain": [
+    {
+     "n": "freeColony"
+    }
+   ]
+  },
+  "john_smith": {
+   "id": "john_smith",
+   "ru": "Джон Смит",
+   "en": "John Smith",
+   "category": "diplomatic",
+   "bells": 3,
+   "mods": [
+    {
+     "mod": "allianceMax",
+     "value": 3
+    }
+   ],
+   "onGain": []
+  },
+  "squanto": {
+   "id": "squanto",
+   "ru": "Скванто",
+   "en": "Squanto",
+   "category": "diplomatic",
+   "bells": 3,
+   "mods": [
+    {
+     "mod": "production",
+     "icons": [
+      "corn"
+     ],
+     "add": 1
+    }
+   ],
+   "onGain": []
+  },
+  "john_rolfe": {
+   "id": "john_rolfe",
+   "ru": "Джон Рольф",
+   "en": "John Rolfe",
+   "category": "economy",
+   "bells": 3,
+   "mods": [
+    {
+     "mod": "production",
+     "icons": [
+      "leaf"
+     ],
+     "add": 1
+    }
+   ],
+   "onGain": []
+  },
+  "thomas_hooker": {
+   "id": "thomas_hooker",
+   "ru": "Томас Гукер",
+   "en": "Thomas Hooker",
+   "category": "religious",
+   "bells": 3,
+   "mods": [
+    {
+     "mod": "production",
+     "icons": [
+      "crosses"
+     ],
+     "add": 1
+    }
+   ],
+   "onGain": []
+  },
+  "peter_minuit": {
+   "id": "peter_minuit",
+   "ru": "Петер Минёйт",
+   "en": "Peter Minuit",
+   "category": "diplomatic",
+   "bells": 2,
+   "mods": [
+    {
+     "mod": "pointsPerAlliance",
+     "value": 1
+    }
+   ],
+   "onGain": []
+  },
+  "william_bradford": {
+   "id": "william_bradford",
+   "ru": "Уильям Брэдфорд",
+   "en": "William Bradford",
+   "category": "religious",
+   "bells": 3,
+   "mods": [],
+   "onGain": [
+    {
+     "n": "convertCrosses",
+     "max": 5
+    }
+   ]
+  },
+  "pocahontas": {
+   "id": "pocahontas",
+   "ru": "Покахонтас",
+   "en": "Pocahontas",
+   "category": "diplomatic",
+   "bells": 2,
+   "mods": [
+    {
+     "mod": "nativeHostility",
+     "add": -1
+    }
+   ],
+   "onGain": []
+  },
+  "roger_williams": {
+   "id": "roger_williams",
+   "ru": "Роджер Уильямс",
+   "en": "Roger Williams",
+   "category": "religious",
+   "bells": 2,
+   "mods": [
+    {
+     "mod": "recruitLook",
+     "value": 3
+    }
+   ],
+   "onGain": []
+  },
+  "john_eliot": {
+   "id": "john_eliot",
+   "ru": "Джон Элиот",
+   "en": "John Eliot",
+   "category": "religious",
+   "bells": 2,
+   "mods": [
+    {
+     "mod": "cost",
+     "of": "preach",
+     "add": -2
+    },
+    {
+     "mod": "preachCalm"
+    }
+   ],
+   "onGain": []
+  },
+  "michiel_de_ruyter": {
+   "id": "michiel_de_ruyter",
+   "ru": "Михил де Рёйтер",
+   "en": "Michiel de Ruyter",
+   "category": "military",
+   "bells": 2,
+   "mods": [
+    {
+     "mod": "bombardAny"
+    }
+   ],
+   "onGain": []
+  },
+  "robert_de_la_salle": {
+   "id": "robert_de_la_salle",
+   "ru": "Робер де Ла Салль",
+   "en": "Robert de La Salle",
+   "category": "exploration",
+   "bells": 2,
+   "mods": [],
+   "onGain": [
+    {
+     "n": "freeBuilding",
+     "options": [
+      "stockade",
+      "fort"
+     ]
+    }
+   ]
+  },
+  "william_penn": {
+   "id": "william_penn",
+   "ru": "Уильям Пенн",
+   "en": "William Penn",
+   "category": "economy",
+   "bells": 2,
+   "mods": [
+    {
+     "mod": "foundCost",
+     "resource": "timber",
+     "value": 2
+    }
+   ],
+   "onGain": []
+  },
+  "benjamin_franklin": {
+   "id": "benjamin_franklin",
+   "ru": "Бенджамин Франклин",
+   "en": "Benjamin Franklin",
+   "category": "political",
+   "bells": 5,
+   "mods": [
+    {
+     "mod": "production",
+     "icons": [
+      "bells"
+     ],
+     "add": 2
+    }
+   ],
+   "onGain": []
+  },
+  "george_washington": {
+   "id": "george_washington",
+   "ru": "Джордж Вашингтон",
+   "en": "George Washington",
+   "category": "military",
+   "bells": 5,
+   "mods": [
+    {
+     "mod": "militiaPerBell",
+     "value": 2
+    }
+   ],
+   "onGain": []
+  },
+  "paul_revere": {
+   "id": "paul_revere",
+   "ru": "Пол Ревир",
+   "en": "Paul Revere",
+   "category": "economy",
+   "bells": 3,
+   "mods": [
+    {
+     "mod": "freeMilitia",
+     "value": 4
+    }
+   ],
+   "onGain": []
+  },
+  "thomas_jefferson": {
+   "id": "thomas_jefferson",
+   "ru": "Томас Джефферсон",
+   "en": "Thomas Jefferson",
+   "category": "political",
+   "bells": 5,
+   "mods": [
+    {
+     "mod": "fatherLimit",
+     "value": 6
+    }
+   ],
+   "onGain": [
+    {
+     "n": "cheapestFather"
+    }
+   ]
+  },
+  "olaudah_equiano": {
+   "id": "olaudah_equiano",
+   "ru": "Олауда Эквиано",
+   "en": "Olaudah Equiano",
+   "category": "political",
+   "bells": 2,
+   "mods": [],
+   "onGain": [
+    {
+     "n": "replaceAgents",
+     "agent": "slave"
+    }
+   ]
+  },
+  "thaddeus_kosciuszko": {
+   "id": "thaddeus_kosciuszko",
+   "ru": "Тадеуш Костюшко",
+   "en": "Thaddeus Kosciuszko",
+   "category": "military",
+   "bells": 3,
+   "mods": [
+    {
+     "mod": "colonyDefence",
+     "building": "stockade",
+     "add": 1
+    },
+    {
+     "mod": "colonyDefence",
+     "building": "fort",
+     "add": 2
+    }
+   ],
+   "onGain": []
+  },
+  "eli_whitney": {
+   "id": "eli_whitney",
+   "ru": "Илай Витни",
+   "en": "Eli Whitney",
+   "category": "economy",
+   "bells": 3,
+   "mods": [
+    {
+     "mod": "production",
+     "icons": [
+      "goods"
+     ],
+     "add": 1
+    }
+   ],
+   "onGain": []
+  },
+  "simon_bolivar": {
+   "id": "simon_bolivar",
+   "ru": "Симон Боливар",
+   "en": "Simon Bolivar",
+   "category": "military",
+   "bells": 4,
+   "mods": [
+    {
+     "mod": "pointsPerPatriotColony",
+     "value": 3
+    }
+   ],
+   "onGain": []
+  },
+  "benedict_arnold": {
+   "id": "benedict_arnold",
+   "ru": "Бенедикт Арнольд",
+   "en": "Benedict Arnold",
+   "category": "military",
+   "bells": 2,
+   "mods": [
+    {
+     "mod": "betray",
+     "add": -3
+    }
+   ],
+   "onGain": []
+  }
+ },
+ "events": {
+  "sugar_act": {
+   "id": "sugar_act",
+   "ru": "Закон о сахаре",
+   "en": "Sugar Act",
+   "do": [
+    {
+     "n": "price",
+     "res": [
+      "crops"
+     ],
+     "add": -1
+    },
+    {
+     "n": "gainIfStock",
+     "res": "crops",
+     "bells": 1
+    },
+    {
+     "n": "sellOff",
+     "res": [
+      "crops"
+     ],
+     "priceAdd": 0,
+     "refPerUnit": 1
+    },
+    {
+     "n": "activate",
+     "settlement": 1
+    }
+   ]
+  },
+  "silver_fleet": {
+   "id": "silver_fleet",
+   "ru": "Серебряный конвой",
+   "en": "Silver Fleet",
+   "do": [
+    {
+     "n": "price",
+     "res": [
+      "silver"
+     ],
+     "add": -1
+    },
+    {
+     "n": "firstMayTake",
+     "agent": "corsair",
+     "gold": 5
+    },
+    {
+     "n": "mostPays",
+     "res": "silver",
+     "goldPerUnit": 2,
+     "ref": 1,
+     "bells": 1
+    },
+    {
+     "n": "activate",
+     "settlement": 2
+    }
+   ]
+  },
+  "seven_years_war": {
+   "id": "seven_years_war",
+   "ru": "Семилетняя война",
+   "en": "Seven Years War",
+   "do": [
+    {
+     "n": "price",
+     "res": [
+      "goods",
+      "silver"
+     ],
+     "add": 1
+    },
+    {
+     "n": "refreshPier",
+     "which": "military"
+    },
+    {
+     "n": "sellAgents",
+     "max": 3,
+     "gold": 6,
+     "refEach": 1
+    },
+    {
+     "n": "activate",
+     "settlement": 3
+    }
+   ]
+  },
+  "the_great_awakening": {
+   "id": "the_great_awakening",
+   "ru": "Великое пробуждение",
+   "en": "The Great Awakening",
+   "do": [
+    {
+     "n": "gainPerBuilding",
+     "buildings": {
+      "chapel": 2,
+      "church": 4
+     },
+     "what": "crosses"
+    },
+    {
+     "n": "jointCrosses",
+     "per": 4,
+     "max": 4
+    },
+    {
+     "n": "activate",
+     "settlement": 4
+    }
+   ]
+  },
+  "smallpox_epidemic": {
+   "id": "smallpox_epidemic",
+   "ru": "Эпидемия оспы",
+   "en": "Smallpox Epidemic",
+   "do": [
+    {
+     "n": "price",
+     "res": [
+      "timber"
+     ],
+     "add": 1
+    },
+    {
+     "n": "populationAll",
+     "add": -1
+    },
+    {
+     "n": "refreshPier",
+     "which": "all"
+    },
+    {
+     "n": "activate",
+     "settlement": 5
+    }
+   ]
+  },
+  "stamp_act": {
+   "id": "stamp_act",
+   "ru": "Налог на гербовый сбор",
+   "en": "Stamp Act",
+   "do": [
+    {
+     "n": "price",
+     "res": [
+      "goods"
+     ],
+     "add": 1
+    },
+    {
+     "n": "gainPerBuilding",
+     "buildings": {
+      "town_hall": 1,
+      "newspaper": 1
+     },
+     "what": "bells",
+     "once": true
+    },
+    {
+     "n": "payPerBuilding",
+     "gold": 2,
+     "ref": 1
+    },
+    {
+     "n": "activate",
+     "settlement": 6
+    }
+   ]
+  },
+  "atlantic_storms": {
+   "id": "atlantic_storms",
+   "ru": "Бури в Атлантике",
+   "en": "Atlantic Storms",
+   "do": [
+    {
+     "n": "price",
+     "res": [
+      "food",
+      "timber",
+      "crops",
+      "goods",
+      "silver"
+     ],
+     "add": 1
+    },
+    {
+     "n": "storm"
+    },
+    {
+     "n": "fewestColoniesGain",
+     "wh": {
+      "goods": 2
+     }
+    },
+    {
+     "n": "activate",
+     "settlement": 1
+    }
+   ]
+  },
+  "pontiacs_rebellion": {
+   "id": "pontiacs_rebellion",
+   "ru": "Восстание Понтиака",
+   "en": "Pontiacs Rebellion",
+   "do": [
+    {
+     "n": "raidAll"
+    },
+    {
+     "n": "ref",
+     "perPlayer": 1
+    }
+   ]
+  },
+  "broken_treaties": {
+   "id": "broken_treaties",
+   "ru": "Нарушенные договоры",
+   "en": "Broken Treaties",
+   "do": [
+    {
+     "n": "breakAlliances",
+     "min": 3
+    },
+    {
+     "n": "raidAll"
+    }
+   ]
+  },
+  "black_market": {
+   "id": "black_market",
+   "ru": "Чёрный рынок",
+   "en": "Black Market",
+   "do": [
+    {
+     "n": "price",
+     "res": [
+      "goods"
+     ],
+     "add": -1
+    },
+    {
+     "n": "sellOff",
+     "res": [
+      "food",
+      "timber",
+      "crops",
+      "goods",
+      "silver"
+     ],
+     "priceAdd": -1,
+     "refPerSeller": 2
+    },
+    {
+     "n": "activate",
+     "settlement": 2
+    }
+   ]
+  },
+  "starving_time": {
+   "id": "starving_time",
+   "ru": "Затяжная зима",
+   "en": "Starving Time",
+   "do": [
+    {
+     "n": "price",
+     "res": [
+      "food"
+     ],
+     "add": 1
+    },
+    {
+     "n": "nativeGifts",
+     "min": 0,
+     "max": 2,
+     "food": 1
+    },
+    {
+     "n": "winter",
+     "food": 1
+    },
+    {
+     "n": "activate",
+     "settlement": 3
+    }
+   ]
+  },
+  "prison_ships": {
+   "id": "prison_ships",
+   "ru": "Тюрьмы переполнены",
+   "en": "Prison Ships",
+   "do": [
+    {
+     "n": "price",
+     "res": [
+      "timber"
+     ],
+     "add": -1
+    },
+    {
+     "n": "firstMayTake",
+     "agent": "criminal",
+     "gold": 0
+    },
+    {
+     "n": "ref",
+     "perPlayer": 1
+    },
+    {
+     "n": "activate",
+     "settlement": 4
+    }
+   ]
+  },
+  "common_sense": {
+   "id": "common_sense",
+   "ru": "Памфлеты будоражат умы",
+   "en": "Common Sense",
+   "do": [
+    {
+     "n": "refreshSalon"
+    },
+    {
+     "n": "ref",
+     "add": 2,
+     "perBells": 5
+    },
+    {
+     "n": "activate",
+     "settlement": 5
+    }
+   ]
+  },
+  "industrial_boom": {
+   "id": "industrial_boom",
+   "ru": "Промышленный бум",
+   "en": "Industrial Boom",
+   "do": [
+    {
+     "n": "price",
+     "res": [
+      "goods"
+     ],
+     "add": -1
+    },
+    {
+     "n": "price",
+     "res": [
+      "crops"
+     ],
+     "add": 1
+    },
+    {
+     "n": "cheapBuild",
+     "options": [
+      "blacksmith_shop",
+      "factory"
+     ],
+     "timber": 2
+    },
+    {
+     "n": "mostPays",
+     "res": "goods",
+     "gold": 3,
+     "ref": 1
+    },
+    {
+     "n": "activate",
+     "settlement": 6
+    }
+   ]
+  },
+  "salem_witch_trials": {
+   "id": "salem_witch_trials",
+   "ru": "Салемские ведьмы",
+   "en": "Salem Witch Trials",
+   "do": [
+    {
+     "n": "witchTrial",
+     "crosses": 5
+    },
+    {
+     "n": "ref",
+     "perPlayer": 1
+    },
+    {
+     "n": "activate",
+     "settlement": 1
+    }
+   ]
+  },
+  "mutiny": {
+   "id": "mutiny",
+   "ru": "Роптание в гарнизоне",
+   "en": "Mutiny",
+   "do": [
+    {
+     "n": "price",
+     "res": [
+      "silver"
+     ],
+     "add": 1
+    },
+    {
+     "n": "payOrRemove",
+     "which": "military",
+     "gold": 2,
+     "refEach": 2
+    },
+    {
+     "n": "activate",
+     "settlement": 2
+    }
+   ]
+  },
+  "sacred_forest": {
+   "id": "sacred_forest",
+   "ru": "Священная роща",
+   "en": "Sacred Forest",
+   "do": [
+    {
+     "n": "price",
+     "res": [
+      "timber"
+     ],
+     "add": 1
+    },
+    {
+     "n": "sacredForest",
+     "goods": 1,
+     "gold": 5,
+     "hostility": 1
+    },
+    {
+     "n": "raidAll"
+    }
+   ]
+  },
+  "el_dorado_rumors": {
+   "id": "el_dorado_rumors",
+   "ru": "Слухи об Эльдорадо",
+   "en": "El Dorado Rumors",
+   "do": [
+    {
+     "n": "price",
+     "res": [
+      "silver"
+     ],
+     "add": -1
+    },
+    {
+     "n": "sellAgents",
+     "max": 3,
+     "gold": 5,
+     "refEach": 0
+    },
+    {
+     "n": "ref",
+     "perPlayer": 2
+    },
+    {
+     "n": "activate",
+     "settlement": 3
+    }
+   ]
+  },
+  "slave_rebellion": {
+   "id": "slave_rebellion",
+   "ru": "Восстание рабов",
+   "en": "Slave Rebellion",
+   "do": [
+    {
+     "n": "price",
+     "res": [
+      "crops"
+     ],
+     "add": 1
+    },
+    {
+     "n": "payOrRemove",
+     "which": "slave",
+     "gold": 2,
+     "refEach": 1
+    },
+    {
+     "n": "activate",
+     "settlement": 4
+    }
+   ]
+  },
+  "treaty_of_paris": {
+   "id": "treaty_of_paris",
+   "ru": "Парижский мир",
+   "en": "Treaty of Paris",
+   "do": [
+    {
+     "n": "priceReset",
+     "res": [
+      "crops",
+      "goods"
+     ]
+    },
+    {
+     "n": "hostilityAll",
+     "add": -1
+    },
+    {
+     "n": "firstMayTake",
+     "agent": "soldier",
+     "gold": 5
+    },
+    {
+     "n": "activate",
+     "settlement": 5
+    }
+   ]
+  },
+  "the_boston_tea_party": {
+   "id": "the_boston_tea_party",
+   "ru": "Бостонское чаепитие",
+   "en": "The Boston Tea Party",
+   "do": [
+    {
+     "n": "price",
+     "res": [
+      "goods"
+     ],
+     "add": 1
+    },
+    {
+     "n": "boycott",
+     "res": "goods",
+     "goldPerUnit": 2,
+     "refPerUnit": 2
+    },
+    {
+     "n": "ref",
+     "perPlayer": 1
+    },
+    {
+     "n": "activate",
+     "settlement": 6
+    }
+   ]
+  },
+  "pirate_blockade": {
+   "id": "pirate_blockade",
+   "ru": "Пиратская блокада",
+   "en": "Pirate Blockade",
+   "do": [
+    {
+     "n": "price",
+     "res": [
+      "goods"
+     ],
+     "add": 1
+    },
+    {
+     "n": "blockade",
+     "gold": 3,
+     "refEach": 2
+    }
+   ]
+  }
+ },
+ "ruins": {
+  "natives_ambush": {
+   "id": "natives_ambush",
+   "ru": "Засада дикарей",
+   "en": "Natives Ambush",
+   "do": [
+    {
+     "n": "endMove"
+    },
+    {
+     "n": "choice",
+     "id": "natives_ambush",
+     "options": [
+      {
+       "id": "fight",
+       "en": "Fight back",
+       "ru": "Дать отпор",
+       "do": [
+        {
+         "n": "gain",
+         "bells": 1
+        }
+       ],
+       "cost": {
+        "agent": "military"
+       }
+      },
+      {
+       "id": "surrender",
+       "en": "Surrender",
+       "ru": "Сдаться",
+       "do": [
+        {
+         "n": "discardCards",
+         "amount": 1
+        }
+       ]
+      },
+      {
+       "id": "flee",
+       "en": "Flee",
+       "ru": "Бежать",
+       "do": [
+        {
+         "n": "toEurope",
+         "skull": true
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "predators_lair": {
+   "id": "predators_lair",
+   "ru": "Логово хищников",
+   "en": "Predators Lair",
+   "do": [
+    {
+     "n": "endMove"
+    },
+    {
+     "n": "choice",
+     "id": "predators_lair",
+     "options": [
+      {
+       "id": "fight",
+       "en": "Fight",
+       "ru": "Вступить в бой",
+       "do": [
+        {
+         "n": "gain",
+         "gold": 5
+        }
+       ],
+       "cost": {
+        "agent": "military"
+       }
+      },
+      {
+       "id": "flee",
+       "en": "Flee",
+       "ru": "Бежать",
+       "do": [
+        {
+         "n": "toEurope",
+         "skull": true
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "golden_city": {
+   "id": "golden_city",
+   "ru": "Золотой город",
+   "en": "Golden City",
+   "do": [
+    {
+     "n": "endMove"
+    },
+    {
+     "n": "choice",
+     "id": "golden_city",
+     "options": [
+      {
+       "id": "search",
+       "en": "Search for valuables",
+       "ru": "Искать ценности",
+       "do": [
+        {
+         "n": "roll",
+         "table": [
+          {
+           "max": 2,
+           "do": [
+            {
+             "n": "gain",
+             "gold": 10
+            }
+           ]
+          },
+          {
+           "max": 4,
+           "do": [
+            {
+             "n": "gain",
+             "gold": 15
+            }
+           ]
+          },
+          {
+           "max": 6,
+           "do": [
+            {
+             "n": "gain",
+             "gold": 20
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "id": "study",
+       "en": "Study",
+       "ru": "Изучить",
+       "do": [
+        {
+         "n": "gain",
+         "bells": 2
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "silver_mines": {
+   "id": "silver_mines",
+   "ru": "Серебряные копи",
+   "en": "Silver Mines",
+   "do": [
+    {
+     "n": "choice",
+     "id": "silver_mines",
+     "options": [
+      {
+       "id": "search",
+       "en": "Search",
+       "ru": "Обыскать",
+       "do": [
+        {
+         "n": "endMove"
+        },
+        {
+         "n": "roll",
+         "table": [
+          {
+           "max": 2,
+           "do": [
+            {
+             "n": "gain",
+             "wh": {
+              "silver": 1
+             }
+            }
+           ]
+          },
+          {
+           "max": 4,
+           "do": [
+            {
+             "n": "gain",
+             "wh": {
+              "silver": 3
+             }
+            }
+           ]
+          },
+          {
+           "max": 6,
+           "do": [
+            {
+             "n": "gain",
+             "wh": {
+              "silver": 5
+             }
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "id": "leave",
+       "en": "Move on",
+       "ru": "Продолжить путь",
+       "do": [
+        {
+         "n": "moves",
+         "add": 1
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "survivor": {
+   "id": "survivor",
+   "ru": "Выживший",
+   "en": "Survivor",
+   "do": [
+    {
+     "n": "choice",
+     "id": "survivor",
+     "options": [
+      {
+       "id": "take",
+       "en": "Take along",
+       "ru": "Взять с собой",
+       "do": [
+        {
+         "n": "pierLeftmost"
+        }
+       ]
+      },
+      {
+       "id": "escort",
+       "en": "Escort home",
+       "ru": "Сопроводить",
+       "do": [
+        {
+         "n": "gain",
+         "crosses": 3
+        },
+        {
+         "n": "toEurope"
+        }
+       ]
+      },
+      {
+       "id": "abandon",
+       "en": "Abandon",
+       "ru": "Бросить",
+       "do": [
+        {
+         "n": "lose",
+         "crosses": 2
+        },
+        {
+         "n": "drawPoi"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "abandoned_fort": {
+   "id": "abandoned_fort",
+   "ru": "Заброшенный форт",
+   "en": "Abandoned Fort",
+   "do": [
+    {
+     "n": "gain",
+     "wh": {
+      "timber": 4
+     }
+    },
+    {
+     "n": "freeBasicBuilding"
+    }
+   ]
+  },
+  "hidden_granaries": {
+   "id": "hidden_granaries",
+   "ru": "Тайные амбары",
+   "en": "Hidden Granaries",
+   "do": [
+    {
+     "n": "gain",
+     "wh": {
+      "food": 4
+     }
+    }
+   ]
+  },
+  "smugglers_cave": {
+   "id": "smugglers_cave",
+   "ru": "Пещера контрабандистов",
+   "en": "Smugglers Cave",
+   "do": [
+    {
+     "n": "gain",
+     "wh": {
+      "crops": 2,
+      "goods": 2
+     }
+    }
+   ]
+  },
+  "mere_rumors": {
+   "id": "mere_rumors",
+   "ru": "Всего лишь слухи",
+   "en": "Mere Rumors",
+   "do": [
+    {
+     "n": "moves",
+     "add": 1
+    }
+   ]
+  },
+  "native_burial": {
+   "id": "native_burial",
+   "ru": "Индейское погребение",
+   "en": "Native Burial",
+   "do": [
+    {
+     "n": "choice",
+     "id": "native_burial",
+     "options": [
+      {
+       "id": "loot",
+       "en": "Loot",
+       "ru": "Разграбить",
+       "do": [
+        {
+         "n": "endMove"
+        },
+        {
+         "n": "roll",
+         "table": [
+          {
+           "max": 2,
+           "do": []
+          },
+          {
+           "max": 4,
+           "do": [
+            {
+             "n": "gain",
+             "gold": 5
+            },
+            {
+             "n": "hostilityNearest",
+             "add": 1
+            }
+           ]
+          },
+          {
+           "max": 6,
+           "do": [
+            {
+             "n": "gain",
+             "gold": 10
+            },
+            {
+             "n": "hostilityNearest",
+             "add": 2
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "id": "respect",
+       "en": "Show respect",
+       "ru": "Проявить уважение",
+       "do": [
+        {
+         "n": "hostilityNearest",
+         "add": -1
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "desecrated_burial": {
+   "id": "desecrated_burial",
+   "ru": "Разорённое погребение",
+   "en": "Desecrated Burial",
+   "do": [
+    {
+     "n": "choice",
+     "id": "desecrated_burial",
+     "options": [
+      {
+       "id": "take",
+       "en": "Take what is left",
+       "ru": "Забрать, что осталось",
+       "do": [
+        {
+         "n": "gain",
+         "gold": 5
+        },
+        {
+         "n": "hostilityNearest",
+         "add": 1
+        }
+       ]
+      },
+      {
+       "id": "rebury",
+       "en": "Rebury",
+       "ru": "Перезахоронить",
+       "do": [
+        {
+         "n": "gain",
+         "crosses": 3
+        },
+        {
+         "n": "endMove"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "sacred_totem_circle": {
+   "id": "sacred_totem_circle",
+   "ru": "Священный круг тотемов",
+   "en": "Sacred Totem Circle",
+   "do": [
+    {
+     "n": "endMove"
+    },
+    {
+     "n": "choice",
+     "id": "sacred_totem_circle",
+     "options": [
+      {
+       "id": "dismantle",
+       "en": "Dismantle the totems",
+       "ru": "Разобрать тотемы",
+       "do": [
+        {
+         "n": "hostilityNearest",
+         "add": 2
+        },
+        {
+         "n": "roll",
+         "table": [
+          {
+           "max": 2,
+           "do": []
+          },
+          {
+           "max": 4,
+           "do": [
+            {
+             "n": "gain",
+             "wh": {
+              "silver": 3
+             }
+            }
+           ]
+          },
+          {
+           "max": 6,
+           "do": [
+            {
+             "n": "gain",
+             "gold": 20
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "id": "offer",
+       "en": "Make an offering",
+       "ru": "Принести подношения",
+       "do": [
+        {
+         "n": "hostilityNearest",
+         "add": -2
+        },
+        {
+         "n": "lose",
+         "crosses": 5
+        }
+       ],
+       "cost": {
+        "anyResource": 1
+       }
+      },
+      {
+       "id": "study",
+       "en": "Study",
+       "ru": "Изучить",
+       "do": [
+        {
+         "n": "gain",
+         "bells": 2
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "guide": {
+   "id": "guide",
+   "ru": "Проводник",
+   "en": "Guide",
+   "do": [
+    {
+     "n": "choice",
+     "id": "guide",
+     "options": [
+      {
+       "id": "pay",
+       "en": "Pay",
+       "ru": "Заплатить",
+       "do": [
+        {
+         "n": "guide",
+         "look": 2
+        }
+       ],
+       "cost": {
+        "gold": 2
+       }
+      },
+      {
+       "id": "threaten",
+       "en": "Threaten",
+       "ru": "Пригрозить",
+       "do": [
+        {
+         "n": "hostilityNearest",
+         "add": -1
+        },
+        {
+         "n": "drawPoi"
+        }
+       ]
+      },
+      {
+       "id": "leave",
+       "en": "Decline",
+       "ru": "Отказаться от услуг",
+       "do": [
+        {
+         "n": "moves",
+         "add": 1
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "warrior_burial": {
+   "id": "warrior_burial",
+   "ru": "Воинское захоронение",
+   "en": "Warrior Burial",
+   "do": [
+    {
+     "n": "choice",
+     "id": "warrior_burial",
+     "options": [
+      {
+       "id": "loot",
+       "en": "Loot",
+       "ru": "Разграбить погребение",
+       "do": [
+        {
+         "n": "gain",
+         "gold": 6
+        },
+        {
+         "n": "lose",
+         "crosses": 2
+        },
+        {
+         "n": "hostilityNearest",
+         "add": 1
+        }
+       ]
+      },
+      {
+       "id": "leave",
+       "en": "Pass by",
+       "ru": "Пройти мимо",
+       "do": [
+        {
+         "n": "moves",
+         "add": 1
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "bandeirante_tracks": {
+   "id": "bandeirante_tracks",
+   "ru": "Следы бандейрантов",
+   "en": "Bandeirante Tracks",
+   "do": [
+    {
+     "n": "choice",
+     "id": "bandeirante_tracks",
+     "options": [
+      {
+       "id": "track",
+       "en": "Follow the tracks",
+       "ru": "Изучить следы",
+       "do": [
+        {
+         "n": "gain",
+         "gold": 15
+        }
+       ],
+       "cost": {
+        "agent": "scout"
+       }
+      },
+      {
+       "id": "comb",
+       "en": "Comb the area",
+       "ru": "Прочесать округу",
+       "do": [
+        {
+         "n": "endMove"
+        },
+        {
+         "n": "roll",
+         "table": [
+          {
+           "max": 3,
+           "do": []
+          },
+          {
+           "max": 4,
+           "do": [
+            {
+             "n": "toEurope",
+             "skull": true
+            }
+           ]
+          },
+          {
+           "max": 6,
+           "do": [
+            {
+             "n": "gain",
+             "gold": 15
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "id": "leave",
+       "en": "Move on",
+       "ru": "Продолжить путь",
+       "do": [
+        {
+         "n": "moves",
+         "add": 1
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "stone_wall": {
+   "id": "stone_wall",
+   "ru": "Каменная стена",
+   "en": "Stone Wall",
+   "do": [
+    {
+     "n": "choice",
+     "id": "stone_wall",
+     "options": [
+      {
+       "id": "dig",
+       "en": "Dismantle the wall",
+       "ru": "Разобрать кладку",
+       "do": [
+        {
+         "n": "endMove"
+        },
+        {
+         "n": "roll",
+         "table": [
+          {
+           "max": 1,
+           "do": [
+            {
+             "n": "toEurope",
+             "skull": true
+            }
+           ]
+          },
+          {
+           "max": 4,
+           "do": [
+            {
+             "n": "gain",
+             "gold": 10
+            }
+           ]
+          },
+          {
+           "max": 6,
+           "do": [
+            {
+             "n": "gain",
+             "gold": 15
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "id": "leave",
+       "en": "Turn back",
+       "ru": "Развернуться и уйти",
+       "do": [
+        {
+         "n": "moves",
+         "add": 1
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "protective_amulet": {
+   "id": "protective_amulet",
+   "ru": "Защитный амулет",
+   "en": "Protective Amulet",
+   "do": [
+    {
+     "n": "choice",
+     "id": "protective_amulet",
+     "options": [
+      {
+       "id": "study",
+       "en": "Study",
+       "ru": "Изучить",
+       "do": [
+        {
+         "n": "gain",
+         "bells": 2
+        },
+        {
+         "n": "endMove"
+        }
+       ]
+      },
+      {
+       "id": "take",
+       "en": "Take",
+       "ru": "Забрать",
+       "do": [
+        {
+         "n": "hostilityNearest",
+         "add": 1
+        },
+        {
+         "n": "gain",
+         "gold": 10
+        }
+       ]
+      },
+      {
+       "id": "leave",
+       "en": "Leave it",
+       "ru": "Оставить",
+       "do": [
+        {
+         "n": "moves",
+         "add": 1
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "defiled_shrine": {
+   "id": "defiled_shrine",
+   "ru": "Осквернённая святыня",
+   "en": "Defiled Shrine",
+   "do": [
+    {
+     "n": "choice",
+     "id": "defiled_shrine",
+     "options": [
+      {
+       "id": "search",
+       "en": "Search",
+       "ru": "Обыскать",
+       "do": [
+        {
+         "n": "endMove"
+        },
+        {
+         "n": "roll",
+         "table": [
+          {
+           "max": 2,
+           "do": [
+            {
+             "n": "hostilityNearest",
+             "add": 1
+            }
+           ]
+          },
+          {
+           "max": 4,
+           "do": [
+            {
+             "n": "gain",
+             "gold": 5
+            }
+           ]
+          },
+          {
+           "max": 6,
+           "do": [
+            {
+             "n": "gain",
+             "gold": 10
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "id": "leave",
+       "en": "Leave in peace",
+       "ru": "Оставить в покое",
+       "do": [
+        {
+         "n": "gain",
+         "crosses": 2
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "lost_tomb": {
+   "id": "lost_tomb",
+   "ru": "Затерянная усыпальница",
+   "en": "Lost Tomb",
+   "do": [
+    {
+     "n": "choice",
+     "id": "lost_tomb",
+     "options": [
+      {
+       "id": "open",
+       "en": "Try to open",
+       "ru": "Попытаться вскрыть",
+       "do": [
+        {
+         "n": "hostilityNearest",
+         "add": 1
+        },
+        {
+         "n": "roll",
+         "table": [
+          {
+           "max": 1,
+           "do": [
+            {
+             "n": "toEurope",
+             "skull": true
+            }
+           ]
+          },
+          {
+           "max": 4,
+           "do": [
+            {
+             "n": "gain",
+             "gold": 5
+            }
+           ]
+          },
+          {
+           "max": 6,
+           "do": [
+            {
+             "n": "gain",
+             "gold": 20
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "id": "record",
+       "en": "Record and leave",
+       "ru": "Сделать записи и уйти",
+       "do": [
+        {
+         "n": "gain",
+         "bells": 2
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "trail_marker": {
+   "id": "trail_marker",
+   "ru": "Путеводный знак",
+   "en": "Trail Marker",
+   "do": [
+    {
+     "n": "choice",
+     "id": "trail_marker",
+     "options": [
+      {
+       "id": "study",
+       "en": "Study",
+       "ru": "Изучить",
+       "do": [
+        {
+         "n": "revealAdjacent"
+        },
+        {
+         "n": "endMove"
+        }
+       ]
+      },
+      {
+       "id": "destroy",
+       "en": "Destroy the idol",
+       "ru": "Уничтожить идол",
+       "do": [
+        {
+         "n": "gain",
+         "crosses": 5
+        },
+        {
+         "n": "hostilityNearest",
+         "add": 2
+        }
+       ]
+      },
+      {
+       "id": "leave",
+       "en": "Pass by",
+       "ru": "Пройти мимо",
+       "do": [
+        {
+         "n": "moves",
+         "add": 1
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "wrecks": {
+  "shipwreck": {
+   "id": "shipwreck",
+   "ru": "Кораблекрушение",
+   "en": "Shipwreck",
+   "do": [
+    {
+     "n": "choice",
+     "id": "shipwreck",
+     "options": [
+      {
+       "id": "take",
+       "en": "Take",
+       "ru": "Забрать",
+       "do": [
+        {
+         "n": "gain",
+         "hold": {
+          "timber": 1
+         }
+        },
+        {
+         "n": "endMove"
+        }
+       ]
+      },
+      {
+       "id": "leave",
+       "en": "Sail on",
+       "ru": "Отплыть",
+       "do": [
+        {
+         "n": "moves",
+         "add": 1
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "sunken_galleon": {
+   "id": "sunken_galleon",
+   "ru": "Затонувший галеон",
+   "en": "Sunken Galleon",
+   "do": [
+    {
+     "n": "choice",
+     "id": "sunken_galleon",
+     "options": [
+      {
+       "id": "deck",
+       "en": "Search the upper deck",
+       "ru": "Обыскать верхнюю палубу",
+       "do": [
+        {
+         "n": "gain",
+         "gold": 8
+        },
+        {
+         "n": "endMove"
+        }
+       ]
+      },
+      {
+       "id": "dive",
+       "en": "Dive into the hold",
+       "ru": "Нырнуть в затопленный трюм",
+       "do": [
+        {
+         "n": "endMove"
+        },
+        {
+         "n": "roll",
+         "table": [
+          {
+           "max": 2,
+           "do": [
+            {
+             "n": "damage",
+             "amount": 1,
+             "skull": true
+            }
+           ]
+          },
+          {
+           "max": 4,
+           "do": [
+            {
+             "n": "gain",
+             "gold": 15
+            }
+           ]
+          },
+          {
+           "max": 6,
+           "do": [
+            {
+             "n": "gain",
+             "gold": 25
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "id": "leave",
+       "en": "Sail past",
+       "ru": "Проплыть мимо",
+       "do": [
+        {
+         "n": "moves",
+         "add": 1
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "man_overboard": {
+   "id": "man_overboard",
+   "ru": "Человек за бортом!",
+   "en": "Man Overboard",
+   "do": [
+    {
+     "n": "choice",
+     "id": "man_overboard",
+     "options": [
+      {
+       "id": "save",
+       "en": "Save",
+       "ru": "Спасти",
+       "do": [
+        {
+         "n": "gain",
+         "crosses": 2
+        },
+        {
+         "n": "pierLeftmost"
+        },
+        {
+         "n": "endMove"
+        }
+       ]
+      },
+      {
+       "id": "abandon",
+       "en": "Abandon",
+       "ru": "Бросить",
+       "do": [
+        {
+         "n": "lose",
+         "crosses": 2
+        },
+        {
+         "n": "moves",
+         "add": 1
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "floating_cargo": {
+   "id": "floating_cargo",
+   "ru": "Плавающий груз",
+   "en": "Floating Cargo",
+   "do": [
+    {
+     "n": "choice",
+     "id": "floating_cargo",
+     "options": [
+      {
+       "id": "barrels",
+       "en": "Haul in barrels",
+       "ru": "Выловить бочки",
+       "do": [
+        {
+         "n": "gain",
+         "hold": {
+          "goods": 2
+         }
+        },
+        {
+         "n": "endMove"
+        }
+       ]
+      },
+      {
+       "id": "bales",
+       "en": "Haul in bales",
+       "ru": "Выловить тюки",
+       "do": [
+        {
+         "n": "gain",
+         "hold": {
+          "crops": 4
+         }
+        },
+        {
+         "n": "endMove"
+        }
+       ]
+      },
+      {
+       "id": "leave",
+       "en": "Leave it",
+       "ru": "Оставить в воде",
+       "do": [
+        {
+         "n": "moves",
+         "add": 1
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "plague_ship": {
+   "id": "plague_ship",
+   "ru": "Чумной корабль",
+   "en": "Plague Ship",
+   "do": [
+    {
+     "n": "choice",
+     "id": "plague_ship",
+     "options": [
+      {
+       "id": "board",
+       "en": "Board",
+       "ru": "Подняться на борт",
+       "do": [
+        {
+         "n": "endMove"
+        },
+        {
+         "n": "roll",
+         "table": [
+          {
+           "max": 1,
+           "do": [
+            {
+             "n": "damage",
+             "amount": 2,
+             "skull": true
+            }
+           ]
+          },
+          {
+           "max": 3,
+           "do": [
+            {
+             "n": "damage",
+             "amount": 1,
+             "skull": true
+            }
+           ]
+          },
+          {
+           "max": 6,
+           "do": [
+            {
+             "n": "gain",
+             "gold": 10
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "id": "leave",
+       "en": "Flee",
+       "ru": "Бежать",
+       "do": [
+        {
+         "n": "moves",
+         "add": 1
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "drifting_frigate": {
+   "id": "drifting_frigate",
+   "ru": "Дрейфующий фрегат",
+   "en": "Drifting Frigate",
+   "do": [
+    {
+     "n": "choice",
+     "id": "drifting_frigate",
+     "options": [
+      {
+       "id": "guns",
+       "en": "Take the guns",
+       "ru": "Вывезти орудия",
+       "do": [
+        {
+         "n": "gain",
+         "bells": 2
+        },
+        {
+         "n": "toColonyWater"
+        }
+       ],
+       "cost": {
+        "cards": 1
+       },
+       "needs": "sea-colony"
+      },
+      {
+       "id": "tow",
+       "en": "Tow",
+       "ru": "Взять на буксир",
+       "do": [
+        {
+         "n": "gain",
+         "gold": 10
+        },
+        {
+         "n": "toEurope"
+        }
+       ],
+       "cost": {
+        "cards": 1
+       }
+      },
+      {
+       "id": "leave",
+       "en": "Sail past",
+       "ru": "Проплыть мимо",
+       "do": [
+        {
+         "n": "moves",
+         "add": 1
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "pirate_ambush": {
+   "id": "pirate_ambush",
+   "ru": "Пиратская засада",
+   "en": "Pirate Ambush",
+   "do": [
+    {
+     "n": "choice",
+     "id": "pirate_ambush",
+     "options": [
+      {
+       "id": "fire",
+       "en": "Fire a broadside",
+       "ru": "Дать залп",
+       "do": [
+        {
+         "n": "gain",
+         "bells": 1
+        },
+        {
+         "n": "endMove"
+        }
+       ],
+       "cost": {
+        "agent": "military"
+       }
+      },
+      {
+       "id": "cargo",
+       "en": "Give up the cargo",
+       "ru": "Отдать груз",
+       "do": [],
+       "cost": {
+        "wholeHold": 2
+       }
+      },
+      {
+       "id": "ransom",
+       "en": "Pay ransom",
+       "ru": "Откупиться золотом",
+       "do": [],
+       "cost": {
+        "gold": 5
+       }
+      },
+      {
+       "id": "flee",
+       "en": "Full sail",
+       "ru": "Уходить на всех парусах",
+       "do": [
+        {
+         "n": "moves",
+         "add": 1
+        }
+       ],
+       "cost": {
+        "cards": 2
+       }
+      },
+      {
+       "id": "surrender",
+       "en": "White flag",
+       "ru": "Вывесить белый флаг",
+       "do": [
+        {
+         "n": "dropHold"
+        },
+        {
+         "n": "damage",
+         "amount": 2,
+         "skull": true
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "sea_charts": {
+   "id": "sea_charts",
+   "ru": "Морские карты",
+   "en": "Sea Charts",
+   "do": [
+    {
+     "n": "choice",
+     "id": "sea_charts",
+     "options": [
+      {
+       "id": "currents",
+       "en": "Study currents",
+       "ru": "Изучить течения",
+       "do": [
+        {
+         "n": "moves",
+         "add": 5
+        }
+       ]
+      },
+      {
+       "id": "copy",
+       "en": "Copy the charts",
+       "ru": "Копировать карты",
+       "do": [
+        {
+         "n": "revealAdjacent"
+        },
+        {
+         "n": "endMove"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "smugglers_cache": {
+   "id": "smugglers_cache",
+   "ru": "Тайник контрабандистов",
+   "en": "Smugglers Cache",
+   "do": [
+    {
+     "n": "choice",
+     "id": "smugglers_cache",
+     "options": [
+      {
+       "id": "take",
+       "en": "Take the silver",
+       "ru": "Забрать серебро",
+       "do": [
+        {
+         "n": "gain",
+         "hold": {
+          "silver": 2
+         }
+        },
+        {
+         "n": "endMove"
+        }
+       ]
+      },
+      {
+       "id": "report",
+       "en": "Report it",
+       "ru": "Сдать тайник властям",
+       "do": [
+        {
+         "n": "ref",
+         "add": -1
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "surviving_crew": {
+   "id": "surviving_crew",
+   "ru": "Выживший экипаж",
+   "en": "Surviving Crew",
+   "do": [
+    {
+     "n": "choice",
+     "id": "surviving_crew",
+     "options": [
+      {
+       "id": "feed",
+       "en": "Feed them",
+       "ru": "Накормить",
+       "do": [
+        {
+         "n": "gain",
+         "crosses": 2
+        },
+        {
+         "n": "pierLeftmost"
+        }
+       ],
+       "cost": {
+        "anyFood": 1
+       }
+      },
+      {
+       "id": "abandon",
+       "en": "Pass by",
+       "ru": "Пройти мимо",
+       "do": [
+        {
+         "n": "lose",
+         "crosses": 2
+        },
+        {
+         "n": "moves",
+         "add": 1
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "treacherous_reefs": {
+   "id": "treacherous_reefs",
+   "ru": "Коварные рифы",
+   "en": "Treacherous Reefs",
+   "do": [
+    {
+     "n": "choice",
+     "id": "treacherous_reefs",
+     "options": [
+      {
+       "id": "careful",
+       "en": "Manoeuvre carefully",
+       "ru": "Осторожно маневрировать",
+       "do": [
+        {
+         "n": "moves",
+         "add": 1
+        }
+       ],
+       "cost": {
+        "cards": 1
+       }
+      },
+      {
+       "id": "straight",
+       "en": "Go straight through",
+       "ru": "Идти напролом",
+       "do": [
+        {
+         "n": "endMove"
+        },
+        {
+         "n": "roll",
+         "table": [
+          {
+           "max": 3,
+           "do": [
+            {
+             "n": "damage",
+             "amount": 1,
+             "skull": true
+            }
+           ]
+          },
+          {
+           "max": 6,
+           "do": [
+            {
+             "n": "gain",
+             "gold": 5
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "slave_ship": {
+   "id": "slave_ship",
+   "ru": "Судно работорговцев",
+   "en": "Slave Ship",
+   "do": [
+    {
+     "n": "choice",
+     "id": "slave_ship",
+     "options": [
+      {
+       "id": "free",
+       "en": "Free them",
+       "ru": "Освободить",
+       "do": [
+        {
+         "n": "gain",
+         "crosses": 3
+        },
+        {
+         "n": "hostilityNearest",
+         "add": -1
+        }
+       ]
+      },
+      {
+       "id": "chain",
+       "en": "Chain them",
+       "ru": "Заковать в цепи",
+       "do": [
+        {
+         "n": "takeAgent",
+         "agent": "slave",
+         "amount": 1
+        },
+        {
+         "n": "lose",
+         "crosses": 2
+        },
+        {
+         "n": "hostilityNearest",
+         "add": 1
+        },
+        {
+         "n": "endMove"
+        }
+       ]
+      },
+      {
+       "id": "abandon",
+       "en": "Abandon",
+       "ru": "Бросить",
+       "do": [
+        {
+         "n": "lose",
+         "crosses": 3
+        },
+        {
+         "n": "moves",
+         "add": 1
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "gutted_hull": {
+   "id": "gutted_hull",
+   "ru": "Выпотрошенный остов",
+   "en": "Gutted Hull",
+   "do": [
+    {
+     "n": "choice",
+     "id": "gutted_hull",
+     "options": [
+      {
+       "id": "strip",
+       "en": "Strip the planking",
+       "ru": "Снять обшивку",
+       "do": [
+        {
+         "n": "gain",
+         "hold": {
+          "timber": 1
+         }
+        },
+        {
+         "n": "endMove"
+        }
+       ]
+      },
+      {
+       "id": "search",
+       "en": "Search thoroughly",
+       "ru": "Тщательно обыскать",
+       "do": [
+        {
+         "n": "endMove"
+        },
+        {
+         "n": "roll",
+         "table": [
+          {
+           "max": 4,
+           "do": []
+          },
+          {
+           "max": 6,
+           "do": [
+            {
+             "n": "gain",
+             "gold": 5
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "id": "leave",
+       "en": "Pass by",
+       "ru": "Пройти мимо",
+       "do": [
+        {
+         "n": "moves",
+         "add": 1
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "calm_seas": {
+   "id": "calm_seas",
+   "ru": "Штиль",
+   "en": "Calm Seas",
+   "do": [
+    {
+     "n": "endMove"
+    }
+   ]
+  },
+  "capricious_official": {
+   "id": "capricious_official",
+   "ru": "Капризный чиновник",
+   "en": "Capricious Official",
+   "do": [
+    {
+     "n": "choice",
+     "id": "capricious_official",
+     "options": [
+      {
+       "id": "space",
+       "en": "Make room",
+       "ru": "Освободить место",
+       "do": [],
+       "cost": {
+        "holdResource": 1
+       }
+      },
+      {
+       "id": "cabin",
+       "en": "Give up the captain's cabin",
+       "ru": "Отдать каюту капитана",
+       "do": [],
+       "cost": {
+        "bells": 2
+       }
+      },
+      {
+       "id": "ignore",
+       "en": "Ignore",
+       "ru": "Игнорировать",
+       "do": [
+        {
+         "n": "ref",
+         "add": 1
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "lost_relic": {
+   "id": "lost_relic",
+   "ru": "Потерянная реликвия",
+   "en": "Lost Relic",
+   "do": [
+    {
+     "n": "choice",
+     "id": "lost_relic",
+     "options": [
+      {
+       "id": "dive",
+       "en": "Dive",
+       "ru": "Нырять",
+       "do": [
+        {
+         "n": "endMove"
+        },
+        {
+         "n": "roll",
+         "table": [
+          {
+           "max": 2,
+           "do": []
+          },
+          {
+           "max": 4,
+           "do": [
+            {
+             "n": "gain",
+             "gold": 5
+            },
+            {
+             "n": "gain",
+             "crosses": 1
+            }
+           ]
+          },
+          {
+           "max": 6,
+           "do": [
+            {
+             "n": "gain",
+             "gold": 15
+            },
+            {
+             "n": "gain",
+             "crosses": 2
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "id": "abandon",
+       "en": "Not worth it",
+       "ru": "Не стоит того",
+       "do": [
+        {
+         "n": "lose",
+         "crosses": 3
+        },
+        {
+         "n": "moves",
+         "add": 1
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "message_in_a_bottle_1": {
+   "id": "message_in_a_bottle_1",
+   "ru": "Послание в бутылке",
+   "en": "Message in a Bottle 1",
+   "do": [
+    {
+     "n": "choice",
+     "id": "message_in_a_bottle_1",
+     "options": [
+      {
+       "id": "deliver",
+       "en": "Deliver the letter",
+       "ru": "Доставить письмо",
+       "do": [
+        {
+         "n": "toEurope"
+        }
+       ]
+      },
+      {
+       "id": "discard",
+       "en": "Throw it back",
+       "ru": "Выбросить назад в море",
+       "do": []
+      }
+     ]
+    }
+   ]
+  },
+  "message_in_a_bottle_2": {
+   "id": "message_in_a_bottle_2",
+   "ru": "Послание в бутылке",
+   "en": "Message in a Bottle 2",
+   "do": [
+    {
+     "n": "choice",
+     "id": "message_in_a_bottle_2",
+     "options": [
+      {
+       "id": "spread",
+       "en": "Spread",
+       "ru": "Распространить",
+       "do": [
+        {
+         "n": "gain",
+         "bells": 2
+        },
+        {
+         "n": "ref",
+         "add": 1
+        }
+       ]
+      },
+      {
+       "id": "destroy",
+       "en": "Destroy",
+       "ru": "Уничтожить",
+       "do": [
+        {
+         "n": "ref",
+         "add": -1
+        }
+       ],
+       "cost": {
+        "bells": 2
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "message_in_a_bottle_3": {
+   "id": "message_in_a_bottle_3",
+   "ru": "Послание в бутылке",
+   "en": "Message in a Bottle 3",
+   "do": [
+    {
+     "n": "choice",
+     "id": "message_in_a_bottle_3",
+     "options": [
+      {
+       "id": "spread",
+       "en": "Spread",
+       "ru": "Распространить",
+       "do": [
+        {
+         "n": "gain",
+         "bells": 1
+        },
+        {
+         "n": "ref",
+         "add": 1
+        }
+       ]
+      },
+      {
+       "id": "destroy",
+       "en": "Destroy",
+       "ru": "Уничтожить",
+       "do": [],
+       "cost": {
+        "bells": 1
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "rich_reefs": {
+   "id": "rich_reefs",
+   "ru": "Богатство рифов",
+   "en": "Rich Reefs",
+   "do": [
+    {
+     "n": "choice",
+     "id": "rich_reefs",
+     "options": [
+      {
+       "id": "dive",
+       "en": "Dive",
+       "ru": "Нырять",
+       "do": [
+        {
+         "n": "endMove"
+        },
+        {
+         "n": "roll",
+         "table": [
+          {
+           "max": 2,
+           "do": []
+          },
+          {
+           "max": 4,
+           "do": [
+            {
+             "n": "gain",
+             "gold": 8
+            }
+           ]
+          },
+          {
+           "max": 6,
+           "do": [
+            {
+             "n": "gain",
+             "gold": 20
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "id": "leave",
+       "en": "No delay",
+       "ru": "Не задерживаемся",
+       "do": [
+        {
+         "n": "moves",
+         "add": 1
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "tactics": {
+  "line_infantry": {
+   "id": "line_infantry",
+   "ru": "Линейная пехота",
+   "en": "Line Infantry",
+   "effect": {
+    "t": "perCubes",
+    "add": 1,
+    "per": 3
+   }
+  },
+  "ships_of_the_line": {
+   "id": "ships_of_the_line",
+   "ru": "Линейные корабли",
+   "en": "Ships of the Line",
+   "effect": {
+    "t": "perOcean",
+    "add": 1,
+    "per": 2
+   }
+  },
+  "native_scouts": {
+   "id": "native_scouts",
+   "ru": "Индейские скауты",
+   "en": "Native Scouts",
+   "effect": {
+    "t": "noTerrain"
+   }
+  },
+  "hessian_mercenaries": {
+   "id": "hessian_mercenaries",
+   "ru": "Гессенские наёмники",
+   "en": "Hessian Mercenaries",
+   "effect": {
+    "t": "cubes",
+    "add": 4
+   }
+  },
+  "surprise_assault": {
+   "id": "surprise_assault",
+   "ru": "Внезапный штурм",
+   "en": "Surprise Assault",
+   "effect": {
+    "t": "successFrom",
+    "faces": [
+     4,
+     5,
+     6
+    ]
+   }
+  },
+  "siege_artillery": {
+   "id": "siege_artillery",
+   "ru": "Осадная артиллерия",
+   "en": "Siege Artillery",
+   "effect": {
+    "t": "noBuildings"
+   }
+  },
+  "loyalist_militia": {
+   "id": "loyalist_militia",
+   "ru": "Ополчение лоялистов",
+   "en": "Loyalist Militia",
+   "effect": {
+    "t": "militiaPerCross",
+    "value": 1
+   }
+  },
+  "extended_supply_lines": {
+   "id": "extended_supply_lines",
+   "ru": "Растянутые коммуникации",
+   "en": "Extended Supply Lines",
+   "effect": {
+    "t": "minSuccesses",
+    "value": 2
+   }
+  },
+  "gentlemans_war": {
+   "id": "gentlemans_war",
+   "ru": "Джентльменская война",
+   "en": "Gentleman’s War",
+   "effect": {
+    "t": "none"
+   }
+  }
+ },
+ "tribes": {
+  "inca": {
+   "id": "inca",
+   "ru": "Инки",
+   "en": "Inca",
+   "terrain": "mountains",
+   "hostility": 3,
+   "population": 4,
+   "copies": 2,
+   "loot": {
+    "gold": 25
+   }
+  },
+  "aztec": {
+   "id": "aztec",
+   "ru": "Ацтеки",
+   "en": "Aztec",
+   "terrain": "grassland",
+   "hostility": 5,
+   "population": 5,
+   "copies": 2,
+   "loot": {
+    "gold": 20
+   }
+  },
+  "arawak": {
+   "id": "arawak",
+   "ru": "Араваки",
+   "en": "Arawak",
+   "terrain": "forest",
+   "hostility": 2,
+   "population": 2,
+   "copies": 2,
+   "loot": {
+    "gold": 4
+   }
+  },
+  "caribs": {
+   "id": "caribs",
+   "ru": "Карибы",
+   "en": "Caribs",
+   "terrain": "forest",
+   "hostility": 4,
+   "population": 1,
+   "copies": 2,
+   "loot": {
+    "gold": 4
+   }
+  },
+  "cherokee": {
+   "id": "cherokee",
+   "ru": "Чероки",
+   "en": "Cherokee",
+   "terrain": "mountains",
+   "hostility": 3,
+   "population": 3,
+   "copies": 2,
+   "loot": {
+    "res": "crops",
+    "amount": 5
+   }
+  },
+  "iroquois": {
+   "id": "iroquois",
+   "ru": "Ирокезы",
+   "en": "Iroquois",
+   "terrain": "forest",
+   "hostility": 4,
+   "population": 3,
+   "copies": 2,
+   "loot": {
+    "res": "crops",
+    "amount": 6
+   }
+  },
+  "sioux": {
+   "id": "sioux",
+   "ru": "Сиу",
+   "en": "Sioux",
+   "terrain": "grassland",
+   "hostility": 3,
+   "population": 2,
+   "copies": 2,
+   "loot": {
+    "res": "crops",
+    "amount": 3
+   }
+  },
+  "apache": {
+   "id": "apache",
+   "ru": "Апачи",
+   "en": "Apache",
+   "terrain": "desert",
+   "hostility": 4,
+   "population": 2,
+   "copies": 2,
+   "loot": {
+    "gold": 8
+   }
+  },
+  "tupi": {
+   "id": "tupi",
+   "ru": "Тупи",
+   "en": "Tupi",
+   "terrain": "forest",
+   "hostility": 2,
+   "population": 2,
+   "copies": 2,
+   "loot": {
+    "gold": 4
+   }
+  },
+  "mapuche": {
+   "id": "mapuche",
+   "ru": "Арауканы",
+   "en": "Mapuche",
+   "terrain": "mountains",
+   "hostility": 5,
+   "population": 2,
+   "copies": 2,
+   "loot": {
+    "res": "silver",
+    "amount": 3
+   }
+  },
+  "comanche": {
+   "id": "comanche",
+   "ru": "Команчи",
+   "en": "Comanche",
+   "terrain": "grassland",
+   "hostility": 4,
+   "population": 2,
+   "copies": 2,
+   "loot": {
+    "gold": 8
+   }
+  },
+  "inuit": {
+   "id": "inuit",
+   "ru": "Инуиты",
+   "en": "Inuit",
+   "terrain": "tundra",
+   "hostility": 2,
+   "population": 1,
+   "copies": 2,
+   "loot": {
+    "res": "crops",
+    "amount": 2
+   }
+  },
+  "pueblo": {
+   "id": "pueblo",
+   "ru": "Пуэбло",
+   "en": "Pueblo",
+   "terrain": "desert",
+   "hostility": 3,
+   "population": 3,
+   "copies": 2,
+   "loot": {
+    "gold": 10
+   }
+  }
+ },
+ "tiles": [
+  {
+   "id": 1,
+   "cells": [
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "grassland",
+     "poi": "village",
+     "bonus": "corn"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "grassland",
+     "bonus": "corn"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean",
+     "bonus": "fish"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "cells": [
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean",
+     "poi": "wreck"
+    },
+    {
+     "terrain": "ocean",
+     "bonus": "fish"
+    },
+    {
+     "terrain": "grassland",
+     "poi": "village"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "grassland",
+     "poi": "ruin"
+    },
+    {
+     "terrain": "ocean"
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "cells": [
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "grassland",
+     "bonus": "leaf"
+    },
+    {
+     "terrain": "ocean",
+     "bonus": "fish"
+    },
+    {
+     "terrain": "desert",
+     "poi": "village"
+    },
+    {
+     "terrain": "grassland"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "grassland"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "cells": [
+    {
+     "terrain": "grassland",
+     "poi": "village"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean",
+     "bonus": "fish"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "cells": [
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "grassland",
+     "poi": "village"
+    },
+    {
+     "terrain": "grassland",
+     "poi": "ruin",
+     "bonus": "leaf"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    }
+   ]
+  },
+  {
+   "id": 6,
+   "cells": [
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "mountains",
+     "poi": "village"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean",
+     "bonus": "fish"
+    },
+    {
+     "terrain": "grassland"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "grassland"
+    },
+    {
+     "terrain": "grassland",
+     "bonus": "leaf"
+    }
+   ]
+  },
+  {
+   "id": 7,
+   "cells": [
+    {
+     "terrain": "grassland"
+    },
+    {
+     "terrain": "forest",
+     "poi": "village"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "mountains",
+     "poi": "ruin"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    }
+   ]
+  },
+  {
+   "id": 8,
+   "cells": [
+    {
+     "terrain": "grassland"
+    },
+    {
+     "terrain": "grassland"
+    },
+    {
+     "terrain": "mountains",
+     "bonus": "corn"
+    },
+    {
+     "terrain": "forest",
+     "poi": "village"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean",
+     "bonus": "fish"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    }
+   ]
+  },
+  {
+   "id": 9,
+   "cells": [
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean",
+     "bonus": "fish"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "forest"
+    },
+    {
+     "terrain": "forest",
+     "poi": "village"
+    },
+    {
+     "terrain": "mountains",
+     "poi": "ruin"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    }
+   ]
+  },
+  {
+   "id": 10,
+   "cells": [
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "forest",
+     "bonus": "fur"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "forest"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "grassland",
+     "poi": "village"
+    },
+    {
+     "terrain": "grassland",
+     "bonus": "leaf"
+    }
+   ]
+  },
+  {
+   "id": 11,
+   "cells": [
+    {
+     "terrain": "forest"
+    },
+    {
+     "terrain": "ocean",
+     "bonus": "fish"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "grassland"
+    },
+    {
+     "terrain": "mountains",
+     "poi": "village"
+    },
+    {
+     "terrain": "forest"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean",
+     "bonus": "fish"
+    }
+   ]
+  },
+  {
+   "id": 12,
+   "cells": [
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "grassland"
+    },
+    {
+     "terrain": "grassland",
+     "poi": "village"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean",
+     "bonus": "fish"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    }
+   ]
+  },
+  {
+   "id": 13,
+   "cells": [
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "grassland"
+    },
+    {
+     "terrain": "desert"
+    },
+    {
+     "terrain": "grassland",
+     "bonus": "leaf"
+    },
+    {
+     "terrain": "grassland"
+    },
+    {
+     "terrain": "desert"
+    },
+    {
+     "terrain": "desert",
+     "poi": "village"
+    }
+   ]
+  },
+  {
+   "id": 14,
+   "cells": [
+    {
+     "terrain": "ocean",
+     "poi": "wreck"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "forest",
+     "poi": "village"
+    },
+    {
+     "terrain": "ocean",
+     "poi": "wreck"
+    },
+    {
+     "terrain": "grassland",
+     "bonus": "leaf"
+    },
+    {
+     "terrain": "forest"
+    },
+    {
+     "terrain": "forest",
+     "bonus": "timber"
+    }
+   ]
+  },
+  {
+   "id": 15,
+   "cells": [
+    {
+     "terrain": "mountains",
+     "poi": "village"
+    },
+    {
+     "terrain": "ocean",
+     "bonus": "fish"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "mountains"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean",
+     "bonus": "fish"
+    },
+    {
+     "terrain": "forest",
+     "bonus": "fur"
+    },
+    {
+     "terrain": "ocean"
+    }
+   ]
+  },
+  {
+   "id": 16,
+   "cells": [
+    {
+     "terrain": "forest"
+    },
+    {
+     "terrain": "grassland",
+     "poi": "village"
+    },
+    {
+     "terrain": "forest"
+    },
+    {
+     "terrain": "mountains"
+    },
+    {
+     "terrain": "forest",
+     "poi": "village",
+     "bonus": "fur"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    }
+   ]
+  },
+  {
+   "id": 17,
+   "cells": [
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "forest",
+     "poi": "village",
+     "bonus": "fur"
+    },
+    {
+     "terrain": "grassland",
+     "poi": "ruin"
+    },
+    {
+     "terrain": "grassland"
+    },
+    {
+     "terrain": "mountains"
+    },
+    {
+     "terrain": "forest",
+     "bonus": "timber"
+    },
+    {
+     "terrain": "grassland"
+    }
+   ]
+  },
+  {
+   "id": 18,
+   "cells": [
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "grassland"
+    },
+    {
+     "terrain": "forest"
+    },
+    {
+     "terrain": "ocean",
+     "poi": "wreck"
+    },
+    {
+     "terrain": "forest",
+     "poi": "village"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    }
+   ]
+  },
+  {
+   "id": 19,
+   "cells": [
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "mountains",
+     "poi": "village"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "forest",
+     "bonus": "timber"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    }
+   ]
+  },
+  {
+   "id": 20,
+   "cells": [
+    {
+     "terrain": "forest"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean",
+     "bonus": "fish"
+    },
+    {
+     "terrain": "mountains"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "grassland",
+     "poi": "village"
+    },
+    {
+     "terrain": "ocean"
+    }
+   ]
+  },
+  {
+   "id": 21,
+   "cells": [
+    {
+     "terrain": "mountains",
+     "poi": "ruin"
+    },
+    {
+     "terrain": "forest"
+    },
+    {
+     "terrain": "ocean",
+     "bonus": "fish"
+    },
+    {
+     "terrain": "ocean",
+     "bonus": "fish"
+    },
+    {
+     "terrain": "forest"
+    },
+    {
+     "terrain": "ocean",
+     "bonus": "fish"
+    },
+    {
+     "terrain": "ocean",
+     "poi": "wreck"
+    },
+    {
+     "terrain": "forest"
+    },
+    {
+     "terrain": "mountains",
+     "poi": "village"
+    }
+   ]
+  },
+  {
+   "id": 22,
+   "cells": [
+    {
+     "terrain": "grassland",
+     "bonus": "leaf"
+    },
+    {
+     "terrain": "grassland",
+     "poi": "ruin"
+    },
+    {
+     "terrain": "desert",
+     "poi": "village"
+    },
+    {
+     "terrain": "mountains"
+    },
+    {
+     "terrain": "forest"
+    },
+    {
+     "terrain": "forest"
+    },
+    {
+     "terrain": "forest"
+    },
+    {
+     "terrain": "forest"
+    },
+    {
+     "terrain": "ocean",
+     "bonus": "fish"
+    }
+   ]
+  },
+  {
+   "id": 23,
+   "cells": [
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "mountains"
+    },
+    {
+     "terrain": "mountains"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "grassland",
+     "bonus": "corn"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "mountains"
+    },
+    {
+     "terrain": "grassland",
+     "poi": "village"
+    },
+    {
+     "terrain": "ocean"
+    }
+   ]
+  },
+  {
+   "id": 24,
+   "cells": [
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "forest"
+    },
+    {
+     "terrain": "forest",
+     "poi": "village"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean",
+     "bonus": "fish"
+    },
+    {
+     "terrain": "desert"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean",
+     "bonus": "fish"
+    }
+   ]
+  },
+  {
+   "id": 25,
+   "cells": [
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "desert"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "desert",
+     "poi": "ruin"
+    },
+    {
+     "terrain": "grassland",
+     "poi": "village"
+    },
+    {
+     "terrain": "grassland",
+     "bonus": "leaf"
+    },
+    {
+     "terrain": "mountains"
+    },
+    {
+     "terrain": "grassland"
+    },
+    {
+     "terrain": "ocean"
+    }
+   ]
+  },
+  {
+   "id": 26,
+   "cells": [
+    {
+     "terrain": "grassland",
+     "poi": "village"
+    },
+    {
+     "terrain": "grassland"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "grassland"
+    },
+    {
+     "terrain": "grassland"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "grassland",
+     "poi": "ruin"
+    },
+    {
+     "terrain": "grassland"
+    }
+   ]
+  },
+  {
+   "id": 27,
+   "cells": [
+    {
+     "terrain": "forest"
+    },
+    {
+     "terrain": "grassland",
+     "poi": "ruin"
+    },
+    {
+     "terrain": "desert",
+     "poi": "village"
+    },
+    {
+     "terrain": "grassland"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "grassland"
+    },
+    {
+     "terrain": "grassland",
+     "bonus": "corn"
+    },
+    {
+     "terrain": "ocean"
+    }
+   ]
+  },
+  {
+   "id": 28,
+   "cells": [
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "forest",
+     "bonus": "fur"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "grassland",
+     "poi": "village"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "desert"
+    },
+    {
+     "terrain": "grassland"
+    }
+   ]
+  },
+  {
+   "id": 29,
+   "cells": [
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "grassland",
+     "bonus": "corn"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "forest",
+     "poi": "village"
+    },
+    {
+     "terrain": "grassland"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "grassland",
+     "bonus": "leaf"
+    },
+    {
+     "terrain": "ocean"
+    }
+   ]
+  },
+  {
+   "id": 30,
+   "cells": [
+    {
+     "terrain": "ocean",
+     "bonus": "fish"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "desert"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "forest",
+     "bonus": "timber"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "forest"
+    },
+    {
+     "terrain": "forest",
+     "poi": "village"
+    },
+    {
+     "terrain": "ocean"
+    }
+   ]
+  },
+  {
+   "id": 31,
+   "cells": [
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "grassland"
+    },
+    {
+     "terrain": "grassland"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "mountains"
+    },
+    {
+     "terrain": "grassland",
+     "poi": "village"
+    },
+    {
+     "terrain": "grassland",
+     "bonus": "leaf"
+    },
+    {
+     "terrain": "grassland"
+    },
+    {
+     "terrain": "desert"
+    }
+   ]
+  },
+  {
+   "id": 32,
+   "cells": [
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "grassland"
+    },
+    {
+     "terrain": "grassland"
+    },
+    {
+     "terrain": "forest",
+     "poi": "village"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "grassland",
+     "bonus": "leaf"
+    },
+    {
+     "terrain": "grassland"
+    }
+   ]
+  },
+  {
+   "id": 33,
+   "cells": [
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "forest",
+     "poi": "village"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "desert",
+     "poi": "ruin"
+    },
+    {
+     "terrain": "ocean",
+     "bonus": "fish"
+    },
+    {
+     "terrain": "mountains"
+    }
+   ]
+  },
+  {
+   "id": 34,
+   "cells": [
+    {
+     "terrain": "forest"
+    },
+    {
+     "terrain": "mountains",
+     "poi": "village"
+    },
+    {
+     "terrain": "forest"
+    },
+    {
+     "terrain": "grassland"
+    },
+    {
+     "terrain": "mountains",
+     "bonus": "silver"
+    },
+    {
+     "terrain": "ocean",
+     "poi": "wreck"
+    },
+    {
+     "terrain": "grassland"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    }
+   ]
+  },
+  {
+   "id": 35,
+   "cells": [
+    {
+     "terrain": "desert"
+    },
+    {
+     "terrain": "grassland"
+    },
+    {
+     "terrain": "grassland",
+     "bonus": "leaf"
+    },
+    {
+     "terrain": "forest"
+    },
+    {
+     "terrain": "mountains",
+     "poi": "village"
+    },
+    {
+     "terrain": "mountains",
+     "bonus": "corn"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    }
+   ]
+  },
+  {
+   "id": 36,
+   "cells": [
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "grassland"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "grassland"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "forest",
+     "poi": "village"
+    }
+   ]
+  },
+  {
+   "id": 37,
+   "cells": [
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "grassland",
+     "bonus": "leaf"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "mountains",
+     "bonus": "corn"
+    },
+    {
+     "terrain": "mountains",
+     "poi": "village"
+    },
+    {
+     "terrain": "mountains"
+    }
+   ]
+  },
+  {
+   "id": 38,
+   "cells": [
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "mountains",
+     "poi": "village"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "desert"
+    },
+    {
+     "terrain": "ocean",
+     "poi": "wreck"
+    },
+    {
+     "terrain": "ocean",
+     "bonus": "fish"
+    },
+    {
+     "terrain": "forest"
+    },
+    {
+     "terrain": "ocean"
+    }
+   ]
+  },
+  {
+   "id": 39,
+   "cells": [
+    {
+     "terrain": "forest",
+     "poi": "village"
+    },
+    {
+     "terrain": "mountains",
+     "poi": "ruin"
+    },
+    {
+     "terrain": "mountains",
+     "poi": "village"
+    },
+    {
+     "terrain": "mountains",
+     "bonus": "silver"
+    },
+    {
+     "terrain": "grassland"
+    },
+    {
+     "terrain": "mountains"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    }
+   ]
+  },
+  {
+   "id": 40,
+   "cells": [
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "mountains"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean",
+     "poi": "wreck"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean",
+     "bonus": "fish"
+    },
+    {
+     "terrain": "tundra",
+     "poi": "village"
+    }
+   ]
+  },
+  {
+   "id": 41,
+   "cells": [
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean",
+     "bonus": "fish"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "grassland",
+     "poi": "village"
+    },
+    {
+     "terrain": "forest"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "forest"
+    },
+    {
+     "terrain": "ocean",
+     "bonus": "fish"
+    }
+   ]
+  },
+  {
+   "id": 42,
+   "cells": [
+    {
+     "terrain": "forest"
+    },
+    {
+     "terrain": "mountains",
+     "poi": "village"
+    },
+    {
+     "terrain": "ocean",
+     "bonus": "fish"
+    },
+    {
+     "terrain": "ocean",
+     "poi": "wreck"
+    },
+    {
+     "terrain": "forest"
+    },
+    {
+     "terrain": "ocean",
+     "poi": "wreck"
+    },
+    {
+     "terrain": "desert",
+     "poi": "village"
+    },
+    {
+     "terrain": "forest"
+    },
+    {
+     "terrain": "grassland",
+     "bonus": "corn"
+    }
+   ]
+  },
+  {
+   "id": 43,
+   "cells": [
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean",
+     "bonus": "fish"
+    },
+    {
+     "terrain": "tundra"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "tundra"
+    },
+    {
+     "terrain": "tundra"
+    }
+   ]
+  },
+  {
+   "id": 44,
+   "cells": [
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean",
+     "bonus": "fish"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "tundra"
+    },
+    {
+     "terrain": "tundra",
+     "poi": "village"
+    },
+    {
+     "terrain": "ocean"
+    }
+   ]
+  },
+  {
+   "id": 45,
+   "cells": [
+    {
+     "terrain": "grassland",
+     "poi": "ruin"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "forest"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "tundra"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "tundra"
+    },
+    {
+     "terrain": "tundra"
+    },
+    {
+     "terrain": "ocean",
+     "bonus": "fish"
+    }
+   ]
+  },
+  {
+   "id": 46,
+   "cells": [
+    {
+     "terrain": "ocean",
+     "bonus": "fish"
+    },
+    {
+     "terrain": "forest"
+    },
+    {
+     "terrain": "forest"
+    },
+    {
+     "terrain": "mountains"
+    },
+    {
+     "terrain": "mountains",
+     "poi": "village"
+    },
+    {
+     "terrain": "forest"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean",
+     "bonus": "fish"
+    }
+   ]
+  },
+  {
+   "id": 47,
+   "cells": [
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean",
+     "bonus": "fish"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "forest",
+     "bonus": "timber"
+    },
+    {
+     "terrain": "mountains"
+    },
+    {
+     "terrain": "mountains"
+    },
+    {
+     "terrain": "forest",
+     "poi": "ruin"
+    },
+    {
+     "terrain": "forest",
+     "poi": "village"
+    }
+   ]
+  },
+  {
+   "id": 48,
+   "cells": [
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "mountains"
+    },
+    {
+     "terrain": "grassland"
+    },
+    {
+     "terrain": "forest"
+    },
+    {
+     "terrain": "ocean",
+     "bonus": "fish"
+    },
+    {
+     "terrain": "tundra"
+    },
+    {
+     "terrain": "tundra"
+    },
+    {
+     "terrain": "tundra"
+    }
+   ]
+  },
+  {
+   "id": 49,
+   "cells": [
+    {
+     "terrain": "tundra"
+    },
+    {
+     "terrain": "mountains",
+     "bonus": "silver"
+    },
+    {
+     "terrain": "ocean",
+     "bonus": "fish"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "grassland"
+    },
+    {
+     "terrain": "ocean",
+     "bonus": "fish"
+    },
+    {
+     "terrain": "grassland"
+    },
+    {
+     "terrain": "mountains"
+    },
+    {
+     "terrain": "ocean"
+    }
+   ]
+  },
+  {
+   "id": 50,
+   "cells": [
+    {
+     "terrain": "ocean",
+     "bonus": "fish"
+    },
+    {
+     "terrain": "tundra"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "forest"
+    },
+    {
+     "terrain": "forest"
+    },
+    {
+     "terrain": "mountains",
+     "poi": "village"
+    },
+    {
+     "terrain": "grassland",
+     "poi": "village",
+     "bonus": "leaf"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    }
+   ]
+  },
+  {
+   "id": 51,
+   "cells": [
+    {
+     "terrain": "forest"
+    },
+    {
+     "terrain": "mountains",
+     "poi": "village"
+    },
+    {
+     "terrain": "grassland"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "forest"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "forest"
+    },
+    {
+     "terrain": "mountains"
+    },
+    {
+     "terrain": "forest"
+    }
+   ]
+  },
+  {
+   "id": 52,
+   "cells": [
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "forest"
+    },
+    {
+     "terrain": "ocean",
+     "poi": "wreck"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "forest",
+     "bonus": "timber"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    }
+   ]
+  },
+  {
+   "id": 53,
+   "cells": [
+    {
+     "terrain": "forest"
+    },
+    {
+     "terrain": "ocean",
+     "bonus": "fish"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "forest"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean",
+     "bonus": "fish"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "mountains"
+    }
+   ]
+  },
+  {
+   "id": 54,
+   "cells": [
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean",
+     "poi": "wreck"
+    },
+    {
+     "terrain": "forest"
+    },
+    {
+     "terrain": "mountains"
+    },
+    {
+     "terrain": "mountains",
+     "poi": "ruin"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean",
+     "bonus": "fish"
+    },
+    {
+     "terrain": "tundra",
+     "bonus": "fur"
+    }
+   ]
+  },
+  {
+   "id": 55,
+   "cells": [
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "forest",
+     "bonus": "timber"
+    },
+    {
+     "terrain": "forest"
+    },
+    {
+     "terrain": "ocean",
+     "bonus": "fish"
+    },
+    {
+     "terrain": "forest"
+    },
+    {
+     "terrain": "mountains"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "grassland",
+     "bonus": "corn"
+    },
+    {
+     "terrain": "ocean"
+    }
+   ]
+  },
+  {
+   "id": 56,
+   "cells": [
+    {
+     "terrain": "mountains",
+     "poi": "ruin",
+     "bonus": "silver"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "grassland",
+     "poi": "village"
+    },
+    {
+     "terrain": "grassland",
+     "bonus": "corn"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "grassland",
+     "poi": "village",
+     "bonus": "corn"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    }
+   ]
+  },
+  {
+   "id": 57,
+   "cells": [
+    {
+     "terrain": "ocean",
+     "bonus": "fish"
+    },
+    {
+     "terrain": "grassland"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "forest",
+     "poi": "village"
+    },
+    {
+     "terrain": "grassland"
+    },
+    {
+     "terrain": "grassland"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    }
+   ]
+  },
+  {
+   "id": 58,
+   "cells": [
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "grassland"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "forest"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "mountains"
+    },
+    {
+     "terrain": "grassland"
+    },
+    {
+     "terrain": "desert"
+    }
+   ]
+  },
+  {
+   "id": 59,
+   "cells": [
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "grassland",
+     "bonus": "leaf"
+    },
+    {
+     "terrain": "grassland"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "grassland"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "grassland"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "grassland"
+    }
+   ]
+  },
+  {
+   "id": 60,
+   "cells": [
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "grassland",
+     "poi": "ruin"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "forest",
+     "bonus": "fur"
+    },
+    {
+     "terrain": "grassland"
+    }
+   ]
+  },
+  {
+   "id": 61,
+   "cells": [
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "grassland"
+    },
+    {
+     "terrain": "grassland",
+     "poi": "ruin"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "grassland",
+     "bonus": "corn"
+    },
+    {
+     "terrain": "grassland"
+    }
+   ]
+  },
+  {
+   "id": 62,
+   "cells": [
+    {
+     "terrain": "grassland",
+     "bonus": "leaf"
+    },
+    {
+     "terrain": "forest"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "desert",
+     "poi": "ruin"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "grassland",
+     "bonus": "corn"
+    }
+   ]
+  },
+  {
+   "id": 63,
+   "cells": [
+    {
+     "terrain": "forest",
+     "bonus": "fur"
+    },
+    {
+     "terrain": "forest"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "forest",
+     "poi": "village"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean",
+     "poi": "wreck"
+    },
+    {
+     "terrain": "ocean"
+    }
+   ]
+  },
+  {
+   "id": 64,
+   "cells": [
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean",
+     "bonus": "fish"
+    },
+    {
+     "terrain": "ocean",
+     "bonus": "fish"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean",
+     "poi": "wreck"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean",
+     "bonus": "fish"
+    }
+   ]
+  },
+  {
+   "id": 65,
+   "cells": [
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "tundra"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    }
+   ]
+  },
+  {
+   "id": 66,
+   "cells": [
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "tundra"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    }
+   ]
+  },
+  {
+   "id": 67,
+   "cells": [
+    {
+     "terrain": "tundra"
+    },
+    {
+     "terrain": "ocean",
+     "bonus": "fish"
+    },
+    {
+     "terrain": "tundra"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "desert"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    }
+   ]
+  },
+  {
+   "id": 68,
+   "cells": [
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    }
+   ]
+  },
+  {
+   "id": 69,
+   "cells": [
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean",
+     "poi": "wreck"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean",
+     "poi": "wreck"
+    },
+    {
+     "terrain": "ocean"
+    }
+   ]
+  },
+  {
+   "id": 70,
+   "cells": [
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "tundra"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean",
+     "bonus": "fish"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    }
+   ]
+  },
+  {
+   "id": 71,
+   "cells": [
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "desert"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean",
+     "bonus": "fish"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    }
+   ]
+  },
+  {
+   "id": 72,
+   "cells": [
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    }
+   ]
+  },
+  {
+   "id": 73,
+   "cells": [
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean",
+     "poi": "wreck"
+    },
+    {
+     "terrain": "ocean"
+    }
+   ]
+  },
+  {
+   "id": 74,
+   "cells": [
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean"
+    },
+    {
+     "terrain": "ocean",
+     "poi": "wreck"
+    },
+    {
+     "terrain": "ocean"
+    }
+   ]
+  }
+ ],
+ "settings": {
+  "players": {
+   "min": 1,
+   "max": 5
+  },
+  "hand": {
+   "size": 5
+  },
+  "rounds": {
+   "max": 10,
+   "firstYear": 1620,
+   "yearStep": 20
+  },
+  "tax": {
+   "track": [
+    0,
+    1,
+    3,
+    6,
+    10,
+    10,
+    15,
+    15,
+    20,
+    25
+   ],
+   "refuseRef": 2,
+   "refuseRefSolo": 3,
+   "refuseBells": 1
+  },
+  "map": {
+   "size": 4
+  },
+  "ring": {
+   "openSea": 1,
+   "europe": 1
+  },
+  "move": {
+   "points": 5,
+   "explore": 1,
+   "cargo": 1,
+   "embark": 1
+  },
+  "cargo": {
+   "costPer": "operation"
+  },
+  "explore": {
+   "diagonal": false
+  },
+  "hold": {
+   "size": 4,
+   "maxDamage": 4
+  },
+  "damage": {
+   "sendsToEurope": true
+  },
+  "warehouse": {
+   "base": 6
+  },
+  "colony": {
+   "max": 3,
+   "foundCost": {
+    "resource": "food",
+    "value": 5
+   }
+  },
+  "buildings": {
+   "max": 6
+  },
+  "fathers": {
+   "max": 4,
+   "salon": 5
+  },
+  "propaganda": {
+   "maxFathers": 2
+  },
+  "hire": {
+   "max": 2
+  },
+  "pier": {
+   "slots": 5
+  },
+  "market": {
+   "maxPrice": 5
+  },
+  "crosses": {
+   "max": 15,
+   "recruitPerRound": 1
+  },
+  "collection": {
+   "min": 4
+  },
+  "natives": {
+   "maxSettlements": 6,
+   "maxHostility": 5,
+   "allianceMax": 1,
+   "allianceBreak": 4,
+   "giftDice": 3,
+   "giftBase": 1,
+   "preachMin": 0,
+   "afterAttack": 5
+  },
+  "activation": {
+   "giftMaxHostility": 2,
+   "raidMinHostility": 4,
+   "gift": 1
+  },
+  "raid": {
+   "resources": 2
+  },
+  "production": {
+   "emptyMeans": "noToken"
+  },
+  "combat": {
+   "successFaces": [
+    4,
+    5
+   ],
+   "diceCap": null,
+   "countPlayedCard": true,
+   "supportFromCriminalSlave": true,
+   "landingPenalty": -1,
+   "infantryVsShipPenalty": -1,
+   "colonyDefence": 1,
+   "victoryBells": 1
+  },
+  "europe": {
+   "safe": true
+  },
+  "fort": {
+   "replacesStockade": true
+  },
+  "war": {
+   "bells": 15,
+   "refStrength": 2,
+   "hostileCubes": 1,
+   "hostileFrom": 4,
+   "allyCubes": 3,
+   "mercenaryGold": 5,
+   "diceCap": 10,
+   "refStrengthIncludesTactic": true,
+   "tokenBonus": 1,
+   "baseDefence": 1
+  },
+  "score": {
+   "patriotColony": 6,
+   "loyalistColony": 3,
+   "perBell": 1,
+   "agentsPerPoint": 5,
+   "goldPerPoint": 10,
+   "building": 1,
+   "father": 1
+  }
+ }
+}

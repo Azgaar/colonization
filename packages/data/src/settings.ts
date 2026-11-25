@@ -1,0 +1,41 @@
+import type { Settings } from './types.ts';
+
+/** Numbers that are not in the workbook. Sources and decisions: docs/rules-spec.md, docs/decisions.md. */
+export const SETTINGS: Settings = {
+  players: { min: 1, max: 5 },
+  hand: { size: 5 },
+  rounds: { max: 10, firstYear: 1620, yearStep: 20 },
+  tax: { track: [0, 1, 3, 6, 10, 10, 15, 15, 20, 25], refuseRef: 2, refuseRefSolo: 3, refuseBells: 1 },
+  map: { size: 4 },
+  ring: { openSea: 1, europe: 1 },
+  move: { points: 5, explore: 1, cargo: 1, embark: 1 },
+  cargo: { costPer: 'operation' },
+  explore: { diagonal: false },
+  hold: { size: 4, maxDamage: 4 },
+  damage: { sendsToEurope: true },
+  warehouse: { base: 6 },
+  colony: { max: 3, foundCost: { resource: 'food', value: 5 } },
+  buildings: { max: 6 },
+  fathers: { max: 4, salon: 5 },
+  propaganda: { maxFathers: 2 },
+  hire: { max: 2 },
+  pier: { slots: 5 },
+  market: { maxPrice: 5 },
+  crosses: { max: 15, recruitPerRound: 1 },
+  collection: { min: 4 },
+  natives: { maxSettlements: 6, maxHostility: 5, allianceMax: 1, allianceBreak: 4, giftDice: 3, giftBase: 1, preachMin: 0, afterAttack: 5 },
+  activation: { giftMaxHostility: 2, raidMinHostility: 4, gift: 1 },
+  raid: { resources: 2 },
+  production: { emptyMeans: 'noToken' },
+  combat: {
+    successFaces: [4, 5], diceCap: null, countPlayedCard: true, supportFromCriminalSlave: true,
+    landingPenalty: -1, infantryVsShipPenalty: -1, colonyDefence: 1, victoryBells: 1,
+  },
+  europe: { safe: true },
+  fort: { replacesStockade: true },
+  war: {
+    bells: 15, refStrength: 2, hostileCubes: 1, hostileFrom: 4, allyCubes: 3, mercenaryGold: 5, diceCap: 10,
+    refStrengthIncludesTactic: true, tokenBonus: 1, baseDefence: 1,
+  },
+  score: { patriotColony: 6, loyalistColony: 3, perBell: 1, agentsPerPoint: 5, goldPerPoint: 10, building: 1, father: 1 },
+};

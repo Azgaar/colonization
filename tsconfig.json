@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "target": "ES2023", "lib": ["ES2023"], "types": ["node"], "module": "NodeNext", "moduleResolution": "NodeNext",
+    "strict": true, "noUncheckedIndexedAccess": false, "noImplicitOverride": true, "noFallthroughCasesInSwitch": true,
+    "allowImportingTsExtensions": true, "erasableSyntaxOnly": true, "verbatimModuleSyntax": true,
+    "resolveJsonModule": true, "skipLibCheck": true, "noEmit": true
+  },
+  "include": ["packages/*/src", "packages/*/test"]
+}
