@@ -212,7 +212,8 @@ export interface Override {
   remove?: string[];
 }
 /** `base` names a ruleset whose overrides come first: `pc` is `board` plus its own changes. */
-export interface Ruleset { id: string; title: string; base?: string; sandbox?: boolean; overrides: Override[] }
+/** `packages`: named sets of this ruleset's overrides (by id) meant to be tried together, as in `proposed`. */
+export interface Ruleset { id: string; title: string; base?: string; sandbox?: boolean; overrides: Override[]; packages?: Record<string, string[]> }
 /** Where a value can be edited: a workbook cell, or a key in packages/data/src/settings.ts. `row` is null for a new row. */
 export interface Source { sheet: string; row: number | null; column: string | null; header: string }
 export interface GameDef extends GameData { rulesetId: string; rulesetHash: string }

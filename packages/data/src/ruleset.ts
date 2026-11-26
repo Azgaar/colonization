@@ -3,10 +3,11 @@ import { COLLECTIONS, validateChange } from './values.ts';
 import board from '../../../rulesets/board.json' with { type: 'json' };
 import pc from '../../../rulesets/pc.json' with { type: 'json' };
 import alternatives from '../../../rulesets/alternatives.json' with { type: 'json' };
+import proposed from '../../../rulesets/proposed.json' with { type: 'json' };
 
 export class RulesetError extends Error {}
 
-export const rulesets: Record<string, Ruleset> = { board: board as unknown as Ruleset, pc: pc as unknown as Ruleset, alternatives: alternatives as unknown as Ruleset };
+export const rulesets: Record<string, Ruleset> = { board: board as unknown as Ruleset, pc: pc as unknown as Ruleset, alternatives: alternatives as unknown as Ruleset, proposed: proposed as unknown as Ruleset };
 
 /** Apply a ruleset's overrides, after those of its base, to imported data. The result is frozen and shared by all games that use it. */
 export function compileRuleset(data: GameData, rules: Ruleset, all: Record<string, Ruleset> = rulesets): GameDef {

@@ -8,7 +8,7 @@ The game in the browser (milestones M3 and M4). It plays the real rules engine: 
 pnpm web
 ```
 
-Builds `dist/app.js` and the lab's worker `dist/lab-worker.js`, and serves this package at http://localhost:8765. While working on it, run `pnpm web:watch` in one terminal and `node packages/web/tools/serve.ts` in another, then reload the page after a change.
+Builds `dist/app.js`, the lab's worker `dist/lab-worker.js` and the list of sound files `dist/sounds.json`, and serves this package at http://localhost:8765. While working on it, run `pnpm web:watch` in one terminal and `node packages/web/tools/serve.ts` in another, then reload the page after a change.
 
 | Command | When |
 |---|---|
@@ -19,14 +19,17 @@ Builds `dist/app.js` and the lab's worker `dist/lab-worker.js`, and serves this 
 
 ## What it does
 
-- **Title screen**: Continue, New game, Load game, Design bench, Options, About, over a living map where bots play a game of their own under a still camera.
+- **Title screen**: Continue, New game, Load game, Rules, Design bench, Options, About, over a living map where bots play a game of their own under a still camera.
 - **New game**: your nation from a gallery with its starting agents, the seed, and for each rival its nation and who plays it: a person (hot-seat: the screen switches to whoever decides) or a bot at a difficulty (easy, normal, hard, expert: how well it thinks, never what it gets) with its character. A new game opens with a short film drawn in code (harbour, open sea, storm, landfall, first colony); Enter, Esc, Space or Skip end it.
 - **Saving**: the game is saved in the browser after every decision and taken up again on reload. Options → Save to a file / Open a file moves a game between browsers.
 - **Undo** takes back the player's own choices until something hidden shows: dice, a new tile, a card from a deck, or the bots' turns (FR-U-12).
 - **Replays**: a recorded game is stepped through choice by choice, jumped to any point and seen from any seat.
+- **Tutorial**: part of every new game until turned off: in Options (in the game or on the title screen), by ending it, or by reading its last step. Turned on again, it starts over in the game being played. A coach gives seat 0 one step at a time, from the first move to the war and the score, keeps off the player's ship and infantry, and moves on by itself when the step is done (FR-U-20).
+- **Rules** (F1, or Rules in the game menu): the board game's rules in short, in both languages, with the numbers of the rules being played.
 - **Advice** next to Pass: the search bot's three best moves with its reasons; one click plays the whole action, a sail to its end (FR-A-8).
 - **Forecast** (dev mode): each governor's expected score and chance to keep a colony, the likely loyalist, and how each of your colonies would hold now and at the expected war.
-- **Design bench**: Rules (your own rulesets: every value with board's default, validation, reset, and each change's conversion label and table wording), Lab (compare two rulesets on paired seeds, sweep a value, find problems: bot games in the browser's workers), Export (conversion report, the cells to edit by sheet, row and column, the ruleset file).
+- **Design bench**: Rules (your own rulesets: every value with board's default, validation, reset, and each change's conversion label and table wording), Lab (compare two rulesets on paired seeds, sweep a value, find problems: bot games in the browser's workers), Export (conversion report, the cells to edit by sheet, row and column, the ruleset file; in dev mode also Toward the board game: add a change to `pc`, promote it to `board` or drop it, written to `rulesets/` and `docs/decisions.md` by the local server).
+- **Sound**: effects for what happens and music by the game's stage, from `sound/fx` and `sound/music` (see [docs/audio.md](../../docs/audio.md)); Music, Effects and Sound on/off in Options and the game menu. A missing file is silent.
 - **Dev mode** (Options → Dev mode, only when the game runs on this computer, not in a deployed copy): Options then offers the Forecast in the Governors sheet (FR-U-15) and the Dev menu, to edit the game, force the next event, agent and dice, give cards, take any seat, undo anything and change the rules mid-game (FR-U-19, FR-R-6).
 - Both languages, switchable at any time.
 
@@ -38,7 +41,8 @@ Builds `dist/app.js` and the lab's worker `dist/lab-worker.js`, and serves this 
 | `dist/` | Built, not in git |
 | `art/` | Web-sized art, made by `tools/art.py` |
 | `styles/` | One file per area, loaded in order. Later files may rely on earlier ones, as in one stylesheet |
-| `tools/` | `art.py` (art), `serve.ts` (a static server) |
+| `tools/` | `art.py` (art), `serve.ts` (the server; from this computer it also takes rule changes toward the board game), `sounds.ts` (lists the sound files), `fx.sh` and `music.sh` (build `sound/fx` and `sound/music` from `assets/Sound`) |
+| `sound/` | Effects (`fx/`) and music (`music/`), `.ogg`; see docs/audio.md |
 | `test/` | Unit tests: what the view hides, the session's undo, replays |
 
 `src/` modules, each importing what it uses:
@@ -47,6 +51,7 @@ Builds `dist/app.js` and the lab's worker `dist/lab-worker.js`, and serves this 
 |---|---|
 | `main.ts` | Start-up |
 | `sim.ts` | The session: engine and bots, setup, people's seats, saving, undo, news since the last look, bots playing their turns, replays, the advisor, dev mode |
+| `sound.ts` | Effects from new log entries, music by mood with crossfades, volumes kept in the browser; plays only the files listed in `dist/sounds.json` |
 | `rules.ts` | The rulesets: built-in ones and the designer's own, kept in the browser, compiled once |
 | `forecast.ts` | The standing forecast, from the shown seat's view |
 | `view.ts` | What the interface reads from a game state (`GameView`), only what the shown seat may know |
@@ -58,7 +63,7 @@ Builds `dist/app.js` and the lab's worker `dist/lab-worker.js`, and serves this 
 | `paint.ts` | `paint()` draws everything again after any change. Call it rather than a single painter |
 | `icons.ts`, `texts.ts`, `plural.ts` | Flat pictograms and emblems; card texts in both languages; Russian number forms |
 | `map/` | `board.ts` the map and what stands on it, `camera.ts` pan, zoom and tilt, `terrain.ts` the painted ground and sea, `sprites.ts` and `towns.ts` ships, infantry, villages, colonies, `bonus.ts` bonus resources on the ground |
-| `ui/` | One module per part of the screen: `top`, `hand`, `fans` (choices off the map and the glimpse behind a door), `scenes` (Colony and Europe), `look` (a clicked cell), `decisions` (a panel per decision), `reports`, `cards` and `news` (events, ruins, wrecks, other players' turns), `war`, `title`, `attract`, `newgame` and `intro` (the title screen, its living map, the new game screen, the opening film), `setup` (starting games, files, replays), `toasts`, `goods`, `kit` (shared pieces), `bench`, `lab` and `md` (the design bench and its reports), `sandbox` (the Dev menu), `advisor` |
+| `ui/` | One module per part of the screen: `top`, `hand`, `fans` (choices off the map and the glimpse behind a door), `scenes` (Colony and Europe), `look` (a clicked cell), `decisions` (a panel per decision), `reports`, `cards` and `news` (events, ruins, wrecks, other players' turns), `war`, `title`, `attract`, `newgame` and `intro` (the title screen, its living map, the new game screen, the opening film), `setup` (starting games, files, replays), `toasts`, `goods`, `kit` (shared pieces), `bench`, `lab` and `md` (the design bench and its reports), `sandbox` (the Dev menu), `advisor`, `tutorial` and `guide` (the coach and the rules) |
 
 ## Ways of working
 

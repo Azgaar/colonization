@@ -1,0 +1,25 @@
+{
+  "id": "proposed",
+  "title": "Candidate changes for the designer: try one package at a time (docs/proposals.md); nothing here is decided",
+  "base": "board",
+  "sandbox": true,
+  "packages": {
+    "A: cube 1, defence 4": ["cube-strength-1", "base-defence-4"],
+    "B: cube 1, defence 4, no refusal bell": ["cube-strength-1", "base-defence-4", "refusal-no-bell"],
+    "C: cube 1, refusal 1 cube, no refusal bell": ["cube-strength-1", "refusal-1-cube", "refusal-no-bell"]
+  },
+  "overrides": [
+    { "id": "cube-strength-1", "why": "The King's army grows with every refusal at every seat (about 104 cubes at 4 players); colonies are defended by about 5, so 5% survive and the loyalist wins 87%",
+      "conversion": "direct", "table": "Each King's army cube attacks with 1 ⚔️, not 2. / Каждый кубик армии короля атакует с силой 1 ⚔️, а не 2.",
+      "set": { "settings.war.refStrength": 1 } },
+    { "id": "base-defence-4", "why": "A colony's own defence in the war is 1, too small against any share of the King's army",
+      "conversion": "direct", "table": "In the war every colony defends with 4 before buildings, terrain and troops, not 1. / В войне каждая колония защищается с силой 4 до построек, местности и войск, а не 1.",
+      "set": { "settings.war.baseDefence": 4 } },
+    { "id": "refusal-no-bell", "why": "Refusing is free in bells and feeds the race to 15: refusals give 9 of 15 bells and end games early",
+      "conversion": "direct", "table": "Refusing the tax adds cubes to the King's army but gives no bell. / Отказ от налога добавляет кубики в армию короля, но не даёт колокола.",
+      "set": { "settings.tax.refuseBells": 0 } },
+    { "id": "refusal-1-cube", "why": "Each refusal adds 2 cubes to a pool shared by all patriots, so refusing is cheap for the refuser and costly for the others (H2)",
+      "conversion": "direct", "table": "Refusing the tax adds 1 cube to the King's army, not 2 (solo unchanged). / Отказ от налога добавляет в армию короля 1 кубик, а не 2 (соло без изменений).",
+      "set": { "settings.tax.refuseRef": 1 } }
+  ]
+}

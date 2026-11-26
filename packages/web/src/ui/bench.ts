@@ -3,6 +3,7 @@
 import { changeList, conversionReport, editable, flattenRuleset, gameData, getPath, promoteProblem, rulesets, toCsv, toMarkdown, validateChange, where, sourceOf, type Conversion, type Editable, type Override, type Ruleset } from '@col/data';
 import { L, pick } from '../data.ts';
 import { all, custom, defOf, forget, keep } from '../rules.ts';
+import { Dev } from '../sim.ts';
 import { U } from '../state.ts';
 import { lab, labTab } from './lab.ts';
 import { esc, md } from './md.ts';
@@ -83,7 +84,38 @@ function exportTab() {
   return `<div class="b-export"><div class="b-acts"><label>${L('Ruleset', 'Набор')} <select data-b-pick>${Object.keys(all()).map((id) => `<option${id === B.rs ? ' selected' : ''}>${esc(id)}</option>`).join('')}</select></label>
 <button data-b-dl="csv">${L('Cells to edit (CSV)', 'Ячейки для правки (CSV)')}</button><button data-b-dl="md">${L('Cells to edit (Markdown)', 'Ячейки для правки (Markdown)')}</button><button data-b-dl="report">${L('Conversion report', 'Отчёт о конверсии')}</button><button data-b-dl="json">${L('Ruleset file', 'Файл набора')}</button></div>
 <p class="note">${L('To make a change part of the board game: put the ruleset file\'s change into rulesets/pc.json, then run', 'Чтобы перенести изменение в настольную игру: добавьте его в rulesets/pc.json и выполните')} <code>pnpm rules promote &lt;id&gt;</code> ${L('(or drop). The decision is logged in docs/decisions.md.', '(или drop). Решение записывается в docs/decisions.md.')}</p>
+${Dev.on ? `<section class="b-board" id="b-board">${toBoard()}</section>` : ''}
 <div class="md">${md(report)}</div><h4>${L('Cells to edit', 'Ячейки для правки')}</h4><div class="md">${md(toMarkdown(rows))}</div></div>`;
+}
+
+/* ---- toward the board game (dev mode, FR-R-9): the local server writes rulesets/*.json and docs/decisions.md, as `pnpm rules` does ---- */
+const S: { rs: Record<string, Ruleset> | null; down: boolean; busy: boolean; msg: string; rows: string; fresh: boolean } = { rs: null, down: false, busy: false, msg: '', rows: '', fresh: false };
+async function readServer() {
+  try { const r = await fetch('/api/rules'); if (!r.ok) throw new Error(); S.rs = (await r.json()) as Record<string, Ruleset>; S.down = false; } catch { S.down = true; }
+  const el = document.getElementById('b-board'); if (el) el.innerHTML = toBoard();
+}
+function toBoard(): string {
+  const h = `<h4>${L('Toward the board game', 'В настольную игру')}</h4>`;
+  if (S.down) return `${h}<p class="note">${L('The rules files are changed through the local server, which is not answering. Start the game with', 'Файлы правил меняет локальный сервер, а он не отвечает. Запустите игру через')} <code>pnpm web</code> ${L('or use', 'или используйте')} <code>pnpm rules</code>.</p>`;
+  if (!S.rs) { void readServer(); return `${h}<p class="note">${L('Reading the rules files…', 'Читаю файлы правил…')}</p>`; }
+  const pc = S.rs.pc.overrides, board = S.rs.board.overrides, off = S.busy ? ' disabled' : '';
+  const line = (o: Override, acts: string) => { const why = promoteProblem(o); return `<div class="b-ch"><div class="b-ch-h"><b>${esc(o.id)}</b><span>${esc(o.table || o.why || Object.keys(o.set ?? {}).join(', '))}</span>${acts}</div>${why ? `<small class="b-warn">${L('Not ready for the table', 'Не готово для стола')}: ${esc(why)}</small>` : ''}</div>`; };
+  const pcRows = pc.length ? pc.map((o) => line(o, `<button data-b-promote="${esc(o.id)}"${promoteProblem(o) ? ' disabled' : off}>${L('Promote to board', 'В настольную')}</button><button data-b-drop="${esc(o.id)}"${off}>${L('Drop', 'Отклонить')}</button>`)).join('') : `<p class="note">${L('pc plays exactly as board: nothing is waiting for a decision.', 'pc играет как board: решений не ждёт ничего.')}</p>`;
+  const from = B.rs !== 'pc' && B.rs !== 'board' ? all()[B.rs] : undefined;
+  const add = from ? `<h5>${L(`Changes in ${from.id}`, `Изменения в ${from.id}`)}</h5>${from.overrides.length ? from.overrides.map((o) => line(o, pc.some((x) => x.id === o.id) ? `<small>${L('in pc', 'в pc')}</small>` : board.some((x) => x.id === o.id) ? `<small>${L('on board', 'в board')}</small>` : `<button data-b-add="${esc(o.id)}"${promoteProblem(o) ? ' disabled' : off}>${L('Add to pc', 'В pc')}</button>`)).join('') : `<p class="note">${L('No changes.', 'Изменений нет.')}</p>`}` : '';
+  return `${h}<p class="note">${L('A change goes into pc, where it is played and tested; then you promote it to board or drop it. Each decision is logged in docs/decisions.md.', 'Изменение попадает в pc, где его играют и проверяют; затем вы переносите его в board или отклоняете. Каждое решение записывается в docs/decisions.md.')}</p>
+<h5>${L('Waiting in pc', 'Ждут в pc')}</h5>${pcRows}${add}
+${S.msg ? `<p class="b-msg">${esc(S.msg)}${S.fresh ? ` <button data-b-reload>${L('Reload the game', 'Перезагрузить игру')}</button>` : ''}</p>` : ''}${S.rows ? `<div class="md">${md(S.rows)}</div>` : ''}`;
+}
+async function step(kind: 'add' | 'promote' | 'drop', x: { id?: string; override?: Override }) {
+  S.busy = true; S.msg = L('Writing the files and rebuilding the game…', 'Записываю файлы и пересобираю игру…'); S.rows = '';
+  const el = () => document.getElementById('b-board'); el()!.innerHTML = toBoard();
+  try {
+    const r = await fetch(`/api/rules/${kind}`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(x) }), out = (await r.json()) as { message?: string; error?: string; rows?: Parameters<typeof toMarkdown>[0] };
+    S.msg = out.error ?? `${out.message} ${L('Reload to play the new rules.', 'Перезагрузите, чтобы играть по новым правилам.')}`; S.fresh = !out.error;
+    if (out.rows?.length) S.rows = toMarkdown(out.rows);
+  } catch { S.msg = L('The local server did not answer.', 'Локальный сервер не ответил.'); }
+  S.busy = false; await readServer();
 }
 function download(name: string, text: string, type: string) {
   const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type })); a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
@@ -120,6 +152,10 @@ document.addEventListener('click', (e) => {
   else if (q('[data-b-delete]')) { if (confirm(L(`Delete the ruleset "${B.rs}"?`, `Удалить набор «${B.rs}»?`))) { forget(B.rs); B.rs = ''; redraw(); } }
   else if (q('[data-b-test]')) { B.tab = 'lab'; lab.b = B.rs; redraw(); }
   else if (q('[data-b-play]')) { void import('./newgame.ts').then((m) => m.openNewGame(B.rs)); }
+  else if ((x = q('[data-b-promote]'))) { const id = x.dataset.bPromote!; if (confirm(L(`Make "${id}" part of the board game? This changes rulesets/board.json and pc.json and logs the decision.`, `Сделать «${id}» частью настольной игры? Это изменит rulesets/board.json и pc.json и запишет решение.`))) void step('promote', { id }); }
+  else if ((x = q('[data-b-drop]'))) { const id = x.dataset.bDrop!; if (confirm(L(`Drop "${id}" from pc? The decision is logged.`, `Убрать «${id}» из pc? Решение будет записано.`))) void step('drop', { id }); }
+  else if ((x = q('[data-b-add]'))) { const o = all()[B.rs]?.overrides.find((v) => v.id === x!.dataset.bAdd); if (o) void step('add', { override: o }); }
+  else if (q('[data-b-reload]')) location.reload();
   else if ((x = q('[data-b-dl]'))) {
     const r = all()[B.rs], flat = { ...flattenRuleset(r, all()), base: undefined }, rows = changeList(gameData, flat), k = x.dataset.bDl;
     if (k === 'csv') download(`${r.id}-cells.csv`, toCsv(rows), 'text/csv');

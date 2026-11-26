@@ -1,15 +1,23 @@
 /* The game session: the real rules engine with the players in their seats (one or more people, hot-seat) and bots in the others; or a recorded game, replayed. */
-import { applyInPlace, createGame, IllegalChoice, load, map, save, viewFor, type Choice, type Decision, type LogEntry, type State } from '@col/engine';
-import { advise, botForLevel, goalBot, PERSONALITIES, type Bot, type Considered, type Level, type Personality } from '@col/bots';
+import { applyInPlace, clone, createGame, IllegalChoice, load, map, save, viewFor, type Choice, type Decision, type LogEntry, type State } from '@col/engine';
+import { advise, botForLevel, goalBot, PERSONALITIES, type Bot, type Level, type Personality } from '@col/bots';
 import type { GameDef } from '@col/data';
 import { defOf, ids } from './rules.ts';
 import { exportRules, exportState, type GameView } from './view.ts';
+import { fx, hear, keepSound } from './sound.ts';
+import { devOptions, keepOptions, Options } from './options.ts';
 
 /** A log entry or a decision as the interface reads them: the engine keeps their fields loose. */
 export type Entry = LogEntry & Record<string, any>;
 export type Pending = Decision & Record<string, any>;
 /** A choice the engine offers, with its own fields (card, cell, building…). */
 export type Opt = Choice & Record<string, any>;
+
+/** A suggestion of the advisor: the choice, the bot's goal with it (e.g. "ship: explore"), the cell a move heads for,
+ * and the choices that follow at once (what to sell, whom to hire, which Father), worked out in advance on a copy of the game. */
+export interface Advice { choice: Choice; goal: string; to?: number; then: Choice[] }
+/** Follow-up decisions the advisor settles in advance: they hide nothing, so the copy plays them as the game will. */
+const SETTLED = new Set(['trade', 'hire', 'propaganda']);
 
 /** How a new game is set up (FR-U-1). Seat 0 is a person; `bots[i - 1]` is the character of seat i when a bot plays it.
  * `humans` lists the seats people play (hot-seat, FR-U-16; seat 0 alone when left out); `levels[i - 1]` is a bot's difficulty (FR-A-6);
@@ -27,8 +35,8 @@ const SAVE = 'game', wait = (ms: number) => new Promise((r) => setTimeout(r, ms)
 export const LOCAL = typeof location !== 'undefined' && /^(localhost|127\.0\.0\.1|\[::1\]|.+\.local)$/.test(location.hostname);
 /** Dev mode, switched in Options and kept in this browser: the Dev menu (edit the game, force dice and cards, any seat, unlimited undo, other rules mid-game) and, if chosen, the forecast. */
 export const Dev = {
-  get on() { return LOCAL && localStorage.getItem('dev') === '1'; }, set on(v: boolean) { localStorage.setItem('dev', v ? '1' : ''); },
-  get forecast() { return Dev.on && localStorage.getItem('forecast') === '1'; }, set forecast(v: boolean) { localStorage.setItem('forecast', v ? '1' : ''); },
+  get on() { return LOCAL && Options.dev; }, set on(v: boolean) { Options.dev = v; if (v) devOptions(); keepSound(); },
+  get forecast() { return Dev.on && Options.forecast; }, set forecast(v: boolean) { Options.forecast = v; keepOptions(); },
 };
 /** Log entries that show something hidden: dice, a new tile, a card from a deck. Undo stops there (FR-U-12). */
 const REVEALS = new Set(['roll', 'combat', 'reveal', 'settlement', 'poi', 'event', 'gainAgent', 'siege', 'war']);
@@ -36,7 +44,7 @@ const REVEALS = new Set(['roll', 'combat', 'reveal', 'settlement', 'poi', 'event
 /** The first game, before the player sets one up. */
 export const DEFAULT: Setup = { nations: ['french', 'english', 'spanish', 'dutch'], bots: ['balanced', 'trader', 'explorer'], ruleset: 'board', seed: 'start' };
 let def: GameDef = defOf('board'), setup: Setup = DEFAULT;
-let s: State, bots: Bot[] = [], history: { json: string; placed: Placed[] }[] = [], seen = 0, busy = false, fast = localStorage.getItem('fast') === '1';
+let s: State, bots: Bot[] = [], history: { json: string; placed: Placed[] }[] = [], seen = 0, busy = false;
 let replay: { data: Replay; at: number; marks: Map<number, string> } | null = null;
 /** A game the bots play alone behind the title screen. Never saved. */
 let demo = false;
@@ -72,7 +80,7 @@ const mine = () => live() && !!s.pending && humans.has(s.pending.player) && s.pe
 export const Sim = {
   D, placed: [] as Placed[],
   get s() { return s; }, get busy() { return busy; }, get seat() { return seat; }, get setup() { return setup; },
-  get fast() { return fast; }, set fast(v: boolean) { fast = v; localStorage.setItem('fast', v ? '1' : ''); },
+  get fast() { return Options.fast; }, set fast(v: boolean) { Options.fast = v; keepOptions(); },
   get replay() { return replay; },
   /** The kind of decision the player has to make now, if any. */
   kind: (): string | null => (mine() ? s.pending!.kind : null),
@@ -122,6 +130,7 @@ export const Sim = {
     try { applyInPlace(s, c); } catch (e) { if (e instanceof IllegalChoice) { console.warn('refused', JSON.stringify(c), e.message); return false; } throw e; }
     // Recruiting shows the top agent of the deck: that, too, cannot be taken back. A sandbox takes anything back (FR-U-12).
     if (!Sim.sandbox && (s.log.slice(from).some((e) => REVEALS.has(e.e)) || s.pending?.kind === 'recruit')) history = [];
+    if (live() || s.over) hear(s.log.slice(from) as Entry[], seat, true);
     return true;
   },
   /** These entries were already told. */
@@ -137,9 +146,11 @@ export const Sim = {
       applyInPlace(s, bots[p].choose(viewFor(s, p)), true); acted = true;
       if (k === 'turn') last = { p, from };
       const ended = s.over || s.pending!.kind === 'turn' || humans.has(s.pending!.player);
-      if (last && ended) { refresh(); show(last.p, s.log.slice(last.from) as Entry[]); last = null; if (!fast) await wait(650); }
+      if (last && ended) { refresh(); if (!Options.fast) hear(s.log.slice(last.from) as Entry[], seat, false); show(last.p, s.log.slice(last.from) as Entry[]); last = null; if (!Options.fast) await wait(650); }
     }
     if (acted && !Sim.sandbox) history = [];
+    // The end of the game always sounds; otherwise a chime when it is a person's decision again.
+    if (acted && s.over) hear(s.log.slice(-4) as Entry[], seat, false); else if (acted) fx('turn', 0.3);
     busy = false; refresh();
   },
   /** Let a bot play for the player as well, up to some point. */
@@ -151,7 +162,23 @@ export const Sim = {
   },
 
   /** The advisor (FR-A-8): the search bot's best suggestions for the decision in front of the person, with its reasons. Takes most of a second. */
-  advise: (): Considered[] => (mine() ? advise(viewFor(s, seat), { ms: 700, seed: `${s.seed}-advice-${s.log.length}` }) : []),
+  advise(): Advice[] {
+    if (!mine()) return [];
+    const helper = goalBot(`${s.seed}-advice`, PERSONALITIES.balanced);
+    return advise(viewFor(s, seat), { ms: 700, seed: `${s.seed}-advice-${s.log.length}` }).map((x) => {
+      const then: Choice[] = [], c = clone(s);
+      try {
+        applyInPlace(c, x.choice);
+        // New agents on the pier would show what is hidden in the deck: from there on, the bot decides as it plays.
+        for (let n = 0; n < 20 && !c.over && c.pending?.player === seat && SETTLED.has(c.pending.kind); n++) {
+          const k = helper.choose(viewFor(c, seat));
+          if (k.c === 'refresh') break;
+          then.push(k); applyInPlace(c, k);
+        }
+      } catch { then.length = 0; }
+      return { choice: x.choice, goal: x.goal ?? x.why, to: x.to, then };
+    });
+  },
 
   /** After a suggestion is played: the seat's bot carries the action through (each step of a move, loading, the choices it brings) until the decision is no longer this person's or a new turn begins. `step` runs after each choice, to show it. */
   async finish(step: () => Promise<void>) {

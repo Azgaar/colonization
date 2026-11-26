@@ -1,6 +1,6 @@
 /* One panel for every decision that is not placing an agent. */
 import { RESOURCES, type ChoiceOption, type Node, type Resource } from '@col/data';
-import { $, art, cap, D, L, P, pick, settlementAt, t } from '../data.ts';
+import { $, art, cap, cellName, D, L, P, pick, settlementAt, t } from '../data.ts';
 import { icon } from '../icons.ts';
 import { Places } from '../places.ts';
 import { Sim, type Entry, type Opt, type Pending } from '../sim.ts';
@@ -25,7 +25,7 @@ const ASK: Record<string, Pair> = {
 const WORD: Record<string, Pair> = { pay: ['Pay', 'Заплатить'], refuse: ['Refuse', 'Отказаться'], yes: ['Yes', 'Да'], no: ['No', 'Нет'], done: ['Done', 'Готово'], skip: ['Skip', 'Пропустить'], keep: ['Keep', 'Оставить'], leave: ['Leave it', 'Оставить'], sink: ['Sink it', 'Потопить'], stop: ['Stop', 'Хватит'], top: ['Back on top', 'Вернуть наверх'], bottom: ['Under the deck', 'Под колоду'], europe: ['Europe', 'Европа'], resources: ['2 goods', '2 товара'], anger: ['Nothing: they grow angrier', 'Ничего: враждебность растёт'], goods: ['1 goods', '1 товары'], gold: ['5 gold', '5 золота'], boycott: ['Throw away', 'Выбросить'], remove: ['Let go', 'Отпустить'] };
 /** The options of a ruin or wreck that asks for a choice. */
 const optsOf = (d: Pending): ChoiceOption[] => d.opts;
-const where = (c: number) => { const n = (c % D.width) - 1, m = Math.floor(c / D.width); return `${String.fromCharCode(64 + Math.max(1, n + 1))}${m}`; };
+export const where = cellName;
 /** How a choice looks in a decision panel. */
 export function look(c: Opt, d: Pending): Face {
   if (c.c === 'option') { const o = optsOf(d).find((x) => x.id === c.id)!, k = o.cost || {}; return { title: pick([o.en, o.ru]) + (c.card ? `: ${pick(D.agents[c.card])}` : ''), sub: (['gold', 'bells', 'crosses'] as const).filter((q) => k[q]).map((q) => Places.plus(-(k[q] ?? 0), q, 16)).join(' ') + (k.agent && !c.card ? L('your agent can', 'агент подходит') : '') }; }

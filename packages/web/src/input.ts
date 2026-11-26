@@ -6,9 +6,12 @@ import { Board, PICK } from './map/board.ts';
 import { paint } from './paint.ts';
 import { Places } from './places.ts';
 import { Sim } from './sim.ts';
+import { keepSound, Sound } from './sound.ts';
+import { keepOptions, Options } from './options.ts';
 import { S, U, X } from './state.ts';
 import { deciding, paintStep, pickedCards } from './ui/decisions.ts';
 import { peek } from './ui/fans.ts';
+import { setTutorial } from './ui/tutorial.ts';
 /* ---- lifting, hovering, dropping ---- */
 /** An agent pressed in the hand; `on` once it is dragged. */
 let press: { card: string; x: number; y: number; on: boolean } | null = null, ghost: HTMLElement | null = null;
@@ -43,7 +46,11 @@ addEventListener('pointermove', (e: PointerEvent) => {
   // The cell under the pointer shows the plates of what stands there.
   const c = e.target instanceof Element && e.target.closest('.map-stage') ? Board.stage.cell(e.clientX, e.clientY) : null;
   if (c !== S.hov) { S.hov = c; Board.draw(); }
+  // The clicked cell's note closes a second after the pointer leaves the cell and the note.
+  const stay = S.look === null || c === S.look || (e.target instanceof Element && !!e.target.closest('#look'));
+  if (stay) { clearTimeout(lookT); lookT = undefined; } else if (lookT === undefined) { const was = S.look; lookT = setTimeout(() => { lookT = undefined; if (S.look === was) { S.look = null; paint(); } }, 1000); }
 });
+let lookT: ReturnType<typeof setTimeout> | undefined;
 addEventListener('pointerup', (e: PointerEvent) => {
   const p = press; press = null; if (!p) return;
   if (p.on) { put(); if (!drop(e.clientX, e.clientY)) S.card = null; S.over = null; if (!Sim.busy) paint(); }
@@ -67,7 +74,7 @@ document.addEventListener('click', async (e: MouseEvent) => {
   if ((x = q('[data-opt]'))) { const at = S.pickAt, o = at && Places.spaces(S.card)[at.id]?.options?.[+x.dataset.opt!]; if (at && o) commit(o, at.id); return; }
   if (q('[data-agent]')) return;
   if (S.card && !q('button:not([data-space])')) { const id = find(e.clientX, e.clientY); if (id && drop(e.clientX, e.clientY)) return; if (S.pickAt && !q('.kp')) { S.pickAt = null; paint(); return; } }
-  if (Sim.busy && !q('[data-menu],[data-fast],[data-sheet],[data-king]')) return;
+  if (Sim.busy && !q('[data-menu],[data-fast],[data-mute],[data-sheet],[data-king]')) return;
   if (q('[data-ok]')) read();
   else if ((x = q('[data-do]'))) act(JSON.parse(x.dataset.do!));
   else if ((x = q('[data-cargo]'))) cargo(x.dataset.cargo!, x.dataset.r ?? '');
@@ -79,11 +86,13 @@ document.addEventListener('click', async (e: MouseEvent) => {
   else if (q('[data-recruit]')) { Sim.mark(); S.card = null; Sim.apply({ c: 'recruit' }); settle(); }
   else if (q('[data-peace]')) { S.war = -1; paint(); }
   else if ((x = q('[data-war]'))) { if (D.over) { S.war = +x.dataset.war!; S.view = 'map'; S.look = null; U.king = false; focus(); paint(); } }
-  else if ((x = q('[data-lang]'))) { document.documentElement.lang = x.dataset.lang!; paint(); }
+  else if ((x = q('[data-lang]'))) { document.documentElement.lang = Options.lang = x.dataset.lang!; keepOptions(); paint(); }
   else if ((x = q('[data-grid]'))) { Board.grid = !!x.dataset.grid; paint(); }
-  else if ((x = q('[data-follow]'))) { Board.view.auto = x.dataset.follow ? 1 : 0; localStorage.setItem(Board.KEY, JSON.stringify(Board.view)); Board.look(); Board.land(); paint(); }
+  else if ((x = q('[data-follow]'))) { Board.view.auto = x.dataset.follow ? 1 : 0; keepOptions(); Board.look(); Board.land(); paint(); }
+  else if ((x = q('[data-tutorial]'))) { setTutorial(!!x.dataset.tutorial); paint(); }
   else if ((x = q('[data-fast]'))) { Sim.fast = !!x.dataset.fast; paint(); }
-  else if (q('[data-reset]')) { Object.assign(Board.view, Board.VIEW); localStorage.removeItem(Board.KEY); Board.look(); Board.land(); paint(); }
+  else if ((x = q('[data-mute]'))) { Sound.mute = !!x.dataset.mute; keepSound(); paint(); }
+  else if (q('[data-reset]')) { Object.assign(Board.view, Board.VIEW); keepOptions(); Board.look(); Board.land(); paint(); }
   else if ((x = q('[data-cam]'))) { const c = x.dataset.cam; if (c === 'in' || c === 'out') Board.stage.zoomBy(c === 'in' ? 1.25 : 0.8); else if (c === 'home') Board.home(); else Board.fit(); }
   else if (q('[data-auto]')) { const r = D.round; U.menu = false; await Sim.auto((s) => s.round > r || !!s.war); clearNews(); Sim.news(); settle(); }
   else if (q('[data-menu]')) { U.menu = !U.menu; U.king = U.sheet = false; paint(); }
@@ -95,7 +104,7 @@ document.addEventListener('click', async (e: MouseEvent) => {
 });
 // The map sliders of the game menu: seen at once while dragged, kept when let go; a new tilt grows the trees differently, so the land is painted again.
 document.addEventListener('input', (e) => { const el = e.target as HTMLInputElement, k = el.dataset.viewSet as keyof typeof Board.view | undefined; if (!k) return; Board.view[k] = +el.value; el.nextElementSibling!.textContent = `${Board.view[k]}${el.dataset.unit}`; Board.look(); });
-document.addEventListener('change', (e) => { const k = (e.target as HTMLElement).dataset.viewSet; if (!k) return; localStorage.setItem(Board.KEY, JSON.stringify(Board.view)); if (['tilt', 'most'].includes(k)) void Board.land(); });
+document.addEventListener('change', (e) => { const k = (e.target as HTMLElement).dataset.viewSet; if (!k) return; keepOptions(); if (['tilt', 'most'].includes(k)) void Board.land(); });
 addEventListener('keydown', (e: KeyboardEvent) => {
   // Esc puts down or closes what is open, one thing at a time; with nothing left open on the map, it opens the options menu.
   if (e.key === 'Escape' && !U.title) { put(); if (S.pickAt) S.pickAt = null; else if (S.card) S.card = null; else if (S.war >= 0) S.war = -1; else if (U.menu || U.king || U.sheet) U.menu = U.king = U.sheet = false; else if (S.view !== 'map') S.view = 'map'; else U.menu = true; bub().hidden = true; paint(); }

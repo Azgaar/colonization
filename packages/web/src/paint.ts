@@ -3,8 +3,9 @@ import { P } from './data.ts';
 import { picker } from './input.ts';
 import { Board } from './map/board.ts';
 import { Places } from './places.ts';
-import { Sim } from './sim.ts';
-import { S } from './state.ts';
+import { D, Sim } from './sim.ts';
+import { mood } from './sound.ts';
+import { S, U } from './state.ts';
 import { paintStep } from './ui/decisions.ts';
 import { fans, peek } from './ui/fans.ts';
 import { hand } from './ui/hand.ts';
@@ -12,6 +13,8 @@ import { details } from './ui/look.ts';
 import { scenes } from './ui/scenes.ts';
 import { sandbox } from './ui/sandbox.ts';
 import { advisor } from './ui/advisor.ts';
+import { coach } from './ui/tutorial.ts';
+import { guide } from './ui/guide.ts';
 import { menu, top } from './ui/top.ts';
 import { replayBar } from './ui/setup.ts';
 import { title } from './ui/title.ts';
@@ -21,6 +24,7 @@ export function paint() {
   Places.forget(); if (S.card && (!P.hand.includes(S.card) || Sim.kind() !== 'turn')) S.card = null;
   const b = document.body; b.classList.toggle('lift', !!S.card); b.dataset.view = S.view; b.classList.toggle('war', S.war >= 0); b.classList.toggle('busy', Sim.busy);
   // The title screen first: whether it covers the table decides what can be measured below (card names are fitted to their cards).
-  title(); const sp = Places.spaces(S.card); top(); menu(); hand(sp); fans(sp); peek(); scenes(sp); details(); paintStep(); war(); replayBar(); sandbox(); advisor(); Board.edge(); Board.ground(); Board.draw(); picker(); marks();
+  title(); const sp = Places.spaces(S.card); top(); menu(); hand(sp); fans(sp); peek(); scenes(sp); details(); paintStep(); war(); replayBar(); sandbox(); advisor(); coach(); guide(); Board.edge(); Board.ground(); Board.draw(); picker(); marks();
+  mood(U.title ? 'title' : D.over ? null : D.war ? 'war' : D.round >= 8 || D.players.some((p) => p.bells >= 10) ? 'tension' : D.round <= 3 ? 'explore' : 'colony');
 }
 const marks = () => document.querySelectorAll<HTMLElement>('[data-space]').forEach((e) => { const s = S.card ? Places.spaces(S.card)[e.dataset.space!] : null; e.classList.toggle('ok', !!s?.options?.length); e.classList.toggle('off', !!S.card && !s?.options?.length); });

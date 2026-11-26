@@ -11,7 +11,8 @@ import { cardPower, outlook } from './outlook.ts';
 import { planAssault, planDefence } from './war.ts';
 import { BASE, type Weights } from './weights.ts';
 
-export interface Considered { choice: Choice; score: number; why: string }
+/** A choice weighed: its score and why; the goal bot's own reason when `why` holds more (the search bot's), and for a move the cell the token heads for. */
+export interface Considered { choice: Choice; score: number; why: string; goal?: string; to?: number }
 export interface GoalBot extends Bot { last: Considered[] }
 
 interface Goal { name: string; value: number; dist: number; extra: number; to: number; then?: 'explore' | 'cargo' | 'disembark' | 'embark'; cell?: number }
@@ -184,7 +185,7 @@ function scoreTurn(x: Situation): Considered[] {
     if (c.c === 'pass') { base.push({ choice: c, score: 0, why: 'pass' }); continue; }
     if (c.c === 'recruit') { base.push({ choice: c, score: (0.5 + agentValue(x, 'colonist')) * 0.9 - s.round * w.cross * 1.1 + (x.last ? -0.3 : 0.3), why: 'recruit with crosses' }); continue; }
     const card = c.card as string;
-    let score = 0, why = c.a as string;
+    let score = 0, why = c.a as string, to: number | undefined;
     switch (c.a) {
       case 'produce': case 'docks': {
         const y = cellYield(s, me, card, c.cell as number, (c.icon ?? 'fish') as 'fish', c.a === 'docks' ? 1 : 0)!;
@@ -203,10 +204,10 @@ function scoreTurn(x: Situation): Considered[] {
         else score = n * Math.max(x.res.goods, x.gold * s.price.goods * 0.6 * w.trade * (x.left > 1 ? 1 : 0)) - x.res.crops * 0.5;
         break;
       }
-      case 'moveShip': { const g = top(sg, points(card, 'ship')); score = g ? worth(g, points(card, 'ship')) : -0.1; why = g ? `ship: ${g.name}` : 'ship'; break; }
+      case 'moveShip': { const g = top(sg, points(card, 'ship')); score = g ? worth(g, points(card, 'ship')) : -0.1; why = g ? `ship: ${g.name}` : 'ship'; to = g?.to; break; }
       case 'moveInfantry': {
         const p = points(card, 'infantry'), g = pl.inf === 'ship' ? top(sg.filter((q) => q.then === 'disembark' && q.dist <= 1), p) : top(lg, p);
-        score = g ? worth(g, p) : -0.1; why = g ? `infantry: ${g.name}` : 'infantry'; break;
+        score = g ? worth(g, p) : -0.1; why = g ? `infantry: ${g.name}` : 'infantry'; to = g?.to; break;
       }
       case 'found': score = siteValue(x, pl.inf as number) * (x.last ? 0.6 : 1); break;
       case 'attack': score = attackValue(x, c); break;
@@ -237,7 +238,7 @@ function scoreTurn(x: Situation): Considered[] {
       case 'preach': score = preachValue(x, 0) - 0.12 * w.cross * util.combinedHostility(s, me, s.settlements[(c.settlement as number) - 1].tribe); break;
       case 'alliance': score = allyValue(x); break;
     }
-    base.push({ choice: c, score, why });
+    base.push({ choice: c, score, why, ...(to !== undefined ? { to } : {}) });
   }
   // A card is worth keeping for what it does best.
   const best = new Map<string, number>();

@@ -77,6 +77,8 @@ Work can start with the defaults. "Matters" is an estimate of the effect on resu
 | Q16 | May a settlement appear next to an existing colony when a fragment is revealed? | Yes | Low |
 | Q17 | Does forest give fur without a fur bonus? The document (15:13) says timber only, the spreadsheet 🟫, 🟩 | Yes, as in the spreadsheet | Medium |
 | Q18 | Is Supply meant to gain an action? As written it plays 1 card to draw 1, so it only swaps a card for 1 food and a turn | As written | Medium |
+| Q19 | The war is one-sided: the loyalist wins 87–89% and 4–5% of colonies survive. Adopt package B (each cube attacks with 1, colonies defend with 4, refusing gives no bell)? Evidence and alternatives in [proposals.md](proposals.md) | Board unchanged | High |
+| Q20 | With 2 players the loyalist wins 62–89% under every package tried. Should a 2-player game have a loyalist at all, or another kind of war? | As written | High |
 
 Smaller defaults are marked **[D]** in [rules-spec.md](rules-spec.md).
 

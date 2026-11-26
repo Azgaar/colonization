@@ -7,6 +7,7 @@ import { NATIONS, PERSONALITY_NAMES, RULESETS, Sim } from '../sim.ts';
 import { U } from '../state.ts';
 import { traits } from '../texts.ts';
 import { startGame } from './setup.ts';
+import { coachFromStart } from './tutorial.ts';
 
 const CHARACTERS: Record<string, [string, string, string, string]> = {
   balanced: ['Balanced', 'Сбалансированный', 'does a bit of everything', 'понемногу всё'],
@@ -90,7 +91,7 @@ document.addEventListener('click', (e) => {
   if ((x = q('[data-ng-nation]'))) { if (form.nation !== x.dataset.ngNation) { form.nation = x.dataset.ngNation!; fit(); changed('nation'); } }
   else if ((x = q('[data-ng-n]'))) { form.n = +x.dataset.ngN!; fit(); changed('players'); }
   else if (q('[data-ng-dice]')) { form.seed = Math.random().toString(36).slice(2, 8); const i = box()?.querySelector<HTMLInputElement>('[data-ng-seed]'); if (i) i.value = form.seed; }
-  else if (q('[data-ng-start]')) startGame({ nations: [form.nation, ...form.rivals.map((r) => r.nation)], bots: form.rivals.map((r) => r.bot), ruleset: form.ruleset, seed: form.seed.trim() || `g${Date.now().toString(36)}`, humans: [0, ...form.rivals.flatMap((r, i) => (r.who === 'person' ? [i + 1] : []))], levels: form.rivals.map((r) => (r.who === 'person' ? 'normal' : r.who)) });
+  else if (q('[data-ng-start]')) { coachFromStart(); startGame({ nations: [form.nation, ...form.rivals.map((r) => r.nation)], bots: form.rivals.map((r) => r.bot), ruleset: form.ruleset, seed: form.seed.trim() || `g${Date.now().toString(36)}`, humans: [0, ...form.rivals.flatMap((r, i) => (r.who === 'person' ? [i + 1] : []))], levels: form.rivals.map((r) => (r.who === 'person' ? 'normal' : r.who)) }); }
 });
 document.addEventListener('change', (e) => {
   if (U.title !== 'new') return;

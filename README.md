@@ -10,7 +10,7 @@ Digital version and test bench for the board game. Start with [docs/PRD.md](docs
 | `packages/bots` | AI players: random, goal-driven with personalities, search (information-set Monte Carlo), difficulty levels, the advisor |
 | `packages/lab` | Playing many games: batches on all cores or in the browser, A/B on paired seeds, sweeps, problem detectors |
 | `packages/web` | The game in the browser: against bots or hot-seat, advisor, saving, replays, the design bench (rules editor, lab, export), and dev mode (Dev menu, forecasts). See [packages/web/README.md](packages/web/README.md) |
-| `rulesets/` | `board` (reference), `pc` (convertible changes), `alternatives` (sandbox) |
+| `rulesets/` | `board` (reference), `pc` (convertible changes), `alternatives` (sandbox), `proposed` (candidate changes for the designer) |
 
 `assets/` and `components/` are kept out of git.
 
@@ -30,9 +30,10 @@ Digital version and test bench for the board game. Start with [docs/PRD.md](docs
 | `pnpm replay seed 4` | Play a bot game and save it as a replay for the interface |
 | `pnpm sweep settings.tax.refuseRef=1,2,3 --games 200` | One or two values over a range, on paired seeds; writes `out/sweep-*.md` |
 | `pnpm strength:search [seeds] [iterations] [players]` | Search bot against the tuned bot on paired seeds, e.g. `100 60 2` |
+| `pnpm proposals 400` | The evidence for the candidate rule changes in `rulesets/proposed.json` against `board`; writes `out/proposals.md` (see [docs/proposals.md](docs/proposals.md)) |
 | `pnpm detect 400 --players 4` | Look for stalls, dead cards, runaway leaders and dominated options; writes `out/detect-*.md` |
 | `pnpm rules list`, `export pc --csv`, `report` | Rulesets and their changes, the cells to edit in the workbook, the conversion report `pc` vs `board` |
-| `pnpm rules promote <id>`, `drop <id>` | Move a change from `pc` to `board`, or drop it; both are logged in `docs/decisions.md` |
+| `pnpm rules add <ruleset> <id>`, `promote <id>`, `drop <id>` | Put a change from another ruleset into `pc`; move a change from `pc` to `board`, or drop it; promote and drop are logged in `docs/decisions.md`. In dev mode the same steps are in Design bench → Export |
 | `pnpm release:patch`, `:minor`, `:major` | Raise the game's version (shown on the title screen) |
 | `pnpm check` | Import, type check (engine and interface) and tests |
 

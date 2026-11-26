@@ -55,6 +55,10 @@ export const colonyAt = (c: number) => D.colonies.find((x) => x.cell === c);
 export const settlementAt = (c: number) => D.settlements.find((x) => x.alive && x.cell === c);
 /** Top left corner of a cell, in map units. */
 export const at = (c: number) => [(c % W) * CELL, Math.floor(c / W) * CELL];
+/** Cells are named as on the grid, counted from the top left corner of Europe's ring, which is A1: a column letter, then a row number. */
+/** A column's letters: A to Z, then AA, AB… as in a spreadsheet, for maps wider than 26 cells. */
+export const column = (x: number): string => (x >= 26 ? column(Math.floor(x / 26) - 1) : '') + String.fromCharCode(65 + (x % 26));
+export const cellName = (c: number) => `${column(c % D.width)}${Math.floor(c / D.width) + 1}`;
 /** The cell a log entry is about, if any: where a colony was founded, an attack or a siege took place, a settlement acted. */
 export function placeOf(e: Entry): number | null {
   if (typeof e.cell === 'number') return e.cell;

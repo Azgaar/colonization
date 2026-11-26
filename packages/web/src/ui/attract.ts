@@ -8,7 +8,7 @@ export const TITLE = { seed: 'meridian', nations: ['french', 'english', 'spanish
 const STEP_MS = 650;
 /** Where on the screen the chosen point stands: right of the menu, a little below the middle. */
 const SPOT: [number, number] = [0.62, 0.52];
-let tick: ReturnType<typeof setInterval> | null = null, opened = '', most: number | null = null;
+let tick: ReturnType<typeof setInterval> | null = null, opened = '';
 
 /** Put the camera on the title view. It does not move after that: only a new window size frames it again. */
 function frame() {
@@ -33,7 +33,7 @@ export function startAttract() {
   // The player's game is already saved at each of their decisions; the bots' game is never saved.
   if (!Sim.demo) { Sim.startDemo(TITLE.seed, TITLE.nations); opened = D.revealed.join(''); void Board.land(true); }
   // A flatter view than in play, so the horizon stays on the water.
-  most = Board.view.most; Board.view.most = 42;
+  Board.lean(42);
   frame();
   addEventListener('resize', frame);
   tick = setInterval(play, STEP_MS);
@@ -42,5 +42,5 @@ export function stopAttract() {
   if (tick) clearInterval(tick);
   removeEventListener('resize', frame);
   tick = null;
-  if (most !== null) { Board.view.most = most; most = null; Board.look(); }
+  Board.lean(null);
 }

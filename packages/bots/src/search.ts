@@ -222,11 +222,14 @@ export function searchBot(seed: string, o: SearchOptions = {}): SearchBot {
         return { mean: m, sure: Math.min(m - confidence * sd / Math.sqrt(d.length), m - least) };
       });
       const order = arms.map((a, i) => ({ a, i })).sort((x, y) => (y.i === 0 ? 0 : gain[y.i].sure) - (x.i === 0 ? 0 : gain[x.i].sure) || gain[y.i].mean - gain[x.i].mean || x.i - y.i);
-      bot.last = order.slice(0, 5).map(({ a, i }) => {
+      // The choice made first; the rest best to worst, by how they did against the goal bot's choice on the same truths.
+      const [made, ...rest] = order;
+      rest.sort((x, y) => gain[y.i].mean - gain[x.i].mean || x.i - y.i);
+      bot.last = [made, ...rest].slice(0, 5).map(({ a, i }) => {
         const mean = a.n ? a.sum / a.n : 0, share = Math.round((100 * a.n) / Math.max(1, total));
         const vs = v.state.players.length > 1 ? ' vs the best rival' : '';
         const g = i ? `, ${gain[i].mean >= 0 ? '+' : ''}${gain[i].mean.toFixed(1)} vs the goal bot's choice` : ", the goal bot's choice";
-        return { choice: a.choice, score: mean, why: `${share}% of ${total} samples, ${mean >= 0 ? '+' : ''}${mean.toFixed(1)} points${vs}${g} (${guide.last[i].why})` };
+        return { choice: a.choice, score: mean, why: `${share}% of ${total} samples, ${mean >= 0 ? '+' : ''}${mean.toFixed(1)} points${vs}${g} (${guide.last[i].why})`, goal: guide.last[i].why, to: guide.last[i].to };
       });
       return order[0].a.choice;
     },

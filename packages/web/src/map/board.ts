@@ -1,12 +1,13 @@
 /* The map: a tilted plane of fixed pictures, with everything that stands on it as separate upright elements. */
 import { map, type Move } from '@col/engine';
-import { $, ACT, art, at, colonyAt, D, L, lang, me, P, pick, RES, settlementAt, SIZE, syncWidth, t, tokenAt, W } from '../data.ts';
+import { $, ACT, art, at, colonyAt, column, D, L, lang, me, P, pick, RES, settlementAt, SIZE, syncWidth, t, tokenAt, W } from '../data.ts';
 import { DEFS, roundel, SHAPES } from '../icons.ts';
 import { Bonus } from './bonus.ts';
 import { stage, type Pitch, type Stage } from './camera.ts';
 import { Sprite } from './sprites.ts';
 import { drawRich, drawSea, isKept } from './terrain.ts';
 import { paint } from '../paint.ts';
+import { keepOptions, Options, VIEW } from '../options.ts';
 import { Places, type Spaces, type Way } from '../places.ts';
 import { S } from '../state.ts';
 import { Sim, type Opt } from '../sim.ts';
@@ -15,12 +16,15 @@ type Colony = Snapshot['colonies'][number];
 type Village = Snapshot['settlements'][number];
 const terrain = document.querySelector<HTMLCanvasElement>('canvas.terrain')!;
 /* ---- the view: tilt, perspective and shift, remembered in the browser ---- */
-const VIEW = { tilt: 24, depth: 55, shift: -4, auto: 1, most: 52 }, KEY = 'view', view: View = { ...VIEW, ...JSON.parse(localStorage.getItem(KEY) || '{}') };
+const view: View = Options.view;
+/** A lean for the moment, in place of the person's (the title screen's flatter view): never stored. */
+let lean: number | null = null;
+const most = () => lean ?? view.most;
 /** How the map is seen: the tilt and the most of it when it follows the zoom (`auto`), the perspective, the shift up or down. */
 export type View = typeof VIEW;
-const lens = () => 3600 * (900 / 3600) ** (view.depth / 100), up = () => 1 / Math.cos(((view.auto ? view.most * 0.6 : view.tilt) * Math.PI) / 180);
+const lens = () => 3600 * (900 / 3600) ** (view.depth / 100), up = () => 1 / Math.cos(((view.auto ? most() * 0.6 : view.tilt) * Math.PI) / 180);
 /** As in strategy games: straight down when zoomed far out, leaning more the closer one gets. The lean grows fast at first and levels off near the ground (ease-out over the logarithm of the zoom). */
-const pitch: Pitch = (z, min, max) => { const u = Math.min(1, Math.max(0, Math.log(z / min) / Math.log(max / min))); return view.most * (1 - (1 - u) ** 2); };
+const pitch: Pitch = (z, min, max) => { const u = Math.min(1, Math.max(0, Math.log(z / min) / Math.log(max / min))); return most() * (1 - (1 - u) ** 2); };
 const haze = () => document.body.style.setProperty('--haze', ((B.stage.angle() / 45) ** 1.3 * 0.34).toFixed(2));
 /** Farthest zoom: the whole board just fits between the top line and the hand, seen from above. */
 const whole = () => Math.min((innerWidth - 24) / SIZE(), (innerHeight - 220) / SIZE());
@@ -61,7 +65,8 @@ function things(sp: Spaces) {
   const glow = (x: number, y: number) => `<ellipse cx="${x}" cy="${y}" rx="33" ry="13" fill="#fff08a" fill-opacity=".25" stroke="#fff08a" stroke-width="4"/>`, own = (x: number, y: number, r = 25) => `<ellipse cx="${x}" cy="${y}" rx="${r}" ry="${r * 0.36}" fill="none" stroke="#fff" stroke-width="3.400"/>`;
   const put = (id: string, c: number, dx: number, dy: number, html: (x: number, y: number) => string, z = 0, hit = false) => { if (shown && shown[c] === '0') return; const [x, y] = at(c); o.push({ id, x: x + dx, y: y + dy, z: Math.round(y + dy + z), hit, html: html(x, y) }); };
   // What lies on land that is still being painted waits for it.
-  for (const [c, k] of Object.entries(D.poi)) put(`p${c}`, +c, 32, 50, (x, y) => SVG(x + 4, y + 2, 56, k === 'ruin' ? Sprite.ruin() : Sprite.wreck()));
+  // A wreck is drawn smaller than a ruin, with the same centre and bottom.
+  for (const [c, k] of Object.entries(D.poi)) put(`p${c}`, +c, 32, 50, (x, y) => (k === 'ruin' ? SVG(x + 4, y + 2, 56, Sprite.ruin(+c)) : SVG(x + 10, y + 14, 44, Sprite.wreck(+c))));
   // Plates with numbers only for the cell under the pointer or the clicked one; at rest a colony shows whose it is.
   const near = (c: number) => S.hov === c || S.look === c || S.over === `cell:${c}`;
   // A village grows with its people: 5 is a little larger than a cell's picture, 1 about two thirds of it.
@@ -96,7 +101,7 @@ function draw() {
   for (const q of things(Places.spaces(S.card))) {
     now.add(q.id);
     let e = sprites.get(q.id);
-    if (!e) { e = { el: document.createElement('div') }; e.el.className = 'sp'; layer.append(e.el); sprites.set(q.id, e); }
+    if (!e) { e = { el: document.createElement('div') }; e.el.className = 'sp'; e.el.dataset.thing = q.id; layer.append(e.el); sprites.set(q.id, e); }
     const was = e.q;
     if (was?.html !== q.html || was.x !== q.x || was.y !== q.y) e.el.innerHTML = `<svg viewBox="${q.x - 50} ${q.y - 66} 100 100" width="200" height="200">${q.html}</svg>`;
     if (was?.z !== q.z) e.el.style.zIndex = String(q.z);
@@ -160,6 +165,16 @@ async function edge() {
   g.globalAlpha = 0.72; g.font = '700 24px "Alegreya SC"'; g.letterSpacing = '6px'; g.textAlign = 'center'; g.fillStyle = '#fbeecb'; g.lineJoin = 'round'; g.lineWidth = 8; g.strokeStyle = '#124468';
   const word = (x: number, y: number, a: number) => { g.save(); g.translate(x, y); g.rotate(a); g.strokeText(t('europe'), 0, 0); g.fillText(t('europe'), 0, 0); g.restore(); };
   word(S / 2, S - 21, 0); word(40, S / 2, -Math.PI / 2); word(S - 40, S / 2, Math.PI / 2);
+  // With the grid, the names of columns (letters) and rows (numbers) on all four sides, in the outer part of Europe's ring, as cells are named elsewhere:
+  // the ring is counted too, as the ship stands on its cells, so its top left corner is A1.
+  if (B.grid) {
+    // Quiet: small and faint, to be found when looked for, not to draw the eye.
+    g.globalAlpha = 0.45; g.font = '700 14px "Alegreya SC"'; g.letterSpacing = '0px'; g.textBaseline = 'middle';
+    for (let i = 0; i < W; i++) {
+      const a = column(i), n = String(i + 1), m = (i + 0.5) * 64;
+      g.fillText(a, m, 11); g.fillText(a, m, S - 11); g.fillText(n, 11, m); g.fillText(n, S - 11, m);
+    }
+  }
 }
 /** The box about the clicked cell follows it on the screen. */
 function bubble() { const c = S.look; if ($('look').hidden || c === null) return; const [x, y] = B.stage.point(((c % W) + 0.5) * 64, (Math.floor(c / W) + 0.1) * 64); $('look').style.left = `${Math.min(innerWidth - 130, Math.max(130, x))}px`; $('look').style.top = `${Math.max(200, y)}px`; }
@@ -234,7 +249,11 @@ async function land(whole = false) {
 interface Moving { move: Move; n: number; ways: Map<number, Way>; frags: number[]; legal: Opt[] }
 let moved: Moving | null = null, cam: Stage | null = null;
 const B = {
-  ground, view, VIEW, KEY, look, draw, edge, land, bubble, terrain, grid: false,
+  ground, view, VIEW, look,
+  /** Lean as far as this while the tilt follows the zoom, whatever the person chose; null gives their choice back. */
+  lean(x: number | null) { lean = x; if (cam) look(); }, draw, edge, land, bubble, terrain,
+  /** The cell grid, with the names of columns and rows. */
+  get grid() { return Options.grid; }, set grid(v: boolean) { Options.grid = v; keepOptions(); },
   /** Pan, zoom and tilt of the map, once it is open. */
   get stage(): Stage { if (!cam) throw new Error('the map is not open yet'); return cam; },
   /** Where the token on the move can still go, and what it could uncover. Only asked during a move, which always has its token and points. */

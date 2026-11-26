@@ -5,18 +5,24 @@ import { Board } from '../map/board.ts';
 import { paint } from '../paint.ts';
 import { Dev, LOCAL, Sim } from '../sim.ts';
 import { U, type TitlePage } from '../state.ts';
+import { Sound } from '../sound.ts';
 import { crest, newGame, openNewGame } from './newgame.ts';
+import { tutorialOn } from './tutorial.ts';
 import { bench } from './bench.ts';
 import { chooseFile, enterGame } from './setup.ts';
 import { introPlaying } from './intro.ts';
 import { startAttract, stopAttract } from './attract.ts';
 // The game's version, from the root package.json (bumped with `pnpm release:patch`, `:minor` or `:major`).
 import { version } from '../../../../package.json';
+/** The recordings the game plays and whom to credit (assets/Sound/music.json, from their Wikimedia Commons pages). */
+import MUSIC from '../../../../assets/Sound/music.json';
 
 /** The year a round falls in. */
 const year = (round: number) => D.settings.rounds.firstYear + (round - 1) * D.settings.rounds.yearStep;
 /** A compass rose: the ornament under the title. */
 const ROSE = `<svg viewBox="0 0 120 24" aria-hidden="true"><path d="M2 12h44M74 12h44" stroke="currentColor" stroke-width="1.200"/><circle cx="60" cy="12" r="9.500" fill="none" stroke="currentColor" stroke-width="1.200"/><path d="M60 0l3 12-3 12-3-12Z" fill="currentColor"/><path d="M48 12l12-3 12 3-12 3Z" fill="currentColor" opacity=".6"/><circle cx="46" cy="12" r="1.800" fill="currentColor"/><circle cx="74" cy="12" r="1.800" fill="currentColor"/></svg>`;
+/** A volume slider: heard as it moves (sound.ts). */
+export const vol = (cls: string, k: 'music' | 'fx', name: string) => `<label class="${cls} vol"><span>${name}</span><input type="range" data-vol="${k}" min="0" max="100" step="5" value="${Sound[k]}"${Sound.mute ? ' disabled' : ''}><output>${Sound[k]}%</output></label>`;
 const seg = (label: string, list: [string, string, boolean][]) => `<div class="orow"><span>${label}</span><span class="set">${list.map(([a, n, on]) => `<button class="${on ? 'on' : ''}" ${on ? '' : a}>${n}</button>`).join('')}</span></div>`;
 
 /** The saved game, as a card with what it is. */
@@ -32,9 +38,13 @@ const PAGES: Record<Exclude<TitlePage, 'main' | 'new' | 'bench'>, () => string> 
 <button class="wide" data-open-file>${icon('book', 18)} ${L('Open a saved game…', 'Открыть сохранённую игру…')}</button>`,
   options: () => { const v = Board.view; return `<h2>${L('Options', 'Настройки')}</h2>
 ${seg(L('Language', 'Язык'), [['data-lang="en"', 'English', lang() === 'en'], ['data-lang="ru"', 'Русский', lang() === 'ru']])}
+${seg(L('Tutorial', 'Обучение'), [['data-tutorial="1"', L('On', 'Да'), tutorialOn()], ['data-tutorial=""', L('Off', 'Нет'), !tutorialOn()]])}
 ${seg(L('Other players’ turns', 'Ходы других игроков'), [['data-fast=""', L('Show each', 'Показывать'), !Sim.fast], ['data-fast="1"', L('At once', 'Сразу'), Sim.fast]])}
 ${LOCAL ? seg(L('Dev mode', 'Режим разработчика'), [['data-dev="1"', L('On', 'Да'), Dev.on], ['data-dev=""', L('Off', 'Нет'), !Dev.on]]) : ''}
 ${Dev.on ? seg(L('Forecast in play', 'Прогноз в игре'), [['data-forecast="1"', L('On', 'Да'), Dev.forecast], ['data-forecast=""', L('Off', 'Нет'), !Dev.forecast]]) : ''}
+<h3>${L('Sound', 'Звук')}</h3>
+${seg(L('Sound', 'Звук'), [['data-mute=""', L('On', 'Да'), !Sound.mute], ['data-mute="1"', L('Off', 'Нет'), Sound.mute]])}
+${vol('orow', 'music', L('Music', 'Музыка'))}${vol('orow', 'fx', L('Effects', 'Эффекты'))}
 <h3>${L('Map', 'Карта')}</h3>
 ${seg(L('Tilt follows zoom', 'Наклон по масштабу'), [['data-follow="1"', L('On', 'Да'), !!v.auto], ['data-follow=""', L('Off', 'Нет'), !v.auto]])}
 ${seg(L('Cell grid', 'Сетка клеток'), [['data-grid=""', L('Off', 'Нет'), !Board.grid], ['data-grid="1"', L('On', 'Да'), Board.grid]])}
@@ -50,7 +60,9 @@ ${seg(L('Cell grid', 'Сетка клеток'), [['data-grid=""', L('Off', 'Н�
 <dt>${L('Drag or click an agent', 'Перетащите или выберите агента')}</dt><dd>${L('every place it can act lights up', 'подсвечиваются все места, где он может действовать')}</dd>
 <dt>${L('Wheel, drag', 'Колесо, перетаскивание')}</dt><dd>${L('zoom and move the map', 'масштаб и движение карты')}</dd>
 <dt>1–9</dt><dd>${L('pick an agent from the hand', 'выбрать агента с руки')}</dd><dt>Enter</dt><dd>${L('read on', 'дальше')}</dd><dt>Esc</dt><dd>${L('put down, close', 'отменить, закрыть')}</dd></dl>
-<p class="note">${L('Board game, rules and art: the Colonization board game. Interface, rules engine and bots: this project, milestone M3.', 'Настольная игра, правила и иллюстрации: настольная игра «Колонизация». Интерфейс, движок правил и боты: этот проект, этап M3.')}</p>`,
+<p class="note">${L('Board game, rules and art: the Colonization board game. Interface, rules engine and bots: this project, milestone M3.', 'Настольная игра, правила и иллюстрации: настольная игра «Колонизация». Интерфейс, движок правил и боты: этот проект, этап M3.')}</p>
+<h3>${L('Music', 'Музыка')}</h3><ul class="credits">${MUSIC.map((m) => `<li><a href="${m.page}" target="_blank" rel="noopener">${m.title}</a><small>${m.by} · ${m.license}</small></li>`).join('')}</ul>
+<p class="note">${L('Sound effects: Kenney (kenney.nl), public domain (CC0).', 'Звуковые эффекты: Kenney (kenney.nl), общественное достояние (CC0).')}</p>`,
 };
 
 /** What the title screen shows; it is drawn again only when this changes. */
@@ -61,7 +73,7 @@ export function title() {
   document.body.classList.toggle('titled', !!page);
   if (!page || introPlaying()) { el.hidden = true; el.dataset.page = ''; shown = ''; stopAttract(); return; }
   el.hidden = false; startAttract();
-  const key = [page, lang(), page === 'new' ? '' : JSON.stringify(Sim.savedInfo()), page === 'options' ? [Sim.fast, Board.view.auto, Board.grid, Dev.on, Dev.forecast].join() : ''].join('|'), was = shown.split('|')[0];
+  const key = [page, lang(), page === 'new' ? '' : JSON.stringify(Sim.savedInfo()), page === 'options' ? [tutorialOn(), Sim.fast, Board.view.auto, Board.grid, Dev.on, Dev.forecast, Sound.mute].join() : ''].join('|'), was = shown.split('|')[0];
   if (key === shown) return;
   shown = key;
   if (page === 'new') { el.dataset.page = 'new'; el.innerHTML = newGame(); return; }
@@ -71,6 +83,7 @@ export function title() {
     ['data-t-continue', L('Continue', 'Продолжить'), !cont],
     ['data-t-new', L('New game', 'Новая игра'), false],
     ['data-t-page="load"', L('Load game', 'Загрузить игру'), false],
+    ['data-guide', L('Rules', 'Правила'), false],
     ['data-t-page="bench"', L('Design bench', 'Мастерская'), false],
     ['data-t-page="options"', L('Options', 'Настройки'), false],
     ['data-t-page="about"', L('About', 'Об игре'), false],

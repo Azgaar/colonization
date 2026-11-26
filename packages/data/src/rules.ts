@@ -1,20 +1,9 @@
-/** Rulesets from the command line (FR-R-9): list, export, report, promote, drop. Run with "pnpm rules <command>". */
-import { readFileSync, writeFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
-import type { Ruleset } from './types.ts';
-import { compileRuleset, flattenRuleset, RulesetError } from './ruleset.ts';
-import { addDecision, changeList, conversionReport, decisionText, dropOverride, promoteOverride, toCsv, toMarkdown } from './changes.ts';
+/** Rulesets from the command line (FR-R-9): list, export, report, add to pc, promote, drop. Run with "pnpm rules <command>". */
+import type { Override } from './types.ts';
+import { flattenRuleset, RulesetError } from './ruleset.ts';
+import { changeList, conversionReport, toCsv, toMarkdown } from './changes.ts';
 import { gameData } from './index.ts';
-
-const at = (p: string) => fileURLToPath(new URL(p, import.meta.url));
-const file = (id: string) => at(`../../../rulesets/${id}.json`);
-const decisionsPath = at('../../../docs/decisions.md');
-// Read from disk, not the imported JSON, so promote and drop work on the current files.
-const read = (id: string) => JSON.parse(readFileSync(file(id), 'utf8')) as Ruleset;
-const write = (r: Ruleset) => writeFileSync(file(r.id), JSON.stringify(r, null, 2) + '\n');
-const all = () => Object.fromEntries(['board', 'pc', 'alternatives'].map((id) => [id, read(id)]));
-const today = () => new Date().toISOString().slice(0, 10);
-const log = (entry: string) => writeFileSync(decisionsPath, addDecision(readFileSync(decisionsPath, 'utf8'), entry, today()));
+import { addToPc, allRulesets as all, drop, promote } from './rulesfs.ts';
 
 const [cmd, arg] = process.argv.slice(2);
 try {
@@ -31,21 +20,19 @@ try {
   } else if (cmd === 'report') {
     const rs = all();
     process.stdout.write(conversionReport(gameData, rs.board, rs.pc));
+  } else if (cmd === 'add' && arg && process.argv[4]) {
+    // From another ruleset (proposed, or one exported from the design bench) into pc.
+    const from = all()[arg], o = from?.overrides.find((x: Override) => x.id === process.argv[4]);
+    if (!o) throw new RulesetError(`no override "${process.argv[4]}" in ${arg}`);
+    console.log(addToPc(o));
   } else if (cmd === 'promote' && arg) {
-    const rs = all();
-    const { board, pc, override } = promoteOverride(rs.board, rs.pc, arg);
-    const next = { ...rs, board, pc };
-    compileRuleset(gameData, board, next); compileRuleset(gameData, pc, next);
-    const rows = changeList(gameData, board).filter((r) => r.override === arg);
-    write(board); write(pc); log(decisionText('promoted', override, rows));
-    console.log(`Promoted "${arg}" to board and logged it in docs/decisions.md. Carry it into the workbook:`);
+    const { message, rows } = promote(arg);
+    console.log(`${message} Carry it into the workbook:`);
     process.stdout.write(toMarkdown(rows));
   } else if (cmd === 'drop' && arg) {
-    const { pc, override } = dropOverride(read('pc'), arg);
-    write(pc); log(decisionText('dropped', override, []));
-    console.log(`Dropped "${arg}" from pc and logged it in docs/decisions.md.`);
+    console.log(drop(arg));
   } else {
-    console.log('Usage: pnpm rules list | export <ruleset> [--csv] | report | promote <override-id> | drop <override-id>');
+    console.log('Usage: pnpm rules list | export <ruleset> [--csv] | report | add <ruleset> <override-id> | promote <override-id> | drop <override-id>');
     process.exitCode = cmd ? 1 : 0;
   }
 } catch (e) {
