@@ -2,14 +2,15 @@
 .scene { position:fixed;inset:0;z-index:8;display:none;background-size:cover;background-position:50%;overflow:auto }
 body[data-view=colony] .s-col,body[data-view=europe] .s-eu { display:block }
 .scene::before { content:"";position:fixed;inset:0;background:linear-gradient(90deg,#0b2b33ec 0 24%,#0b2b33a3 62%,#0b2b3338) }
-.scene>.in { position:relative;padding:24px 36px calc(var(--ch)*.4);max-width:1560px;margin:0 auto }
+.scene>.in { position:relative;padding:24px 36px calc(var(--ch)*.7 + 12px);max-width:1560px;margin:0 auto }
 .scene h2 { font:800 42px/1 var(--sc);margin-bottom:18px }
 .scene h4 { font-size:21px;margin-bottom:9px;display:flex;gap:14px;align-items:baseline }
 .scene h4 .yes,.scene h4 .no { font:800 18px var(--ui) }
 .scene h4 .no { font-weight:500 }
 .back { position:fixed;right:28px;top:22px;background:var(--bone);color:var(--ink);border-radius:13px;padding:9px 24px;font:800 19px var(--sc);z-index:10 }
-body:not([data-view=map]) .hand .card { transform:translateY(68%) }
-body:not([data-view=map]) .hand .card:hover,body:not([data-view=map]) .hand .card.sel { transform:translateY(-6px) }
+/* On the Colony and Europe screens the hand sinks, but the names, talents and faces stay in view. */
+body:not([data-view=map]) .hand .card { transform:translateY(calc(var(--k2)*5px + var(--ch)*.4)) rotate(calc(var(--k)*3.500deg)) }
+body:not([data-view=map]) .hand .card:hover,body:not([data-view=map]) .hand .card.sel { transform:translateY(calc(var(--k2)*5px)) rotate(calc(var(--k)*3.500deg)) scale(1.12) }
 body:not([data-view=map]) .door,body:not([data-view=map]) #heaps,body:not([data-view=map]) .side,body:not([data-view=map]) .acts,body:not([data-view=map]) .top .purse .king { visibility:hidden }
 .two { display:grid;grid-template-columns:minmax(320px,430px) minmax(0,1fr);gap:42px }
 .land { position:relative;width:100%;aspect-ratio:1;border-radius:20px;overflow:hidden;box-shadow:0 8px 28px #0009 }
@@ -20,26 +21,6 @@ body:not([data-view=map]) .door,body:not([data-view=map]) #heaps,body:not([data-
 .land .c.over.ok { background:#fff08a66 }
 .land .c svg.town { position:absolute;inset:6%;width:88%;height:88%;pointer-events:none }
 .under { display:flex;gap:26px;margin-top:13px;font-size:19px;align-items:center }
-.blds { display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px;max-width:980px }
-.bld { position:relative;border-radius:14px;overflow:hidden;background:var(--bone);color:var(--ink);box-shadow:0 5px 16px #0008 }
-.bld img { width:100%;height:clamp(64px,10vh,104px);object-fit:cover;display:block }
-.bld .cp { padding:8px 12px 10px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:2px 8px;align-items:baseline;font-weight:700 }
-.bld .cp b { font:800 19px/1.1 var(--sc) }
-.bld .no { font-weight:500;font-size:15px }
-.bld.empty { background:#ffffff1c;color:var(--bone);display:grid;place-items:center;min-height:140px;box-shadow:none;font:700 19px var(--sc) }
-.bld.ok { box-shadow:0 0 0 5px var(--hot),0 5px 16px #0008;cursor:copy }
-.bld.over.ok { background:#fff08a }
-.bld.off img { filter:saturate(.35) }
-.bld .tk { position:absolute;right:10px;top:10px;transform:scale(1.35);transform-origin:100% 0 }
-.ppl { display:flex;gap:13px;flex-wrap:wrap }
-.big { position:relative;width:clamp(104px,9.6vw,150px);border-radius:14px;overflow:hidden;background:var(--bone);color:var(--ink);box-shadow:0 5px 16px #0008 }
-.big img { width:100%;height:clamp(104px,9.2vw,146px);object-fit:cover;object-position:50% 8%;display:block }
-.big b { display:block;font:800 17px/1.05 var(--sc);padding:8px 10px 0 }
-.big small { display:block;padding:2px 10px 9px;font-size:15.5px;white-space:nowrap }
-.big .cost { position:absolute;right:8px;top:8px;background:#1c2a2aeb;color:#fff;border-radius:99px;padding:1px 10px 1px 6px;font-weight:800;font-size:18px }
-.big.dear img { filter:saturate(.2) }
-.big.dear { opacity:.75 }
-.big.empty { background:#ffffff1c;color:var(--bone);display:grid;place-items:center;min-height:170px;box-shadow:none;font:700 17px var(--sc) }
 .zone { border-radius:18px;padding:13px 16px 16px;margin:-13px -16px -16px }
 .zone.ok { box-shadow:0 0 0 4px var(--hot);cursor:copy }
 .zone.over.ok { background:#fff08a3d }
@@ -55,16 +36,6 @@ body:not([data-view=map]) .door,body:not([data-view=map]) #heaps,body:not([data-
 .hold { display:flex;gap:16px;align-items:center;margin-top:20px;font-size:19px }
 .hold b { font:800 25px var(--sc) }
 .hold .hull { flex:none }
-.plans { display:grid;grid-template-columns:repeat(auto-fill,minmax(206px,1fr));gap:9px;max-width:980px }
-.plan { display:grid;grid-template-columns:50px minmax(0,1fr) auto;gap:0 9px;align-items:center;background:#0b2b33d6;border-radius:11px;overflow:hidden;min-height:50px;padding-right:9px;line-height:1.1 }
-.plan>img { grid-row:1/3;width:50px;height:100%;min-height:50px;object-fit:cover }
-.plan .nm { font:800 15.500px/1.05 var(--sc);align-self:end }
-.plan small { font-size:14px;align-self:start;margin-top:2px }
-.plan em { grid-column:3;grid-row:1/3;font-style:normal;font-weight:800;font-size:17px;white-space:nowrap }
-.plan.gone { opacity:.4 }
-.plan.ok { background:var(--bone);color:var(--ink);box-shadow:0 0 0 3px var(--hot);cursor:copy }
-.plan.over.ok { background:var(--hot) }
-.plan.off img { filter:saturate(.2) }
 .scene h4 { margin-top:18px }
 .scene h4 small { font:500 16px var(--ui);opacity:.8 }
 .two>div>h4:first-child,.zone>h4 { margin-top:0 }
@@ -73,17 +44,44 @@ body:not([data-view=map]) .door,body:not([data-view=map]) #heaps,body:not([data-
 .land .def { position:absolute;right:10px;bottom:10px;background:#0f3436e6;border-radius:99px;padding:3px 12px;font-weight:800 }
 .stores { display:grid;grid-template-columns:1fr auto;gap:22px }
 .two.eu { grid-template-columns:minmax(330px,420px) minmax(0,1fr) }
-.big { width:clamp(112px,9.6vw,168px) }
-.big img { height:clamp(96px,15vh,158px) }
-.big small { white-space:normal;line-height:1.18;min-height:38px }
-.big.fa small { min-height:56px }
-.big.ok { box-shadow:0 0 0 4px var(--hot);cursor:copy }
-.big.over.ok { background:var(--hot) }
-.big.dear { opacity:1 }
-.big.dear .cost { background:#8d2c1e }
-.big.off { filter:brightness(.78) }
-.big .tk { position:absolute;left:8px;top:8px }
-.big.newp { display:grid;place-items:center;align-content:center;text-align:center;background:#f7f1e1d9 }
-.big .rot { font-size:44px }
 .note { font-size:15.500px;opacity:.85;margin:9px 0 0 }
-.big i.lore { display:block;padding:0 10px 3px;font-size:13.500px;line-height:1.2;opacity:.75;white-space:normal }
+/* Cards in the proportions of printed ones: agents on the pier, Fathers, buildings. */
+.row-dk { align-items:stretch;display:grid;grid-template-columns:repeat(auto-fill,minmax(124px,1fr));gap:12px;max-width:calc(6*172px);margin-bottom:22px }
+.tree { align-items:stretch;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:14px 10px;max-width:calc(7*150px);margin-bottom:22px }
+.s-col .row-dk { grid-template-columns:repeat(7,minmax(0,1fr));gap:14px 10px;max-width:calc(7*150px) }
+/* 5:7 at least (the text part makes up the height with container units); a card with more text grows taller, and its row with it. */
+.dk { position:relative;display:flex;flex-direction:column;container-type:inline-size;min-width:0;border-radius:11px;overflow:visible;background:var(--bone);color:var(--ink);box-shadow:0 5px 16px #0008 }
+.dk .pic { flex:none;display:block;width:100%;aspect-ratio:1.08;height:auto;border-radius:11px 11px 0 0;object-fit:cover;object-position:50% 10% }
+.dk.bl .pic { object-position:50% 45%;aspect-ratio:1.3 }
+.dk .dt { flex:1 0 auto;min-height:calc(140cqw - 100cqw/1.08);display:flex;flex-direction:column;gap:3px;padding:6px 8px 7px;overflow:hidden;white-space:normal;hyphens:auto;overflow-wrap:break-word }
+.dk .dt b { font:800 clamp(13px,1.02vw,16.500px)/1.08 var(--sc) }
+.dk .dt small { font-size:clamp(12.500px,.95vw,15px);line-height:1.18 }
+.dk .dt em { font-style:normal;font-weight:700;font-size:clamp(12px,.9vw,14px);line-height:1.15;color:#a3381f }
+.dk .dt i { flex:1 1 0;min-height:0;overflow:hidden;font-size:clamp(11px,.82vw,13px);line-height:1.2;opacity:.72;-webkit-mask-image:linear-gradient(#000 calc(100% - 14px),#0000);mask-image:linear-gradient(#000 calc(100% - 14px),#0000) }
+.dk .cost { position:absolute;right:6px;top:6px;display:flex;align-items:center;gap:2px;background:#1c2a2aeb;color:#fff;border-radius:99px;padding:1px 8px 1px 5px;font-weight:800;font-size:16px }
+.dk .tk { position:absolute;left:6px;top:6px }
+.dk.dear .cost { background:#8d2c1e }
+.dk.dear .pic { filter:saturate(.3) }
+.dk.ok { box-shadow:0 0 0 4px var(--hot),0 5px 16px #0008;cursor:copy }
+.dk.over.ok { background:var(--hot) }
+.dk.off { filter:brightness(.78) }
+/* a building not built yet is a project: dark, faded picture, its cost on top */
+.dk.plan { background:#0f3436e6;color:var(--bone) }
+.dk.plan .pic { filter:saturate(.2) brightness(.8);opacity:.75 }
+.dk.plan .dt em { color:#ffb19e }
+.dk.plan.ok { background:var(--bone);color:var(--ink) }
+.dk.plan.ok .pic { filter:none;opacity:1 }
+.dk.plan.ok .dt em { color:#a3381f }
+.dk.locked { opacity:.62 }
+.dk.gone { opacity:.38 }
+.dk.seat { background:#ffffff12;box-shadow:inset 0 0 0 2px #ffffff2e }
+.dk.newp { display:grid;place-items:center;align-content:center;gap:4px;text-align:center;padding:10px;background:#f7f1e1d9;font:800 16px/1.1 var(--sc) }
+.dk .rot { font-size:40px;line-height:1 }
+/* two or three colonies share the column */
+.lands.n2 .land .c span.y,.lands.n3 .land .c span.y { padding:2px 7px 2px 4px;font-size:14px }
+.lands.n2 .land .c span.y svg,.lands.n3 .land .c span.y svg { width:15px;height:15px }
+.lands.n2 .land .def,.lands.n3 .land .def { right:6px;bottom:6px;padding:1px 8px;font-size:14px }
+.dk.fa .pic { aspect-ratio:1.25 }
+.dk.fa .dt { min-height:calc(140cqw - 100cqw/1.25) }
+.dk.bl .dt { min-height:calc(140cqw - 100cqw/1.3) }
+.dk.seat { aspect-ratio:5/7 }

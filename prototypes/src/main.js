@@ -10,6 +10,8 @@ import { S, X } from './state.js';
 import { Toast } from './ui/toasts.js';
 // Pictures that first appear when an agent is lifted or a screen opens, ready beforehand.
 setTimeout(() => { for (const u of [...Object.keys(D.buildings).map(art.building), ...D.salon.map(art.father), ...D.pier.map(([x]) => art.agent(x)), 'art/crate.webp', 'art/europe.webp', art.nation(P.nation)]) { const i = new Image(); i.src = u; i.decode?.().catch(() => {}); (window.ready ||= []).push(i); } }, 400);
+// Names are fitted to the cards by measuring them, so measure again once the web fonts are in.
+document.fonts?.ready.then(() => paint());
 Board.open(onCell); paint(); Board.land(true); settle();
 // For the browser console and the test scripts.
 Object.assign(window, { Sim, S, X, Board, Places, Toast, Play: { commit }, paint });

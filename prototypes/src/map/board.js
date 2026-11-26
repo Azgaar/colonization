@@ -1,5 +1,5 @@
 /* The map: a tilted plane of fixed pictures, with everything that stands on it as separate upright elements. */
-import { $, ACT, art, at, colonyAt, D, L, lang, me, P, pick, settlementAt, t, tokenAt, W } from '../data.js';
+import { $, ACT, art, at, colonyAt, D, L, lang, me, P, pick, RES, settlementAt, t, tokenAt, W } from '../data.js';
 import { DEFS, roundel, SHAPES } from '../icons.js';
 import { Bonus } from './bonus.js';
 import { stage } from './camera.js';
@@ -31,19 +31,33 @@ function warPlate(c, x, y) {
 /** A settlement: how many live there and how alarmed they are. */
 function count(v, x, y) {
   const hot = v.hostility >= 4, w = 66, ic = (n, cx) => `<svg x="${cx}" y="2" width="14" height="14" viewBox="0 0 24 24" color="#f7f1e1">${SHAPES[n]}</svg>`, num = (n, cx, c = '#f7f1e1') => `<text x="${cx}" y="14" font-size="14.500" font-weight="800" fill="${c}">${n}</text>`;
-  return `<g transform="translate(${x - w / 2} ${y - 1})"><rect width="${w}" height="18" rx="9" fill="#0f3436e6" ${hot ? 'stroke="#e2533b" stroke-width="1.500"' : ''}/>${ic('people', 7)}${num(v.pop, 23)}${ic('anger', 36)}${num(v.hostility, 53, hot ? '#ff8f78' : '#f7f1e1')}</g>`;
+  return `<g transform="translate(${x - w / 2} ${y - 1})"><rect width="${w}" height="18" rx="9" fill="#0f3436e6"/>${ic('people', 7)}${num(v.pop, 23)}${ic('anger', 36)}${num(v.hostility, 53, hot ? '#ff8f78' : '#f7f1e1')}</g>`;
+}
+/** A ship under the pointer: what is in its hold, and the infantry if it is aboard. */
+function cargoPlate(i, x, y) {
+  const p = D.players[i], l = [...RES.filter((r) => p.hold[r]).map((r) => [r, p.hold[r]]), ...(p.inf === 'ship' ? [['infantry', 1]] : [])];
+  const w = l.length ? l.length * 34 + 10 : 66, item = ([k, n], j) => `<svg x="${7 + j * 34}" y="2" width="15" height="15" viewBox="0 0 24 24" color="#f7f1e1">${SHAPES[k]}</svg><text x="${24 + j * 34}" y="15" font-size="14.500" font-weight="800" fill="#f7f1e1">${n}</text>`;
+  return `<g transform="translate(${x - w / 2} ${y})"><rect width="${w}" height="19" rx="9.500" fill="#0f3436e6"/>${l.length ? l.map(item).join('') : `<text x="${w / 2}" y="14.500" text-anchor="middle" font-size="13" font-weight="700" fill="#f7f1e1" fill-opacity=".8">${L('empty', 'пусто')}</text>`}</g>`;
+}
+/** A colony under the pointer: how well it holds. */
+function colonyPlate(c, x, y) {
+  const mine = c.owner === me, w = 56;
+  return `<g transform="translate(${x - w / 2} ${y})"><rect width="${w}" height="20" rx="10" fill="${mine ? D.players[me].color : '#0f3436e6'}" ${mine ? 'stroke="#fff" stroke-width="2"' : ''}/>${roundel(-4, -3, c.owner, 26)}<text x="28" y="15" font-size="14.500" font-weight="800" fill="#f7f1e1">${c.defence}</text><svg x="38" y="4" width="12" height="12" viewBox="0 0 24 24" color="#f7f1e1">${SHAPES.sword}</svg></g>`;
 }
 function things(sp) {
   const o = [], lift = !!S.card;
-  const plate = (x, y, w, inner, fill = '#0f3436e6', rim = '') => `<g transform="translate(${x - w / 2} ${y})"><rect width="${w}" height="17" rx="8.500" fill="${fill}" ${rim}/>${inner}</g>`, glow = (x, y) => `<ellipse cx="${x}" cy="${y}" rx="33" ry="13" fill="#fff08a" fill-opacity=".25" stroke="#fff08a" stroke-width="4"/>`, own = (x, y, r = 25) => `<ellipse cx="${x}" cy="${y}" rx="${r}" ry="${r * 0.36}" fill="none" stroke="#fff" stroke-width="3.400"/>`;
+  const glow = (x, y) => `<ellipse cx="${x}" cy="${y}" rx="33" ry="13" fill="#fff08a" fill-opacity=".25" stroke="#fff08a" stroke-width="4"/>`, own = (x, y, r = 25) => `<ellipse cx="${x}" cy="${y}" rx="${r}" ry="${r * 0.36}" fill="none" stroke="#fff" stroke-width="3.400"/>`;
   const put = (id, c, dx, dy, html, z = 0, hit = false) => { if (shown && shown[c] === '0') return; const [x, y] = at(c); o.push({ id, x: x + dx, y: y + dy, z: Math.round(y + dy + z), hit, html: html(x, y) }); };
   // What lies on land that is still being painted waits for it.
   for (const [c, k] of Object.entries(D.poi)) put(`p${c}`, +c, 32, 50, (x, y) => SVG(x + 4, y + 2, 56, k === 'ruin' ? Sprite.ruin() : Sprite.wreck()));
-  for (const v of D.settlements) if (v.alive) { const s = sp[`cell:${v.cell}`], on = s?.village || s?.attack, acts = on ? [...new Set(s.options.map((q) => pick(ACT[q.a] || ['', ''])))].join(' / ') : ''; put(`v${v.cell}`, v.cell, 32, 56, (x, y) => (on ? glow(x + 32, y + 50) : '') + SVG(x, y - 4, 64, Sprite.village(v)) + (v.ally !== null ? roundel(x + 44, y - 2, v.ally, 22) : '') + (on ? pill(x + 32, y + 64, acts) : count(v, x + 32, y + 57))); }
-  for (const c of D.colonies) { const mine = c.owner === me, s = sp[`cell:${c.cell}`]; put(`c${c.cell}`, c.cell, 32, 56, (x, y) => (s?.attack ? glow(x + 32, y + 50) : '') + SVG(x - 2, y - 6, 68, Sprite.colony(c)) + (warPlate(c, x, y) ?? plate(x + 32, y + 57, 54, `${roundel(-4, -4, c.owner, 25)}<text x="28" y="13" font-size="14" font-weight="800" fill="#f7f1e1">${c.defence}</text><svg x="37" y="3" width="11" height="11" viewBox="0 0 24 24" color="#f7f1e1">${SHAPES.sword}</svg>`, mine ? D.players[me].color : '#0f3436e6', mine ? 'stroke="#fff" stroke-width="2"' : '')) + (s?.attack ? pill(x + 32, y - 12, pick(ACT.attack)) : ''), 0, !!D.war); }
+  // Plates with numbers only for the cell under the pointer or the clicked one; at rest a colony shows whose it is.
+  const near = (c) => S.hov === c || S.look === c || S.over === `cell:${c}`;
+  // A village grows with its people: 5 is a little larger than a cell's picture, 1 about two thirds of it.
+  for (const v of D.settlements) if (v.alive) { const k = 0.58 + 0.1 * v.pop, s = sp[`cell:${v.cell}`], on = s?.village || s?.attack, acts = on ? [...new Set(s.options.map((q) => pick(ACT[q.a] || ['', ''])))].join(' / ') : ''; put(`v${v.cell}`, v.cell, 32, 56, (x, y) => (on ? glow(x + 32, y + 50) : '') + SVG(x + 32 - 32 * k, y + 53 - 57 * k, 64 * k, Sprite.village(v)) + (v.ally !== null ? roundel(x + 32 + 12 * k, y + 53 - 55 * k, v.ally, 22) : '') + (on ? pill(x + 32, y + 64, acts) : '')); if (!on && near(v.cell)) put(`h${v.cell}`, v.cell, 32, 56, (x, y) => count(v, x + 32, y + 57), 3000); }
+  for (const c of D.colonies) { const s = sp[`cell:${c.cell}`]; put(`c${c.cell}`, c.cell, 32, 56, (x, y) => (s?.attack ? glow(x + 32, y + 50) : '') + SVG(x - 2, y - 6, 68, Sprite.colony(c)) + (warPlate(c, x, y) ?? roundel(x + 20, y + 52, c.owner, 24)) + (s?.attack ? pill(x + 32, y - 12, pick(ACT.attack)) : ''), 0, !!D.war); if (near(c.cell) && !warPlate(c, 0, 0)) put(`h${c.cell}`, c.cell, 32, 56, (x, y) => colonyPlate(c, x + 32, y + 57), 3000); }
   D.players.forEach((p, i) => {
     const mine = i === me;
-    if (typeof p.ship === 'number') { const s = sp[`cell:${p.ship}`], hit = s?.attack && !mine; put(`s${i}`, p.ship, 32, 54, (x, y) => (hit ? glow(x + 32, y + 52) : mine ? own(x + 32, y + 54, 30) : '') + SVG(x, y - 3, 64, Sprite.ship(i)) + (p.damage ? `<text x="${x + 10}" y="${y + 14}" font-size="17" font-weight="800" fill="#ff6a52" stroke="#1c2a2a" stroke-width="3" paint-order="stroke">−${p.damage}</text>` : '') + (hit ? pill(x + 32, y + 66, pick(ACT.attack)) : '')); }
+    if (typeof p.ship === 'number') { const s = sp[`cell:${p.ship}`], hit = s?.attack && !mine; put(`s${i}`, p.ship, 32, 54, (x, y) => (hit ? glow(x + 32, y + 52) : mine ? own(x + 32, y + 54, 30) : '') + SVG(x, y - 3, 64, Sprite.ship(i)) + (p.damage ? `<text x="${x + 10}" y="${y + 14}" font-size="17" font-weight="800" fill="#ff6a52" stroke="#1c2a2a" stroke-width="3" paint-order="stroke">−${p.damage}</text>` : '') + (hit ? pill(x + 32, y + 66, pick(ACT.attack)) : '')); if (near(p.ship) && !hit) put(`hs${i}`, p.ship, 32, 54, (x, y) => cargoPlate(i, x + 32, y + 58), 3000); }
     if (typeof p.inf === 'number') { const c = colonyAt(p.inf), s = sp[`cell:${p.inf}`], hit = s?.attack && !mine && !c; put(`i${i}`, p.inf, c ? 6 : 32, 58, (x, y) => (hit ? glow(x + 32, y + 54) : mine ? own(x + (c ? 6 : 32), y + (c ? 52 : 57), c ? 16 : 19) : '') + SVG(x + (c ? -22 : 0), y + (c ? 2 : 0), c ? 56 : 64, Sprite.infantry(i)) + (hit ? pill(x + 32, y + 68, pick(ACT.attack)) : ''), 2); }
   });
   if (lift) for (const [id, s] of Object.entries(sp)) {

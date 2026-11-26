@@ -6,7 +6,6 @@
 .peek h4 { font-size:19px;margin:10px 0 6px }
 .peek h4:first-child { margin-top:0 }
 .col1 { display:grid;gap:6px }
-.grid3 { display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px }
 .mini { display:grid;grid-template-columns:44px 1fr auto;gap:9px;align-items:center;background:var(--bone);color:var(--ink);border-radius:11px;overflow:hidden;padding-right:9px;min-height:46px;line-height:1.12 }
 .peek .mini { min-height:44px }
 .peek .mini img { min-height:44px;max-height:46px }
@@ -16,7 +15,7 @@
 .mini em { font-style:normal;font-weight:800;font-size:17px;white-space:nowrap }
 .mini em.no { color:#a8321f }
 .court .gear { width:38px;height:38px;border-radius:50%;background:#0f3436cc;display:grid;place-items:center;margin-left:4px }
-.acts { display:flex;flex-direction:column;gap:7px;margin:0 0 16px 8px;align-self:flex-end;transition:opacity .2s }
+.acts { display:flex;flex-direction:column;gap:7px;margin:0 0 calc(16px + var(--skirt)) 22px;align-self:flex-end;transition:opacity .2s }
 .acts button { border-radius:12px;font:800 16px/1.1 var(--sc);padding:8px 12px;text-align:center;max-width:104px }
 .acts .pass { background:#0f3436d9;border:2px solid #f7f1e166 }
 .acts .pass.now { background:var(--bone);color:var(--ink);border-color:var(--hot);box-shadow:0 0 0 4px #fff08a80 }

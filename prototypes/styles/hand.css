@@ -1,12 +1,16 @@
 /* The hand of agents. */
-/* cards: the name on top, so that a lowered hand still says who is in it */
+/* A card: the picture fills it, the name on a light ribbon across the top (so a lowered hand still says who is in it), the talent in white on the picture just below. */
 .hand { position:fixed;left:50%;bottom:calc(-1*var(--skirt));transform:translateX(-50%);display:flex;gap:8px;z-index:9;align-items:flex-end }
 .card+.card { margin-left:min(0px,calc((100vw - 2*(var(--door) + var(--res,196px)) - 110px - var(--n)*(var(--cw) + 8px))/(var(--n) - 1))) }
 .card { position:relative;flex:none;width:var(--cw);height:calc(var(--ch) + var(--skirt));border-radius:15px 15px 0 0;overflow:hidden;background:var(--bone);color:var(--ink);box-shadow:0 -3px 16px #000a;transition:transform .16s,filter .16s,height .16s;transform-origin:50% 100% }
-.card .b { display:block;height:52px;padding:8px 10px 0 }
-.card .nm { display:block;font:800 clamp(14px,1.18vw,20px)/1.1 var(--sc);white-space:nowrap }
-.card .tr { display:block;font-size:clamp(13.500px,1.1vw,17px);line-height:1.2;margin-top:2px;white-space:nowrap;font-weight:500 }
-.card img { display:block;width:100%;height:calc(var(--ch) - 52px + var(--skirt));object-fit:cover;object-position:50% 6% }
+.card .b { position:absolute;z-index:1;left:0;right:0;top:0;padding:5px 6px 4px;background:#f7f1e1e8;box-shadow:0 2px 6px #0005 }
+.card .tr.two { white-space:normal;line-height:1.08;top:calc(var(--rib) + 1px) }
+.card .nm { display:block;font:800 clamp(14px,1.18vw,20px)/1.1 var(--sc);white-space:nowrap;overflow:hidden;text-overflow:ellipsis }
+.card .tr { position:absolute;left:6px;right:6px;top:calc(var(--rib) + 2px);display:block;font-size:clamp(13.500px,1.1vw,17px);line-height:1.2;white-space:nowrap;font-weight:700;color:#fff;text-shadow:0 1px 2px #000,0 0 6px #000c;overflow:hidden;text-overflow:ellipsis }
+.card .tr svg { filter:drop-shadow(0 1px 1.500px #000) }
+.card .tr i { font-style:normal }
+/* The picture starts just under the name, so its top (mostly sky) holds the talent line. */
+.card img { display:block;width:100%;height:calc(var(--ch) + var(--skirt));object-fit:cover;object-position:50% var(--rib) }
 .card:hover,.card.sel { z-index:3 }
 .card.sel { box-shadow:0 0 0 5px var(--hot),0 -3px 18px #000a }
 .card.drag { opacity:.4 }
@@ -19,6 +23,10 @@ body.busy .hand .card { filter:brightness(.8) }
 #heaps,.side,.door { transition:opacity .2s,transform .15s }
 body.lift #heaps,body.lift .side,body.lift .acts,body.lift .door { opacity:0;pointer-events:none }
 /* The hand is a fan of small cards. A strip below the screen edge keeps a lifted card from showing a gap. */
-.hand { --cw:clamp(80px,7.6vw,130px);--ch:calc(var(--cw)*1.36);gap:2px }
+.hand { --cw:clamp(96px,8.4vw,140px);--ch:calc(var(--cw)*1.36);--rib:calc(clamp(14px,1.18vw,20px)*1.1 + 9px);gap:2px }
 .hand .card { transform:translateY(calc(var(--k2)*5px)) rotate(calc(var(--k)*3.500deg)) }
 .hand .card:hover,.hand .card.sel { transform:translateY(calc(var(--k2)*5px)) rotate(calc(var(--k)*3.500deg)) scale(1.25) }
+/* Education is seldom needed: a small sign in front of the name. */
+.card .pic { position:relative;display:block }
+.card .edu { display:inline-block;margin-right:.22em;vertical-align:-.13em }
+.card .edu svg { display:block;width:.82em;height:.82em }

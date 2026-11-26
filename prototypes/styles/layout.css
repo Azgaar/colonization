@@ -32,8 +32,10 @@ body[data-view=europe] .map-stage { transform:translateX(-9%) }
   .two { gap:30px }
 }
 @media (max-height:760px) {
-  .bld img { height:46px }
   .lands.n1 { max-width:300px }
   .two { grid-template-columns:minmax(280px,330px) minmax(0,1fr) }
-  .big img { height:84px }
+}
+@media (max-width:1280px) {
+  .s-col .two { grid-template-columns:minmax(240px,300px) minmax(0,1fr);gap:26px }
+  .two.eu { grid-template-columns:minmax(260px,320px) minmax(0,1fr);gap:26px }
 }

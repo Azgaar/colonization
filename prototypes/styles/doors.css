@@ -6,7 +6,7 @@
 .door.west { left:18px;background-position:60% }
 .door.east { right:18px;background-image:url(../art/europe.webp);background-position:46% }
 .door .who { position:absolute;right:calc(100% - 22px);top:-8px;display:flex;gap:2px }
-.heaps { position:fixed;left:calc(var(--door) + 34px);bottom:18px;width:158px;z-index:5;display:flex;flex-direction:column;gap:7px;text-shadow:var(--shade);transition:opacity .2s }
+.heaps { position:fixed;left:calc(var(--door) + 34px);bottom:18px;height:var(--door);width:158px;z-index:5;display:flex;flex-direction:column;justify-content:center;gap:7px;text-shadow:var(--shade);transition:opacity .2s }
 .heap { display:grid;grid-template-columns:repeat(6,1fr);align-items:center;justify-items:center;row-gap:3px;grid-auto-rows:27px }
 .heap svg { width:27px;height:27px;filter:drop-shadow(0 2px 2px #0009) }
 .heap i { width:9px;height:9px;border-radius:50%;background:#ffffff38;place-self:center }

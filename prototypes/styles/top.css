@@ -15,7 +15,7 @@
 .court small { font:700 14.500px/1.2 var(--ui);display:flex;gap:3px;align-items:center;opacity:.92 }
 .court .now .em { box-shadow:0 0 0 3px var(--hot),0 2px 6px #0008 }
 .court .me b::after { content:"" }
-.king { display:flex;gap:9px;align-items:center;margin-left:16px;padding-left:18px;border-left:2px solid #ffffff3d;text-shadow:inherit }
+.king { display:flex;gap:9px;align-items:center;margin-left:18px;padding-left:18px;border-left:2px solid #ffffff3d;text-shadow:inherit }
 .king b { display:block;font:800 28px/1 var(--sc) }
 .king small { font-size:15px!important }
 .kingbox { position:fixed;left:20px;top:70px;z-index:12;width:372px;background:var(--deep);border-radius:18px;padding:16px 20px 18px;box-shadow:0 14px 40px #000b }
@@ -39,5 +39,4 @@
 .menu input { flex:1;min-width:0;accent-color:var(--ochre) }
 .menu output { width:48px;text-align:right;font-weight:800;font-variant-numeric:tabular-nums }
 .menu label.row { display:grid;grid-template-columns:96px 1fr 48px;gap:10px }
-.date>div { min-width:74px }
 .king>span { min-width:90px }

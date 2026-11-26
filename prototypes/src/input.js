@@ -39,6 +39,9 @@ addEventListener('pointermove', (e) => {
     if (!press.on && Math.hypot(e.clientX - press.x, e.clientY - press.y) > 7) { press.on = true; S.card = S.drag = press.card; S.pickAt = null; S.look = null; paint(); ghost = document.createElement('div'); ghost.className = 'ghost'; ghost.innerHTML = `<img src="${art.agent(press.card)}" alt="">`; document.body.append(ghost); }
     if (press.on) { ghost.style.left = `${e.clientX}px`; ghost.style.top = `${e.clientY}px`; hover(e.clientX, e.clientY); }
   } else if ((S.card || Sim.kind() === 'move') && !S.pickAt) hover(e.clientX, e.clientY);
+  // The cell under the pointer shows the plates of what stands there.
+  const c = e.target.closest?.('.map-stage') ? Board.stage.cell(e.clientX, e.clientY) : null;
+  if (c !== S.hov) { S.hov = c; Board.draw(); }
 });
 addEventListener('pointerup', (e) => {
   const p = press; press = null; if (!p) return;

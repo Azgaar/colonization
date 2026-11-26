@@ -1,5 +1,5 @@
 /* Card texts. Russian comes from the spreadsheet, English is written here. */
-import { D, L, lang, pick, t } from './data.js';
+import { D, L, lang, pick } from './data.js';
 import { eduIcon, icon } from './icons.js';
 import { Places } from './places.js';
 const FATHER = {
@@ -18,15 +18,17 @@ export function traits(id) {
   const out = [], n = (x) => (x > 0 ? `+${x}` : x);
   const sword = { infantry: 0, ship: 0 };
   for (const m of D.agents[id].mods) {
-    if (m.mod === 'production') out.push(`${n(m.add)} ${m.icons ? m.icons.map((i) => icon({ corn: 'food', leaf: 'crops' }[i] || i, 15)).join('') : pick(['gathering', 'добыча'])}${m.terrain ? ' ' + pick(D.names.terrain[m.terrain]).toLowerCase() : ''}`);
-    if (m.mod === 'move') out.push(`${n(m.add)} ${icon('move', 15)} ${t(m.token).toLowerCase()}`);
+    if (m.mod === 'production') out.push(`${n(m.add)} ${m.icons ? m.icons.map((i) => icon({ corn: 'food', leaf: 'crops' }[i] || i, 15)).join('') : icon('gather', 15)}${m.terrain ? icon(m.terrain, 15) : ''}`);
+    if (m.mod === 'move') out.push(`${n(m.add)} ${icon('move', 15)}${icon(m.token, 15)}`);
+    if (m.mod === 'combat' && m.terrain && !m.vs) out.push(`${n(m.add)} ${icon('sword', 14)}${icon(m.terrain, 15)}`);
     if (m.mod === 'combat') sword[m.token] += m.vs || m.terrain ? 0 : m.add;
     if (m.mod === 'cost') out.push(`${m.add} ${m.of === 'hire' ? icon('gold', 15) : icon('timber', 15)}`);
     if (m.mod === 'sellPrice') out.push(`${n(m.add)} ${icon('gold', 15)}`);
-    if (m.mod === 'onlyProduce') out.push(pick(['gathers only', 'только добыча']));
     if (m.mod === 'bombard') out.push(pick(['bombards', 'обстрел']));
   }
-  if (sword.infantry) out.unshift(`+${sword.infantry} ${icon('sword', 14)}`); else if (sword.ship) out.unshift(`+${sword.ship} ${icon('sword', 14)} ${t('ship').toLowerCase()}`);
+  // Gathering only: said once, after the gathering bonus if there is one.
+  if (D.agents[id].mods.some((m) => m.mod === 'onlyProduce')) { const i = out.findIndex((x) => x.includes('ic-gather')); if (i >= 0) out[i] += ` ${pick(['only', 'только'])}`; else out.push(`${icon('gather', 15)} ${pick(['only', 'только'])}`); }
+  if (sword.infantry) out.unshift(`+${sword.infantry} ${icon('sword', 14)}`); else if (sword.ship) out.unshift(`+${sword.ship} ${icon('sword', 14)}${icon('ship', 15)}`);
   return out;
 }
 export const trait = (c) => `${eduIcon(D.agents[c].edu)} ${traits(c).join(' ')}`;
