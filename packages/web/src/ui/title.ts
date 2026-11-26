@@ -9,6 +9,8 @@ import { crest, newGame, openNewGame } from './newgame.ts';
 import { chooseFile, enterGame } from './setup.ts';
 import { introPlaying } from './intro.ts';
 import { startAttract, stopAttract } from './attract.ts';
+// The game's version, from the root package.json (bumped with `pnpm release:patch`, `:minor` or `:major`).
+import { version } from '../../../../package.json';
 
 /** The year a round falls in. */
 const year = (round: number) => D.settings.rounds.firstYear + (round - 1) * D.settings.rounds.yearStep;
@@ -74,7 +76,8 @@ export function title() {
   el.innerHTML = `<div class="veil" aria-hidden="true"><div class="mist a"></div><div class="mist b"></div></div>
 <header class="brand${first ? ' enter' : ''}"><h1>${L('Colonization', 'Колонизация')}</h1><span class="rose">${ROSE}</span><p>${L('A New World, a charter from the King, and a question of loyalty', 'Новый Свет, грамота короля и вопрос верности')}</p></header>
 <nav class="menu-t${first ? ' enter' : ''}">${items.map(([a, n, off], i) => `<button ${a} class="${page !== 'main' && a.includes(`"${page}"`) ? 'on' : ''}" ${off ? 'disabled' : ''} style="--i:${i}"><b>${n}</b></button>`).join('')}</nav>
-${page === 'main' ? '' : `<section class="page${fresh ? ' anim' : ''}">${PAGES[page]()}<button class="pback" data-t-page="main">${L('Back', 'Назад')}</button></section>`}`;
+${page === 'main' ? '' : `<section class="page${fresh ? ' anim' : ''}">${PAGES[page]()}<button class="pback" data-t-page="main">${L('Back', 'Назад')}</button></section>`}
+<small class="ver">v${version}</small>`;
 }
 /** Open the title screen from the game. */
 export function openTitle(page: TitlePage = 'main') { U.title = page; U.menu = false; paint(); }

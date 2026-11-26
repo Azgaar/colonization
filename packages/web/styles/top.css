@@ -26,17 +26,22 @@
 .kingbox .sum { border-top:2px solid #fff5;padding-top:4px;margin-top:2px }
 .kingbox p { margin:9px 0 12px;line-height:1.25 }
 .kingbox button { background:var(--bone);color:var(--ink);border-radius:99px;padding:6px 20px;font:800 18px var(--sc) }
-.menu { position:fixed;right:20px;top:66px;max-height:calc(100vh - 84px);overflow:auto;z-index:22;width:420px;background:var(--deep);border-radius:18px;padding:16px 20px 18px;box-shadow:0 14px 40px #000b }
+.menu { position:fixed;right:20px;top:66px;z-index:22;width:360px;max-height:calc(100vh - 84px);overflow:auto;background:var(--deep);border-radius:16px;padding:12px 14px 14px;box-shadow:0 14px 40px #000b;display:flex;flex-direction:column;gap:4px }
 .menu[hidden] { display:none }
-.menu h3 { font-size:23px;margin-bottom:10px }
-.menu .row { display:flex;justify-content:space-between;align-items:center;gap:14px;padding:6px 0;font-size:18px }
-.menu .set { display:flex;gap:6px }
-.menu .set button { background:#ffffff1f;border-radius:10px;min-width:40px;height:36px;padding:0 13px;font-weight:800;text-align:center }
+.menu h4 { font:800 14px var(--sc);color:var(--ochre);letter-spacing:.04em;margin:8px 0 0;padding-top:9px;border-top:1px solid #ffffff1f }
+/* the game: three actions */
+.menu .act { display:block;width:100%;text-align:left;padding:7px 12px;border-radius:10px;background:#ffffff12;font:800 17px/1.2 var(--sc);transition:background .15s }
+.menu .act:hover:not(:disabled),.menu .act:focus-visible { background:#ffffff26 }
+.menu .act:disabled { opacity:.45;cursor:default }
+/* settings: a name on the left, its choices or slider on the right */
+.menu .row { display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:34px;font-size:16px }
+.menu .set { display:flex;gap:4px }
+.menu .set button { min-width:34px;height:30px;padding:0 10px;border-radius:9px;background:#ffffff17;font-weight:800;white-space:nowrap;text-align:center }
+.menu .set button:hover { background:#ffffff2b }
 .menu .set button.on { background:var(--bone);color:var(--ink) }
-.menu .wrapr .set { flex-wrap:wrap }
-.menu .set button { white-space:nowrap }
-.menu h4 { font-size:19px;margin:10px 0 2px;padding-top:10px;border-top:1px solid #ffffff2e }
-.menu input { flex:1;min-width:0;accent-color:var(--ochre) }
-.menu output { width:48px;text-align:right;font-weight:800;font-variant-numeric:tabular-nums }
-.menu label.row { display:grid;grid-template-columns:96px 1fr 48px;gap:10px }
+.menu label.row { display:grid;grid-template-columns:110px 1fr 46px;gap:10px }
+.menu input { min-width:0;accent-color:var(--ochre) }
+.menu output { text-align:right;font-weight:800;font-variant-numeric:tabular-nums }
+.menu .reset { align-self:flex-start;margin-top:4px;padding:6px 12px;border-radius:9px;background:#ffffff17;font-weight:800 }
+.menu .reset:hover { background:#ffffff2b }
 .king>span { min-width:90px }

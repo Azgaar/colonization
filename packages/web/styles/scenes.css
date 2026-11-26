@@ -75,6 +75,13 @@ body:not([data-view=map]) .door,body:not([data-view=map]) #heaps,body:not([data-
 .dk.locked { opacity:.62 }
 .dk.gone { opacity:.38 }
 .dk.seat { background:#ffffff12;box-shadow:inset 0 0 0 2px #ffffff2e }
+.dk.rec { text-align:left;padding:0;cursor:pointer;transition:transform .2s;box-shadow:0 5px 16px #0008,3px 3px 0 -1px #e8dcc0,6px 6px 0 -2px #d8c9a6 }
+.dk.rec .pile { flex:none;width:100%;aspect-ratio:1.08;display:grid;place-items:center;border-radius:11px 11px 0 0;color:#d9b45a;background:radial-gradient(circle at 50% 45%,#1f5a5e,#0c2d33 78%);box-shadow:inset 0 0 0 5px #0c2d33,inset 0 0 0 6.5px #c9a24a99,inset 0 0 0 9px #0c2d33,inset 0 0 0 10px #c9a24a55 }
+.dk.rec .pile svg { width:46%;filter:drop-shadow(0 2px 4px #0008) }
+.dk.rec:hover:not(:disabled) { transform:translateY(-3px) }
+.dk.rec:disabled { cursor:default }
+.dk.rec.off { opacity:.72 }
+.dk.rec.off .pile,.dk.rec.dear .pile { filter:saturate(.3) brightness(.85) }
 .dk.newp { display:grid;place-items:center;align-content:center;gap:4px;text-align:center;padding:10px;background:#f7f1e1d9;font:800 16px/1.1 var(--sc) }
 .dk .rot { font-size:40px;line-height:1 }
 /* two or three colonies share the column */

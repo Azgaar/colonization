@@ -1,5 +1,6 @@
 {
   "name": "colonization",
+  "version": "0.3.0",
   "private": true,
   "type": "module",
   "engines": {
@@ -19,7 +20,10 @@
     "watch": "node packages/lab/src/watch.ts",
     "experiments": "node packages/lab/src/experiments.ts",
     "tune": "node packages/lab/src/tune.ts",
-    "check": "pnpm data:import && pnpm typecheck && pnpm test"
+    "check": "pnpm data:import && pnpm typecheck && pnpm test",
+    "release:patch": "npm version patch --no-git-tag-version",
+    "release:minor": "npm version minor --no-git-tag-version",
+    "release:major": "npm version major --no-git-tag-version"
   },
   "devDependencies": {
     "@types/node": "^26.6.10",

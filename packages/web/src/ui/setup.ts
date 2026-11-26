@@ -25,7 +25,8 @@ export function replayBar() {
 let timer: ReturnType<typeof setInterval> | null = null;
 const stop = () => { if (timer) clearInterval(timer); timer = null; };
 /** The interface after the game behind it changed: nothing lifted, no stale reports, the map repainted. */
-const after = () => { clearNews(); S.card = null; S.look = null; S.war = -1; S.view = 'map'; paint(); void Board.land(true); };
+/** Show the game now loaded; the promise ends when its map is painted (behind the loading screen, if that takes a moment). */
+const after = () => { clearNews(); S.card = null; S.look = null; S.war = -1; S.view = 'map'; paint(); return Board.land(); };
 /** Go to a moment of the replay. */
 const seek = (at: number) => { Sim.seek(at); if (Sim.replay && Sim.replay.at >= Sim.replay.data.choices.length) stop(); after(); };
 
@@ -33,8 +34,9 @@ const seek = (at: number) => { Sim.seek(at); if (Sim.replay && Sim.replay.at >= 
 export function enterGame() { U.title = null; U.menu = false; after(); if (!Sim.replay) void settle(); }
 /** A new game from a setup: the opening scene first, then the map. */
 export function startGame(x: Setup) {
-  stop(); Sim.start(x); Sim.keep(); showSeat(0); U.title = null; U.menu = false; Board.home(); after();
-  playIntro(x.nations[0], () => void settle());
+  stop(); Sim.start(x); Sim.keep(); showSeat(0); U.title = null; U.menu = false; Board.home();
+  // The new map is painted first, under the loading screen, so that the film then plays without a stop.
+  void after().then(() => playIntro(x.nations[0], () => void settle()));
 }
 /** A file chosen by the player: a saved game, or a recorded one. */
 async function openFile(f: File) {

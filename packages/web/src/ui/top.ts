@@ -1,4 +1,4 @@
-/* The top line, the King's army box, the Governors sheet and the options menu. */
+/* The top line, the King's army box, the Governors sheet and the game menu. */
 import { $, D, L, lang, logLine, me, P, placeOf, t } from '../data.ts';
 import type { Entry } from '../sim.ts';
 import { icon } from '../icons.ts';
@@ -16,8 +16,26 @@ export function top() {
   $('sheet').className = `sheet${U.sheet ? ' on' : ''}`;
   $('sheet').innerHTML = `<button class="x" data-sheet>${t('close')}</button><h2>${t('rivals')}</h2>${D.players.map((p, i) => `<div class="riv${i === me ? ' me' : ''}">${Places.em(i, 44)}<span>${Places.name(i)}${i === me ? ` <small>(${t('you')})</small>` : ''}<small class="two-l"><span title="${L('Agents', 'Агенты')}">${icon('people', 15)}${p.agents}</span> <span title="${t('gold')}">${icon('gold', 15)}${p.gold}</span> <span title="${t('buildings')}">${icon('house', 15)}${p.buildings.length}</span> <span title="${t('fathers')}">${icon('father', 15)}${p.fathers.length}</span></small></span><span class="v" title="${t('bells')}">${icon('bells', 18)}${p.bells}</span><span class="v" title="${t('crosses')}">${icon('crosses', 18)}${p.crosses}</span></div>`).join('')}<h2 style="margin-top:20px">${t('log')}</h2><ul class="log">${D.log.slice().reverse().map((e) => { const l = logLine(e as Entry), at = placeOf(e as Entry); return l ? `<li${at === null ? '' : ` class="at" data-look="${at}" title="${L('Show on the map', 'Показать на карте')}"`}>${l}</li>` : ''; }).join('')}</ul>`;
 }
+/** The game menu (the gear, or Esc): first what is done to the game itself, then how it is shown. */
 export function menu() {
-  const seg = (name: string, list: [k: string, n: string, on?: boolean][]) => `<div class="row">${name}<span class="set">${list.map(([k, n, on]) => `<button class="${on ? 'on' : ''}" ${on ? '' : k}>${n}</button>`).join('')}</span></div>`, v = Board.view;
   $('menu').hidden = !U.menu;
-  $('menu').innerHTML = `<h3>${L('Options', 'Настройки')}</h3>${seg(L('Language', 'Язык'), [['data-lang="en"', 'English', lang() === 'en'], ['data-lang="ru"', 'Русский', lang() === 'ru']])}${seg(L('Other players', 'Другие игроки'), [['data-fast=""', L('Show', 'Показывать'), !Sim.fast], ['data-fast="1"', L('At once', 'Сразу'), Sim.fast]])}<h4>${L('Map', 'Карта')}</h4>${seg(L('Zoom', 'Масштаб'), [['data-zoom=".8" aria-label="−"', '−'], ['data-zoom="1.25" aria-label="+"', '+'], ['data-home', L('Start', 'Начало')], ['data-fit', L('All', 'Всё')]])}${seg(L('Tilt follows zoom', 'Наклон по масштабу'), [['data-follow="1"', L('On', 'Да'), !!v.auto], ['data-follow=""', L('Off', 'Нет'), !v.auto]])}${([v.auto ? ['most', L('Closest tilt', 'Наклон вблизи'), 20, 70, '°'] : ['tilt', L('Tilt', 'Наклон'), 0, 45, '°'], ['depth', L('Perspective', 'Перспектива'), 0, 100, '%'], ['shift', L('Shift', 'Сдвиг'), -25, 25, '%']] satisfies [keyof typeof v, string, number, number, string][]).map(([k, n, lo, hi, u]) => `<label class="row">${n}<input type="range" data-view-set="${k}" data-unit="${u}" min="${lo}" max="${hi}" value="${v[k]}"><output>${v[k]}${u}</output></label>`).join('')}${seg(L('Cell grid', 'Сетка'), [['data-grid=""', L('Off', 'Нет'), !Board.grid], ['data-grid="1"', L('On', 'Да'), Board.grid], ['data-reset', L('Reset map', 'Сбросить')]])}<h4>${L('Game', 'Игра')}</h4><div class="row wrapr"><span class="set">${Sim.replay ? '' : `<button data-auto="round">${L('Play this round for me', 'Сыграть тур за меня')}</button><button data-auto="war">${L('Skip to the war', 'Сразу к войне')}</button>`}<button data-t-open="new">${L('New game…', 'Новая игра…')}</button><button data-t-open="main">${L('Main menu', 'Главное меню')}</button>${Sim.replay ? '' : `<button data-new="">${L('Start this game again', 'Начать эту игру заново')}</button><button data-save-file>${L('Save to a file', 'Сохранить в файл')}</button>`}<button data-open-file>${L('Open a saved game…', 'Открыть сохранённую игру…')}</button></span></div>`;
+  if (!U.menu) return;
+  const v = Board.view;
+  const act = (attr: string, name: string, off = false, why = '') => `<button class="act" ${attr}${off ? ` disabled title="${why}"` : ''}>${name}</button>`;
+  const seg = (name: string, list: [k: string, n: string, on?: boolean][]) => `<div class="row"><span>${name}</span><span class="set">${list.map(([k, n, on]) => `<button class="${on ? 'on' : ''}" ${on ? '' : k}>${n}</button>`).join('')}</span></div>`;
+  const slide = ([k, n, lo, hi, u]: [keyof typeof v, string, number, number, string]) => `<label class="row"><span>${n}</span><input type="range" data-view-set="${k}" data-unit="${u}" min="${lo}" max="${hi}" value="${v[k]}"><output>${v[k]}${u}</output></label>`;
+  $('menu').innerHTML = `${act('data-t-open="main"', L('Main menu', 'Главное меню'))}
+${Sim.replay ? '' : `${act('data-save-file', L('Save to a file', 'Сохранить в файл'))}
+${act('data-auto="round"', L('Automate round', 'Автоматизировать тур'), !!D.over, L('The war is over', 'Война окончена'))}`}
+<h4>${L('Settings', 'Настройки')}</h4>
+${seg(L('Language', 'Язык'), [['data-lang="en"', 'English', lang() === 'en'], ['data-lang="ru"', 'Русский', lang() === 'ru']])}
+${seg(L('Other players', 'Другие игроки'), [['data-fast=""', L('Show each', 'Показывать'), !Sim.fast], ['data-fast="1"', L('At once', 'Сразу'), Sim.fast]])}
+<h4>${L('Map', 'Карта')}</h4>
+${seg(L('Camera', 'Камера'), [['data-cam="out" aria-label="−"', '−'], ['data-cam="in" aria-label="+"', '+'], ['data-cam="home"', L('Start', 'Начало')], ['data-cam="fit"', L('All', 'Всё')]])}
+${seg(L('Tilt follows zoom', 'Наклон по масштабу'), [['data-follow="1"', L('On', 'Да'), !!v.auto], ['data-follow=""', L('Off', 'Нет'), !v.auto]])}
+${slide(v.auto ? ['most', L('Closest tilt', 'Наклон вблизи'), 20, 70, '°'] : ['tilt', L('Tilt', 'Наклон'), 0, 45, '°'])}
+${slide(['depth', L('Perspective', 'Перспектива'), 0, 100, '%'])}
+${slide(['shift', L('Shift', 'Сдвиг'), -25, 25, '%'])}
+${seg(L('Cell grid', 'Сетка'), [['data-grid=""', L('Off', 'Нет'), !Board.grid], ['data-grid="1"', L('On', 'Да'), Board.grid]])}
+<button class="reset" data-reset>${L('Reset the map view', 'Сбросить вид карты')}</button>`;
 }

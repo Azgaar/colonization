@@ -6,6 +6,9 @@
 .map-inner { left:0;top:0;will-change:transform;pointer-events:none }
 .map-inner>canvas.sea { inset:auto;left:-1792px;top:-1792px;width:4608px;height:4608px }
 .paths,.sprites { position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible }
+/* While a new map's terrain is being painted, what stands on it waits, then fades in. */
+.paths,.sprites,.map-inner>canvas.ground { transition:opacity .6s }
+.map-stage.bare .paths,.map-stage.bare .sprites,.map-stage.bare canvas.ground { opacity:0;transition:none }
 .paths .rim { stroke-width:3;stroke-linecap:round;fill:none }
 .paths .sea.rim { stroke:#fff;stroke-opacity:.75;stroke-dasharray:2 8 }
 .paths .sea.area { fill:#d6f4ff;fill-opacity:.13 }

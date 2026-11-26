@@ -13,12 +13,14 @@ async function textures() {
 
 const KINDS: TerrainId[] = ['ocean', 'forest', 'grassland', 'mountains', 'desert', 'tundra'];
 const mix = (a: number[], b: number[], k: number) => [a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k, a[2] + (b[2] - a[2]) * k];
-/** How to paint the map: `K` times the base size, trees `tall` times higher, the open cells (`seen`, kept as the key of the last whole picture), a pause now and then (`rest`), and only a part of it (`box`: left, top, right, bottom in map units). */
-export interface Plan { K?: number; tall?: number; seen?: string; rest?: () => Promise<void>; box?: [number, number, number, number] | null }
+/** How to paint the map: `K` times the base size, trees `tall` times higher, the open cells (`seen`, kept as the key of the last whole picture), and only a part of it (`box`: left, top, right, bottom in map units). */
+export interface Plan { K?: number; tall?: number; seen?: string; box?: [number, number, number, number] | null }
 /** The last whole picture with the terrain kinds of its pixels, to draw it again at once. */
 let kept: { key: string; im: ImageData; f: Uint8Array } | null = null;
+/** Whether the whole picture for these settings is at hand, to be drawn again at once. */
+export const isKept = (K: number, seen: string) => kept?.key === `${K} ${seen}`;
 /** Painted map at `K` times the base size: blended ground, lit relief, beaches, shallows, clouds over the unknown. */
-export async function drawRich(canvas: HTMLCanvasElement, { K = 1.5, tall = 1, seen = '', rest = async () => {}, box = null }: Plan = {}) {
+export async function drawRich(canvas: HTMLCanvasElement, { K = 1.5, tall = 1, seen = '', box = null }: Plan = {}) {
   const tex = await textures(), C = CELL * K, N = Math.round(W * C), sea = true, open = (c: number) => D.open[c], key = `${K} ${seen}`;
   if (!box && kept?.key === key) { const q = kept; canvas.width = canvas.height = N; const g = canvas.getContext('2d')!; g.putImageData(q.im, 0, 0); scatter(g, K, (x, y) => q.f[y * N + x], tall); return canvas; }
   // A part of the map is painted inside a wider window, so that distances near its edge are still right.
@@ -30,13 +32,12 @@ export async function drawRich(canvas: HTMLCanvasElement, { K = 1.5, tall = 1, s
     const c = Math.min(W - 1, Math.max(0, Math.floor(wy / CELL))) * W + Math.min(W - 1, Math.max(0, Math.floor(wx / CELL)));
     const t = D.terrain[c];
     f[ly * ww + lx] = open(c) && t ? KINDS.indexOf(t) : 255;
-    if (lx === ww - 1) await rest();
   }
   const field = async (goal: (v: number) => boolean) => {
     const d = new Float32Array(ww * wh).fill(1e4), r = 1.41;
     for (let i = 0; i < ww * wh; i++) if (goal(f[i])) d[i] = 0;
-    for (let y = 0; y < wh; y++) for (let x = 0; x < ww; x++) { const i = y * ww + x; let v = d[i]; if (x) v = Math.min(v, d[i - 1] + 1); if (y) { v = Math.min(v, d[i - ww] + 1); if (x) v = Math.min(v, d[i - ww - 1] + r); if (x < ww - 1) v = Math.min(v, d[i - ww + 1] + r); } d[i] = v; if (x === ww - 1) await rest(); }
-    for (let y = wh - 1; y >= 0; y--) for (let x = ww - 1; x >= 0; x--) { const i = y * ww + x; let v = d[i]; if (x < ww - 1) v = Math.min(v, d[i + 1] + 1); if (y < wh - 1) { v = Math.min(v, d[i + ww] + 1); if (x) v = Math.min(v, d[i + ww - 1] + r); if (x < ww - 1) v = Math.min(v, d[i + ww + 1] + r); } d[i] = v; if (!x) await rest(); }
+    for (let y = 0; y < wh; y++) for (let x = 0; x < ww; x++) { const i = y * ww + x; let v = d[i]; if (x) v = Math.min(v, d[i - 1] + 1); if (y) { v = Math.min(v, d[i - ww] + 1); if (x) v = Math.min(v, d[i - ww - 1] + r); if (x < ww - 1) v = Math.min(v, d[i - ww + 1] + r); } d[i] = v; }
+    for (let y = wh - 1; y >= 0; y--) for (let x = ww - 1; x >= 0; x--) { const i = y * ww + x; let v = d[i]; if (x < ww - 1) v = Math.min(v, d[i + 1] + 1); if (y < wh - 1) { v = Math.min(v, d[i + ww] + 1); if (x) v = Math.min(v, d[i + ww - 1] + r); if (x < ww - 1) v = Math.min(v, d[i + ww + 1] + r); } d[i] = v; }
     return d;
   };
   const land = (v: number) => v > 0 && v < 6, toLand = await field(land), toSea = await field((v) => v === 0), toFog = await field((v) => v === 255);
@@ -77,7 +78,6 @@ export async function drawRich(canvas: HTMLCanvasElement, { K = 1.5, tall = 1, s
       c = mix(c, mix([150, 178, 190], [244, 246, 240], Math.min(1, Math.max(0, (n - 0.25) * 1.9))), Math.min(0.95, Math.max(0, k)));
     }
     o[i * 4] = c[0]; o[i * 4 + 1] = c[1]; o[i * 4 + 2] = c[2]; o[i * 4 + 3] = sea ? Math.min(255, Math.min(X, Y, W * CELL - X, W * CELL - Y) * 5) : 255;
-    if (lx === ww - 1) await rest();
   }
   const at = (x: number, y: number) => (x >= ox && y >= oy && x < ox + ww && y < oy + wh ? f[(y - oy) * ww + x - ox] : 255);
   if (!box) {

@@ -5,6 +5,7 @@ import { icon } from '../icons.ts';
 import { Board } from '../map/board.ts';
 import { Sprite } from '../map/sprites.ts';
 import { Places, type Spaces } from '../places.ts';
+import { Sim } from '../sim.ts';
 import { S } from '../state.ts';
 import { Texts, trait, work } from '../texts.ts';
 import { lore } from './fans.ts';
@@ -55,11 +56,21 @@ function colony(sp: Spaces) {
 }
 
 /* ---- Europe ---- */
+/** The face-down deck of agents beside the pier. On the player's turn, crosses equal to the round buy a look at its top agent, without using an action. */
+function recruit() {
+  const cost = D.recruit, why = Sim.kind() === 'recruit' ? '' : Sim.kind() !== 'turn' ? L('On your turn', 'В свой ход') : !P.hand.length ? L('Needs an agent in hand', 'Нужен агент в руке')
+    : !D.agentsLeft ? L('The deck is empty', 'Колода пуста') : P.crosses < cost ? L(`Needs ${cost} ${cost === 1 ? 'cross' : 'crosses'}`, `Нужно крестов: ${cost}`) : '', off = !!why || Sim.kind() === 'recruit';
+  // The back of the deck: a gilt frame and a compass star. The price is in the corner; the reason it cannot be done now, in the tooltip.
+  const star = '<svg viewBox="-50 -50 100 100" aria-hidden="true"><circle r="30" fill="none" stroke="currentColor" stroke-width="2"/><circle r="22" fill="none" stroke="currentColor" stroke-width="1" opacity=".6"/><path d="M0-44 7-7 44 0 7 7 0 44-7 7-44 0-7-7Z" fill="currentColor"/><path d="M0-44 7-7 0 0ZM44 0 7 7 0 0ZM0 44-7 7 0 0ZM-44 0-7-7 0 0Z" fill="#0c2d33" opacity=".35"/><circle r="4" fill="#0c2d33"/></svg>';
+  return `<button class="dk rec${P.crosses < cost ? ' dear' : off ? ' off' : ''}" ${off ? 'disabled' : 'data-recruit'}${why ? ` title="${why}"` : ''}><span class="pile">${star}</span><span class="cost">${icon('crosses', 16)}${cost}</span>
+<span class="dt"><b>${L('Recruit', 'Вербовка')}</b><small>${L('Look at the top agent of the deck: take it or put it back', 'Посмотрите верхнего агента колоды: возьмите его или верните')}</small></span></button>`;
+}
 function europe(sp: Spaces) {
   const lab = (id: string) => (S.card ? Places.label(sp[id]) : '');
   const market = `<div class="zone" data-space="eu:market"><h4>${t('market')} ${lab('eu:market')}</h4><div class="mk">${RES.map((r) => `${icon(r, 32)}<span class="bar"><i style="width:${D.price[r] * 20}%"></i></span><b>${D.price[r]}</b><span class="dm" title="${t('demand')}">${D.players.map((_, i) => `<i class="${i < D.demand[r] ? 'on' : ''}"></i>`).join('')}</span>`).join('')}</div><p class="note">${L('When the circles of a good fill, its price falls by 1.', 'Когда кружки товара заполнены, его цена падает на 1.')}</p><div class="hold">${hull()}<span>${L('Worth', 'Стоит')} <b>${Places.worth(S.card)} ${icon('gold', 22)}</b>${Places.inEurope() ? '' : `<br><small>${L('The ship must be in Europe to sell', 'Чтобы продать, корабль должен быть в Европе')}</small>`}</span>${Places.tokens('eu:market')}</div></div>`;
   const extra = `${S.card && sp['eu:some']?.options ? `<div class="tls wide"><div class="tl" data-space="eu:some"><img src="art/crate.webp" alt=""><span><b>${L('Sell some', 'Продать часть')}</b></span></div></div>` : ''}${P.damage ? `<div class="tls wide"><div class="tl" data-space="eu:yard"><img src="${art.building('shipyard')}" alt=""><span><b>${pick(ACT.repair)}</b></span><span class="rs">${lab('eu:yard')}</span></div></div>` : ''}`;
-  const pier = D.pier.map(([x, n]) => deck({ id: `pier:${x}`, pic: art.agent(x), name: `${pick(D.agents[x])}${n > 1 ? ` ×${n}` : ''}`, does: trait(x) || L('no talent', 'без таланта'), cost: `${icon('gold', 16)}${sp[`pier:${x}`]?.cost ?? D.agents[x].price}`, cls: `ag${(D.agents[x].price ?? 0) > P.gold ? ' dear' : ''}` })).join('') + (S.card ? `<div class="dk newp" data-space="pier:new"><span class="rot">↻</span><b>${L('New agents', 'Другие агенты')}</b></div>` : '');
+  const agents = D.pier.map(([x, n]) => deck({ id: `pier:${x}`, pic: art.agent(x), name: `${pick(D.agents[x])}${n > 1 ? ` ×${n}` : ''}`, does: trait(x) || L('no talent', 'без таланта'), cost: `${icon('gold', 16)}${sp[`pier:${x}`]?.cost ?? D.agents[x].price}`, cls: `ag${(D.agents[x].price ?? 0) > P.gold ? ' dear' : ''}` })).join('') + (S.card ? `<div class="dk newp" data-space="pier:new"><span class="rot">↻</span><b>${L('New agents', 'Другие агенты')}</b></div>` : '');
+  const pier = agents + recruit();
   const salon = D.salon.map((f) => deck({ id: `salon:${f}`, pic: art.father(f), name: pick(D.fathers[f]), does: Texts.father(f, 14), story: lore(f), cost: `${icon('bells', 16)}${D.fathers[f].bells}`, cls: `fa${D.fathers[f].bells > P.bells ? ' dear' : ''}` })).join('');
   $('sEu').innerHTML = `${back()}<div class="in"><h2>${t('europe')}</h2><div class="two eu"><div>${market}${extra}</div><div><h4>${t('pier')} <small>${L('up to 2 per action', 'до 2 за действие')}</small></h4><div class="row-dk">${pier}</div><h4>${t('salon')} <small>${L('up to 2 per action', 'до 2 за действие')}</small></h4><div class="row-dk">${salon}</div></div></div></div>`;
 }

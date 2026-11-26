@@ -5,7 +5,7 @@ import { DEFS, roundel, SHAPES } from '../icons.ts';
 import { Bonus } from './bonus.ts';
 import { stage, type Pitch, type Stage } from './camera.ts';
 import { Sprite } from './sprites.ts';
-import { drawRich, drawSea } from './terrain.ts';
+import { drawRich, drawSea, isKept } from './terrain.ts';
 import { paint } from '../paint.ts';
 import { Places, type Spaces, type Way } from '../places.ts';
 import { S } from '../state.ts';
@@ -90,6 +90,8 @@ const layer = document.querySelector<HTMLElement>('.sprites')!, paths = document
 /** Keeps the elements in step with the game. Only what changed is drawn again. */
 function draw() {
   resize();
+  // A new map: nothing stands on it until its terrain is painted (see `land`).
+  if (`${Sim.s.seed} ${W}` !== painted) bare(true);
   const now = new Set<string>();
   for (const q of things(Places.spaces(S.card))) {
     now.add(q.id);
@@ -178,27 +180,54 @@ function resize(first = false) {
   if (!first) { grounded = '!'; edged = ''; }
 }
 resize(true);
-/* A quick sketch of the land at once, then the sharp one in the background, a few milliseconds at a time. */
-const SHARP = devicePixelRatio > 1 ? 2.2 : 1.6, plan = (k: number, rest?: () => Promise<void>) => ({ K: k, tall: up(), rest, seen: D.open.map((x) => (x ? 1 : 0)).join('') });
-let clock = 0, drawing: Promise<unknown> = Promise.resolve(), drawn = '', shown: string | null = null;
-const rest = async () => { if (performance.now() - clock > 8) { await new Promise((r) => setTimeout(r)); clock = performance.now(); } };
-async function land(sketch = false) {
+/* The land is painted at full quality in one go: never a rough picture first. It holds the page for about a second on a new map (measured: 0.8–1.2 s, 1.7 s on Retina), which is the fastest way to the finished map. */
+const SHARP = devicePixelRatio > 1 ? 2.2 : 1.6, plan = (k: number) => ({ K: k, tall: up(), seen: D.open.map((x) => (x ? 1 : 0)).join('') });
+let drawing: Promise<unknown> = Promise.resolve(), drawn = '', shown: string | null = null;
+/** The map whose terrain is painted (seed and width). Until a new map's terrain is fully painted, what stands on it is hidden, then fades in. */
+let painted = '', hidden = false;
+/** The loading screen (in index.html): it shows while a whole picture of the map is painted, since that holds the page for a moment. */
+function loading(on: boolean) {
+  // Only faded in and out, never removed, so that its swing keeps running on its own (see index.html).
+  $('loading').classList.toggle('done', !on);
+  if (!on) document.body.classList.remove('loading');
+}
+/** A new map: what stands on it waits, hidden, until its terrain is painted. */
+const bare = (on: boolean) => { hidden = on; document.querySelector('.map-stage')!.classList.toggle('bare', on); if (on) loading(true); };
+/** The whole picture being painted now, and when it is done: whoever asks for the same one again waits for it. */
+let painting = '', painted$: Promise<void> = Promise.resolve();
+const frame = () => new Promise((r) => requestAnimationFrame(() => setTimeout(r)));
+/** Paint the land as the game now is. On the same map only the part that changed is painted, at once: land explored, or closed again by Undo or a replay.
+ * A new map, other trees, a change over much of it, or `whole`, is painted whole, in one go, behind the loading screen. */
+async function land(whole = false) {
   resize();
-  const now = plan(SHARP, rest); if (drawn === now.seen + now.tall && !sketch) return;
-  const was = drawn, old = shown, fresh = was && was.slice(-String(now.tall).length) === String(now.tall) && old && old.length === now.seen.length ? [...now.seen].map((v, c) => (v === '1' && old[c] === '0' ? c : -1)).filter((c) => c >= 0) : [];
+  const map = `${Sim.s.seed} ${W}`;
+  if (map !== painted) { painted = map; whole = true; bare(true); }
+  const now = plan(SHARP); if (drawn === now.seen + now.tall && !whole) return;
+  const was = drawn, old = shown, same = !whole && !hidden && !!old && was.slice(-String(now.tall).length) === String(now.tall) && old.length === now.seen.length;
+  const changed = same ? [...now.seen].map((v, c) => (v !== old[c] ? c : -1)).filter((c) => c >= 0) : [];
   drawn = now.seen + now.tall;
-  // Something just explored on the same map: paint only that part, at once, and the rest quietly afterwards. A new map of another size is painted whole.
-  if (fresh.length && !sketch) {
-    const xs = fresh.map((c) => c % W), ys = fresh.map((c) => Math.floor(c / W));
-    await drawRich(terrain, { ...plan(SHARP), box: [Math.min(...xs) * 64, Math.min(...ys) * 64, (Math.max(...xs) + 1) * 64, (Math.max(...ys) + 1) * 64] });
-    shown = now.seen; draw(); if (S.view === 'colony') paint();
-    return;
+  if (changed.length) {
+    const xs = changed.map((c) => c % W), ys = changed.map((c) => Math.floor(c / W)), box: [number, number, number, number] = [Math.min(...xs) * 64, Math.min(...ys) * 64, (Math.max(...xs) + 1) * 64, (Math.max(...ys) + 1) * 64];
+    if ((box[2] - box[0]) * (box[3] - box[1]) <= (SIZE() * SIZE()) / 4) {
+      await drawRich(terrain, { ...plan(SHARP), box });
+      shown = now.seen; draw(); if (S.view === 'colony') paint();
+      return;
+    }
   }
+  const key = `${map} ${now.seen}${now.tall}`;
+  if (painting === key) return painted$; // already on its way
+  painting = key;
+  let done = () => {};
+  painted$ = new Promise<void>((r) => { done = r; });
   await drawing;
-  if (drawn !== now.seen + now.tall) return; // something newer is waiting
-  if (sketch) { await drawRich(terrain, plan(0.75)); shown = now.seen; draw(); }
+  // A whole new picture holds the page for about a second: the loading screen shows first, unless the picture is at hand.
+  if (drawn === now.seen + now.tall && !isKept(now.K, now.seen)) { loading(true); await frame(); }
+  if (drawn !== now.seen + now.tall) { if (painting === key) painting = ''; done(); return; } // something newer is waiting
   if (S.view === 'colony') paint();
   drawing = drawRich(terrain, now); await drawing; shown = now.seen; draw();
+  if (painting === key) painting = '';
+  if (drawn === now.seen + now.tall) { bare(false); loading(false); }
+  done();
   if (S.view === 'colony') paint();
 }
 /** The token on the move: where it can still go, the closed fragments it could explore, and the legal choices; kept for the move and the length of the log. */

@@ -45,7 +45,7 @@ export function exportState(s: State, me: number) {
       agents: util.collection(p).length, score: scorePlayer(s, i).score, parts: scorePlayer(s, i).parts, color: def.nations[p.nation].color,
     })),
     price: { ...s.price }, demand: { ...s.demand }, pier: s.pier.map((x) => [x[0], x.length] as [string, number]), salon: s.salon.slice(), ref: s.ref, left: { ...s.buildingsLeft }, cap: util.warehouseCap(s, me), loyal: findLoyalist(s),
-    recruit: recruitCost(s), event: s.event,
+    recruit: recruitCost(s), agentsLeft: s.agentDeck.length + s.agentDiscard.length, event: s.event,
     actions: record(mine ? cards : [], (c) => actionsFor(s, me, c)),
     build: record(mine ? ['', ...cards] : [], (c) => record(Object.keys(def.buildings), (b) => buildPrice(s, me, c || null, b))),
     sell: record(mine ? cards : [], (c) => record(Object.keys(s.price), (r) => sellPrice(s, me, c, r as keyof typeof s.price))),

@@ -80,15 +80,12 @@ document.addEventListener('click', async (e: MouseEvent) => {
   else if (q('[data-peace]')) { S.war = -1; paint(); }
   else if ((x = q('[data-war]'))) { if (D.over) { S.war = +x.dataset.war!; S.view = 'map'; S.look = null; U.king = false; focus(); paint(); } }
   else if ((x = q('[data-lang]'))) { document.documentElement.lang = x.dataset.lang!; paint(); }
-  else if ((x = q('[data-zoom]'))) Board.stage.zoomBy(+x.dataset.zoom!);
-  else if (q('[data-home]')) Board.home();
-  else if (q('[data-fit]')) Board.fit();
   else if ((x = q('[data-grid]'))) { Board.grid = !!x.dataset.grid; paint(); }
   else if ((x = q('[data-follow]'))) { Board.view.auto = x.dataset.follow ? 1 : 0; localStorage.setItem(Board.KEY, JSON.stringify(Board.view)); Board.look(); Board.land(); paint(); }
   else if ((x = q('[data-fast]'))) { Sim.fast = !!x.dataset.fast; paint(); }
   else if (q('[data-reset]')) { Object.assign(Board.view, Board.VIEW); localStorage.removeItem(Board.KEY); Board.look(); Board.land(); paint(); }
-  else if ((x = q('[data-auto]'))) { const r = D.round, war = x.dataset.auto === 'war'; U.menu = false; await Sim.auto((s) => (war ? !!s.war && s.pending?.player === me : s.round > r || !!s.war)); clearNews(); Sim.news(); settle(); }
-  else if ((x = q('[data-new]'))) { U.menu = false; S.war = -1; S.view = 'map'; clearNews(); if (x.dataset.new) Sim.start({ ...Sim.setup, seed: `p${Date.now()}`, nations: Sim.setup.nations.slice(0, +x.dataset.new) }); else Sim.start(Sim.setup); Board.home(); settle(); }
+  else if ((x = q('[data-cam]'))) { const c = x.dataset.cam; if (c === 'in' || c === 'out') Board.stage.zoomBy(c === 'in' ? 1.25 : 0.8); else if (c === 'home') Board.home(); else Board.fit(); }
+  else if (q('[data-auto]')) { const r = D.round; U.menu = false; await Sim.auto((s) => s.round > r || !!s.war); clearNews(); Sim.news(); settle(); }
   else if (q('[data-menu]')) { U.menu = !U.menu; U.king = U.sheet = false; paint(); }
   else if (q('[data-king]')) { U.king = !U.king; U.sheet = U.menu = false; paint(); }
   else if (q('[data-sheet]')) { U.sheet = !U.sheet; U.king = U.menu = false; paint(); }
@@ -96,11 +93,12 @@ document.addEventListener('click', async (e: MouseEvent) => {
   else if ((x = q('[data-go]'))) { const g = x.dataset.go; if (!deciding() && (g === 'colony' || g === 'europe')) { S.view = S.view === g ? 'map' : g; U.peek = null; paint(); } }
   else if (document.contains(el) && ((U.menu && !q('.menu')) || (U.king && !q('.kingbox')))) { U.menu = U.king = false; paint(); }
 });
+// The map sliders of the game menu: seen at once while dragged, kept when let go; a new tilt grows the trees differently, so the land is painted again.
+document.addEventListener('input', (e) => { const el = e.target as HTMLInputElement, k = el.dataset.viewSet as keyof typeof Board.view | undefined; if (!k) return; Board.view[k] = +el.value; el.nextElementSibling!.textContent = `${Board.view[k]}${el.dataset.unit}`; Board.look(); });
+document.addEventListener('change', (e) => { const k = (e.target as HTMLElement).dataset.viewSet; if (!k) return; localStorage.setItem(Board.KEY, JSON.stringify(Board.view)); if (['tilt', 'most'].includes(k)) void Board.land(); });
 addEventListener('keydown', (e: KeyboardEvent) => {
   // Esc puts down or closes what is open, one thing at a time; with nothing left open on the map, it opens the options menu.
   if (e.key === 'Escape' && !U.title) { put(); if (S.pickAt) S.pickAt = null; else if (S.card) S.card = null; else if (S.war >= 0) S.war = -1; else if (U.menu || U.king || U.sheet) U.menu = U.king = U.sheet = false; else if (S.view !== 'map') S.view = 'map'; else U.menu = true; bub().hidden = true; paint(); }
   if (e.key === 'Enter' && X.reports.length && !Sim.busy) { e.preventDefault(); read(); }
   if (/^[1-9]$/.test(e.key) && Sim.kind() === 'turn' && !Sim.busy && P.hand[+e.key - 1]) { S.card = P.hand[+e.key - 1]; S.pickAt = null; paint(); }
 });
-document.addEventListener('input', (e) => { const el = e.target as HTMLInputElement, k = el.dataset.viewSet as keyof typeof Board.view | undefined; if (!k) return; Board.view[k] = +el.value; el.nextElementSibling!.textContent = `${Board.view[k]}${el.dataset.unit}`; Board.look(); });
-document.addEventListener('change', (e) => { const k = (e.target as HTMLElement).dataset.viewSet; if (!k) return; localStorage.setItem(Board.KEY, JSON.stringify(Board.view)); if (['tilt', 'most'].includes(k)) Board.land(); });

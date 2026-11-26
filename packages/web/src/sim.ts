@@ -96,7 +96,8 @@ export const Sim = {
   apply(c: Choice): boolean {
     const from = s.log.length;
     try { applyInPlace(s, c); } catch (e) { if (e instanceof IllegalChoice) { console.warn('refused', JSON.stringify(c), e.message); return false; } throw e; }
-    if (s.log.slice(from).some((e) => REVEALS.has(e.e))) history = [];
+    // Recruiting shows the top agent of the deck: that, too, cannot be taken back.
+    if (s.log.slice(from).some((e) => REVEALS.has(e.e)) || s.pending?.kind === 'recruit') history = [];
     return true;
   },
   /** These entries were already told. */
@@ -126,10 +127,9 @@ export const Sim = {
 
   /* ---- the game behind the title screen ---- */
   get demo() { return demo; },
-  /** A bot game for the title screen, already some rounds in, so there is land, colonies and ships to see. */
-  startDemo() {
-    const n = NATIONS.slice().sort(() => Math.random() - 0.5).slice(0, 4);
-    setup = { nations: n, bots: ['explorer', 'trader', 'balanced'], ruleset: 'board', seed: `demo${Date.now().toString(36)}` };
+  /** A bot game for the title screen, with the seed and nations it is given, already some rounds in, so there is land, colonies and ships to see. The same seed plays the same game. */
+  startDemo(seed: string, n: string[]) {
+    setup = { nations: n, bots: ['explorer', 'trader', 'balanced'], ruleset: 'board', seed };
     def = loadRuleset('board'); replay = null; seat = 0; demo = true;
     s = createGame({ def, seed: setup.seed, nations: n, logging: true }); Object.assign(D, exportRules(def)); begin(); demo = true;
     for (let k = 0; k < 6000 && !s.over && s.round < 3; k++) Sim.demoStep();
