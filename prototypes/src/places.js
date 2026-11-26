@@ -3,7 +3,8 @@ import { ACT, art, D, L, me, P, pick, RES, why as reason } from './data.js';
 import { icon } from './icons.js';
 import { Sim } from './sim.js';
 const E = window.Engine;
-const ico = (i) => ({ corn: 'food', leaf: 'crops' })[i] || i;
+/** The resource a gathered icon becomes: corn is food, leaf and fur are crops. Fish keeps its own sign (food from water). */
+const ico = (i) => ({ corn: 'food', leaf: 'crops', fur: 'crops' })[i] || i;
 const homes = () => D.colonies.filter((c) => c.owner === me);
 const inEurope = () => D.zone[P.ship] === 'europe';
 const sum = (x) => RES.reduce((n, r) => n + x[r], 0);

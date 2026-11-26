@@ -1,5 +1,6 @@
 /* The flow of the game: the player's choices go to the engine, then the others play until it is the player's turn again. */
-import { ACT, art, D, logLine, P, pick, RES, W } from './data.js';
+import { doing } from './ui/news.js';
+import { art, D, P, RES, W } from './data.js';
 import { bub } from './input.js';
 import { Board } from './map/board.js';
 import { paint } from './paint.js';
@@ -50,9 +51,9 @@ export async function settle() {
 }
 /** A turn of another player. */
 function note(p, l) {
-  const e = l.find((x) => x.e === 'play'), more = l.filter((x) => ['build', 'found', 'hire', 'father', 'sell', 'reveal', 'poi', 'alliance'].includes(x.e) && x.p === p).map((x) => logLine(x).replace(/^<b.*?<\/b> /, '')).filter(Boolean).slice(0, 3);
+  const play = l.find((x) => x.e === 'play'), line = doing(p, l);
   // Passing tells the others nothing.
-  if (e) Toast.add({ who: p, pic: art.agent(e.card), html: `<b>${Places.name(p)}</b>${pick(D.agents[e.card])}: ${pick(ACT[e.a] || ['', '']).toLowerCase()}${more.length ? `<small>${more.join(', ')}</small>` : ''}` });
+  if (line) Toast.add({ who: p, pic: play ? art.agent(play.card) : '', html: `<b>${Places.name(p)}</b>${line}` });
   report(l.filter((x) => x.e === 'combat' || x.e === 'attack')); Sim.seen(l);
   paint(); Board.land();
 }
