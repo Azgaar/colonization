@@ -1,12 +1,16 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Colonization: interface prototype</title><link rel="stylesheet" href="kit.css"><link rel="stylesheet" href="game.css"></head>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Colonization: interface prototype</title><link rel="stylesheet" href="styles/base.css"><link rel="stylesheet" href="styles/map.css"><link rel="stylesheet" href="styles/top.css"><link rel="stylesheet" href="styles/doors.css"><link rel="stylesheet" href="styles/peek.css"><link rel="stylesheet" href="styles/hand.css"><link rel="stylesheet" href="styles/fans.css"><link rel="stylesheet" href="styles/look.css"><link rel="stylesheet" href="styles/scenes.css"><link rel="stylesheet" href="styles/sheet.css"><link rel="stylesheet" href="styles/war.css"><link rel="stylesheet" href="styles/panels.css"><link rel="stylesheet" href="styles/toasts.css"><link rel="stylesheet" href="styles/cards.css"><link rel="stylesheet" href="styles/layout.css"></head>
 <body data-view="map">
-<svg width="0" height="0" style="position:absolute" id="defs"></svg><div class="map-stage"><div class="map-inner"><canvas class="sea"></canvas><canvas class="terrain"></canvas><canvas class="edge"></canvas></div><svg class="paths"></svg><div class="sprites"></div></div><div class="haze"></div><div class="vig"></div>
+<svg width="0" height="0" style="position:absolute" id="defs"></svg><div class="map-stage"><div class="map-inner"><canvas class="sea"></canvas><canvas class="terrain"></canvas><canvas class="ground"></canvas><canvas class="edge"></canvas></div><svg class="paths"></svg><div class="sprites"></div></div><div class="haze"></div><div class="vig"></div>
 <header class="top"><div class="date" id="date"></div><div class="purse" id="purse"></div><div class="court" id="court"></div></header>
 <div class="kingbox" id="king" hidden data-solid></div><div class="menu" id="menu" hidden data-solid></div><div class="look" id="look" hidden></div>
 <div class="heaps" id="heaps"></div><div class="side" id="side"></div><button class="door west" data-go="colony" id="dw"></button><button class="door east" data-go="europe" id="de"></button>
 <div class="fan w" id="fw" data-solid></div><div class="fan e" id="fe" data-solid></div>
 <section class="scene s-col" id="sCol" data-solid></section><section class="scene s-eu" style="background-image:url(art/europe.webp)" id="sEu" data-solid></section>
-<div class="hand" id="hand"></div><aside class="sheet" id="sheet" data-solid></aside><section class="warbox" id="war" data-solid></section>
-<script src="textures.js"></script><script src="snapshot.js"></script><script src="core.js"></script><script src="panels.js"></script><script src="rich.js"></script><script src="kit.js"></script>
-<script src="game.js"></script></body></html>
+<div class="peek east" id="peekE" data-solid></div><div class="peek west" id="peekW" data-solid></div><div class="hand" id="hand"></div><div class="shade" data-solid></div><div class="step" id="step" data-solid role="status"></div><div class="toasts" id="toasts" role="status"></div><aside class="sheet" id="sheet" data-solid></aside><section class="warbox" id="war" data-solid></section>
+<!-- Generated: terrain textures (tools/art.py), the starting position and the rules engine (pnpm prototype). -->
+<script src="build/textures.js"></script>
+<script src="build/start.js"></script>
+<script src="build/engine.js"></script>
+<script type="module" src="src/main.js"></script>
+</body></html>

@@ -1,0 +1,27 @@
+/* The doors to the Colony and Europe, the goods heaps and the pier beside them. */
+.door { position:fixed;bottom:18px;width:var(--door);height:var(--door);border-radius:50%;display:grid;place-items:center;font:800 19px/1 var(--sc);border:4px solid var(--bone);box-shadow:0 5px 18px #000a;text-shadow:0 2px 6px #000,0 0 3px #000;background-size:cover;z-index:6;transition:transform .15s }
+.door::before { content:"";position:absolute;inset:0;border-radius:50%;background:radial-gradient(#0b2b3399 20%,#0b2b3326 72%);z-index:-1 }
+.door { isolation:isolate }
+.door:hover { transform:scale(1.05) }
+.door.west { left:18px;background-position:60% }
+.door.east { right:18px;background-image:url(../art/europe.webp);background-position:46% }
+.door .who { position:absolute;right:calc(100% - 22px);top:-8px;display:flex;gap:2px }
+.heaps { position:fixed;left:calc(var(--door) + 34px);bottom:18px;width:158px;z-index:5;display:flex;flex-direction:column;gap:7px;text-shadow:var(--shade);transition:opacity .2s }
+.heap { display:grid;grid-template-columns:repeat(6,1fr);align-items:center;justify-items:center;row-gap:3px;grid-auto-rows:27px }
+.heap svg { width:27px;height:27px;filter:drop-shadow(0 2px 2px #0009) }
+.heap i { width:9px;height:9px;border-radius:50%;background:#ffffff38;place-self:center }
+.heap .new svg { animation:drop .45s }
+@keyframes drop {
+  from { transform:translateY(-60px) }
+}
+.hull { position:relative;width:138px;height:50px }
+.hull>svg { position:absolute;inset:0;width:100%;height:100% }
+.hull .heap { position:absolute;left:19px;right:19px;top:2px;grid-template-columns:repeat(4,1fr);height:27px }
+.hull .heap svg { width:24px;height:24px }
+.hull .hurt { color:#ff6a52;font-weight:800;font-size:22px }
+.heap.wide { display:flex;flex-wrap:wrap;gap:5px;align-items:center;min-height:30px }
+.side { position:fixed;right:calc(var(--door) + 34px);bottom:18px;height:var(--door);z-index:5;display:flex;flex-direction:column;gap:8px;align-items:flex-end;justify-content:center;text-shadow:var(--shade);cursor:default }
+.faces { display:flex }
+.faces img { width:29px;height:29px;border-radius:50%;object-fit:cover;object-position:50% 10%;border:2px solid var(--bone);margin-left:-4px;background:var(--bone) }
+.prices { display:grid;grid-template-columns:repeat(5,28px);text-align:center;font-weight:800;font-size:19px;line-height:1.05 }
+.prices span { display:flex;flex-direction:column;align-items:center }

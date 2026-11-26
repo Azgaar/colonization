@@ -9,9 +9,10 @@
     "data:import": "node packages/data/src/cli.ts",
     "data:review": "node packages/data/src/cli.ts --review",
     "test": "vitest run",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit && node prototypes/tools/check.mjs",
     "fuzz": "node packages/lab/src/fuzz.ts",
     "systems": "node packages/lab/src/systems.ts",
+    "prototype": "rolldown packages/lab/src/browser.ts --format iife --name Engine --minify -o prototypes/build/engine.js && node packages/lab/src/snapshot.ts",
     "watch": "node packages/lab/src/watch.ts",
     "experiments": "node packages/lab/src/experiments.ts",
     "tune": "node packages/lab/src/tune.ts",
@@ -21,6 +22,7 @@
     "@types/node": "^26.6.10",
     "fast-check": "^4.11.0",
     "read-excel-file": "^9.3.20",
+    "rolldown": "1.2.19",
     "typescript": "^7.0.2",
     "vitest": "^5.1.2"
   }

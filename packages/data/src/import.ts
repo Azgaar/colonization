@@ -170,7 +170,7 @@ export function importWorkbook(sheets: RawSheet[], reviewed: Record<string, stri
     review('father', id, 'Fathers', r.row, r.get('effect'));
     const m = /^(\d+)\s*🔔$/u.exec(r.get('price'));
     if (!m) err('Fathers', r.row, 'price', `cannot read price "${r.get('price')}"`);
-    add(fathers, { id, ru: r.get('name'), en: r.get('nickname'), category: r.get('type'), bells: Number(m?.[1] ?? 0), mods: [], onGain: [], ...effect(fx.FATHERS, id, 'Fathers', r.row) }, 'Fathers', r.row);
+    add(fathers, { id, ru: r.get('name'), en: r.get('nickname'), flavor: r.get('description') || undefined, category: r.get('type'), bells: Number(m?.[1] ?? 0), mods: [], onGain: [], ...effect(fx.FATHERS, id, 'Fathers', r.row) }, 'Fathers', r.row);
   }
 
   // Events, ruins, wrecks, tactics
@@ -178,14 +178,14 @@ export function importWorkbook(sheets: RawSheet[], reviewed: Record<string, stri
   for (const r of table('Events')) {
     const id = toId(r.get('nickname'));
     review('event', id, 'Events', r.row, r.get('effect 1'), r.get('effect 2'), r.get('effect 3'), r.get('effect 4'));
-    add(events, { id, ru: r.get('name'), en: r.get('nickname'), do: effect(fx.EVENTS, id, 'Events', r.row) ?? [] }, 'Events', r.row);
+    add(events, { id, ru: r.get('name'), en: r.get('nickname'), flavor: r.get('flavor') || undefined, do: effect(fx.EVENTS, id, 'Events', r.row) ?? [] }, 'Events', r.row);
   }
   const poiCards = (sheet: string, kind: string, map: Record<string, Node[]>) => {
     const out: Record<string, PoiCardDef> = {};
     for (const r of table(sheet)) {
       const id = toId(r.get('nickname'));
       review(kind, id, sheet, r.row, r.get('effect 1'));
-      add(out, { id, ru: r.get('name'), en: r.get('nickname'), do: effect(map, id, sheet, r.row) ?? [] }, sheet, r.row);
+      add(out, { id, ru: r.get('name'), en: r.get('nickname'), flavor: r.get('flavor') || undefined, do: effect(map, id, sheet, r.row) ?? [] }, sheet, r.row);
     }
     return out;
   };
@@ -233,6 +233,8 @@ export function importWorkbook(sheets: RawSheet[], reviewed: Record<string, stri
       const b = r.get(`resource ${i}`);
       if (b) {
         if (!ICONS[b]) err('Tiles', r.row, `resource ${i}`, `"${b}" is not a resource icon`);
+        // DD-47: food does not grow on mountains, so a corn bonus there is dropped until the workbook loses it.
+        else if (t === 'mountains' && ICONS[b] === 'corn') warn('Tiles', `tile ${id} cell ${i}: food bonus on mountains is dropped (DD-47)`, r.row);
         else c.bonus = ICONS[b];
       }
       cells.push(c);

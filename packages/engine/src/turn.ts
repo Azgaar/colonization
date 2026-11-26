@@ -48,7 +48,6 @@ task('turnLoop', (s) => {
   for (let i = 0; i < n; i++) {
     const p = (s.current + i) % n, pl = s.players[p];
     if (pl.passed) continue;
-    if (!pl.hand.length) { pl.passed = true; log(s, { e: 'pass', p, forced: true }); continue; }
     s.current = p;
     return ask(s, { kind: 'turn', player: p });
   }
@@ -203,6 +202,8 @@ decision('turn', {
   always: true,
   options(s, d) {
     const pl = s.players[d.player];
+    // T-3: without cards there is nothing but to pass.
+    if (!pl.hand.length) return [{ c: 'pass' }];
     const out: Choice[] = uniq(pl.hand).flatMap((card) => actionsFor(s, d.player, card).flatMap((x) => x.options));
     if (pl.crosses >= recruitCost(s) && s.agentDeck.length + s.agentDiscard.length > 0) out.push({ c: 'recruit' });
     out.push({ c: 'pass' });
@@ -212,7 +213,7 @@ decision('turn', {
     const p = d.player as number, pl = s.players[p];
     if (c.c === 'pass') {
       pl.passed = true;
-      log(s, { e: 'pass', p });
+      log(s, pl.hand.length ? { e: 'pass', p } : { e: 'pass', p, forced: true });
       return push(s, { t: 'discardHand', p }, { t: 'endTurn', p });
     }
     if (c.c === 'recruit') {

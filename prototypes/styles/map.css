@@ -1,0 +1,21 @@
+/* The map plane, its layers, the haze and the vignette. */
+/* At rest: the map, the hand, and two doors with a glimpse of what is behind them, Colony in the west and Europe in the east.
+   Lifting an agent shows every choice off the map beside its door. The camera never moves by itself. */
+:root { --cw:clamp(96px,9.4vw,162px);--ch:calc(var(--cw)*1.36);--skirt:18px;--vis:.84;--door:clamp(84px,7vw,112px);--shade:0 2px 5px #000b }
+.map-stage { position:fixed;inset:0;background:#12476f }
+.map-inner { left:0;top:0;will-change:transform;pointer-events:none }
+.map-inner>canvas.sea { inset:auto;left:-1792px;top:-1792px;width:4608px;height:4608px }
+.paths,.sprites { position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible }
+.paths .rim { stroke-width:3;stroke-linecap:round;fill:none }
+.paths .sea.rim { stroke:#fff;stroke-opacity:.75;stroke-dasharray:2 8 }
+.paths .sea.area { fill:#d6f4ff;fill-opacity:.13 }
+.paths .foot.rim { stroke:#fff08a;stroke-opacity:.95;stroke-dasharray:9 7 }
+.paths .foot.area { fill:#fff08a;fill-opacity:.2 }
+.paths .closed.area { fill:#fff08a;fill-opacity:.24 }
+.paths .closed.rim { stroke:#fff08a }
+.paths .way { fill:none;stroke:#fff6da;stroke-width:6;stroke-dasharray:2 13;stroke-linecap:round }
+.sp { position:absolute;left:0;top:0;width:0;height:0;will-change:transform }
+.sp>svg { position:absolute;left:-100px;top:-132px;overflow:visible }
+.sp text { font-family:var(--ui) }
+.haze { position:fixed;inset:0 0 auto;height:34vh;background:linear-gradient(#a9cdd6,#a9cdd600);opacity:var(--haze,0);pointer-events:none }
+.vig { position:fixed;inset:0;pointer-events:none;background:radial-gradient(430px 240px at 0 100%,#0b2b33e0,#0b2b3300),radial-gradient(430px 240px at 100% 100%,#0b2b33e0,#0b2b3300),linear-gradient(#0b2b33d1,#0b2b3385 46px,#0b2b3300 84px),linear-gradient(#0b2b3300 calc(100% - 150px),#0b2b33b8) }

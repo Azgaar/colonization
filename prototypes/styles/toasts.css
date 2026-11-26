@@ -1,0 +1,19 @@
+/* Notifications. */
+.toasts { position:fixed;right:20px;top:72px;z-index:16;display:flex;flex-direction:column;width:348px;pointer-events:none }
+.toast { display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center;text-align:left;background:#0f3436f2;border-left:5px solid #f7f1e166;border-radius:13px;padding:8px 14px 8px 9px;margin-bottom:8px;box-shadow:0 8px 24px #0008;pointer-events:auto;opacity:0;transform:translateX(40px);transition:opacity .28s,transform .28s,margin .28s;line-height:1.2 }
+.toast.on { opacity:1;transform:none }
+.toast:hover { background:#164246f7 }
+.toast.good { border-left-color:#8fd39a }
+.toast.bad { border-left-color:#ff8a73 }
+.toast .pc { position:relative;display:block;width:46px;height:46px }
+.toast .pc>img { width:46px;height:46px;border-radius:11px;object-fit:cover;object-position:50% 8%;display:block }
+.toast .pc>img+.em { position:absolute;right:-7px;bottom:-6px }
+.toast .tt { display:block;min-width:0;font-size:16.500px }
+.toast .tt>b { display:block;font:800 16.500px/1.1 var(--sc);margin-bottom:1px }
+.toast small { display:block;opacity:.85;font-size:14.500px;margin-top:2px }
+.toast .fb { grid-template-columns:26px 1fr;gap:6px;margin-top:3px }
+.toast .fb b { font-size:17px }
+.toast .fparts { height:21px }
+.toast .fparts i { padding:2px 5px;font-size:13px }
+.toast .fparts em { font-size:13px }
+.toast .dice i { width:18px;height:18px;line-height:18px;font-size:12.500px }

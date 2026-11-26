@@ -1,0 +1,23 @@
+/* A glimpse behind a door on hover; the Pass and Undo buttons. */
+.peek { position:fixed;bottom:calc(var(--door) + 30px);width:312px;max-height:calc(100vh - var(--door) - 100px);overflow:auto;background:#0f3436f5;border-radius:20px;padding:14px 16px 16px;z-index:11;box-shadow:0 14px 44px #000b;opacity:0;transform:translateY(12px);visibility:hidden;transition:opacity .3s ease,transform .35s cubic-bezier(.2,.8,.3,1),visibility 0s .35s }
+.peek.on { opacity:1;transform:none;visibility:visible;transition:opacity .3s ease,transform .35s cubic-bezier(.2,.8,.3,1) }
+.peek.east { right:18px }
+.peek.west { left:18px }
+.peek h4 { font-size:19px;margin:10px 0 6px }
+.peek h4:first-child { margin-top:0 }
+.col1 { display:grid;gap:6px }
+.grid3 { display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px }
+.mini { display:grid;grid-template-columns:44px 1fr auto;gap:9px;align-items:center;background:var(--bone);color:var(--ink);border-radius:11px;overflow:hidden;padding-right:9px;min-height:46px;line-height:1.12 }
+.peek .mini { min-height:44px }
+.peek .mini img { min-height:44px;max-height:46px }
+.mini img { width:44px;height:100%;min-height:50px;max-height:74px;object-fit:cover;object-position:50% 8% }
+.mini b { display:block;font:800 15.500px/1.05 var(--sc) }
+.mini small { display:block;font-size:14.500px;margin-top:2px }
+.mini em { font-style:normal;font-weight:800;font-size:17px;white-space:nowrap }
+.mini em.no { color:#a8321f }
+.court .gear { width:38px;height:38px;border-radius:50%;background:#0f3436cc;display:grid;place-items:center;margin-left:4px }
+.acts { display:flex;flex-direction:column;gap:7px;margin:0 0 16px 8px;align-self:flex-end;transition:opacity .2s }
+.acts button { border-radius:12px;font:800 16px/1.1 var(--sc);padding:8px 12px;text-align:center;max-width:104px }
+.acts .pass { background:#0f3436d9;border:2px solid #f7f1e166 }
+.acts .pass.now { background:var(--bone);color:var(--ink);border-color:var(--hot);box-shadow:0 0 0 4px #fff08a80 }
+.acts .undo { background:var(--bone);color:var(--ink) }

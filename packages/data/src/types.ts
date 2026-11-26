@@ -122,9 +122,10 @@ export type BuildingWork =
   | { kind: 'teach'; maxEdu: Education }
   | { kind: 'sell'; amount: number }
   | { kind: 'repair' };
-export interface FatherDef extends Named { category: string; bells: number; mods: Mod[]; onGain: Node[] }
-export interface EventDef extends Named { do: Node[] }
-export interface PoiCardDef extends Named { do: Node[] }
+export interface FatherDef extends Named { /** Russian lore line: years of life and who they were. */ flavor?: string; category: string; bells: number; mods: Mod[]; onGain: Node[] }
+/** `flavor` is the Russian story line printed above the effects. */
+export interface EventDef extends Named { flavor?: string; do: Node[] }
+export interface PoiCardDef extends Named { flavor?: string; do: Node[] }
 export interface TribeDef extends Named { terrain: TerrainId; hostility: number; population: number; copies: number; loot: { gold?: number; res?: Resource; amount?: number } }
 export type TacticEffect =
   | { t: 'perCubes'; add: number; per: number } | { t: 'perOcean'; add: number; per: number }

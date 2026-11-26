@@ -135,7 +135,7 @@ Require the player's ship on a Europe cell.
 
 | ID | Rule |
 |---|---|
-| R-1 | **Produce on a cell:** 1 resource from a colony's cell or one of its 8 neighbours that is empty. **[D]** Empty means no colony, settlement or token |
+| R-1 | **Produce on a cell:** 1 resource from a colony's cell (it may be worked itself **[A]**) or one of its 8 neighbours that is empty. **[D]** Empty means no colony, settlement or token |
 | R-2 | Terrain yields: forest timber or crops (fur); grassland food or crops (leaf); mountains silver; ocean food (fish); desert and tundra nothing |
 | R-3 | **Ocean.** Working an ocean cell directly gives 1 food (fish) and needs no building. Docks are a building to work in (R-7, no education needed): the agent works an ocean cell through them for +1, so 2 food **[A]** . The player picks an eligible ocean cell (R-1), so its fish bonus adds +1, and a fisherman +1 more: up to 4 food **[A]** |
 | R-4 | A cell's bonus icon adds +1 when that resource is produced. **[D]** A bonus on terrain that does not normally yield the resource allows producing it, for 1 in total |

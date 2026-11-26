@@ -91,7 +91,7 @@ Checked on the 15:13 version. The earlier tile 20 and tile 31 problems are fixed
 | 2 | Sepúlveda's slaves | Updated to 2 in the 15:13 workbook |
 | 3 | Desert produces nothing; tundra has 1 bonus on 20 cells | Intended **[A]**. The cossack can work empty tundra **[A]** |
 | 4 | Bonus frequencies differ from the Terrain sheet's percentages | Not a problem; the percentages are untested notes **[A]**. Actual frequencies are still reported, for information |
-| 5 | 3 mountain cells carry corn | Handled by rule R-4 |
+| 5 | 3 mountain cells carry corn | Dropped on import (DD-47); to be removed from the workbook |
 | 6 | Document lists no crops from forest, the sheet does | Sheet followed |
 | 7 | Common agent deck is 35% military (17 of 49) | For simulation to judge |
 | 8 | Price cap and tax track exist only on the Europe board image | Confirmed current **[A]**. Kept in the settings file |

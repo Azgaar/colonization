@@ -93,12 +93,15 @@ describe('Round', () => {
     play(s, 'colonist', 'exchange');
     expect(s.pending!.player).toBe(1); // player 0 has passed
   });
-  it('[T-3] no cards means an automatic pass', () => {
+  it('[T-3] a player without cards can only pass', () => {
     const s = game(2);
     P(s, 1).hand = [];
     turn(s, 0, 'colonist', 'sailor');
     play(s, 'colonist', 'moveShip');
     act(s, { c: 'end' });
+    expect(s.pending).toMatchObject({ kind: 'turn', player: 1 });
+    expect(legal(s)).toEqual([{ c: 'pass' }]);
+    act(s, { c: 'pass' });
     expect(s.pending).toMatchObject({ kind: 'turn', player: 0 });
     expect(P(s, 1).passed).toBe(true);
   });

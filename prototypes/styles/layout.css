@@ -1,0 +1,39 @@
+/* Moving between screens, and other window sizes. */
+/* the map leans away from the screen that opens */
+.map-stage,.scene { transition:transform .35s ease }
+body[data-view=colony] .map-stage { transform:translateX(9%) }
+body[data-view=europe] .map-stage { transform:translateX(-9%) }
+.s-col { animation:west .35s ease }
+.s-eu { animation:east .35s ease }
+@keyframes west {
+  from { transform:translateX(-14%);opacity:0 }
+}
+@keyframes east {
+  from { transform:translateX(14%);opacity:0 }
+}
+@media (prefers-reduced-motion:reduce) {
+  .map-stage { transition:none }
+  .scene { animation:none!important }
+}
+@media (min-width:1700px) {
+  #heaps { transform:scale(1.2);transform-origin:0 100% }
+  #side { transform:scale(1.2);transform-origin:100% 100% }
+}
+@media (max-width:1180px) {
+  :root { --res:20px }
+  #heaps { left:18px;bottom:calc(var(--door) + 30px) }
+  .side { right:18px;bottom:calc(var(--door) + 26px);height:auto }
+  .fan { width:270px }
+}
+@media (max-height:760px) {
+  .scene h2 { font-size:32px;margin-bottom:10px }
+  .scene>.in { padding-top:16px }
+  .scene h4 { margin-top:11px }
+  .two { gap:30px }
+}
+@media (max-height:760px) {
+  .bld img { height:46px }
+  .lands.n1 { max-width:300px }
+  .two { grid-template-columns:minmax(280px,330px) minmax(0,1fr) }
+  .big img { height:84px }
+}
