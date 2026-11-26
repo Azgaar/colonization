@@ -34,7 +34,7 @@ function scramble(s: State, p: number): State {
 const key = (s: State, seed: string) => { const b = searchBot(seed, { iterations: 10 }); const c = b.choose(viewFor(s, s.pending!.player)); return { c: choiceKey(c), b }; };
 
 describe('search bot', () => {
-  const list = positions('srch', 2, 37).slice(0, 8);
+  const list = positions('srch', 2, 25).slice(0, 8);
   it('chooses a legal option, repeatably, within the budget and only from the view', () => {
     expect(list.length).toBeGreaterThan(4);
     for (const s of list) {

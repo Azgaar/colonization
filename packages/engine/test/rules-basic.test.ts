@@ -124,11 +124,11 @@ describe('Round', () => {
     act(s, { c: 'pay' });
     expect(P(s, 0).gold).toBe(4);
     // Player 1 cannot pay and refuses automatically.
-    expect([P(s, 1).gold, P(s, 1).bells, s.ref]).toEqual([5, 1, 2]);
+    expect([P(s, 1).gold, P(s, 1).bells, s.ref]).toEqual([5, 0, 1]);
     const solo = game(1);
     solo.round = 2;
     runTasks(solo, { t: 'taxPhase' });
-    expect([solo.ref, P(solo).bells]).toEqual([3, 1]);
+    expect([solo.ref, P(solo).bells]).toEqual([3, 0]);
     const first = game(2);
     runTasks(first, { t: 'taxPhase' });
     expect(first.ref).toBe(0);

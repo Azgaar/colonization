@@ -1,7 +1,7 @@
 /* The hand of agents. */
 /* A card: the picture fills it, the name on a light ribbon across the top (so a lowered hand still says who is in it), the talent in white on the picture just below. */
 .hand { position:fixed;left:50%;bottom:calc(-1*var(--skirt));transform:translateX(-50%);display:flex;gap:8px;z-index:9;align-items:flex-end }
-.card+.card { margin-left:min(0px,calc((100vw - 2*(var(--door) + var(--res,196px)) - 162px - var(--n)*(var(--cw) + 8px))/(var(--n) - 1))) }
+.card+.card { margin-left:min(0px,calc((100vw - 2*(var(--door) + 36px) - 174px - 162px - var(--n)*(var(--cw) + 8px))/(var(--n) - 1))) }
 .card { position:relative;flex:none;width:var(--cw);height:calc(var(--ch) + var(--skirt));border-radius:15px 15px 0 0;overflow:hidden;background:var(--bone);color:var(--ink);box-shadow:0 -3px 16px #000a;transition:transform .16s,filter .16s,height .16s;transform-origin:50% 100% }
 .card .b { position:absolute;z-index:1;left:0;right:0;top:0;padding:5px 6px 4px;background:#f7f1e1e8;box-shadow:0 2px 6px #0005 }
 .card .tr.two { white-space:normal;line-height:1.08;top:calc(var(--rib) + 1px) }
@@ -30,3 +30,35 @@ body.lift #heaps,body.lift .side,body.lift .acts,body.lift .door { opacity:0;poi
 .card .pic { position:relative;display:block }
 .card .edu { display:inline-block;margin-right:.22em;vertical-align:-.13em }
 .card .edu svg { display:block;width:.82em;height:.82em }
+/* Left of the hand, balancing the buttons on its right: the deck face down and the discard with its last card up, each with how many. Either opens all the player's agents. */
+.piles { display:flex;gap:16px;margin:0 40px calc(var(--skirt) + 34px) 0;align-self:flex-end;transition:opacity .2s }
+.pile { position:relative;width:52px;height:72px;transition:transform .15s }
+.pile:hover { transform:translateY(-4px) }
+.pile .stack { position:absolute;inset:0 }
+.pile .stack i,.pile .stack img { position:absolute;inset:0;width:100%;height:100%;border-radius:8px;box-shadow:0 3px 8px #000a }
+.pile.deck .stack i { background:radial-gradient(circle at 50% 50%,#edb44333 0 22%,transparent 23%),repeating-linear-gradient(45deg,#174a4a 0 6px,#123c3d 6px 12px);border:3px solid var(--bone) }
+.pile.deck .stack i::after { content:"";position:absolute;inset:50% auto auto 50%;width:16px;height:16px;margin:-8px 0 0 -8px;background:var(--ochre);clip-path:polygon(50% 0,59% 41%,100% 50%,59% 59%,50% 100%,41% 59%,0 50%,41% 41%) }
+.pile.deck .stack i:nth-child(1) { transform:translate(-4px,4px) rotate(-5deg) }
+.pile.deck .stack i:nth-child(2) { transform:translate(-2px,2px) rotate(-2deg) }
+.pile.disc .stack i { background:var(--bone);transform:translate(4px,3px) rotate(6deg) }
+.pile.disc .stack img { object-fit:cover;object-position:50% 20%;border:3px solid var(--bone);filter:saturate(.55) brightness(.85);transform:rotate(-3deg) }
+.pile.empty .stack { border:2px dashed #f7f1e159;border-radius:8px }
+.pile b { position:absolute;left:-12px;right:-12px;top:calc(100% + 5px);text-align:center;font-weight:800;font-size:19px;line-height:1;text-shadow:var(--shade) }
+body.lift .piles,body:not([data-view=map]) .piles,body.titled .piles { opacity:0;pointer-events:none }
+/* All the player's agents, over the table. */
+.deckbox { position:fixed;inset:0;z-index:40;display:grid;place-items:center }
+.deckbox[hidden] { display:none }
+.deckbox .veil { position:absolute;inset:0;background:#06181acc }
+.deckbox .box { position:relative;width:min(860px,92vw);max-height:86vh;overflow:auto;background:var(--deep);border-radius:20px;padding:24px 28px 28px;box-shadow:0 0 0 1.5px #edb44366,0 24px 60px #000c }
+.deckbox h2 { font-size:30px;display:flex;align-items:baseline;gap:12px }
+.deckbox h2 b,.deckbox h3 b { font:800 .8em var(--sc);color:var(--ochre) }
+.deckbox h3 { font-size:20px;margin:20px 0 4px;display:flex;align-items:baseline;gap:10px }
+.deckbox p { margin:0 0 10px;opacity:.7;font-size:15px }
+.deckbox .x { position:absolute;right:20px;top:22px;padding:6px 14px;border-radius:10px;background:#ffffff17;font-weight:800 }
+.deckbox .x:hover { background:#ffffff2b }
+.deckbox .minis { display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:12px }
+.deckbox figure { margin:0;border-radius:12px;overflow:hidden;background:var(--bone);color:var(--ink);box-shadow:0 4px 12px #0008 }
+.deckbox figure img { display:block;width:100%;aspect-ratio:3/3.4;object-fit:cover;object-position:50% 18% }
+.deckbox figcaption { padding:6px 8px 7px;font:800 14.5px/1.1 var(--sc);white-space:nowrap;overflow:hidden;text-overflow:ellipsis }
+.deckbox .edu { display:inline-block;margin-right:.25em;vertical-align:-.12em }
+.deckbox .edu svg { display:block;width:.85em;height:.85em }

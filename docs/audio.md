@@ -21,7 +21,6 @@ What the game plays, and the file it looks for in `sound/fx/`:
 
 | File | When | From |
 |---|---|---|
-| `click.ogg` | Any button | Interface Sounds |
 | `card.ogg` | An agent is played; a card is drawn or taken | Casino Audio (card) |
 | `dice.ogg` | Dice are rolled: combat, gifts, ruins, the war | Casino Audio (dice) |
 | `coins.ogg` | Gold earned or paid: trade, tax, hire | Casino Audio (chips) |
@@ -41,7 +40,7 @@ In place (2026-11-26): all effects but `win` and `lose`, built by `packages/web/
 
 | File | Made from |
 |---|---|
-| `click`, `turn`, `reveal` | Interface Sounds: click_001, confirmation_002, maximize_001 |
+| `turn`, `reveal` | Interface Sounds: confirmation_002, maximize_001 |
 | `card`, `event`, `dice` | Casino Audio: card-place-1, card-slide-1, dice-throw-1 |
 | `coins`, `sail` | RPG Audio: handleCoins, creak1 (a ship's creak; the packs have no water) |
 | `build`, `bell` | Impact Sounds: impactPlank_medium_000, impactBell_heavy_000 |
@@ -52,31 +51,36 @@ In place (2026-11-26): all effects but `win` and `lose`, built by `packages/web/
 
 ## Music
 
-Source chosen by the designer (2026-11-26): real recordings of baroque music under free licences, not generated music. The recordings come from Wikimedia Commons; each licence was checked on its file page. The originals are kept in `assets/Sound/music/<mood>/`, with the credits in `assets/Sound/music.json`, which the About page shows. `packages/web/tools/music.sh` (needs ffmpeg) prepares them for the game:
+Source chosen by the designer (2026-11-26): real recordings of baroque music under free licences, not generated music. Widened the same day to other music of the period, so the baroque does not tire: a Haydn quartet, and fifes and drums for the war; the best-known pieces (Vivaldi's Four Seasons) left out. The recordings come from Wikimedia Commons; each licence was checked on its file page. The originals are kept in one folder, `assets/Sound/music/`, with the credits and each piece's mood in `packages/web/sound/music.json`, which the About page shows. `packages/web/tools/music.sh` (needs ffmpeg) prepares them for the game:
 - it trims the silence before and after each piece;
-- it levels each piece to about −20 LUFS in two passes, so the dynamics stay as played;
-- it encodes them as Opus at 64 kb/s into `sound/music/<mood>/`, 32 MB in all.
+- it levels each piece to about −20 LUFS in two passes, so the dynamics stay as played; a piece whose loudness range is over 11 LU (a singer's soft passages, a funeral march) is first brought nearer, so its quiet parts are not lost under the game. Every piece then measures −20 ± 0.6 LUFS;
+- it drops the files' tags and cover art;
+- it encodes them as Opus at 64 kb/s into `sound/music/` (only pieces not encoded yet; `ALL=1` encodes all again), 36 MB in all.
 
-Each mood is a playlist: a piece crossfades into another of the same mood as it ends, and into the new mood's when the game moves on. A mood without pieces borrows a neighbour's.
+Five moods, set in `music.json`. The main menu always plays one signature piece, Albinoni's Adagio. The game plays one rotation through every round. The War of Independence plays marches. The end plays one piece: Garryowen when the player has won, Purcell's funeral march when they have lost; the short `win` and `lose` endings are then heard only when the music is turned off or paused. Each mood plays its pieces in an order shuffled once when the page opens, round and round, and goes on from where it was when the game comes back to it; a piece crossfades into the next as it ends, and into the new mood's when the mood changes. The player in Options names the piece playing ("Surname: Title"); that name is also the list of every piece, in alphabetical order, so any piece can be played, whatever the mood; Next goes on through all of them in the shuffled order. When a piece chosen by hand ends, the mood's playlist goes on. One movement of each work is kept, so no tune comes back as another part of itself.
 
 | Mood | File | Piece | Performers | Licence |
 |---|---|---|---|---|
-| Title screen | `title/ombra-mai-fu.ogg` | [Handel: Serse, “Ombra mai fù”](https://commons.wikimedia.org/wiki/File:Les_Arts_Florissants_-_Handel%27s_Serse,_HWV_40_-_Ombra_mai_fu.ogg) | Lea Desandre, Les Arts Florissants | CC BY 3.0 |
-|  | `title/albinoni-op9-2-adagio.ogg` | [Albinoni: Oboe Concerto in D minor, Op. 9 No. 2, II. Adagio](https://commons.wikimedia.org/wiki/File:Albinoni,_Concerto_for_Oboe_and_Strings_No._2_in_D_minor,_Op._9,_II._Adagio.ogg) | Paul Arden-Taylor (oboe), via Musopen | public domain (CC0) |
-| Rounds 1–3: exploring and founding | `explore/vivaldi-spring-allegro.ogg` | [Vivaldi: Spring, RV 269, I. Allegro](https://commons.wikimedia.org/wiki/File:The_Modena_Chamber_Orchestra_-_Vivaldi%27s_Spring,_RV_269_-_I._Allegro.ogg) | The Modena Chamber Orchestra, via Musopen | public domain |
-|  | `explore/brandenburg-3-allegro.ogg` | [Bach: Brandenburg Concerto No. 3, BWV 1048, I. Allegro](https://commons.wikimedia.org/wiki/File:Bach_-_Brandenburg_Concerto_No._3_-_1._Allegro.ogg) | Advent Chamber Orchestra | CC BY-SA 2.0 |
-|  | `explore/telemann-viola-allegro.ogg` | [Telemann: Viola Concerto in G, TWV 51:G9, II. Allegro](https://commons.wikimedia.org/wiki/File:Telemann_-_Viola_Concerto_Gmaj_-_2._Allegro.ogg) | Advent Chamber Orchestra, Elias Goldstein (viola) | CC BY-SA 2.0 |
-|  | `explore/albinoni-op9-3-allegro.ogg` | [Albinoni: Concerto for 2 Oboes in F, Op. 9 No. 3, III. Allegro](https://commons.wikimedia.org/wiki/File:Albinoni_-_Concerto_for_2_Oboes_in_F_Major,_op._9_No._3_-_3._Allegro.ogg) | Advent Chamber Orchestra, Humbert Lucarelli and Edino Biaggi (oboes) | CC BY-SA 2.0 |
-| Mid game: building and trading | `colony/telemann-viola-largo.ogg` | [Telemann: Viola Concerto in G, TWV 51:G9, I. Largo](https://commons.wikimedia.org/wiki/File:Telemann_-_Viola_Concerto_Gmaj_-_1._Largo.ogg) | Advent Chamber Orchestra, Elias Goldstein (viola) | CC BY-SA 2.0 |
-|  | `colony/telemann-viola-andante.ogg` | [Telemann: Viola Concerto in G, TWV 51:G9, III. Andante](https://commons.wikimedia.org/wiki/File:Telemann_-_Viola_Concerto_Gmaj_-_3._Andante.ogg) | Advent Chamber Orchestra, Elias Goldstein (viola) | CC BY-SA 2.0 |
-|  | `colony/bach-bwv1055-allegro.ogg` | [Bach: Harpsichord Concerto in A, BWV 1055, I. Allegro](https://commons.wikimedia.org/wiki/File:Bach_-_Harpsichord_Concerto_BWV_1055_-_1._Allegro.ogg) | Advent Chamber Orchestra, Matthew Ganong (harpsichord) | CC BY-SA 2.0 |
-| Round 8 on, or someone at 10 bells | `tension/vivaldi-two-violins-a-minor.ogg` | [Vivaldi: Concerto for Two Violins in A minor, Op. 3 No. 8, I. Allegro](https://commons.wikimedia.org/wiki/File:Vivaldi_-_Concerto_for_Two_Violins_in_A_minor,_Op._3,_No._8_-_1._Allegro.ogg) | Advent Chamber Orchestra, Jacques Israelievitch and Rebecca Pavel Goldstein (violins) | CC BY-SA 2.0 |
-|  | `tension/albinoni-op9-2-allegro.ogg` | [Albinoni: Oboe Concerto in D minor, Op. 9 No. 2, I. Allegro](https://commons.wikimedia.org/wiki/File:Albinoni,_Concerto_for_Oboe_and_Strings_No._2_in_D_minor,_Op._9,_I._Allegro_e_con_presto.ogg) | Paul Arden-Taylor (oboe), via Musopen | public domain (CC0) |
-|  | `tension/vivaldi-santo-sepolcro.ogg` | [Vivaldi: Sinfonia al Santo Sepolcro, RV 169](https://commons.wikimedia.org/wiki/File:Vivaldi_SinfoniaalSantoSepolcro_RV169_Esmuc.ogg) | ESMUC early-music orchestra, Lluís Vila | CC BY-SA 4.0 |
-| The War of Independence | `war/vivaldi-summer-presto.ogg` | [Vivaldi: Summer, RV 315, III. Presto](https://commons.wikimedia.org/wiki/File:The_Modena_Chamber_Orchestra_-_Vivaldi%27s_Summer,_RV_315_-_III._Presto.ogg) | The Modena Chamber Orchestra, via Musopen | public domain |
-|  | `war/brandenburg-6-allegro.ogg` | [Bach: Brandenburg Concerto No. 6, BWV 1051, I. Allegro](https://commons.wikimedia.org/wiki/File:Bach_-_Brandenburg_Concerto_6_-_1._Allegro.ogg) | Advent Chamber Orchestra | CC BY-SA 2.0 |
-|  | `war/telemann-viola-presto.ogg` | [Telemann: Viola Concerto in G, TWV 51:G9, IV. Presto](https://commons.wikimedia.org/wiki/File:Telemann_-_Viola_Concerto_Gmaj_-_4._Presto.ogg) | Advent Chamber Orchestra, Elias Goldstein (viola) | CC BY-SA 2.0 |
+| Main menu (the signature piece) | `albinoni-op9-2-adagio.ogg` | [Tomaso Albinoni: Oboe Concerto in D minor, Adagio](https://commons.wikimedia.org/wiki/File:Albinoni,_Concerto_for_Oboe_and_Strings_No._2_in_D_minor,_Op._9,_II._Adagio.ogg) | Paul Arden-Taylor, oboe | CC0 |
+| The game | `ombra-mai-fu.ogg` | [George Frideric Handel: Ombra mai fù, from the opera Serse](https://commons.wikimedia.org/wiki/File:Les_Arts_Florissants_-_Handel%27s_Serse,_HWV_40_-_Ombra_mai_fu.ogg) | Lea Desandre and Les Arts Florissants | CC BY 3.0 |
+|  | `brandenburg-3-allegro.ogg` | [Johann Sebastian Bach: Brandenburg Concerto No. 3, Allegro](https://commons.wikimedia.org/wiki/File:Bach_-_Brandenburg_Concerto_No._3_-_1._Allegro.ogg) | Advent Chamber Orchestra | CC BY-SA 2.0 |
+|  | `telemann-viola-allegro.ogg` | [Georg Philipp Telemann: Viola Concerto in G, Allegro](https://commons.wikimedia.org/wiki/File:Telemann_-_Viola_Concerto_Gmaj_-_2._Allegro.ogg) | Elias Goldstein, viola, with the Advent Chamber Orchestra | CC BY-SA 2.0 |
+|  | `albinoni-op9-3-1-allegro.ogg` | [Tomaso Albinoni: Concerto for Two Oboes in F, Allegro](https://commons.wikimedia.org/wiki/File:Albinoni_-_Concerto_for_2_Oboes_in_F_Major,_op._9_No._3_-_1._Allegro.ogg) | Humbert Lucarelli and Edino Biaggi, oboes, with the Advent Chamber Orchestra | CC BY-SA 2.0 |
+|  | `lully-chaconne-scaramouches.ogg` | [Jean-Baptiste Lully: The Bourgeois Gentleman, Chaconne of the Scaramouches](https://commons.wikimedia.org/wiki/File:Lully_Le_Bourgeois_Gentilhomme_-_10._Chaconne_des_Scaramouche,_Trivelins.ogg) | Advent Chamber Orchestra | CC BY-SA 2.0 |
+|  | `handel-op6-9-larghetto.ogg` | [George Frideric Handel: Concerto Grosso in F, Larghetto](https://commons.wikimedia.org/wiki/File:L%27Arco_Magico_Chamber_Orchestra_-_Handel%27s_Concerto_Grosso_in_F_major,_Op._6_No._9,_HWV_327_-_III._Larghetto.ogg) | L'Arco Magico Chamber Orchestra | CC BY 3.0 |
+|  | `handel-op6-7-andante.ogg` | [George Frideric Handel: Concerto Grosso in B-flat, Andante](https://commons.wikimedia.org/wiki/File:L%27Arco_Magico_Chamber_Orchestra_-_Handel%27s_Concerto_Grosso_in_B-flat_major,_Op._6_No._7,_HWV_325_-_IV._Andante.ogg) | L'Arco Magico Chamber Orchestra | CC BY 3.0 |
+|  | `handel-op6-2-andante-larghetto.ogg` | [George Frideric Handel: Concerto Grosso in F, Andante Larghetto](https://commons.wikimedia.org/wiki/File:L%27Arco_Magico_Chamber_Orchestra_-_Handel%27s_Concerto_Grosso_in_F_major,_Op._6_No._2,_HWV_320_-_I._Andante_larghetto.ogg) | L'Arco Magico Chamber Orchestra | CC BY 3.0 |
+|  | `corelli-op6-4-adagio-allegro.ogg` | [Arcangelo Corelli: Concerto Grosso in D, Adagio and Allegro](https://commons.wikimedia.org/wiki/File:Corelli_-_Concerto_Grosso_Op._6_No._4_-_1._Adagio_-_Allegro.ogg) | Advent Chamber Orchestra | CC BY-SA 2.0 |
+|  | `haydn-lark-menuetto.ogg` | [Joseph Haydn: The Lark String Quartet, Minuet](https://commons.wikimedia.org/wiki/File:Haydn_StringQuartetInDMajorOp.64_JosephHaydn-StringQuartetInDOp.645H363Lark-03-MenuettoAllegretto.ogg) | Musopen String Quartet | Public domain |
+|  | `vivaldi-two-violins-a-minor.ogg` | [Antonio Vivaldi: Concerto for Two Violins in A minor, Allegro](https://commons.wikimedia.org/wiki/File:Vivaldi_-_Concerto_for_Two_Violins_in_A_minor,_Op._3,_No._8_-_1._Allegro.ogg) | Jacques Israelievitch and Rebecca Pavel Goldstein, violins, with the Advent Chamber Orchestra | CC BY-SA 2.0 |
+|  | `vivaldi-santo-sepolcro.ogg` | [Antonio Vivaldi: Sinfonia for the Holy Sepulchre](https://commons.wikimedia.org/wiki/File:Vivaldi_SinfoniaalSantoSepolcro_RV169_Esmuc.ogg) | Early-music orchestra of ESMUC, conducted by Lluís Vila | CC BY-SA 4.0 |
+|  | `brandenburg-6-allegro.ogg` | [Johann Sebastian Bach: Brandenburg Concerto No. 6, Allegro](https://commons.wikimedia.org/wiki/File:Bach_-_Brandenburg_Concerto_6_-_1._Allegro.ogg) | Advent Chamber Orchestra | CC BY-SA 2.0 |
+|  | `marais-sonnerie.ogg` | [Marin Marais: The Bells of Sainte-Geneviève](https://commons.wikimedia.org/wiki/File:Marin_Marais_-_Sonnerie_de_Ste-Genevi%C3%A8ve_du_Mont-de-Paris_%28Advent_Chamber_Orchestra%29.ogg) | Stephen Balderston, cello, with the Advent Chamber Orchestra | CC BY-SA 2.0 |
+| War of Independence | `presidents-march.ogg` | [Philip Phile: The President’s March](https://commons.wikimedia.org/wiki/File:The_United_States_Army_Old_Guard_Fife_and_Drum_Corps_-_03_-_The_Presidents_March.ogg) | U.S. Army Old Guard Fife and Drum Corps | CC0 |
+|  | `brandywine-quickstep.ogg` | [Traditional: Brandywine Quickstep](https://commons.wikimedia.org/wiki/File:The_United_States_Army_Old_Guard_Fife_and_Drum_Corps_-_10_-_Brandywine_Quickstep_from_the_Minstrel_Boy_Show.ogg) | U.S. Army Old Guard Fife and Drum Corps | CC0 |
+| The end, won | `garryowen.ogg` | [Traditional Irish: Garryowen](https://commons.wikimedia.org/wiki/File:Garryowen_-_U.S._Army_Field_Band.ogg) | U.S. Army Field Band | Public domain |
+| The end, lost | `purcell-queen-mary-march.ogg` | [Henry Purcell: March for the Funeral of Queen Mary](https://commons.wikimedia.org/wiki/File:H._Purcell_-_March_from_Music_for_the_funeral_of_Queen_Mary.oga) | Performer unknown | CC BY-SA 3.0 |
 
 `win.ogg` and `lose.ogg` (in `fx/`) are the last 9 seconds of Brandenburg No. 3 and the last 11 seconds of Albinoni's Adagio, cut by the same script.
 
-Licences: CC BY and CC BY-SA require credit, given on the About page and here. Share-alike (CC BY-SA) applies to these audio files and any edited versions of them, not to the game. To add a piece: put it in `assets/Sound/music/<mood>/`, add its entry to `music.json`, run `music.sh`, then `pnpm web:build`.
+Licences: CC BY and CC BY-SA require credit, given on the About page and here. Share-alike (CC BY-SA) applies to these audio files and any edited versions of them, not to the game. To add a piece: put it in `assets/Sound/music/`, add its entry to `music.json` with its mood, run `music.sh`, then `pnpm web:build`.

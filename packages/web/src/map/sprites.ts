@@ -18,7 +18,22 @@ ${sail('M26 8Q32 5.500 39 8Q37 12 38.500 16Q32 13.500 26 16Q24.500 12 26 8Z')}${
 <path d="M32 4l-9 1.600 9 1.800ZM45 13l-7 1.300 7 1.500ZM18 13l-7 1.300 7 1.500Z" fill="#fff"/>
 <path d="M5 40Q8 49 13 55H48Q55 51 59 34L49 35.500V41Q36 46 22 44.500L14 43V39.500Z" fill="#5b371d"/><path d="M5 40Q7 45 9.500 49Q30 54 54.500 46Q57 41 59 34L49 35.500V41Q36 46 22 44.500L14 43V39.500Z" fill="#8a5730"/><path d="M6.500 43.500Q30 51 57 41" stroke="#e0b878" stroke-width="1.500" fill="none"/><path d="M49 35.500L59 34L58.300 37L49 38.500ZM5 40L14 39.500V42.500L6 42.500Z" fill="${c}"/><path d="M49 35.500L59 34M5 40L14 39.500" stroke="#e9c987" stroke-width="1.300"/><path d="M17 48.300h2.600v2.400H17Zm7 .9h2.600v2.400H24Zm7 .2h2.600v2.400H31Zm7-.6h2.600v2.400H38Zm7-1.600h2.600v2.400H45Z" fill="#2b1a0d"/><path d="M51.500 39.800h2v2.200h-2Zm3.200-.6h1.900v2.200h-1.900Z" fill="#ffdf8c"/>`;
   },
-  infantry(p: number) { const c = D.players[p].color; return ring(56, 15) + `<path d="M25 56l2-17h10l2 17h-5l-2-11-2 11Z" fill="#e9e2cf"/><path d="M22 24h20l-2 18H24Z" fill="${c}"/><path d="M22 24h20l-1 5H23Z" fill="#0003"/><path d="M27 24l10 15M37 24L27 39" stroke="#fffaf0" stroke-width="2"/><circle cx="32" cy="18" r="5.500" fill="#e2b48b"/><path d="M22 16q10-12 20 0-10-4-20 0Z" fill="#22262b"/><path d="M45 56V12l1.600-4 1.600 4v44Z" fill="#6b4526"/>`; },
+  /** The infantry of player `p`: the coat and the flag of the standard in the player's colour, the headgear and the belts of the nation, its emblem on the flag. */
+  infantry(p: number) {
+    const { color: c, nation: n } = D.players[p], belt = BELT[n] ?? '#fffaf0', arm = (d: string) => `<path d="${d}" stroke="${c}" stroke-width="3.400" stroke-linecap="round" fill="none"/>`, hand = (x: number, y: number) => `<circle cx="${x}" cy="${y}" r="1.700" fill="#e2b48b"/>`;
+    // Below the coat: breeches and stockings with shoes, or for the Scots a kilt in the player's colour over socks.
+    const lower = n === 'scottish'
+      ? `<path d="M26.500 47v8.500h4V47Zm7 0v8.500h4V47Z" fill="#e9e2cf"/><path d="M26.500 49.500h4m3 0h4" stroke="#b8452e" stroke-width="1.100"/><path d="M26 55.500h5v1.300h-5Zm7 0h5v1.300h-5Z" fill="${INK}"/><path d="M24.500 37.500h15l2 10h-19Z" fill="${c}"/><path d="M27.500 37.500l-.8 10m5.300-10v10m4.500-10 .8 10M23.800 41h16.400M23.200 44.500h17.600" stroke="#0007" stroke-width=".9"/><path d="M29.700 37.500v10m4.600-10v10" stroke="#fff6" stroke-width=".6"/>`
+      : `<path d="M26.700 43.500h4.600V55h-4.600Zm6 0h4.600V55h-4.600Z" fill="#e9e2cf"/><path d="M26.200 54.500h5.600v2h-5.600Zm6 0h5.600v2h-5.600Z" fill="${INK}"/><path d="M24.500 36.500L22.300 46H29l3-5.500 3 5.500h6.700l-2.200-9.500Z" fill="${c}"/><path d="M24.500 36.500L22.300 46H29l3-5.500 3 5.500h6.700l-2.200-9.500Z" fill="#0002"/><path d="M22.300 46l1.800-4.500L26 46ZM41.700 46l-1.800-4.500L38 46Z" fill="${belt}"/>`;
+    return ring(56, 15) + lower
+      + `<path d="M23 26.500q0-3.500 3.500-3.500h11q3.500 0 3.500 3.500l-1.500 12h-15Z" fill="${c}" stroke="#fff" stroke-opacity=".5" stroke-width=".8"/><path d="M23 26.500q0-3.500 3.500-3.500h11q3.500 0 3.500 3.500l-.3 2.500H23.300Z" fill="#0002"/>`
+      + `<path d="M26 24.500l11.500 12M38 24.500l-11.500 12" stroke="${belt}" stroke-width="1.800"/><path d="M24.300 35.500h15.400v2H24.300Z" fill="#3a2414"/><path d="M31 35.300h2v2.400h-2Z" fill="${BRASS}"/><path d="M29.300 22h5.400v2.200h-5.400Z" fill="#f4efe4"/>`
+      + arm('M24 25.500q-3 6-2.500 12') + hand(21.500, 38.500)
+      + `<path d="M46.600 56.500V8.500" stroke="#5a3a20" stroke-width="1.300" stroke-linecap="round"/><circle cx="46.600" cy="7.600" r="1.400" fill="${BRASS}"/>`
+      + `<path d="M47.200 10q7.500-2.500 15 0v11q-7.500-2.500-15 0Z" fill="${c}"/><path d="M47.200 10q7.500-2.500 15 0v11q-7.500-2.500-15 0Z" fill="url(#billow)" stroke="#fff" stroke-opacity=".7" stroke-width=".8"/>${flagEmblem(n)}`
+      + arm('M40 25.500q4 2.500 6 7') + hand(46.600, 32.800)
+      + `<circle cx="32" cy="18" r="5.500" fill="#e2b48b"/>${HAT[n] ?? HAT.english}`;
+  },
   /** A ruin: one of a few pictures, always the same for the same cell. */
   ruin: (c: number) => RUINS[(Math.imul(c + 7, 0x9e3779b1) >>> 0) % RUINS.length]!,
   /** A shipwreck: one of a few pictures, always the same for the same cell. */
@@ -58,3 +73,29 @@ const RUINS = [
   // a ring of standing stones around a small fire
   ring(53, 26) + `<ellipse cx="32" cy="47" rx="25" ry="8" fill="${GRASS}" fill-opacity=".5"/>` + stone(17, 42, 5, 10) + stone(26, 40, 5.500, 12) + stone(38, 40, 5.500, 12) + stone(47, 42, 5, 10) + `<ellipse cx="32" cy="47" rx="4.500" ry="1.800" fill="#3a3128"/><path d="M30 46l2-4 2 4" fill="#e0893a"/>` + stone(11, 51, 6, 13) + stone(22, 55, 7, 16) + stone(42, 55, 7, 16) + stone(53, 51, 6, 13) + `<path d="M27 55.500l9-2.500 1 3-9 1.500Z" fill="#a89f88"/>`,
 ];
+/* ---- infantry by nation ---- */
+const STEEL = '#c3cad0', BRASS = '#c9a25a', INK = '#22262b';
+const tricorne = (trim: string, cockade = '') => `<path d="M21 16.500q11-11 22 0-11-3.500-22 0Z" fill="${INK}"/><path d="M21.600 16.200q10.400-3.300 20.800 0" stroke="${trim}" stroke-width="1" fill="none"/>${cockade ? `<circle cx="32" cy="12.600" r="1.600" fill="${cockade}"/>` : ''}`;
+const morion = `<path d="M21 13.500q11 5 22 0-2 3.500-11 3.500t-11-3.500Z" fill="#aeb6bc"/><path d="M26 15q0-7 6-7t6 7Z" fill="${STEEL}"/><path d="M28 9.500q4-5 8 0" stroke="#8d969c" stroke-width="2" fill="none"/>`;
+/** The colour of the crossbelts of each nation. */
+const BELT: Record<string, string> = { english: '#fffaf0', french: '#fffaf0', dutch: '#f0a64a', spanish: '#e9c987', portuguese: '#e9c987', swedish: '#f2c94c', danish: '#fffaf0', russian: '#e9c987', curonian: '#f2c94c', scottish: '#fffaf0' };
+/** The headgear of each nation, over a head at (32, 18). */
+const HAT: Record<string, string> = {
+  english: tricorne('#fffaf0'),
+  french: tricorne('#e9c987', '#fffaf0'),
+  swedish: tricorne('#f2c94c', '#f2c94c'),
+  danish: tricorne('#fffaf0', '#c8102e'),
+  dutch: `<ellipse cx="32" cy="14.500" rx="10" ry="2.300" fill="${INK}"/><path d="M27 14.500V9.500q5-2 10 0v5Z" fill="${INK}"/><path d="M27 12.300h10v1.600H27Z" fill="#e8862a"/>`,
+  spanish: morion + `<path d="M36 9.500q5-3 7 .8-3.500-1.300-7-.8Z" fill="#b8452e"/>`,
+  portuguese: `<path d="M22.500 15.500q9.500 3 19 0l-1.500-1.500h-16Z" fill="#aeb6bc"/><path d="M25 14.500q0-8 7-8.500 7 .5 7 8.500Z" fill="${STEEL}"/><path d="M25.200 13h13.600" stroke="${BRASS}" stroke-width="1.200"/><path d="M31.200 6.300l.8-2.300.8 2.300Z" fill="#8d969c"/>`,
+  russian: `<path d="M28 20.500q4 6.500 8 0-4 1.500-8 0Z" fill="#6b4a30"/><path d="M25.500 15.500V8q6.500-3 13 0v7.500Z" fill="#3a2c22"/><path d="M27 15V9.500m3 5.500V8.700m3 6.300V8.500m3 6.500V9" stroke="#5a4636" stroke-width=".8"/><path d="M26 8.300q6-2.200 12 0-6 1.600-12 0Z" fill="#b8452e"/>`,
+  curonian: `<path d="M26.500 15.500L29 5q3-2 5 0l3.500 10.500Z" fill="#9b1212"/><path d="M26.500 15.500L29 5q3-2 5 0l3.500 10.500Z" fill="none" stroke="${BRASS}" stroke-width="1"/><path d="M27.500 13l9 0" stroke="${BRASS}" stroke-width="1.300"/><circle cx="31.500" cy="4.200" r="1.300" fill="${BRASS}"/>`,
+  scottish: `<path d="M24.500 14.500q-1-5.500 7.500-5.500 8.500 0 7.500 5.500Z" fill="#2f4a7a"/><path d="M24.800 14h14.400v1.800H24.800Z" fill="#e6e0d0"/><path d="M26.500 14h2v1.800h-2Zm4 0h2v1.800h-2Zm4 0h2v1.800h-2Z" fill="#b8452e"/><circle cx="32" cy="9" r="1.500" fill="#b8452e"/>`,
+};
+/** Where each emblem is drawn inside its picture, as parts of its width and height: left, top, right, bottom (measured from the pictures). */
+const EMBLEM_BOX: Record<string, [number, number, number, number]> = { curonian: [0, 0.031, 0.992, 0.961], danish: [0.09, 0, 0.883, 0.996], dutch: [0.055, 0.004, 0.898, 0.996], english: [0.016, 0, 0.988, 0.996], french: [0.051, 0, 0.941, 0.996], portuguese: [0.008, 0, 0.988, 0.996], russian: [0.055, 0, 0.934, 0.992], scottish: [0, 0.008, 0.996, 0.992], spanish: [0.07, 0, 0.93, 0.996], swedish: [0, 0.07, 0.996, 0.879] };
+/** The emblem of nation `n` on the infantry's flag: what is drawn of it, at most 8 units across, centred on the middle of the waving flag. */
+function flagEmblem(n: string) {
+  const [x0, y0, x1, y1] = EMBLEM_BOX[n] ?? [0, 0, 1, 1], s = 8 / Math.max(x1 - x0, y1 - y0), f = (v: number) => v.toFixed(2);
+  return `<image href="${art.emblem(n)}" x="${f(54.7 - ((x0 + x1) / 2) * s)}" y="${f(14.3 - ((y0 + y1) / 2) * s)}" width="${f(s)}" height="${f(s)}" filter="url(#lift)"/>`;
+}

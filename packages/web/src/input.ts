@@ -74,7 +74,7 @@ document.addEventListener('click', async (e: MouseEvent) => {
   if ((x = q('[data-opt]'))) { const at = S.pickAt, o = at && Places.spaces(S.card)[at.id]?.options?.[+x.dataset.opt!]; if (at && o) commit(o, at.id); return; }
   if (q('[data-agent]')) return;
   if (S.card && !q('button:not([data-space])')) { const id = find(e.clientX, e.clientY); if (id && drop(e.clientX, e.clientY)) return; if (S.pickAt && !q('.kp')) { S.pickAt = null; paint(); return; } }
-  if (Sim.busy && !q('[data-menu],[data-fast],[data-mute],[data-sheet],[data-king]')) return;
+  if (Sim.busy && !q('[data-menu],[data-fast],[data-mute],[data-sheet],[data-king],[data-deck]')) return;
   if (q('[data-ok]')) read();
   else if ((x = q('[data-do]'))) act(JSON.parse(x.dataset.do!));
   else if ((x = q('[data-cargo]'))) cargo(x.dataset.cargo!, x.dataset.r ?? '');
@@ -86,7 +86,7 @@ document.addEventListener('click', async (e: MouseEvent) => {
   else if (q('[data-recruit]')) { Sim.mark(); S.card = null; Sim.apply({ c: 'recruit' }); settle(); }
   else if (q('[data-peace]')) { S.war = -1; paint(); }
   else if ((x = q('[data-war]'))) { if (D.over) { S.war = +x.dataset.war!; S.view = 'map'; S.look = null; U.king = false; focus(); paint(); } }
-  else if ((x = q('[data-lang]'))) { document.documentElement.lang = Options.lang = x.dataset.lang!; keepOptions(); paint(); }
+  else if ((x = q('[data-lang]'))) { document.documentElement.lang = Options.lang = x.dataset.lang!; keepOptions(); Sim.refresh(); paint(); }
   else if ((x = q('[data-grid]'))) { Board.grid = !!x.dataset.grid; paint(); }
   else if ((x = q('[data-follow]'))) { Board.view.auto = x.dataset.follow ? 1 : 0; keepOptions(); Board.look(); Board.land(); paint(); }
   else if ((x = q('[data-tutorial]'))) { setTutorial(!!x.dataset.tutorial); paint(); }
@@ -98,6 +98,7 @@ document.addEventListener('click', async (e: MouseEvent) => {
   else if (q('[data-menu]')) { U.menu = !U.menu; U.king = U.sheet = false; paint(); }
   else if (q('[data-king]')) { U.king = !U.king; U.sheet = U.menu = false; paint(); }
   else if (q('[data-sheet]')) { U.sheet = !U.sheet; U.king = U.menu = false; paint(); }
+  else if (q('[data-deck]')) { U.deck = !U.deck; U.king = U.sheet = U.menu = false; paint(); }
   else if (q('[data-close]')) { S.view = 'map'; paint(); }
   else if ((x = q('[data-go]'))) { const g = x.dataset.go; if (!deciding() && (g === 'colony' || g === 'europe')) { S.view = S.view === g ? 'map' : g; U.peek = null; paint(); } }
   else if (document.contains(el) && ((U.menu && !q('.menu')) || (U.king && !q('.kingbox')))) { U.menu = U.king = false; paint(); }
@@ -107,7 +108,7 @@ document.addEventListener('input', (e) => { const el = e.target as HTMLInputElem
 document.addEventListener('change', (e) => { const k = (e.target as HTMLElement).dataset.viewSet; if (!k) return; keepOptions(); if (['tilt', 'most'].includes(k)) void Board.land(); });
 addEventListener('keydown', (e: KeyboardEvent) => {
   // Esc puts down or closes what is open, one thing at a time; with nothing left open on the map, it opens the options menu.
-  if (e.key === 'Escape' && !U.title) { put(); if (S.pickAt) S.pickAt = null; else if (S.card) S.card = null; else if (S.war >= 0) S.war = -1; else if (U.menu || U.king || U.sheet) U.menu = U.king = U.sheet = false; else if (S.view !== 'map') S.view = 'map'; else U.menu = true; bub().hidden = true; paint(); }
+  if (e.key === 'Escape' && !U.title) { put(); if (S.pickAt) S.pickAt = null; else if (S.card) S.card = null; else if (S.war >= 0) S.war = -1; else if (U.menu || U.king || U.sheet || U.deck) U.menu = U.king = U.sheet = U.deck = false; else if (S.view !== 'map') S.view = 'map'; else U.menu = true; bub().hidden = true; paint(); }
   if (e.key === 'Enter' && X.reports.length && !Sim.busy) { e.preventDefault(); read(); }
   if (/^[1-9]$/.test(e.key) && Sim.kind() === 'turn' && !Sim.busy && P.hand[+e.key - 1]) { S.card = P.hand[+e.key - 1]; S.pickAt = null; paint(); }
 });

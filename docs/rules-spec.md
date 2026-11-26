@@ -56,7 +56,7 @@ Note: `причал` names both the pier in Europe and the Docks building. Code 
 | T-2 | **Actions.** Clockwise, one card and one action per turn. Passing ends the round for that player, who keeps or discards **[D]** any subset of the remaining cards |
 | T-3 | A player with no cards must pass |
 | T-4 | **Event.** When all have passed, resolve the top event (section V) |
-| T-5 | **Tax.** If the rate is above 0, each player pays in full, or refuses: +2 🟥 to the REF and +1 🔔 (solo: +3 🟥). A player who cannot pay in full must refuse **[D]** |
+| T-5 | **Tax.** If the rate is above 0, each player pays in full, or refuses: +1 🟥 to the REF (DD-52; was +2) (solo: +3 🟥), and no 🔔 (DD-50; was +1 🔔). A player who cannot pay in full must refuse **[D]** |
 | T-6 | **End.** Check for war (W-1), advance the round and year (1620 + 20 per round), pass the first-player marker left |
 | T-7 | At the end of a player's turn, warehouse excess is discarded by choice. **[D]** The check also applies after events |
 | T-8 | Free actions, such as recruiting with crosses, happen on one's own turn, any number of times **[D]** |
@@ -227,7 +227,7 @@ All 34 cards are implemented as printed in the spreadsheet. Clarifications:
 | W-6 | Loyalist places any of their agents face down at patriot colonies. Counts are public |
 | W-7 | Patriots then choose, secretly and at the same time **[D]**: army cards (any with ⚔️, infantry or ship value), militia (1 🔔 each, up to the number of their non-military cards), mercenaries (5 🟡 each), 3 cubes per allied settlement, and their placement |
 | W-8 | Washington: 2 militia per bell, still limited by non-military cards **[D]**. Revere: 4 free militia, not limited **[D]** |
-| W-9 | Attack = 2 × 🟥 + tactic + loyalist cards' ⚔️ + loyalist militia. Card count does not add strength here, unlike C-3 |
+| W-9 | Attack = 1 × 🟥 (DD-49; was 2 ×) + tactic + loyalist cards' ⚔️ + loyalist militia. Card count does not add strength here, unlike C-3 |
 | W-10 | Defence = 1 + terrain + buildings + 1 per own token on or next to the colony + cards' ⚔️ + support cubes |
 | W-11 | A colony not attacked, with no 🟥 and no loyalist card, is kept **[D]** |
 | W-12 | If attack is greater, the loyalist rolls (solo and no loyalist: the game rolls **[D]**) dice equal to the difference, at most 10. No success: colony holds. 1+ success: colony falls. Equal or less: colony holds |

@@ -966,7 +966,7 @@ describe('War', () => {
     start(s);
     s.war!.sieges[0].loyalist = ['captain', 'colonist', 'corsair'];
     s.war!.sieges[0].militia = 2;
-    expect(siegeStrength(s, s.war!.sieges[0]).attack.total).toBe(6 + 3 + 2 + 2);
+    expect(siegeStrength(s, s.war!.sieges[0]).attack.total).toBe(3 + 3 + 2 + 2);
   });
   it('[W-10] defence strength', () => {
     const s = eve(2);
@@ -987,8 +987,8 @@ describe('War', () => {
   });
   it('[W-12] dice decide when the attack is stronger', () => {
     const run2 = (dice: number[], ref: number) => { const s = eve(1); s.ref = ref; start(s); while (!s.over) { rig(s, ...dice); const o = legal(s); act(s, o.find((c) => c.c === 'keep' || c.n === 0) ?? o[0]); } return s.war!.sieges[0]; };
-    expect(run2([1, 2, 3], 2)).toMatchObject({ attack: 4, defence: 1, fell: false });
-    expect(run2([1, 2, 4], 2)).toMatchObject({ fell: true });
+    expect(run2([1, 2, 3], 4)).toMatchObject({ attack: 4, defence: 1, fell: false });
+    expect(run2([1, 2, 4], 4)).toMatchObject({ fell: true });
     expect(run2([], 20).dice!.length).toBe(10);
     const s = eve(1);
     s.ref = 1;
@@ -999,7 +999,7 @@ describe('War', () => {
   it('[W-13] the loyalist takes a colony if at least as strong as the REF', () => {
     for (const [cards, taken] of [[['captain'], 1], [['soldier'], 1], [['colonist'], null]] as const) {
       const s = eve(2);
-      s.ref = 1;
+      s.ref = 2;
       P(s, 1).discard = [...cards];
       P(s).discard = ['colonist', 'colonist'];
       start(s);
@@ -1105,6 +1105,6 @@ describe('settings without a rule of their own', () => {
       s.war = { loyalist: null, tactic: 'ships_of_the_line', pool: 2, order: [0], sieges: [], spent: {} };
       return siegeStrength(s, { owner: 0, cell: at(5, 5), cubes: 2, loyalist: [], militia: 0, army: [], support: 0, betrayed: 0 }).ref;
     };
-    expect([ref(), ref(defWith({ 'settings.war.refStrengthIncludesTactic': false }))]).toEqual([8, 4]);
+    expect([ref(), ref(defWith({ 'settings.war.refStrengthIncludesTactic': false }))]).toEqual([6, 4]);
   });
 });

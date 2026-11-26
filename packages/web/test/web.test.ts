@@ -43,7 +43,7 @@ describe('the game session', () => {
     while (!s.over) { const c = bots[s.pending!.player].choose(viewFor(s, s.pending!.player)); choices.push(c); applyInPlace(s, c); }
     const Sim = await session();
     Sim.watch({ ruleset: 'board', rulesetHash: def.rulesetHash, seed, nations, choices });
-    for (const at of [450, 10, choices.length]) {
+    for (const at of [choices.length >> 1, 10, choices.length]) {
       Sim.seek(at);
       expect(choiceKey(Sim.s.log)).toBe(choiceKey(replay({ def, seed, nations, logging: true }, choices, at).log));
     }

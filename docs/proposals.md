@@ -2,89 +2,52 @@
 
 2026-11-26. Proposals for the designer, from lab evidence. Nothing here is decided: a change reaches `board`, the rulebook and the spreadsheet only by the designer's choice (`pnpm rules promote <id>`, logged in [decisions.md](decisions.md)).
 
-All candidates are **direct** changes: one printed number each, with the table wording ready. They are the overrides of [`rulesets/proposed.json`](../rulesets/proposed.json), which is a sandbox ruleset holding all of them: try one package at a time. The full tables are reproduced by `node packages/lab/src/proposals.ts 400` (about 13 minutes on 8 cores), which writes `out/proposals.md`.
+Every candidate is a **direct** change: printed numbers only, with the table wording ready. They are the overrides of [`rulesets/proposed.json`](../rulesets/proposed.json), a sandbox ruleset on top of `board`. The full tables come from `node packages/lab/src/proposals.ts 400` (about 7 minutes on 8 cores), which writes `out/proposals.md`.
 
-## The problem: the war is one-sided
+## Decided so far
 
-Baseline on `board`, 4 players (paired experiments, tuned bots and mixed bot characters agree):
+- **Accepted** (DD-49, DD-50, DD-52): each King's army cube attacks with 1, not 2; refusing the tax gives no bell; refusing adds 1 cube, not 2. All three are now in `board`.
+- **Rejected** (DD-51): a base colony defence of 4. The designer's rule: a colony's strength is balanced by the King's cubes, not by raising the colony.
 
-| | Board now | Target ([ai-and-testlab.md](ai-and-testlab.md#balance-targets)) |
-|---|---|---|
-| Loyalist wins | 87–89% | about 15% (10–20%) |
-| Patriot colonies that survive the war | 4–5% | 40–70% |
-| King's army in the war | 75–104 cubes, about 28 attack per colony | |
-| A colony's defence | about 5 | |
-| Affordable taxes refused (3+ players) | 96–100% | |
-| Games ending before round 8 (mixed bots) | 53% | under 25% |
+## Where the board stands
 
-Why: every refusal adds 2 cubes to one pool shared by all patriots, so refusing costs the refuser little (H2), and each cube attacks with 2 against a colony that starts at 1. The King's army outgrows any defence a colony can buy, so the least rebellious player wins almost every game. Refusal bells also feed the race to 15 bells, so games end early (H3).
+4 players, 400 paired games, two kinds of bot: **tuned** (one self-play-tuned bot in every seat; never races to 15 bells) and **mixed** (eight bot characters, including the rebel who races). Targets in [ai-and-testlab.md](ai-and-testlab.md#balance-targets).
+
+| | Before the changes | Cube 1 + no refusal bell | Now (+ refusal 1 cube) | Target |
+|---|---|---|---|---|
+| Loyalist wins (tuned / mixed) | 87% / 87% | 69% / 45% | 39% / **11%** | about 15% (10–20%) |
+| Patriot colonies that survive (tuned / mixed) | 4% / 4% | 20% / 24% | 43% / **56%** | 40–70% |
+| Games ending before round 8 (mixed) | 53% | 35% | 56% | under 25% |
+
+At 3 and 5 players with mixed bots: the loyalist wins 23% and 6%, colonies survive 46% and 58%, games end before round 8 in 36% and 67%. With 2 players the loyalist still wins 62% (open question 1).
 
 ## Candidates
 
 | Id | Table wording | Setting |
 |---|---|---|
-| `cube-strength-1` | Each King's army cube attacks with 1 ⚔️, not 2. | `war.refStrength` 2 → 1 |
-| `base-defence-4` | In the war every colony defends with 4 before buildings, terrain and troops, not 1. | `war.baseDefence` 1 → 4 |
-| `refusal-no-bell` | Refusing the tax adds cubes to the King's army but gives no bell. | `tax.refuseBells` 1 → 0 |
-| `refusal-1-cube` | Refusing the tax adds 1 cube to the King's army, not 2 (solo unchanged). | `tax.refuseRef` 2 → 1 |
+| `events-1-cube` | El Dorado Rumors: the King's army gains 1 cube per player, not 2. Mutiny, Boston Tea Party, Pirate Blockade, Black Market: 1 cube instead of 2 for each refusal, unit or seller. | five event-card numbers 2 → 1 |
 
-Russian wording for each is in `rulesets/proposed.json`.
+Russian wording is in `rulesets/proposed.json`. Tested before refusal 1 cube was adopted: it removes 6–8 cubes and moves the loyalist only 4–9 points, because events give about a quarter of the King's army (refusals gave 72 of about 105 cubes at 4 players). Kept for fine-tuning one player count, not as a fix.
 
-## Evidence
+## Open
 
-400 paired games per cell (same seeds, nations and seats on both sides), 2–5 players, two kinds of bots: **tuned** (one self-play-tuned bot in every seat; these never race to 15 bells) and **mixed** (eight characters rotating, including the rebel who does).
-
-**4 players**
-
-| Rules | Loyalist wins (tuned / mixed) | Colonies survive (tuned / mixed) | Ends before round 8 (mixed) |
-|---|---|---|---|
-| board | 87% / 87% | 4% / 4% | 53% |
-| cube strength 1 | 46% / 35% | 28% / 31% | 79% |
-| base defence 4 | 81% / 83% | 7% / 6% | 53% |
-| no refusal bell | 92% / 93% | 3% / 3% | 10% |
-| refusal 1 cube | 66% / 63% | 18% / 16% | 55% |
-| **A**: cube 1 + defence 4 | 26% / 15% | 44% / 56% | 87% |
-| **B**: cube 1 + defence 4 + no refusal bell | 39% / **21%** | 34% / **46%** | **50%** |
-| **C**: cube 1 + refusal 1 cube + no refusal bell | 39% / 11% | 43% / 56% | 56% |
-
-**Package B across player counts** (mixed bots; board in brackets)
-
-| Players | Loyalist wins | Colonies survive | Ends before round 8 |
-|---|---|---|---|
-| 2 | 73% (96%) | 15% (3%) | 11% (30%) |
-| 3 | 32% (92%) | 37% (3%) | 35% (40%) |
-| 4 | 21% (87%) | 46% (4%) | 50% (53%) |
-| 5 | 15% (86%) | 49% (3%) | 62% (64%) |
-
-What the numbers say:
-
-- **Cube strength is the main lever.** Alone it moves the loyalist from 87% to 35–46% and lets about 30% of colonies survive.
-- **Base defence helps little alone, much with weaker cubes.** It matters once an attack is near a colony's defence.
-- **The refusal bell decides game length.** Without it, games end before round 8 five times less often. With the war made winnable for patriots (package A), racing to 15 bells pays and 87% of games end early; taking the bell away (B) brings that back to the board's level.
-- **Package C** is as strong as A for the war and keeps games as long as B, but it removes cubes from the King's army instead of making colonies sturdier, which flattens the tax decision further.
-
-## Recommendation
-
-**Package B: `cube-strength-1`, `base-defence-4`, `refusal-no-bell`.** It is the closest to all three targets at 3–5 players with mixed bots (loyalist 15–32%, colonies 37–49%, early endings at or below the board's), with three short changes to printed numbers and no new component.
-
-Open after B:
-
-1. **Two players stay loyalist-heavy** (62–89% under every package): with one patriot against one loyalist, whoever has fewer bells nearly always wins. This looks structural (for example, no loyalist with 2 players, or a different 2-player war) and is a question for the designer, not a number to tune. Asked as Q19 in [decisions.md](decisions.md#open-questions).
-2. **Early endings** remain at about half of 4-player games with mixed bots, as on the board now. With tuned bots no game ends early, so this depends on how often players race for bells; human games will tell more.
-3. **With tuned bots the loyalist still wins 38–39%** at 4–5 players under B. The tuned bots were trained under the old war; they should be tuned again under the chosen rules before the numbers are trusted further.
+1. **Two players stay loyalist-heavy**: with one patriot against one loyalist, whoever has fewer bells nearly always wins. This looks structural (for example, no loyalist with 2 players, or a different 2-player war) and is a question for the designer. Asked as Q19 in [decisions.md](decisions.md#open-questions).
+2. **Early endings** rose to 56–67% at 4–5 players with mixed bots now that the war is winnable: racing to 15 bells pays again. The refusal bell is gone, so where the racing player's bells come from (buildings, fathers, events) needs a look before choosing a fix.
+3. **5 players may overshoot** (loyalist 6% with mixed bots). Event cards can tune this later.
+4. **Tuned bots** still let the loyalist win 29–49% at 3–5 players. They were trained under the old war and should be tuned again under the new rules before these numbers are trusted further.
 
 ## Not proposed yet
 
 - **Dead cards** (detectors, 800 games): the school (built by 9 of 1,929 seats it was offered to), the slave, the smuggler. Teaching and smuggling are actions the bots hardly use ([system-check.md](system-check.md)), so this may be the bots, not the cards.
-- **"Dominated" town hall, stockade, the work action, alliances**: their holders win less, but they are what patriots build, and patriots lose under the current war. Recheck after the war change.
+- **"Dominated" town hall, stockade, the work action, alliances**: their holders win less, but they are what patriots build, and patriots lost under the old war. Recheck after the war change.
 - **Supply** (H13) plays one card to draw one. Its food cost and draw are fixed in the engine rather than read from the settings, so trying "Supply draws 2" first needs them made settings.
 
 ## Caveats
 
-Bots play weaker than people ([system-check.md](system-check.md)): they build up slowly and defend badly. Each finding here holds for both kinds of bot, as the lab's standards ask, but human games remain the check. Each proposal can be tried in the game: Design bench → Rules, make a ruleset with the package's three values, then Play it.
+Bots play weaker than people ([system-check.md](system-check.md)): they build up slowly and defend badly. Each finding here holds for both kinds of bot, as the lab's standards ask, but human games remain the check. Each candidate can be tried in the game: Design bench → Rules, make a ruleset with its values, then Play it.
 
 ## To adopt a change
 
-1. Copy its override from `rulesets/proposed.json` into `rulesets/pc.json` (or make a ruleset in the design bench and export it).
-2. `pnpm rules promote <id>`: moves it to `board`, logs the decision, and prints the cell or setting to edit.
+1. `pnpm rules add proposed <id>`: copies it into `pc`.
+2. `pnpm rules promote <id>`: moves it to `board`, logs the decision, and prints the setting or card to edit.
 3. Carry the table wording into the rulebook.

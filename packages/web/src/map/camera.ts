@@ -14,7 +14,8 @@ type Pan = [x: number, y: number, zoom: number];
 export function stage(el: HTMLElement, { zoom = 1, center = null, min = 0.45, max = 2.2, onCell, onMove, pitch = null }: StageOptions) {
   // The zoom-out limit may follow the window size.
   const lo = () => (typeof min === 'function' ? min() : min);
-  const inner = el.querySelector<HTMLElement>('.map-inner')!; let z = zoom, x = 0, y = 0, drag: [number, number, number, number] | null = null, moved = 0;
+  // The map plane, and any plane over it that moves with it (the clouds, above everything that stands on the map).
+  const planes = el.querySelectorAll<HTMLElement>('.map-inner,.map-over'); let z = zoom, x = 0, y = 0, drag: [number, number, number, number] | null = null, moved = 0;
   // A tilted plane moves by its transform alone, so nothing is painted again. `un` goes from the screen to the flat stage, `proj` back with the local scale.
   const T = { a: 0, d: 1500, up: 0 }, R = () => ({ left: 0, top: 0, width: innerWidth, height: innerHeight });
   const un = (cx: number, cy: number): [number, number] => { const r = R(), w = r.width / 2, h = r.height / 2, sx = cx - r.left - w, sy = cy - r.top - h - T.up, c = Math.cos(T.a), s = Math.sin(T.a), py = (sy * T.d) / (T.d * c + sy * s), k = T.d / (T.d - py * s); return [w + sx / k, h + py]; };
@@ -29,7 +30,8 @@ export function stage(el: HTMLElement, { zoom = 1, center = null, min = 0.45, ma
   const put = () => {
     aim();
     const w = innerWidth / 2, h = innerHeight / 2;
-    inner.style.transform = `translate(${w}px,${h + T.up}px) perspective(${T.d}px) rotateX(${T.a}rad) translate(${x - w}px,${y - h}px) scale(${z})`;
+    const tf = `translate(${w}px,${h + T.up}px) perspective(${T.d}px) rotateX(${T.a}rad) translate(${x - w}px,${y - h}px) scale(${z})`;
+    for (const p of planes) p.style.transform = tf;
     onMove?.();
   };
   const look = (c: number) => { const [a, b] = at(c), r = R(); x = r.width / 2 - (a + 32) * z; y = r.height / 2 - (b + 32) * z; put(); };

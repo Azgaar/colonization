@@ -29,7 +29,7 @@ Builds `dist/app.js`, the lab's worker `dist/lab-worker.js` and the list of soun
 - **Advice** next to Pass: the search bot's three best moves with its reasons; one click plays the whole action, a sail to its end (FR-A-8).
 - **Forecast** (dev mode): each governor's expected score and chance to keep a colony, the likely loyalist, and how each of your colonies would hold now and at the expected war.
 - **Design bench**: Rules (your own rulesets: every value with board's default, validation, reset, and each change's conversion label and table wording), Lab (compare two rulesets on paired seeds, sweep a value, find problems: bot games in the browser's workers), Export (conversion report, the cells to edit by sheet, row and column, the ruleset file; in dev mode also Toward the board game: add a change to `pc`, promote it to `board` or drop it, written to `rulesets/` and `docs/decisions.md` by the local server).
-- **Sound**: effects for what happens and music by the game's stage, from `sound/fx` and `sound/music` (see [docs/audio.md](../../docs/audio.md)); Music, Effects and Sound on/off in Options and the game menu. A missing file is silent.
+- **Sound**: effects for what happens, and music: a signature piece for the main menu, one rotation for the game, marches for the war, one piece for a win and one for a loss, from `sound/fx` and `sound/music` (see [docs/audio.md](../../docs/audio.md)); Music, Effects and Sound on/off in Options and the game menu. A missing file is silent.
 - **Dev mode** (Options → Dev mode, only when the game runs on this computer, not in a deployed copy): Options then offers the Forecast in the Governors sheet (FR-U-15) and the Dev menu, to edit the game, force the next event, agent and dice, give cards, take any seat, undo anything and change the rules mid-game (FR-U-19, FR-R-6).
 - Both languages, switchable at any time.
 
@@ -42,7 +42,7 @@ Builds `dist/app.js`, the lab's worker `dist/lab-worker.js` and the list of soun
 | `art/` | Web-sized art, made by `tools/art.py` |
 | `styles/` | One file per area, loaded in order. Later files may rely on earlier ones, as in one stylesheet |
 | `tools/` | `art.py` (art), `serve.ts` (the server; from this computer it also takes rule changes toward the board game), `sounds.ts` (lists the sound files), `fx.sh` and `music.sh` (build `sound/fx` and `sound/music` from `assets/Sound`) |
-| `sound/` | Effects (`fx/`) and music (`music/`), `.ogg`; see docs/audio.md |
+| `sound/` | Effects (`fx/`) and music (`music/`), `.ogg`, with `music.json`: each piece's title, performers, licence and mood; see docs/audio.md |
 | `test/` | Unit tests: what the view hides, the session's undo, replays |
 
 `src/` modules, each importing what it uses:

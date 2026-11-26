@@ -1,9 +1,14 @@
-/* The painted map: ground, relief, coasts, sea, and clouds over the unknown. */
+/* The painted map: ground, relief, coasts and sea. The clouds over the unknown are painted apart, above everything (see clouds.ts). */
 import type { TerrainId } from '@col/data';
 import { CELL, colonyAt, D, settlementAt, W } from '../data.ts';
 import TEXTURES from '../generated/textures.json';
 function rnd(x: number, y: number) { let h = Math.imul(x, 374761393) ^ Math.imul(y, 668265263); h = Math.imul(h ^ (h >>> 13), 1274126177); return ((h ^ (h >>> 16)) >>> 0) / 4294967296; }
-function noise(x: number, y: number) { const a = Math.floor(x), b = Math.floor(y), u = x - a, v = y - b, s = u * u * (3 - 2 * u), q = v * v * (3 - 2 * v); return (rnd(a, b) * (1 - s) + rnd(a + 1, b) * s) * (1 - q) + (rnd(a, b + 1) * (1 - s) + rnd(a + 1, b + 1) * s) * q; }
+export function noise(x: number, y: number) { const a = Math.floor(x), b = Math.floor(y), u = x - a, v = y - b, s = u * u * (3 - 2 * u), q = v * v * (3 - 2 * v); return (rnd(a, b) * (1 - s) + rnd(a + 1, b) * s) * (1 - q) + (rnd(a, b + 1) * (1 - s) + rnd(a + 1, b + 1) * s) * q; }
+/** The cell a point of the map (map units) belongs to, with cells meeting on wavy lines: the ground and the clouds over the unknown follow them alike. */
+export function wavyCell(X: number, Y: number) {
+  const wx = X + (noise(X / 26, Y / 26) - 0.5) * 40 + (noise(X / 8 + 50, Y / 8) - 0.5) * 13, wy = Y + (noise(X / 26 + 90, Y / 26 + 40) - 0.5) * 40 + (noise(X / 8, Y / 8 + 70) - 0.5) * 13;
+  return Math.min(W - 1, Math.max(0, Math.floor(wy / CELL))) * W + Math.min(W - 1, Math.max(0, Math.floor(wx / CELL)));
+}
 /** The pixels of every ground texture, 224 by 224. */
 async function textures() {
   const out: Record<string, Uint8ClampedArray> = {};
@@ -14,23 +19,29 @@ async function textures() {
 const KINDS: TerrainId[] = ['ocean', 'forest', 'grassland', 'mountains', 'desert', 'tundra'];
 const mix = (a: number[], b: number[], k: number) => [a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k, a[2] + (b[2] - a[2]) * k];
 /** How to paint the map: `K` times the base size, trees `tall` times higher, the open cells (`seen`, kept as the key of the last whole picture), and only a part of it (`box`: left, top, right, bottom in map units). */
-export interface Plan { K?: number; tall?: number; seen?: string; box?: [number, number, number, number] | null }
+export interface Plan { K?: number; tall?: number; seen?: string; box?: [number, number, number, number] | null; truth?: Truth }
+/** The land of every cell as dealt, explored or not, and what stands on it (villages, ruins, wrecks): with it the whole map is painted once, under the clouds,
+ * so that exploring only opens the clouds. Without it only the explored land is painted. */
+export interface Truth { terrain: readonly (TerrainId | null)[]; poi: readonly (string | null)[] }
+/** Which land is painted and where trees keep clear: everything as dealt, or the explored part as the player knows it. */
+interface Land { terrain: readonly (TerrainId | null)[]; open: (c: number) => boolean; busy: (c: number) => boolean }
+const landOf = (t?: Truth): Land => {
+  const known = (c: number) => !!(colonyAt(c) || settlementAt(c) || D.poi[c]);
+  return t ? { terrain: t.terrain, open: () => true, busy: (c) => (D.open[c] ? known(c) : !!t.poi[c]) } : { terrain: D.terrain, open: (c) => D.open[c], busy: known };
+};
 /** The last whole picture with the terrain kinds of its pixels, to draw it again at once. */
 let kept: { key: string; im: ImageData; f: Uint8Array } | null = null;
 /** Whether the whole picture for these settings is at hand, to be drawn again at once. */
 export const isKept = (K: number, seen: string) => kept?.key === `${K} ${seen}`;
-/** Painted map at `K` times the base size: blended ground, lit relief, beaches, shallows, clouds over the unknown. */
-export async function drawRich(canvas: HTMLCanvasElement, { K = 1.5, tall = 1, seen = '', box = null }: Plan = {}) {
-  const tex = await textures(), C = CELL * K, N = Math.round(W * C), sea = true, open = (c: number) => D.open[c], key = `${K} ${seen}`;
-  if (!box && kept?.key === key) { const q = kept; canvas.width = canvas.height = N; const g = canvas.getContext('2d')!; g.putImageData(q.im, 0, 0); scatter(g, K, (x, y) => q.f[y * N + x], tall); return canvas; }
+/** Painted map at `K` times the base size: blended ground, lit relief, beaches, shallows. */
+export async function drawRich(canvas: HTMLCanvasElement, { K = 1.5, tall = 1, seen = '', box = null, truth }: Plan = {}) {
+  const tex = await textures(), C = CELL * K, N = Math.round(W * C), sea = true, L = landOf(truth), open = L.open, key = `${K} ${seen}`;
+  if (!box && kept?.key === key) { const q = kept; canvas.width = canvas.height = N; const g = canvas.getContext('2d')!; g.putImageData(q.im, 0, 0); scatter(g, K, (x, y) => q.f[y * N + x], tall, L); return canvas; }
   // A part of the map is painted inside a wider window, so that distances near its edge are still right.
   const M = 240, px = (v: number) => Math.max(0, Math.min(N, Math.round(v * K)));
   const ox = box ? px(box[0] - M) : 0, oy = box ? px(box[1] - M) : 0, ww = box ? px(box[2] + M) - ox : N, wh = box ? px(box[3] + M) - oy : N, f = new Uint8Array(ww * wh);
   for (let ly = 0; ly < wh; ly++) for (let lx = 0; lx < ww; lx++) {
-    const x = lx + ox, y = ly + oy, X = x / K, Y = y / K;
-    const wx = X + (noise(X / 26, Y / 26) - 0.5) * 40 + (noise(X / 8 + 50, Y / 8) - 0.5) * 13, wy = Y + (noise(X / 26 + 90, Y / 26 + 40) - 0.5) * 40 + (noise(X / 8, Y / 8 + 70) - 0.5) * 13;
-    const c = Math.min(W - 1, Math.max(0, Math.floor(wy / CELL))) * W + Math.min(W - 1, Math.max(0, Math.floor(wx / CELL)));
-    const t = D.terrain[c];
+    const x = lx + ox, y = ly + oy, c = wavyCell(x / K, y / K), t = L.terrain[c];
     f[ly * ww + lx] = open(c) && t ? KINDS.indexOf(t) : 255;
   }
   const field = async (goal: (v: number) => boolean) => {
@@ -40,7 +51,7 @@ export async function drawRich(canvas: HTMLCanvasElement, { K = 1.5, tall = 1, s
     for (let y = wh - 1; y >= 0; y--) for (let x = ww - 1; x >= 0; x--) { const i = y * ww + x; let v = d[i]; if (x < ww - 1) v = Math.min(v, d[i + 1] + 1); if (y < wh - 1) { v = Math.min(v, d[i + ww] + 1); if (x) v = Math.min(v, d[i + ww - 1] + r); if (x < ww - 1) v = Math.min(v, d[i + ww + 1] + r); } d[i] = v; }
     return d;
   };
-  const land = (v: number) => v > 0 && v < 6, toLand = await field(land), toSea = await field((v) => v === 0), toFog = await field((v) => v === 255);
+  const land = (v: number) => v > 0 && v < 6, toLand = await field(land), toSea = await field((v) => v === 0);
   const im = new ImageData(ww, wh), o = im.data;
   const sw = sea ? calm(tex.ocean) : null;
   const TINT: Record<number, number[]> = { 2: [128, 168, 62], 1: [58, 96, 48], 3: [150, 140, 122], 4: [226, 190, 122], 5: [196, 206, 200] };
@@ -71,12 +82,6 @@ export async function drawRich(canvas: HTMLCanvasElement, { K = 1.5, tall = 1, s
       const sx = lx - Math.round(4 * K), sy = ly - Math.round(5 * K);
       if (sx >= 0 && sy >= 0 && land(f[sy * ww + sx])) c = mix(c, [8, 40, 60], 0.4);
     } else c = [38, 96, 120];
-    // Clouds: thick inside unknown fragments, thinning over their edge.
-    const fd = v === 255 ? 99 : toFog[i] / K, cl = v === 255 ? 1 : Math.max(0, 1 - fd / 22);
-    if (cl > 0) {
-      const n = noise(X / 46, Y / 34) * 0.55 + noise(X / 17 + 30, Y / 14) * 0.3 + noise(X / 7, Y / 7) * 0.15, k = v === 255 ? 0.93 : Math.max(0, cl * 1.5 - (1 - n));
-      c = mix(c, mix([150, 178, 190], [244, 246, 240], Math.min(1, Math.max(0, (n - 0.25) * 1.9))), Math.min(0.95, Math.max(0, k)));
-    }
     o[i * 4] = c[0]; o[i * 4 + 1] = c[1]; o[i * 4 + 2] = c[2]; o[i * 4 + 3] = sea ? Math.min(255, Math.min(X, Y, W * CELL - X, W * CELL - Y) * 5) : 255;
   }
   const at = (x: number, y: number) => (x >= ox && y >= oy && x < ox + ww && y < oy + wh ? f[(y - oy) * ww + x - ox] : 255);
@@ -85,13 +90,13 @@ export async function drawRich(canvas: HTMLCanvasElement, { K = 1.5, tall = 1, s
     const g = canvas.getContext('2d')!;
     g.putImageData(im, 0, 0);
     kept = { key, im, f };
-    scatter(g, K, at, tall);
+    scatter(g, K, at, tall, L);
     return canvas;
   }
   // Only the middle of the window is put back, and the trees there drawn again.
   const g = canvas.getContext('2d')!, dx = px(box[0] - 64), dy = px(box[1] - 64), dw = px(box[2] + 64) - dx, dh = px(box[3] + 64) - dy;
   g.putImageData(im, ox, oy, dx - ox, dy - oy, dw, dh);
-  g.save(); g.beginPath(); g.rect(dx, dy, dw, dh); g.clip(); scatter(g, K, at, tall, [dx / K, dy / K, (dx + dw) / K, (dy + dh) / K]); g.restore();
+  g.save(); g.beginPath(); g.rect(dx, dy, dw, dh); g.clip(); scatter(g, K, at, tall, L, [dx / K, dy / K, (dx + dw) / K, (dy + dh) / K]); g.restore();
   kept = null;
   return canvas;
 }
@@ -120,12 +125,12 @@ export async function drawSea(canvas: HTMLCanvasElement, size: number, K: number
 /** How many trees, peaks, tufts or dunes a land cell has. */
 const TREES: Record<Exclude<TerrainId, 'ocean'>, number> = { forest: 22, mountains: 5, grassland: 7, desert: 5, tundra: 8 };
 /** Trees, peaks, tufts and dunes, drawn back to front so that the ground reads at a glance. */
-function scatter(g: CanvasRenderingContext2D, K: number, fAt: (x: number, y: number) => number, tall: number, only: number[] | null = null) {
+function scatter(g: CanvasRenderingContext2D, K: number, fAt: (x: number, y: number) => number, tall: number, L: Land, only: number[] | null = null) {
   const items: [y: number, x: number, t: TerrainId, r: number][] = [];
   for (let c = 0; c < W * W; c++) {
-    const t = D.terrain[c];
-    if (!D.open[c] || !t || t === 'ocean') continue;
-    const x0 = (c % W) * CELL, y0 = Math.floor(c / W) * CELL, busy = colonyAt(c) || settlementAt(c) || D.poi[c];
+    const t = L.terrain[c];
+    if (!L.open(c) || !t || t === 'ocean') continue;
+    const x0 = (c % W) * CELL, y0 = Math.floor(c / W) * CELL, busy = L.busy(c);
     const n = TREES[t];
     for (let k = 0; k < n; k++) {
       const x = x0 + 4 + rnd(c * 3 + 1, k * 7) * 56, y = y0 + 8 + rnd(k * 5, c * 3 + 2) * 54;

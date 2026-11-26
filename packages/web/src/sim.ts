@@ -140,10 +140,12 @@ export const Sim = {
   /** The bots play until a person has to decide. `show` is called after each of their turns. What they did cannot be undone (except in a sandbox). */
   async run(show: (p: number, l: Entry[]) => void) {
     if (busy || replay) return; busy = true;
-    let last: { p: number; from: number } | null = null, acted = false;
+    let last: { p: number; from: number } | null = null, acted = false, painted = performance.now();
     while (!s.over && !humans.has(s.pending!.player)) {
       const p = s.pending!.player, k = s.pending!.kind, from = s.log.length;
       applyInPlace(s, bots[p].choose(viewFor(s, p)), true); acted = true;
+      // A bot that thinks long (hard and expert search) lets the page paint and move between its decisions; input waits while bots play.
+      if (performance.now() - painted > 50) { await new Promise((r) => setTimeout(r)); painted = performance.now(); }
       if (k === 'turn') last = { p, from };
       const ended = s.over || s.pending!.kind === 'turn' || humans.has(s.pending!.player);
       if (last && ended) { refresh(); if (!Options.fast) hear(s.log.slice(last.from) as Entry[], seat, false); show(last.p, s.log.slice(last.from) as Entry[]); last = null; if (!Options.fast) await wait(650); }

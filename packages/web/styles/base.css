@@ -12,8 +12,8 @@ h2,h3,h4 { font-family:var(--sc);margin:0;font-weight:700 }
 small { font-size:.82em }
 img { -webkit-user-drag:none }
 .map-stage { overflow:hidden;cursor:grab;touch-action:none;background:#0f4468 }
-.map-inner { position:absolute;transform-origin:0 0;width:1024px;height:1024px }
-.map-inner>canvas,.map-inner>svg { position:absolute;inset:0;width:100%;height:100% }
+.map-inner,.map-over { position:absolute;transform-origin:0 0;width:1024px;height:1024px }
+.map-inner>canvas,.map-inner>svg,.map-over>canvas { position:absolute;inset:0;width:100%;height:100% }
 .marks { overflow:visible }
 .marks text { font-family:var(--ui) }
 body.lift .map-stage { cursor:default }

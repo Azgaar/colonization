@@ -5,6 +5,7 @@ import { DEFS, roundel, SHAPES } from '../icons.ts';
 import { Bonus } from './bonus.ts';
 import { stage, type Pitch, type Stage } from './camera.ts';
 import { Sprite } from './sprites.ts';
+import { drawClouds } from './clouds.ts';
 import { drawRich, drawSea, isKept } from './terrain.ts';
 import { paint } from '../paint.ts';
 import { keepOptions, Options, VIEW } from '../options.ts';
@@ -59,24 +60,78 @@ function colonyPlate(c: Colony, x: number, y: number) {
 }
 /** Something that stands on the map: where (map units), how high in the stack, whether it takes the pointer, and its picture. */
 interface Thing { id: string; x: number; y: number; z: number; hit: boolean; html: string }
+/** Puts a thing on cell `c`: its point there (dx, dy), its picture from the cell's corner, how high in the stack, whether it takes the pointer. */
+type Put = (id: string, c: number, dx: number, dy: number, html: (x: number, y: number) => string, z?: number, hit?: boolean) => void;
+/* ---- the overview: zoomed far out, everything on the map is a simple sign, to see at a glance what is where ---- */
+/** Zoomed out to within this much of the farthest, the map shows its overview. */
+const FAR = 1.25;
+let far = false;
+/** A round sign: a disc with a pictogram (24-unit box) in it. */
+const dot = (x: number, y: number, r: number, fill: string, glyph: string, rim = '#fff', w = 2.5, ink = '#fff') => `<circle cx="${x}" cy="${y}" r="${r}" fill="${fill}" stroke="${rim}" stroke-width="${w}"/><svg x="${x - r * 0.64}" y="${y - r * 0.64}" width="${r * 1.28}" height="${r * 1.28}" viewBox="0 0 24 24" color="${ink}">${glyph}</svg>`;
+/** A square sign `a` units across, for a colony or a settlement, in the middle of its cell (x, y the cell's corner). */
+const square = (x: number, y: number, a: number, fill: string, glyph: string, rim = '#fff', ink = '#fff') => { const o = 32 - a / 2, g = a * 0.68; return `<rect x="${x + o}" y="${y + o}" width="${a}" height="${a}" rx="${a * 0.23}" fill="${fill}" stroke="${rim}" stroke-width="3"/><svg x="${x + 32 - g / 2}" y="${y + 32 - g / 2}" width="${g}" height="${g}" viewBox="0 0 24 24" color="${ink}">${glyph}</svg>`; };
+/** A hexagonal sign, for a ruin or a wreck: what is left behind. */
+const hex = (x: number, y: number, r: number, glyph: string) => `<path d="M${[0, 1, 2, 3, 4, 5].map((i) => `${(x + r * Math.cos((i * Math.PI) / 3)).toFixed(1)} ${(y + r * Math.sin((i * Math.PI) / 3)).toFixed(1)}`).join('L')}Z" fill="${LEFT}" stroke="#fff" stroke-width="2" stroke-linejoin="round"/><svg x="${x - r * 0.6}" y="${y - r * 0.6}" width="${r * 1.2}" height="${r * 1.2}" viewBox="0 0 24 24" color="#fff">${glyph}</svg>`;
+/** The colours of the overview: the natives' brown, a settlement alarmed enough to attack, what is left behind (ruins and wrecks). */
+const NATIVE = '#7a4f2a', ALARM = '#ff6a52', LEFT = '#3a3f44';
+const GLYPH: Record<string, string> = {
+  tipi: '<path d="M12 4 3.500 21h17Z" fill="currentColor"/><path d="M12 13.500 9.500 21h5Z" fill="#00000059"/><path d="M8.500 1.500 12 4l3.500-2.500" stroke="currentColor" stroke-width="1.600" fill="none" stroke-linecap="round"/>',
+  ruin: '<path d="M3.500 21V10l2-1.200L7.500 10v11Zm6.500 0V4h4v4l-2 1.500L14 11v10Zm6.500 0v-8l2 1.200 2-1.500V21Z" fill="currentColor"/><path d="M2 21.500h20" stroke="currentColor" stroke-width="1.800"/>',
+  wreck: '<path d="M8 18 14.500 3.500" stroke="currentColor" stroke-width="2.200" stroke-linecap="round"/><path d="M13.500 6.500l6.500 3-2.200 4-1.800-1.600-1.800 2.600Z" fill="currentColor"/><path d="M2 20.500q2.500-2.500 5 0t5 0 5 0 5 0" stroke="currentColor" stroke-width="1.800" fill="none" stroke-linecap="round"/>',
+};
+/** The pictogram of the good each bonus resource gives, as in the warehouse. */
+const BONUS: Record<string, string> = { corn: 'food', fish: 'fish', leaf: 'crops', fur: 'fur', timber: 'timber', silver: 'silver' };
+/** What stands on the map, each as one sign in the middle of its cell. Squares are places: a colony in its nation's colour, a smaller settlement in the natives' brown. Discs are units in their nation's colour.
+ * All of these have a white rim, but a settlement alarmed enough to attack (hostility 4 or more) has a red one. Ruins and wrecks are dark grey hexagons. A bonus resource is the bare pictogram of its good, thinly outlined, in the bottom right corner of its cell. */
+function overview(sp: Spaces, at: Put, near: (c: number) => boolean) {
+  // Signs have their own elements, so that they fade in as the pictures fade out (see `draw`).
+  const put: Put = (id, ...r) => at(`~${id}`, ...r);
+  const halo = (x: number, y: number, r: number) => `<circle cx="${x}" cy="${y}" r="${r + 6}" fill="#fff08a" fill-opacity=".25" stroke="#fff08a" stroke-width="4"/>`;
+  for (const [c, k] of Object.entries(D.poi)) put(`p${c}`, +c, 32, 32, (x, y) => hex(x + 32, y + 32, 14, GLYPH[k] ?? ''));
+  D.bonus.forEach((b, c) => { const n = b ? BONUS[b] : undefined; if (n && !colonyAt(c) && !settlementAt(c)) put(`b${c}`, c, 32, 32, (x, y) => `<g filter="url(#halo)"><svg x="${x + 41}" y="${y + 41}" width="22" height="22" viewBox="0 0 24 24">${SHAPES[n]}</svg></g>`, 1); });
+  for (const v of D.settlements) if (v.alive) {
+    const s = sp[`cell:${v.cell}`], on = s?.village || s?.attack, acts = on ? [...new Set((s.options ?? []).map((q) => pick(ACT[q.a] || ['', ''])))].join(' / ') : '';
+    put(`v${v.cell}`, v.cell, 32, 32, (x, y) => (on ? halo(x + 32, y + 32, 17) : '') + square(x, y, 34, NATIVE, GLYPH.tipi!, v.hostility >= 4 ? ALARM : '#fff', '#f4e2bc') + (v.ally !== null ? roundel(x + 38, y + 10, v.ally, 16) : '') + (on ? pill(x + 32, y + 62, acts) : ''));
+    if (!on && near(v.cell)) put(`h${v.cell}`, v.cell, 32, 32, (x, y) => count(v, x + 32, y + 50), 3000);
+  }
+  for (const c of D.colonies) {
+    const s = sp[`cell:${c.cell}`], war = warPlate(c, 0, 0);
+    put(`c${c.cell}`, c.cell, 32, 32, (x, y) => (s?.attack ? halo(x + 32, y + 32, 22) : '') + square(x, y, 44, D.players[c.owner]!.color, SHAPES.house!) + (warPlate(c, x, y + 4) ?? '') + (s?.attack ? pill(x + 32, y + 2, pick(ACT.attack)) : ''), 0, !!D.war);
+    if (near(c.cell) && !war) put(`h${c.cell}`, c.cell, 32, 32, (x, y) => colonyPlate(c, x + 32, y + 54), 3000);
+  }
+  const ships = new Map<number, number>();
+  D.players.forEach((p, i) => {
+    const mine = i === me;
+    if (typeof p.ship === 'number') {
+      const s = sp[`cell:${p.ship}`], hit = s?.attack && !mine, k = ships.get(p.ship) ?? 0, d = k * 12; ships.set(p.ship, k + 1);
+      put(`s${i}`, p.ship, 32 + d, 32 + d, (x, y) => (hit ? halo(x + 32, y + 32, 16) : '') + dot(x + 32 + d, y + 32 + d, 16, p.color, SHAPES.ship!) + (p.damage ? `<text x="${x + 46 + d}" y="${y + 24 + d}" font-size="15" font-weight="800" fill="#ff6a52" stroke="#1c2a2a" stroke-width="3" paint-order="stroke">−${p.damage}</text>` : '') + (hit ? pill(x + 32, y + 62, pick(ACT.attack)) : ''), 5);
+      if (near(p.ship) && !hit) put(`hs${i}`, p.ship, 32, 32, (x, y) => cargoPlate(i, x + 32, y + 50), 3000);
+    }
+    // Infantry in a colony sits on the corner of its square.
+    if (typeof p.inf === 'number') { const c = colonyAt(p.inf), s = sp[`cell:${p.inf}`], hit = s?.attack && !mine && !c, a = c ? 10 : 32, b = c ? 54 : 32; put(`i${i}`, p.inf, 32, 32, (x, y) => (hit ? halo(x + a, y + b, 12) : '') + dot(x + a, y + b, 12, p.color, SHAPES.infantry!) + (hit ? pill(x + 32, y + 60, pick(ACT.attack)) : ''), 6); }
+  });
+}
 /** Everything that stands on the map now. */
 function things(sp: Spaces) {
   const o: Thing[] = [], lift = !!S.card;
   const glow = (x: number, y: number) => `<ellipse cx="${x}" cy="${y}" rx="33" ry="13" fill="#fff08a" fill-opacity=".25" stroke="#fff08a" stroke-width="4"/>`, own = (x: number, y: number, r = 25) => `<ellipse cx="${x}" cy="${y}" rx="${r}" ry="${r * 0.36}" fill="none" stroke="#fff" stroke-width="3.400"/>`;
   const put = (id: string, c: number, dx: number, dy: number, html: (x: number, y: number) => string, z = 0, hit = false) => { if (shown && shown[c] === '0') return; const [x, y] = at(c); o.push({ id, x: x + dx, y: y + dy, z: Math.round(y + dy + z), hit, html: html(x, y) }); };
   // What lies on land that is still being painted waits for it.
+  const near = (c: number) => S.hov === c || S.look === c || S.over === `cell:${c}`;
+  if (far) overview(sp, put, near); else {
   // A wreck is drawn smaller than a ruin, with the same centre and bottom.
   for (const [c, k] of Object.entries(D.poi)) put(`p${c}`, +c, 32, 50, (x, y) => (k === 'ruin' ? SVG(x + 4, y + 2, 56, Sprite.ruin(+c)) : SVG(x + 10, y + 14, 44, Sprite.wreck(+c))));
   // Plates with numbers only for the cell under the pointer or the clicked one; at rest a colony shows whose it is.
-  const near = (c: number) => S.hov === c || S.look === c || S.over === `cell:${c}`;
   // A village grows with its people: 5 is a little larger than a cell's picture, 1 about two thirds of it.
   for (const v of D.settlements) if (v.alive) { const k = 0.58 + 0.1 * v.pop, s = sp[`cell:${v.cell}`], on = s?.village || s?.attack, acts = on ? [...new Set((s.options ?? []).map((q) => pick(ACT[q.a] || ['', ''])))].join(' / ') : ''; put(`v${v.cell}`, v.cell, 32, 56, (x, y) => (on ? glow(x + 32, y + 50) : '') + SVG(x + 32 - 32 * k, y + 53 - 57 * k, 64 * k, Sprite.village(v)) + (v.ally !== null ? roundel(x + 32 + 12 * k, y + 53 - 55 * k, v.ally, 22) : '') + (on ? pill(x + 32, y + 64, acts) : '')); if (!on && near(v.cell)) put(`h${v.cell}`, v.cell, 32, 56, (x, y) => count(v, x + 32, y + 57), 3000); }
   for (const c of D.colonies) { const s = sp[`cell:${c.cell}`]; put(`c${c.cell}`, c.cell, 32, 56, (x, y) => (s?.attack ? glow(x + 32, y + 50) : '') + SVG(x - 2, y - 6, 68, Sprite.colony(c)) + (warPlate(c, x, y) ?? roundel(x + 20, y + 52, c.owner, 24)) + (s?.attack ? pill(x + 32, y - 12, pick(ACT.attack)) : ''), 0, !!D.war); if (near(c.cell) && !warPlate(c, 0, 0)) put(`h${c.cell}`, c.cell, 32, 56, (x, y) => colonyPlate(c, x + 32, y + 57), 3000); }
   D.players.forEach((p, i) => {
     const mine = i === me;
     if (typeof p.ship === 'number') { const s = sp[`cell:${p.ship}`], hit = s?.attack && !mine; put(`s${i}`, p.ship, 32, 54, (x, y) => (hit ? glow(x + 32, y + 52) : mine ? own(x + 32, y + 54, 30) : '') + SVG(x, y - 3, 64, Sprite.ship(i)) + (p.damage ? `<text x="${x + 10}" y="${y + 14}" font-size="17" font-weight="800" fill="#ff6a52" stroke="#1c2a2a" stroke-width="3" paint-order="stroke">−${p.damage}</text>` : '') + (hit ? pill(x + 32, y + 66, pick(ACT.attack)) : '')); if (near(p.ship) && !hit) put(`hs${i}`, p.ship, 32, 54, (x, y) => cargoPlate(i, x + 32, y + 58), 3000); }
-    if (typeof p.inf === 'number') { const c = colonyAt(p.inf), s = sp[`cell:${p.inf}`], hit = s?.attack && !mine && !c; put(`i${i}`, p.inf, c ? 6 : 32, 58, (x, y) => (hit ? glow(x + 32, y + 54) : mine ? own(x + (c ? 6 : 32), y + (c ? 52 : 57), c ? 16 : 19) : '') + SVG(x + (c ? -22 : 0), y + (c ? 2 : 0), c ? 56 : 64, Sprite.infantry(i)) + (hit ? pill(x + 32, y + 68, pick(ACT.attack)) : ''), 2); }
+    // Infantry is drawn a little smaller than its 64-unit picture, with its feet where they were.
+    if (typeof p.inf === 'number') { const c = colonyAt(p.inf), s = sp[`cell:${p.inf}`], hit = s?.attack && !mine && !c; put(`i${i}`, p.inf, c ? 6 : 32, 58, (x, y) => (hit ? glow(x + 32, y + 54) : mine ? own(x + (c ? 6 : 32), y + (c ? 52 : 57), c ? 14 : 16) : '') + SVG(x + (c ? -18 : 5), y + 9, c ? 48 : 54, Sprite.infantry(i)) + (hit ? pill(x + 32, y + 68, pick(ACT.attack)) : ''), 2); }
   });
+  }
   if (lift) for (const [id, s] of Object.entries(sp)) {
     const c = +id.slice(5);
     if (s.gather) { const best = s.gather, dy = tokenAt(c) || colonyAt(c) ? 14 : 34, w = best.length * 33; put(`g${c}`, c, 32, dy, (x, y) => `<rect x="${x + 32 - w / 2}" y="${y + dy - 13}" width="${w}" height="27" rx="13.500" fill="${S.over === id ? '#fff08a' : '#f7f1e1'}"/>${best.map((b, i) => `<svg x="${x + 36 - w / 2 + i * 33}" y="${y + dy - 9}" width="17" height="17" viewBox="0 0 24 24">${SHAPES[Places.ico(b.icon)]}</svg><text x="${x + 55 - w / 2 + i * 33}" y="${y + dy + 6}" font-size="16" font-weight="800" fill="#1c2a2a">${b.n}</text>`).join('')}`, 2000); }
@@ -88,12 +143,14 @@ function things(sp: Spaces) {
   for (const p of Sim.placed) if (p.space?.startsWith('cell:') && p.space !== `cell:${home}`) put(`a${p.card}`, +p.space.slice(5), 50, 60, (x, y) => face(x + 50, y + 50, p.card, 14), 1000);
   return o;
 }
-$('defs').innerHTML = DEFS;
+/** A thin pale outline, so that a bare pictogram reads on water and on land alike. */
+const HALO = '<defs><filter id="halo" x="-30%" y="-30%" width="160%" height="160%"><feMorphology in="SourceAlpha" operator="dilate" radius="1.200" result="d"/><feFlood flood-color="#f7f1e1" flood-opacity=".9"/><feComposite in2="d" operator="in"/><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>';
+$('defs').innerHTML = DEFS + HALO;
 /** An element on the map and the thing it last showed. */
-interface Shown { el: HTMLDivElement; q?: Thing }
-const layer = document.querySelector<HTMLElement>('.sprites')!, paths = document.querySelector<SVGSVGElement>('svg.paths')!, sprites = new Map<string, Shown>();
+interface Shown { el: HTMLDivElement; q?: Thing; gone?: number }
+const layer = document.querySelector<HTMLElement>('.sprites')!, paths = document.querySelector<SVGSVGElement>('svg.paths')!, above = document.querySelector<SVGSVGElement>('svg.paths.top')!, sprites = new Map<string, Shown>();
 /** Keeps the elements in step with the game. Only what changed is drawn again. */
-function draw() {
+function draw(fade = false) {
   resize();
   // A new map: nothing stands on it until its terrain is painted (see `land`).
   if (`${Sim.s.seed} ${W}` !== painted) bare(true);
@@ -101,19 +158,24 @@ function draw() {
   for (const q of things(Places.spaces(S.card))) {
     now.add(q.id);
     let e = sprites.get(q.id);
-    if (!e) { e = { el: document.createElement('div') }; e.el.className = 'sp'; e.el.dataset.thing = q.id; layer.append(e.el); sprites.set(q.id, e); }
+    if (!e) { e = { el: document.createElement('div') }; e.el.className = fade ? 'sp in' : 'sp'; e.el.dataset.thing = q.id.replace('~', ''); layer.append(e.el); sprites.set(q.id, e); }
+    else if (e.gone) { clearTimeout(e.gone); e.gone = undefined; e.el.classList.remove('out'); }
     const was = e.q;
     if (was?.html !== q.html || was.x !== q.x || was.y !== q.y) e.el.innerHTML = `<svg viewBox="${q.x - 50} ${q.y - 66} 100 100" width="200" height="200">${q.html}</svg>`;
     if (was?.z !== q.z) e.el.style.zIndex = String(q.z);
     if (was?.hit !== q.hit) e.el.style.pointerEvents = q.hit ? 'auto' : 'none';
     e.q = q;
   }
-  for (const [id, e] of sprites) if (!now.has(id)) { e.el.remove(); sprites.delete(id); }
+  // Between the overview and the pictures, what leaves fades out (still following the map) while what comes fades in.
+  for (const [id, e] of sprites) if (!now.has(id) && !e.gone) { if (fade) { e.el.classList.add('out'); e.gone = window.setTimeout(() => { e.el.remove(); sprites.delete(id); }, 400); } else { e.el.remove(); sprites.delete(id); } }
   place();
 }
 /** Puts every element where its point of the map is on the screen now. */
 function place() {
   if (!cam) return;
+  // Zoomed far out or back in: everything is drawn again, as signs or as pictures.
+  const f = cam.get()[2] < whole() * FAR;
+  if (f !== far) { far = f; document.querySelector('.map-stage')!.classList.toggle('far', far); draw(true); return; }
   haze();
   for (const { el, q } of sprites.values()) if (q) { const [x, y, s] = cam.point(q.x, q.y); el.style.transform = `translate(${x.toFixed(1)}px,${y.toFixed(1)}px) scale(${(s / 2).toFixed(4)})`; }
   reach(); bubble();
@@ -125,7 +187,7 @@ function reach() {
   const mv = D.pending?.kind === 'move' && !Sim.busy ? B.moving() : null;
   // A decision that is answered by a cell on the map (where the ship starts, a free colony, a refuge): its cells are marked.
   const pick = PICK.has(Sim.kind() ?? '') ? new Set(Sim.legal().map((c) => c.cell).filter((c): c is number => typeof c === 'number')) : null;
-  if (!S.card && !mv && !pick) { if (paths.innerHTML) paths.innerHTML = ''; return; }
+  if (!S.card && !mv && !pick) { if (paths.innerHTML) paths.innerHTML = ''; if (above.innerHTML) above.innerHTML = ''; return; }
   const sp = S.card ? Places.spaces(S.card) : {}, pt = (x: number, y: number) => B.stage.point(x, y).slice(0, 2).map((v) => v.toFixed(1)).join(' '), quad = (c: number, q = 0) => { const [x, y] = at(c); return `M${pt(x + q, y + q)}L${pt(x + 64 - q, y + q)}L${pt(x + 64 - q, y + 64 - q)}L${pt(x + q, y + 64 - q)}Z`; };
   const sea = new Set<number>(), foot = new Set<number>(), closed = new Set<number>();
   if (pick) for (const c of pick) sea.add(c);
@@ -137,7 +199,10 @@ function reach() {
   const o: Partial<Opt>[] | null | undefined = h === null ? null : pick ? (pick.has(h) ? [{}] : null) : mv ? (way ? [{ path: way.path }] : closed.has(h) ? [{}] : null) : sp[over]?.options;
   const go = o?.find((q) => q.path?.length), inf = typeof P.inf === 'number' ? P.inf : P.ship, from = mv ? (mv.move.token === 'ship' ? P.ship : inf) : go?.a === 'moveInfantry' ? inf : P.ship;
   const sites = mv ? [...mv.ways].filter(([c, n]) => n.foot && !map.colonyProblem(Sim.s, c)).map(([c]) => c) : Object.entries(sp).filter(([id, s]) => id.startsWith('cell:') && s.site).map(([id]) => +id.slice(5)), flag = (c: number) => { const [x, y] = at(c), [a, b2] = B.stage.point(x + 50, y + 16); return `<g transform="translate(${a.toFixed(1)} ${b2.toFixed(1)})"><path d="M0 12V-9" stroke="#3a2614" stroke-width="2"/><path d="M1-9h11l-3 4 3 4H1Z" fill="#fff08a" stroke="#3a2614" stroke-width="1.200"/></g>`; };
-  paths.innerHTML = area(sea, 'sea') + area(foot, 'foot') + area(closed, 'closed') + (o?.length && h !== null ? `<path d="${quad(h, 3)}" fill="#fff08a" fill-opacity=".4" stroke="#fff" stroke-width="3.500" stroke-linejoin="round"/>` : '') + sites.map(flag).join('') + (go?.path ? `<polyline points="${[from, ...go.path].map((c: number) => { const [x, y] = at(c); return pt(x + 32, y + 32); }).join(',')}" class="way"/>` : '');
+  // The closed land to explore, and the pointer over it, are marked over the clouds.
+  const hit = o?.length && h !== null ? `<path d="${quad(h, 3)}" fill="#fff08a" fill-opacity=".4" stroke="#fff" stroke-width="3.500" stroke-linejoin="round"/>` : '', up = h !== null && !D.open[h];
+  above.innerHTML = area(closed, 'closed') + (up ? hit : '');
+  paths.innerHTML = area(sea, 'sea') + area(foot, 'foot') + (up ? '' : hit) + sites.map(flag).join('') + (go?.path ? `<polyline points="${[from, ...go.path].map((c: number) => { const [x, y] = at(c); return pt(x + 32, y + 32); }).join(',')}" class="way"/>` : '');
 }
 /* Bonus resources lie on the ground: painted once into their own layer of the map. */
 let grounded = '';
@@ -188,8 +253,7 @@ function sea() {
 /** Fit the board to the width of the game now loaded: the plane, the sea around it, and the pictures drawn for its size. Cheap when nothing changed. */
 function resize(first = false) {
   if (!syncWidth() && !first) return;
-  const inner = document.querySelector<HTMLElement>('.map-inner')!;
-  inner.style.width = inner.style.height = `${SIZE()}px`;
+  for (const p of document.querySelectorAll<HTMLElement>('.map-inner,.map-over')) p.style.width = p.style.height = `${SIZE()}px`;
   sea();
   // Drawn again for the new size the next time they are asked for.
   if (!first) { grounded = '!'; edged = ''; }
@@ -211,39 +275,41 @@ const bare = (on: boolean) => { hidden = on; document.querySelector('.map-stage'
 /** The whole picture being painted now, and when it is done: whoever asks for the same one again waits for it. */
 let painting = '', painted$: Promise<void> = Promise.resolve();
 const frame = () => new Promise((r) => requestAnimationFrame(() => setTimeout(r)));
-/** Paint the land as the game now is. On the same map only the part that changed is painted, at once: land explored, or closed again by Undo or a replay.
- * A new map, other trees, a change over much of it, or `whole`, is painted whole, in one go, behind the loading screen. */
+/** Paint the land as the game now is. The whole map is painted once, explored or not, under the clouds: exploring (or closing again by Undo or a replay)
+ * only redraws the clouds, at once. A new map, other trees, or `whole` paints the land again, in one go, behind the loading screen. */
 async function land(whole = false) {
   resize();
   const map = `${Sim.s.seed} ${W}`;
   if (map !== painted) { painted = map; whole = true; bare(true); }
-  const now = plan(SHARP); if (drawn === now.seen + now.tall && !whole) return;
-  const was = drawn, old = shown, same = !whole && !hidden && !!old && was.slice(-String(now.tall).length) === String(now.tall) && old.length === now.seen.length;
-  const changed = same ? [...now.seen].map((v, c) => (v !== old[c] ? c : -1)).filter((c) => c >= 0) : [];
-  drawn = now.seen + now.tall;
-  if (changed.length) {
-    const xs = changed.map((c) => c % W), ys = changed.map((c) => Math.floor(c / W)), box: [number, number, number, number] = [Math.min(...xs) * 64, Math.min(...ys) * 64, (Math.max(...xs) + 1) * 64, (Math.max(...ys) + 1) * 64];
-    if ((box[2] - box[0]) * (box[3] - box[1]) <= (SIZE() * SIZE()) / 4) {
-      await drawRich(terrain, { ...plan(SHARP), box });
-      shown = now.seen; draw(); if (S.view === 'colony') paint();
-      return;
-    }
-  }
-  const key = `${map} ${now.seen}${now.tall}`;
+  const now = plan(SHARP), pic = `${map} ${now.tall}`;
+  if (drawn === pic && !whole) { if (shown !== now.seen && !hidden) { shown = now.seen; clouds(); draw(); if (S.view === 'colony') paint(); } return; }
+  drawn = pic;
+  const key = pic;
   if (painting === key) return painted$; // already on its way
   painting = key;
   let done = () => {};
   painted$ = new Promise<void>((r) => { done = r; });
   await drawing;
   // A whole new picture holds the page for about a second: the loading screen shows first, unless the picture is at hand.
-  if (drawn === now.seen + now.tall && !isKept(now.K, now.seen)) { loading(true); await frame(); }
-  if (drawn !== now.seen + now.tall) { if (painting === key) painting = ''; done(); return; } // something newer is waiting
+  if (drawn === pic && !isKept(now.K, pic)) { loading(true); await frame(); }
+  if (drawn !== pic) { if (painting === key) painting = ''; done(); return; } // something newer is waiting
   if (S.view === 'colony') paint();
-  drawing = drawRich(terrain, now); await drawing; shown = now.seen; draw();
+  const { terrain: t, poi } = Sim.s.map;
+  drawing = drawRich(terrain, { ...now, seen: pic, truth: { terrain: t, poi } }); await drawing; shown = plan(SHARP).seen; clouds(); draw();
   if (painting === key) painting = '';
-  if (drawn === now.seen + now.tall) { bare(false); loading(false); }
+  if (drawn === pic) { bare(false); loading(false); }
   done();
   if (S.view === 'colony') paint();
+}
+/** Clouds over the closed cells, a little sharper than the land: drawn again only when what is open changes, and then only around the cells that changed. */
+let clouded = '';
+function clouds() {
+  const now = shown ?? '', was = clouded; if (was === now) return; clouded = now;
+  const changed = was.length === now.length ? [...now].map((v, c) => (v !== was[c] ? c : -1)).filter((c) => c >= 0) : [];
+  const xs = changed.map((c) => c % W), ys = changed.map((c) => Math.floor(c / W));
+  // Clouds thin out over less than a cell around the unknown.
+  const box: [number, number, number, number] | null = changed.length ? [(Math.min(...xs) - 1) * 64, (Math.min(...ys) - 1) * 64, (Math.max(...xs) + 2) * 64, (Math.max(...ys) + 2) * 64] : null;
+  drawClouds(document.querySelector<HTMLCanvasElement>('canvas.clouds')!, devicePixelRatio > 1 ? 2.6 : 2, box);
 }
 /** The token on the move: where it can still go, the closed fragments it could explore, and the legal choices; kept for the move and the length of the log. */
 interface Moving { move: Move; n: number; ways: Map<number, Way>; frags: number[]; legal: Opt[] }

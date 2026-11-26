@@ -8,8 +8,8 @@ export const S: { card: string | null; drag: string | null; over: string | null;
 /** Pages of the title screen; `null` while playing. */
 export type TitlePage = 'main' | 'new' | 'load' | 'options' | 'about' | 'bench';
 /** Boxes that are open: the King's army, the Governors sheet, the options menu, the glimpse behind a door, the sandbox panel; the title screen page. `last` keeps the order of goods in the heaps. */
-export const U: { king: boolean; sheet: boolean; menu: boolean; peek: 'west' | 'east' | null; title: TitlePage | null; last: { wh: string[]; hold: string[] }; sandbox: boolean } =
-  { king: false, sheet: false, menu: false, peek: null, title: 'main', last: { wh: [], hold: [] }, sandbox: false };
+export const U: { king: boolean; sheet: boolean; menu: boolean; peek: 'west' | 'east' | null; title: TitlePage | null; last: { wh: string[]; hold: string[] }; sandbox: boolean; deck: boolean } =
+  { king: false, sheet: false, menu: false, peek: null, title: 'main', last: { wh: [], hold: [] }, sandbox: false, deck: false };
 
 /** A report waiting to be read: a large card, or a short one in a panel. `after` runs once it is closed. */
 export interface Report { html: string; big?: boolean; after?: (() => void) | null }

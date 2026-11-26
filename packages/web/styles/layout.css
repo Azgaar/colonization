@@ -20,9 +20,6 @@ body[data-view=europe] .map-stage { transform:translateX(-9%) }
   #side { transform:scale(1.2);transform-origin:100% 100% }
 }
 @media (max-width:1180px) {
-  :root { --res:20px }
-  #heaps { left:18px;bottom:calc(var(--door) + 30px) }
-  .side { right:18px;bottom:calc(var(--door) + 26px);height:auto }
   .fan { width:270px }
 }
 @media (max-height:760px) {

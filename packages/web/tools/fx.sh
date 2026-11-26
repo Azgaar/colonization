@@ -9,7 +9,6 @@ seq() { # out, then pairs: file delay_ms
   ffmpeg -v error -y "${ins[@]}" -filter_complex "${fl}${labels}amix=inputs=$i:normalize=0:duration=longest" -ac 2 -c:a vorbis -strict -2 $T/$out.ogg
 }
 one() { ffmpeg -v error -y -i "$P/$2.ogg" -ac 2 -c:a vorbis -strict -2 $T/$1.ogg; }
-one click   interface-sounds/click_001
 one turn    interface-sounds/confirmation_002
 one reveal  interface-sounds/maximize_001
 one card    casino-audio/card-place-1

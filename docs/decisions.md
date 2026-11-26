@@ -53,6 +53,15 @@
 | DD-47 | Mountains carry no food bonus. The importer drops the three printed ones until the workbook is edited |
 | DD-48 | The prototype phase is over. The interface is TypeScript in `packages/web`, in strict mode, with minimal unit tests and no end-to-end tests for now |
 
+## Decided by the designer (2026-11-26)
+
+| # | Decision |
+|---|---|
+| DD-49 | Rule change "cube-strength-1" (direct) promoted from pc to board: Each King's army cube attacks with 1 ⚔️, not 2. / Каждый кубик армии короля атакует с силой 1 ⚔️, а не 2. Why: The King's army grows with every refusal at every seat (about 104 cubes at 4 players); colonies are defended by about 5, so 5% survive and the loyalist wins 87%. To carry into the sources: settings.war.refStrength → 1 (packages/data/src/settings.ts: war.refStrength) |
+| DD-50 | Rule change "refusal-no-bell" (direct) promoted from pc to board: Refusing the tax adds cubes to the King's army but gives no bell. / Отказ от налога добавляет кубики в армию короля, но не даёт колокола. Why: Refusing is free in bells and feeds the race to 15: refusals give 9 of 15 bells and end games early. To carry into the sources: settings.tax.refuseBells → 0 (packages/data/src/settings.ts: tax.refuseBells) |
+| DD-51 | Rule change "base-defence-4" (direct) dropped from pc. Why it was tried: A colony's own defence in the war is 1, too small against any share of the King's army |
+| DD-52 | Rule change "refusal-1-cube" (direct) promoted from pc to board: Refusing the tax adds 1 cube to the King's army, not 2 (solo unchanged). / Отказ от налога добавляет в армию короля 1 кубик, а не 2 (соло без изменений). Why: Each refusal adds 2 cubes to a pool shared by all patriots, so refusing is cheap for the refuser and costly for the others (H2). To carry into the sources: settings.tax.refuseRef → 1 (packages/data/src/settings.ts: tax.refuseRef) |
+
 ## Proposed in this PRD, awaiting confirmation
 
 | # | Proposal | Why | Cost if reversed |
@@ -98,3 +107,6 @@ Checked on the 15:13 versions. Done by the designer: activation rule, docks, oce
 | Document, Поселенец | "Базовых построек" is not in the spreadsheet; every building is cheaper | DD-6 |
 | Spreadsheet, Tiles | Remove 🌽 from tile 8 cell 3, tile 35 cell 6, tile 37 cell 7 (mountains) | DD-47 |
 | Document, Эквиано | Slaves go under the deck in the document, are removed in the spreadsheet | DD-6 |
+| Document, war | Each King's army cube attacks with 1 ⚔️, not 2 | DD-49 |
+| Document, tax | Refusing the tax gives no bell | DD-50 |
+| Document, tax | Refusing the tax adds 1 cube to the King's army, not 2 (solo unchanged) | DD-52 |

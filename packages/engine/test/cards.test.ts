@@ -139,15 +139,15 @@ function war(tactic: string, prepare: (s: State) => void = () => {}, n = 2, ref 
 }
 const finish = (s: State, ...dice: number[]) => { while (!s.over) { if (dice.length) rig(s, ...dice); act(s, legal(s).find((c) => c.c === 'keep' || c.n === 0 || c.c === 'skip')!); } return s.war!.sieges[0]; };
 const tactics: Record<string, () => void> = {
-  line_infantry: () => { const s = war('line_infantry', undefined, 2, 7); expect(siegeStrength(s, s.war!.sieges[0]).attack.total).toBe(14 + 2); },
-  ships_of_the_line: () => { const s = war('ships_of_the_line'); expect(siegeStrength(s, s.war!.sieges[0]).attack.total).toBe(6 + 2); },
+  line_infantry: () => { const s = war('line_infantry', undefined, 2, 7); expect(siegeStrength(s, s.war!.sieges[0]).attack.total).toBe(7 + 2); },
+  ships_of_the_line: () => { const s = war('ships_of_the_line'); expect(siegeStrength(s, s.war!.sieges[0]).attack.total).toBe(3 + 2); },
   native_scouts: () => { const d = (t: string) => { const s = war(t, (x) => { x.map.terrain[at(5, 5)] = 'mountains'; }); return siegeStrength(s, s.war!.sieges[0]).defence.total; }; expect([d('gentlemans_war'), d('native_scouts')]).toEqual([3, 1]); },
   hessian_mercenaries: () => expect(war('hessian_mercenaries').war!.pool).toBe(7),
-  surprise_assault: () => { expect(finish(war('surprise_assault', undefined, 2, 1), 6).fell).toBe(true); expect(finish(war('gentlemans_war', undefined, 2, 1), 6).fell).toBe(false); },
+  surprise_assault: () => { expect(finish(war('surprise_assault', undefined, 2, 2), 6).fell).toBe(true); expect(finish(war('gentlemans_war', undefined, 2, 2), 6).fell).toBe(false); },
   siege_artillery: () => { const d = (t: string) => { const s = war(t, (x) => build(x, 0, 'stockade', 'fort')); return siegeStrength(s, s.war!.sieges[0]).defence.total; }; expect([d('gentlemans_war'), d('siege_artillery')]).toEqual([3, 1]); },
   loyalist_militia: () => { const s = war('loyalist_militia', (x) => { P(x, 1).crosses = 5; }); expect(s.war!.sieges[0].militia).toBe(5); },
-  extended_supply_lines: () => { expect(finish(war('extended_supply_lines', undefined, 2, 2), 4, 1, 1).fell).toBe(false); expect(finish(war('extended_supply_lines', undefined, 2, 2), 4, 4, 1).fell).toBe(true); },
-  gentlemans_war: () => { const s = war('gentlemans_war'); expect(siegeStrength(s, s.war!.sieges[0]).attack.total).toBe(6); },
+  extended_supply_lines: () => { expect(finish(war('extended_supply_lines', undefined, 2, 4), 4, 1, 1).fell).toBe(false); expect(finish(war('extended_supply_lines', undefined, 2, 4), 4, 4, 1).fell).toBe(true); },
+  gentlemans_war: () => { const s = war('gentlemans_war'); expect(siegeStrength(s, s.war!.sieges[0]).attack.total).toBe(3); },
 };
 
 const act1 = (hostility: number) => { const s = home(2); s.map.terrain[at(9, 9)] = 'grassland'; settle(s, 'aztec', at(9, 9), { hostility }); return s; };

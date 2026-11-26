@@ -15,10 +15,12 @@
 .mini em { font-style:normal;font-weight:800;font-size:17px;white-space:nowrap }
 .mini em.no { color:#a8321f }
 .court .gear { width:38px;height:38px;border-radius:50%;background:#0f3436cc;display:grid;place-items:center;margin-left:4px }
-/* Beside the hand, set apart from it: one column of even buttons. Pass is the plain end of a turn, and stands out when it is the only thing left. */
-.acts { display:flex;flex-direction:column;gap:8px;width:122px;margin:0 0 calc(18px + var(--skirt)) 40px;align-self:flex-end;transition:opacity .2s }
-.acts button { display:flex;align-items:center;justify-content:center;gap:7px;height:40px;padding:0 12px;border-radius:12px;font:800 16px/1 var(--sc);background:#0c2d33e6;border:1.500px solid #f7f1e140;box-shadow:0 6px 16px #0007;transition:background .15s,border-color .15s }
-.acts button:hover { background:#174a4af2;border-color:#f7f1e180 }
+/* Beside the hand, set apart from it: one column of flat buttons, like the game's panels. Pass, the end of a turn, is bone like the King's button, and ochre when it is the only thing left. */
+.acts { display:flex;flex-direction:column;gap:8px;width:128px;margin:0 0 calc(18px + var(--skirt)) 40px;align-self:flex-end;transition:opacity .2s }
+.acts button { display:flex;align-items:center;justify-content:center;gap:7px;height:40px;padding:0 14px;border-radius:12px;font:800 17px/1 var(--sc);background:var(--glass);box-shadow:0 6px 16px #0007;transition:background .15s }
+.acts button:hover { background:var(--deep2) }
 .acts button svg { flex:none }
-.acts .pass.now { background:var(--bone);color:var(--ink);border-color:var(--hot);box-shadow:0 0 0 4px #fff08a80,0 6px 16px #0007 }
-.acts .undo { color:var(--bone) }
+.acts .pass { background:var(--bone);color:var(--ink) }
+.acts .pass:hover { background:#fff8d6 }
+.acts .pass.now { background:var(--ochre);color:#3a2408;box-shadow:0 0 0 4px #fff08a80,0 6px 16px #0007 }
+.acts .undo { height:34px;font-size:15px }

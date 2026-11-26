@@ -24,6 +24,11 @@ export function exportRules(def: GameDef) {
     flavor: { father: flavor(def.fathers), event: flavor(def.events), ruin: flavor(def.ruins), wreck: flavor(def.wrecks) },
   };
 }
+/** Agents in name order, in the language shown: the order they were drawn in would tell what comes next. */
+function byName(def: GameDef, cards: string[]) {
+  const ru = typeof document !== 'undefined' && document.documentElement.lang === 'ru', name = (c: string) => (ru ? def.agents[c].ru : def.agents[c].en);
+  return cards.slice().sort((a, b) => name(a).localeCompare(name(b), ru ? 'ru' : 'en') || a.localeCompare(b));
+}
 export function exportState(s: State, me: number) {
   const def = s.def, pl = s.players[me], cards = [...new Set(pl.hand)], mine = s.pending?.player === me && s.pending.kind === 'turn';
   const open = (c: number) => map.isOpen(s, c), fleet = workableCells(s, me);
@@ -41,7 +46,7 @@ export function exportState(s: State, me: number) {
     }),
     settlements: s.settlements.map((x) => ({ ...x, hostility: s.hostility[x.tribe], loot: def.tribes[x.tribe].loot, terrain: s.map.terrain[x.cell] })),
     players: s.players.map((p, i) => ({
-      ...structuredClone(p), hand: i === me ? p.hand.slice() : p.hand.length, deck: i === me ? p.deck.slice().sort() : p.deck.length, discard: p.discard.slice(),
+      ...structuredClone(p), hand: i === me ? byName(def, p.hand) : p.hand.length, deck: i === me ? byName(def, p.deck) : p.deck.length, discard: p.discard.slice(),
       agents: util.collection(p).length, score: scorePlayer(s, i).score, parts: scorePlayer(s, i).parts, color: def.nations[p.nation].color,
     })),
     price: { ...s.price }, demand: { ...s.demand }, pier: s.pier.map((x) => [x[0], x.length] as [string, number]), salon: s.salon.slice(), ref: s.ref, left: { ...s.buildingsLeft }, cap: util.warehouseCap(s, me), loyal: findLoyalist(s),

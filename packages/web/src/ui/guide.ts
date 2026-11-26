@@ -3,6 +3,7 @@
 import { $, D, L, lang } from '../data.ts';
 import { icon } from '../icons.ts';
 import { esc } from './md.ts';
+import { plural } from '../plural.ts';
 
 type Pair = [string, string];
 interface Section { id: string; title: Pair; items: Pair[] }
@@ -24,7 +25,7 @@ function sections(): Section[] {
       [`Draw up to ${s.hand.size} agents. An empty deck is refilled by shuffling your discard.`, `Доберите агентов до ${s.hand.size}. Пустая колода пополняется перемешанным сбросом.`],
       ['In turn, each player plays one agent for one action. Passing ends your round; the others go on until all have passed.', 'По очереди каждый разыгрывает одного агента на одно действие. Пас заканчивает ваш тур; остальные продолжают, пока не спасуют все.'],
       ['Then the top event happens, and the King asks for his tax.', 'Затем срабатывает верхнее событие, и король требует налог.'],
-      [`Tax by round: ${tax.join(', ')} ${ic('gold')}. Pay in full, or refuse: +${s.tax.refuseRef} cubes to the King’s army (solo +${s.tax.refuseRefSolo}) and +${s.tax.refuseBells} ${ic('bells')}. Who cannot pay must refuse.`, `Налог по турам: ${tax.join(', ')} ${ic('gold')}. Заплатите полностью или откажитесь: +${s.tax.refuseRef} кубика в армию короля (соло +${s.tax.refuseRefSolo}) и +${s.tax.refuseBells} ${ic('bells')}. Кто не может заплатить, обязан отказаться.`],
+      [`Tax by round: ${tax.join(', ')} ${ic('gold')}. Pay in full, or refuse: +${s.tax.refuseRef} ${s.tax.refuseRef === 1 ? 'cube' : 'cubes'} to the King’s army (solo +${s.tax.refuseRefSolo})${s.tax.refuseBells ? ` and +${s.tax.refuseBells} ${ic('bells')}` : ''}. Who cannot pay must refuse.`, `Налог по турам: ${tax.join(', ')} ${ic('gold')}. Заплатите полностью или откажитесь: +${s.tax.refuseRef} ${plural(s.tax.refuseRef, 'кубик', 'кубика', 'кубиков')} в армию короля (соло +${s.tax.refuseRefSolo})${s.tax.refuseBells ? ` и +${s.tax.refuseBells} ${ic('bells')}` : ''}. Кто не может заплатить, обязан отказаться.`],
       [`Free on your turn: recruit with crosses ${ic('crosses')} (as many as the round number) to look at the top agent of the Europe deck and take it, or put it back.`, `Бесплатно в свой ход: вербовка за кресты ${ic('crosses')} (столько, какой идёт тур): посмотрите верхнего агента колоды Европы и возьмите его или верните.`],
     ] },
     { id: 'agents', title: ['Agents', 'Агенты'], items: [

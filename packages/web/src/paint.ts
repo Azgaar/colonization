@@ -1,5 +1,5 @@
 /* Drawing everything again after any change. */
-import { P } from './data.ts';
+import { me, P } from './data.ts';
 import { picker } from './input.ts';
 import { Board } from './map/board.ts';
 import { Places } from './places.ts';
@@ -25,6 +25,7 @@ export function paint() {
   const b = document.body; b.classList.toggle('lift', !!S.card); b.dataset.view = S.view; b.classList.toggle('war', S.war >= 0); b.classList.toggle('busy', Sim.busy);
   // The title screen first: whether it covers the table decides what can be measured below (card names are fitted to their cards).
   title(); const sp = Places.spaces(S.card); top(); menu(); hand(sp); fans(sp); peek(); scenes(sp); details(); paintStep(); war(); replayBar(); sandbox(); advisor(); coach(); guide(); Board.edge(); Board.ground(); Board.draw(); picker(); marks();
-  mood(U.title ? 'title' : D.over ? null : D.war ? 'war' : D.round >= 8 || D.players.some((p) => p.bells >= 10) ? 'tension' : D.round <= 3 ? 'explore' : 'colony');
+  // The signature piece on the main menu; one rotation for the game; marches for the War of Independence; one piece for the end, won or lost.
+  mood(U.title ? 'menu' : D.over ? (D.over.winners.includes(me) ? 'won' : 'lost') : D.war ? 'war' : 'game');
 }
 const marks = () => document.querySelectorAll<HTMLElement>('[data-space]').forEach((e) => { const s = S.card ? Places.spaces(S.card)[e.dataset.space!] : null; e.classList.toggle('ok', !!s?.options?.length); e.classList.toggle('off', !!S.card && !s?.options?.length); });

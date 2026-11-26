@@ -99,9 +99,9 @@ export function determinize(v: View, rng: Rng): State {
 // --- Search ------------------------------------------------------------------------
 
 export interface Budget {
-  /** Thinking time per decision. Used only when `iterations` is not given. */
+  /** Thinking time per decision at most. Used alone when `iterations` is not given. */
   ms?: number;
-  /** Samples per decision. When given, the bot is deterministic. */
+  /** Samples per decision. Given alone, the bot is deterministic; given with `ms`, it stops at whichever comes first. */
   iterations?: number;
 }
 export interface SearchOptions extends Budget {
@@ -120,6 +120,8 @@ export interface SearchOptions extends Budget {
   confidence?: number;
   /** Points by which it must beat it at least: small leads come from the rough worth of goods, which the goal bot judges better. */
   least?: number;
+  /** Stop early once no candidate can still beat the goal bot's choice by `least` (two standard errors above its mean lead stay below it). Saves most of the time, as most decisions end there. */
+  settle?: boolean;
 }
 export interface SearchBot extends GoalBot { stats: { decisions: number; searched: number; iterations: number; ms: number; errors: number } }
 
@@ -184,7 +186,18 @@ export function searchBot(seed: string, o: SearchOptions = {}): SearchBot {
       // Common random numbers: candidates are compared on the same truths and dice, which removes most of the luck from the difference.
       const truths: State[] = [], base = sample;
       let total = 0, all = 0, allSq = 0, n = 0;
-      const enough = () => (o.iterations !== undefined ? total >= o.iterations : performance.now() - t0 >= (o.ms ?? 3000));
+      // How each candidate did against the goal bot's choice on the same truths: the mean lead and its standard error.
+      const lead = (a: Arm) => {
+        const d: number[] = [];
+        a.res.forEach((x, j) => { const y = arms[0].res[j]; if (x !== undefined && y !== undefined) d.push(x - y); });
+        if (d.length < 2) return null;
+        const m = d.reduce((k, x) => k + x, 0) / d.length, sd = Math.sqrt(d.reduce((k, x) => k + (x - m) ** 2, 0) / (d.length - 1));
+        return { mean: m, se: sd / Math.sqrt(d.length) };
+      };
+      // Settled: every other candidate was tried enough, and none could still lead by `least`.
+      const settled = () => arms.every((a, i) => { if (!i) return true; const g = a.tries >= 6 ? lead(a) : null; return !!g && g.mean + 2 * g.se < least; });
+      const enough = () => (o.iterations !== undefined && total >= o.iterations) || ((o.iterations === undefined || o.ms !== undefined) && performance.now() - t0 >= (o.ms ?? 3000))
+        || (!!o.settle && total >= arms.length * 8 && total % arms.length === 0 && settled());
       while (!enough()) {
         // Exploration scaled by how much results vary, as points differ between games and player counts.
         const spread = n > 1 ? Math.max(1, Math.sqrt(Math.max(0, allSq / n - (all / n) ** 2))) : 1;
@@ -215,11 +228,9 @@ export function searchBot(seed: string, o: SearchOptions = {}): SearchBot {
       bot.stats.searched++; bot.stats.iterations += total; bot.stats.ms += ms;
       // Leave the goal bot's choice only for a candidate that does better on the same truths by more than the noise.
       const gain = arms.map((a) => {
-        const d: number[] = [];
-        a.res.forEach((x, j) => { const y = arms[0].res[j]; if (x !== undefined && y !== undefined) d.push(x - y); });
-        if (d.length < 2) return { mean: 0, sure: a === arms[0] ? 0 : -Infinity };
-        const m = d.reduce((k, x) => k + x, 0) / d.length, sd = Math.sqrt(d.reduce((k, x) => k + (x - m) ** 2, 0) / (d.length - 1));
-        return { mean: m, sure: Math.min(m - confidence * sd / Math.sqrt(d.length), m - least) };
+        const g = lead(a);
+        if (!g) return { mean: 0, sure: a === arms[0] ? 0 : -Infinity };
+        return { mean: g.mean, sure: Math.min(g.mean - confidence * g.se, g.mean - least) };
       });
       const order = arms.map((a, i) => ({ a, i })).sort((x, y) => (y.i === 0 ? 0 : gain[y.i].sure) - (x.i === 0 ? 0 : gain[x.i].sure) || gain[y.i].mean - gain[x.i].mean || x.i - y.i);
       // The choice made first; the rest best to worst, by how they did against the goal bot's choice on the same truths.

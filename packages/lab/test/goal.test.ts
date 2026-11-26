@@ -76,7 +76,7 @@ describe('war planning', () => {
     s.revealed = s.revealed.map(() => true);
     s.colonies = land.map((cell) => ({ cell, owner: 0 }));
     s.players[0].inf = 'europe';
-    s.war = { loyalist: 1, tactic: 'gentlemans_war', pool: 8, order: [0, 1], spent: { 0: { bells: 0, gold: 0 } }, sieges: land.map((cell) => ({ owner: 0, cell, cubes: 4, loyalist: [], militia: 0, army: [], support: 0, betrayed: 0 })) };
+    s.war = { loyalist: 1, tactic: 'gentlemans_war', pool: 16, order: [0, 1], spent: { 0: { bells: 0, gold: 0 } }, sieges: land.map((cell) => ({ owner: 0, cell, cubes: 8, loyalist: [], militia: 0, army: [], support: 0, betrayed: 0 })) };
     s.pending = { kind: 'placeCards', player: 0, side: 'army', _cards: ['dragoon', 'dragoon', 'soldier'] };
     const r = planDefence(viewFor(s, 0), ['dragoon', 'dragoon', 'soldier'], { freeCubes: 0, maxMilitia: 0, perBell: 1, maxMercs: 0, bellCost: 1, goldCost: 0.5 });
     expect(new Set(r.assign.values()).size).toBe(1);

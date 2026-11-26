@@ -1,15 +1,12 @@
 /* The top line, the King's army box, the Governors sheet and the game menu. */
-import { $, D, L, lang, logLine, me, P, placeOf, t } from '../data.ts';
+import { $, D, L, logLine, me, P, placeOf, t } from '../data.ts';
 import type { Entry } from '../sim.ts';
 import { icon } from '../icons.ts';
-import { Board } from '../map/board.ts';
 import { Places } from '../places.ts';
-import { Dev, LOCAL, Sim } from '../sim.ts';
+import { Dev, Sim } from '../sim.ts';
 import { outlook } from '../forecast.ts';
 import { S, U } from '../state.ts';
-import { Sound } from '../sound.ts';
-import { vol } from './title.ts';
-import { tutorialOn } from './tutorial.ts';
+import { settings } from './settings.ts';
 export function top() {
   const A = Places.army(), f = Math.PI * 2 * (D.round / 10), who = D.over ? null : Sim.busy ? D.turnOf : D.pending ? me : D.turnOf;
   $('date').innerHTML = `<svg class="dial" viewBox="0 0 46 46"><circle cx="23" cy="23" r="18" fill="none" stroke="#ffffff38" stroke-width="7"/><path d="M23 5A18 18 0 ${D.round > 5 ? 1 : 0} 1 ${23 + 18 * Math.sin(f)} ${23 - 18 * Math.cos(f)}" fill="none" stroke="#edb443" stroke-width="7"/><text x="23" y="29" text-anchor="middle" font-size="17" font-weight="800" fill="#f7f1e1">${D.round}</text></svg><div><b>${D.year}</b><small>${t('tax')} ${D.tax} ${icon('gold', 15)}</small></div><button class="king" data-king title="${t('ref')}">${icon('ref', 30)}<span><b>${A.ref}</b><small>${t('ref')}</small></span></button>`;
@@ -34,28 +31,9 @@ ${cols ? `<div class="fc head"><span>${L('Your colonies', 'Ваши колони
 export function menu() {
   $('menu').hidden = !U.menu;
   if (!U.menu) return;
-  const v = Board.view;
-  const act = (attr: string, name: string, off = false, why = '') => `<button class="act" ${attr}${off ? ` disabled title="${why}"` : ''}>${name}</button>`;
-  const seg = (name: string, list: [k: string, n: string, on?: boolean][]) => `<div class="row"><span>${name}</span><span class="set">${list.map(([k, n, on]) => `<button class="${on ? 'on' : ''}" ${on ? '' : k}>${n}</button>`).join('')}</span></div>`;
-  const slide = ([k, n, lo, hi, u]: [keyof typeof v, string, number, number, string]) => `<label class="row"><span>${n}</span><input type="range" data-view-set="${k}" data-unit="${u}" min="${lo}" max="${hi}" value="${v[k]}"><output>${v[k]}${u}</output></label>`;
-  $('menu').innerHTML = `${act('data-t-open="main"', L('Main menu', 'Главное меню'))}
+  const act = (attr: string, name: string, off = false, why = '') => `<button ${attr}${off ? ` disabled title="${why}"` : ''}>${name}</button>`;
+  $('menu').innerHTML = `<div class="do">${act('data-t-open="main"', L('Main menu', 'Главное меню'))}
 ${Sim.replay ? '' : `${act('data-save-file', L('Save to a file', 'Сохранить в файл'))}
 ${act('data-auto="round"', L('Automate round', 'Автоматизировать тур'), !!D.over, L('The war is over', 'Война окончена'))}`}
-${act('data-guide', L('Rules', 'Правила'))}
-<h4>${L('Settings', 'Настройки')}</h4>
-${seg(L('Language', 'Язык'), [['data-lang="en"', 'English', lang() === 'en'], ['data-lang="ru"', 'Русский', lang() === 'ru']])}
-${seg(L('Tutorial', 'Обучение'), [['data-tutorial="1"', L('On', 'Да'), tutorialOn()], ['data-tutorial=""', L('Off', 'Нет'), !tutorialOn()]])}
-${seg(L('Other players', 'Другие игроки'), [['data-fast=""', L('Show each', 'Показывать'), !Sim.fast], ['data-fast="1"', L('At once', 'Сразу'), Sim.fast]])}
-${seg(L('Sound', 'Звук'), [['data-mute=""', L('On', 'Да'), !Sound.mute], ['data-mute="1"', L('Off', 'Нет'), Sound.mute]])}
-${Sound.mute ? '' : `${vol('row', 'music', L('Music', 'Музыка'))}${vol('row', 'fx', L('Effects', 'Эффекты'))}`}
-${LOCAL ? seg(L('Dev mode', 'Режим разработчика'), [['data-dev="1"', L('On', 'Да'), Dev.on], ['data-dev=""', L('Off', 'Нет'), !Dev.on]]) : ''}
-${Dev.on ? `${seg(L('Forecast', 'Прогноз'), [['data-forecast="1"', L('On', 'Да'), Dev.forecast], ['data-forecast=""', L('Off', 'Нет'), !Dev.forecast]])}${Sim.sandbox ? `<div class="row"><span>${L('Edit the game', 'Правка игры')}</span><span class="set"><button data-sandbox>${L('Dev menu', 'Меню разработчика')}</button></span></div>` : ''}` : ''}
-<h4>${L('Map', 'Карта')}</h4>
-${seg(L('Camera', 'Камера'), [['data-cam="out" aria-label="−"', '−'], ['data-cam="in" aria-label="+"', '+'], ['data-cam="home"', L('Start', 'Начало')], ['data-cam="fit"', L('All', 'Всё')]])}
-${seg(L('Tilt follows zoom', 'Наклон по масштабу'), [['data-follow="1"', L('On', 'Да'), !!v.auto], ['data-follow=""', L('Off', 'Нет'), !v.auto]])}
-${slide(v.auto ? ['most', L('Closest tilt', 'Наклон вблизи'), 20, 70, '°'] : ['tilt', L('Tilt', 'Наклон'), 0, 45, '°'])}
-${slide(['depth', L('Perspective', 'Перспектива'), 0, 100, '%'])}
-${slide(['shift', L('Shift', 'Сдвиг'), -25, 25, '%'])}
-${seg(L('Cell grid', 'Сетка'), [['data-grid=""', L('Off', 'Нет'), !Board.grid], ['data-grid="1"', L('On', 'Да'), Board.grid]])}
-<button class="reset" data-reset>${L('Reset the map view', 'Сбросить вид карты')}</button>`;
+${act('data-guide', L('Rules', 'Правила'))}</div>${settings(true)}`;
 }

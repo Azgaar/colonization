@@ -52,11 +52,15 @@ body.loading .brand.enter,body.loading .menu-t.enter { animation-play-state:paus
 .title .page dd { margin:0;opacity:.85 }
 .title .page .note { opacity:.7;font-size:14.5px;margin-top:14px }
 .title .page code { background:#ffffff1a;padding:1px 6px;border-radius:6px;font-size:14px }
-.title .page .orow { display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid #ffffff14 }
 .title .page .wide { display:flex;align-items:center;gap:8px;width:100%;padding:12px 16px;border-radius:14px;background:#ffffff14;font-weight:800 }
 .title .page .wide:hover { background:#ffffff24 }
 .title .page .pback { margin-top:18px;padding:7px 18px;border-radius:99px;background:#ffffff14;font:800 16px var(--sc) }
 .title .page .empty { opacity:.75 }
+/* Options: the settings' sections in two columns, one where the page is narrow */
+.title .page .prefs { display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:4px 32px;align-items:start }
+.title .page .prefs section+section { margin-top:0 }
+.title .page .prefs>section { min-width:0 }
+.title .page .prefs .ohead { border-top:0;padding-top:0 }
 .title .save .em,.ng .hero .em { background-image:radial-gradient(circle at 34% 28%,#ffffff40,#fff0 58%);border-width:3px }
 .title .save { display:grid;grid-template-columns:auto 1fr auto;gap:16px;align-items:center;padding:14px 16px;border-radius:16px;background:#ffffff10 }
 .title .save b { display:block;font:800 22px var(--sc) }
@@ -154,9 +158,6 @@ body.loading .brand.enter,body.loading .menu-t.enter { animation-play-state:paus
 .intro .skip:hover { background:#ffffff2b }
 .intro kbd { font:700 12px var(--ui);padding:1px 6px;border-radius:5px;background:#ffffff26 }
 @media (prefers-reduced-motion:reduce) { .title .mist,.hero .ph { animation:none!important } }
-.title .page .vol input { flex:1;max-width:240px;accent-color:var(--ochre) }
-.title .page .vol output { min-width:3.2em;text-align:right;font-weight:800;font-variant-numeric:tabular-nums }
-.vol input:disabled { opacity:.35 }
 .title .page .credits { list-style:none;padding:0;display:grid;gap:6px }
 .title .page .credits a { color:inherit;text-decoration:none;border-bottom:1px solid #ffffff30 }
 .title .page .credits a:hover { border-color:var(--ochre) }

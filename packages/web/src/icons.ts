@@ -7,7 +7,7 @@ export const SHAPES: Record<string, string> = {
   fish: '<path d="M3 12c4-6 11-6 15-1l4-4v10l-4-4c-4 5-11 5-15-1Z" fill="#5c93bd"/><circle cx="8" cy="11" r="1.2" fill="#12324a"/>',
   timber: '<rect x="2" y="13" width="20" height="7" rx="3.5" fill="#8a5a33"/><rect x="5" y="5" width="17" height="7" rx="3.5" fill="#a06c40"/><circle cx="5.5" cy="16.5" r="2.3" fill="#d9ae7c"/><circle cx="8.5" cy="8.5" r="2.3" fill="#e3bd8f"/>',
   crops: '<path d="M4 20C4 9 10 3 20 3c1 10-4 16-13 16" fill="#4f9a45"/><path d="M3 21 15 9" stroke="#2d6a2e" stroke-width="1.6"/>',
-  fur: '<path d="M4 15c0-6 4-9 9-9 4 0 7 3 7 7 0 5-4 7-8 7-5 0-8-2-8-5Z" fill="#7d5535"/><circle cx="16" cy="11" r="1.1" fill="#1d120a"/><path d="M4 16c-2 1-2 4 0 4l5-1" fill="#5d3d25"/>',
+  fur: '<path d="M12 21.8 7.4 17.6 1.8 13.4l2.4-1.3-.6-9.6 5.6 4.8h5.6l5.6-4.8-.6 9.6 2.4 1.3-5.6 4.2Z" fill="#d0662a"/><path d="M5.2 5.4l2.6 2.4-2.4 1.6Zm13.6 0-2.6 2.4 2.4 1.6Z" fill="#5a2a12"/><path d="M1.8 13.4c4 .2 7.2 1.2 10.2 3.6 3-2.4 6.2-3.4 10.2-3.6l-5.6 4.2L12 21.8l-4.6-4.2Z" fill="#f4ece0"/><circle cx="12" cy="20" r="1.4" fill="#1d120a"/><ellipse cx="8.6" cy="11.4" rx=".9" ry="1.1" fill="#1d120a"/><ellipse cx="15.4" cy="11.4" rx=".9" ry="1.1" fill="#1d120a"/>',
   goods: '<path d="M3 7l9-4 9 4v10l-9 4-9-4Z" fill="#3f86c6"/><path d="M3 7l9 4 9-4M12 11v10" stroke="#1f4e7d" stroke-width="1.4" fill="none"/>',
   silver: '<path d="M5 8h14l3 10H2Z" fill="#c3c9cf"/><path d="M5 8h14l1 3H4Z" fill="#eef1f3"/>',
   gold: '<circle cx="12" cy="12" r="9" fill="#e8b923"/><circle cx="12" cy="12" r="6" fill="none" stroke="#a97c0b" stroke-width="1.5"/>',

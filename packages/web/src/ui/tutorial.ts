@@ -3,6 +3,7 @@
 import type { State } from '@col/engine';
 import { $, D, L, lang, me } from '../data.ts';
 import { icon } from '../icons.ts';
+import { plural } from '../plural.ts';
 import { paint } from '../paint.ts';
 import { Sim } from '../sim.ts';
 import { U } from '../state.ts';
@@ -49,8 +50,8 @@ function steps(): Step[] {
       `When you have done what you want, Pass. When everybody has passed, the round ends: an event happens, the King asks for his tax, and you draw back up to ${s.hand.size} agents.`,
       `Когда сделаете, что хотели, нажмите «Пас». Когда спасуют все, тур заканчивается: происходит событие, король требует налог, и вы добираете агентов до ${s.hand.size}.`], done: (x) => x.round >= 2, hi: '.acts .pass' },
     { title: ['The King’s tax', 'Налог короля'], text: [
-      `At the end of this round the King asks for ${ic('gold')} gold. Pay, or refuse: a refusal gives you ${s.tax.refuseBells} ${ic('bells')} but adds ${rr} soldiers to the King’s army ${ic('ref')}. Bells measure your rebellion and pay for Founding Fathers.`,
-      `В конце этого тура король потребует ${ic('gold')} золото. Заплатите или откажитесь: отказ даёт вам ${s.tax.refuseBells} ${ic('bells')}, но добавляет ${rr} солдат в армию короля ${ic('ref')}. Колокола — мера вашего мятежа, ими же платят за Отцов-основателей.`], done: (x) => mine(x, 'tax'), hi: '.king' },
+      `At the end of this round the King asks for ${ic('gold')} gold. Pay, or refuse: a refusal ${s.tax.refuseBells ? `gives you ${s.tax.refuseBells} ${ic('bells')} but ` : ''}adds ${rr} ${rr === 1 ? 'soldier' : 'soldiers'} to the King’s army ${ic('ref')}. Bells measure your rebellion and pay for Founding Fathers.`,
+      `В конце этого тура король потребует ${ic('gold')} золото. Заплатите или откажитесь: отказ ${s.tax.refuseBells ? `даёт вам ${s.tax.refuseBells} ${ic('bells')}, но ` : ''}добавляет ${rr} ${plural(rr, 'солдата', 'солдат', 'солдат')} в армию короля ${ic('ref')}. Колокола — мера вашего мятежа, ими же платят за Отцов-основателей.`], done: (x) => mine(x, 'tax'), hi: '.king' },
     { title: ['The War of Independence', 'Война за независимость'], text: [
       `The game ends with a war, after the round in which ${solo ? 'you reach' : 'someone reaches'} ${s.war.bells} ${ic('bells')}, or after round ${s.rounds.max}. ${solo ? '' : 'The governor with the fewest bells joins the King; the others fight for independence. '}The King’s army ${ic('ref')}, every soldier collected plus one per hostile village, attacks ${solo ? 'your colonies' : 'their colonies'}. Defend with agents with ${ic('sword')}, militia paid in bells and mercenaries paid in gold; a colony attacked by a stronger force falls.`,
       `Игра кончается войной — после тура, в котором ${solo ? 'вы наберёте' : 'кто-то наберёт'} ${s.war.bells} ${ic('bells')}, или после ${s.rounds.max}-го тура. ${solo ? '' : 'Губернатор с наименьшим числом колоколов переходит на сторону короля; остальные воюют за независимость. '}Армия короля ${ic('ref')} — все собранные солдаты плюс по одному за враждебное поселение — нападает на ${solo ? 'ваши колонии' : 'их колонии'}. Защищайтесь агентами с ${ic('sword')}, ополчением за колокола и наёмниками за золото; колония, атакованная сильнее её защиты, падает.`], hi: '.king' },

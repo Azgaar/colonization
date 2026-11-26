@@ -1,25 +1,21 @@
 {
   "id": "proposed",
-  "title": "Candidate changes for the designer: try one package at a time (docs/proposals.md); nothing here is decided",
+  "title": "Candidate changes for the designer, on top of board (docs/proposals.md); nothing here is decided",
   "base": "board",
   "sandbox": true,
-  "packages": {
-    "A: cube 1, defence 4": ["cube-strength-1", "base-defence-4"],
-    "B: cube 1, defence 4, no refusal bell": ["cube-strength-1", "base-defence-4", "refusal-no-bell"],
-    "C: cube 1, refusal 1 cube, no refusal bell": ["cube-strength-1", "refusal-1-cube", "refusal-no-bell"]
-  },
   "overrides": [
-    { "id": "cube-strength-1", "why": "The King's army grows with every refusal at every seat (about 104 cubes at 4 players); colonies are defended by about 5, so 5% survive and the loyalist wins 87%",
-      "conversion": "direct", "table": "Each King's army cube attacks with 1 ⚔️, not 2. / Каждый кубик армии короля атакует с силой 1 ⚔️, а не 2.",
-      "set": { "settings.war.refStrength": 1 } },
-    { "id": "base-defence-4", "why": "A colony's own defence in the war is 1, too small against any share of the King's army",
-      "conversion": "direct", "table": "In the war every colony defends with 4 before buildings, terrain and troops, not 1. / В войне каждая колония защищается с силой 4 до построек, местности и войск, а не 1.",
-      "set": { "settings.war.baseDefence": 4 } },
-    { "id": "refusal-no-bell", "why": "Refusing is free in bells and feeds the race to 15: refusals give 9 of 15 bells and end games early",
-      "conversion": "direct", "table": "Refusing the tax adds cubes to the King's army but gives no bell. / Отказ от налога добавляет кубики в армию короля, но не даёт колокола.",
-      "set": { "settings.tax.refuseBells": 0 } },
-    { "id": "refusal-1-cube", "why": "Each refusal adds 2 cubes to a pool shared by all patriots, so refusing is cheap for the refuser and costly for the others (H2)",
-      "conversion": "direct", "table": "Refusing the tax adds 1 cube to the King's army, not 2 (solo unchanged). / Отказ от налога добавляет в армию короля 1 кубик, а не 2 (соло без изменений).",
-      "set": { "settings.tax.refuseRef": 1 } }
+    {
+      "id": "events-1-cube",
+      "why": "Five event cards add 2 cubes per player, card or unit; with cube strength 1 and no refusal bell the King's army still takes most colonies (loyalist wins 45-69% at 4 players)",
+      "conversion": "direct",
+      "table": "El Dorado Rumors: the King's army gains 1 cube per player, not 2. Mutiny, Boston Tea Party, Pirate Blockade, Black Market: 1 cube instead of 2 for each refusal, unit or seller. / Слухи об Эльдорадо: армия короля получает 1 кубик за игрока, а не 2. Роптание в гарнизоне, Бостонское чаепитие, Пиратская блокада, Чёрный рынок: 1 кубик вместо 2 за каждый отказ, товар или продавца.",
+      "set": {
+        "events.el_dorado_rumors.do.2.perPlayer": 1,
+        "events.mutiny.do.1.refEach": 1,
+        "events.the_boston_tea_party.do.1.refPerUnit": 1,
+        "events.pirate_blockade.do.1.refEach": 1,
+        "events.black_market.do.1.refPerSeller": 1
+      }
+    }
   ]
 }
