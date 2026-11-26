@@ -18,6 +18,8 @@ export function exportRules(def: GameDef) {
     agents: record(Object.keys(def.agents), (id) => { const a = def.agents[id]; return { base: a.base, en: a.en, ru: a.ru, edu: a.edu, price: a.price, unique: a.unique, mods: a.mods }; }),
     buildings: record(Object.keys(def.buildings), (id) => { const b = def.buildings[id]; return { en: b.en, ru: b.ru, timber: b.timber, edu: b.edu, requires: b.requires, improvement: b.improvement, work: b.work, storage: b.storage, defence: b.defence }; }),
     fathers: record(Object.keys(def.fathers), (id) => { const f = def.fathers[id]; return { en: f.en, ru: f.ru, bells: f.bells }; }),
+    /** Each nation: how hard it is (stars), its starting agents, its colour. */
+    nations: record(Object.keys(def.nations), (id) => { const n = def.nations[id]; return { stars: n.stars, deck: n.deck, color: n.color }; }),
     names: { nations: record(Object.keys(def.nations), (k): Pair => [COLONIAL[k] ?? def.nations[k].en, def.nations[k].ru]), tribes: named(def.tribes), terrain: named(def.terrain), tactics: named(def.tactics), events: named(def.events), resources: named(def.resources), ruins: named(def.ruins), wrecks: named(def.wrecks) },
     flavor: { father: flavor(def.fathers), event: flavor(def.events), ruin: flavor(def.ruins), wreck: flavor(def.wrecks) },
   };

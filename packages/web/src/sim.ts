@@ -1,5 +1,5 @@
 /* The game session: the real rules engine with the player in seat 0 and test bots in the others; or a recorded game, replayed. */
-import { applyInPlace, createGame, IllegalChoice, load, save, viewFor, type Choice, type Decision, type LogEntry, type State } from '@col/engine';
+import { applyInPlace, createGame, IllegalChoice, load, map, save, viewFor, type Choice, type Decision, type LogEntry, type State } from '@col/engine';
 import { goalBot, PERSONALITIES, type Bot, type Personality } from '@col/bots';
 import { loadRuleset, rulesets, type GameDef } from '@col/data';
 import { exportRules, exportState, type GameView } from './view.ts';
@@ -27,6 +27,8 @@ export const DEFAULT: Setup = { nations: ['french', 'english', 'spanish', 'dutch
 let def: GameDef = loadRuleset('board'), setup: Setup = DEFAULT;
 let s: State, bots: Bot[] = [], history: { json: string; placed: Placed[] }[] = [], seen = 0, busy = false, fast = localStorage.getItem('fast') === '1';
 let replay: { data: Replay; at: number; marks: Map<number, string> } | null = null;
+/** A game the bots play alone behind the title screen. Never saved. */
+let demo = false;
 const told = new Set<LogEntry>();
 /** An agent that was played on the board, shown where it went until the round ends. */
 export interface Placed { card: string; space: string }
@@ -45,7 +47,7 @@ function refresh() {
 /** A bot for every seat: the others play with it, and the player's own can play a round for them. */
 const seatBots = () => { bots = s.players.map((_, i) => goalBot(`${s.seed}${i}`, PERSONALITIES[(i === 0 ? 'balanced' : setup.bots[i - 1]) ?? 'balanced'])); };
 const begin = () => { s.logging = true; seen = s.log.length; history = []; Sim.placed.splice(0); seatBots(); refresh(); };
-const mine = () => !replay && s.pending?.player === 0 && !s.over;
+const mine = () => !replay && !demo && s.pending?.player === 0 && !s.over;
 
 export const Sim = {
   D, placed: [] as Placed[],
@@ -59,18 +61,29 @@ export const Sim = {
   refresh,
   /** A new game. */
   start(x: Setup) {
-    setup = x; def = loadRuleset(x.ruleset); replay = null; seat = 0;
+    setup = x; demo = false; def = loadRuleset(x.ruleset); replay = null; seat = 0;
     s = createGame({ def, seed: x.seed, nations: x.nations, logging: true });
     Object.assign(D, exportRules(def)); begin();
   },
   /** The game saved in this browser, if there is one, taken up again. */
   resume(): boolean {
     const raw = localStorage.getItem(SAVE); if (!raw) return false;
+    demo = false;
     try { const x = JSON.parse(raw) as { setup: Setup; game: string; placed: Placed[] }; setup = x.setup; def = loadRuleset(x.setup.ruleset); replay = null; seat = 0; s = load(x.game, def); Object.assign(D, exportRules(def)); begin(); Sim.placed.push(...x.placed); return true; } catch { localStorage.removeItem(SAVE); return false; }
   },
   /** Save the game at this decision (FR-E-10). */
-  keep() { if (!replay) localStorage.setItem(SAVE, JSON.stringify({ setup, game: save(s), placed: Sim.placed })); },
+  keep() { if (!replay && !demo) localStorage.setItem(SAVE, JSON.stringify({ setup, game: save(s), placed: Sim.placed })); },
   hasSaved: () => !!localStorage.getItem(SAVE),
+  /** What the saved game is, without loading it: the player's nation, the round, the players, the seed. */
+  savedInfo(): { nation: string; round: number; players: number; seed: string; over: boolean } | null {
+    try {
+      const x = JSON.parse(localStorage.getItem(SAVE) ?? '') as { setup: Setup; game: string }, g = JSON.parse(x.game) as { state: { round: number; over: unknown; players: { nation: string }[] } };
+      return { nation: g.state.players[0].nation, round: g.state.round, players: g.state.players.length, seed: x.setup.seed, over: !!g.state.over };
+    } catch { return null; }
+  },
+  forget() { localStorage.removeItem(SAVE); },
+  /** The setup of the player's last game (not the demo's), to start the new game screen from. */
+  lastSetup(): Setup { try { return (JSON.parse(localStorage.getItem(SAVE) ?? '') as { setup: Setup }).setup; } catch { return demo ? DEFAULT : setup; } },
   /** Save as a file to keep or to send. */
   file: () => JSON.stringify({ setup, game: save(s), placed: Sim.placed }),
   open(text: string) { localStorage.setItem(SAVE, text); return Sim.resume(); },
@@ -111,9 +124,26 @@ export const Sim = {
     history = []; Sim.placed.splice(0); refresh();
   },
 
+  /* ---- the game behind the title screen ---- */
+  get demo() { return demo; },
+  /** A bot game for the title screen, already some rounds in, so there is land, colonies and ships to see. */
+  startDemo() {
+    const n = NATIONS.slice().sort(() => Math.random() - 0.5).slice(0, 4);
+    setup = { nations: n, bots: ['explorer', 'trader', 'balanced'], ruleset: 'board', seed: `demo${Date.now().toString(36)}` };
+    def = loadRuleset('board'); replay = null; seat = 0; demo = true;
+    s = createGame({ def, seed: setup.seed, nations: n, logging: true }); Object.assign(D, exportRules(def)); begin(); demo = true;
+    for (let k = 0; k < 6000 && !s.over && s.round < 3; k++) Sim.demoStep();
+    // The whole New World is charted for the title screen: no clouds over the land, every settlement in its place.
+    s.revealed.forEach((open, f) => { if (!open) map.reveal(s, f, 0); });
+    refresh();
+  },
+  /** One choice of the demo game, by whoever has to make it. False once it is over. */
+  demoStep(): boolean { if (!demo || s.over) return false; const p = s.pending!.player; applyInPlace(s, bots[p].choose(viewFor(s, p)), true); return true; },
+
   /* ---- replays (FR-U-17, FR-T-6) ---- */
   /** Open a recorded game at its start. */
   watch(data: Replay) {
+    demo = false;
     def = loadRuleset(data.ruleset);
     if (data.rulesetHash && data.rulesetHash !== def.rulesetHash) throw new Error(`recorded with another version of ruleset "${data.ruleset}"`);
     setup = { nations: data.nations, bots: [], ruleset: data.ruleset, seed: data.seed };

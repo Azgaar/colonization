@@ -1,6 +1,6 @@
 /* The map: a tilted plane of fixed pictures, with everything that stands on it as separate upright elements. */
 import { map, type Move } from '@col/engine';
-import { $, ACT, art, at, colonyAt, D, L, lang, me, P, pick, RES, settlementAt, t, tokenAt, W } from '../data.ts';
+import { $, ACT, art, at, colonyAt, D, L, lang, me, P, pick, RES, settlementAt, SIZE, syncWidth, t, tokenAt, W } from '../data.ts';
 import { DEFS, roundel, SHAPES } from '../icons.ts';
 import { Bonus } from './bonus.ts';
 import { stage, type Pitch, type Stage } from './camera.ts';
@@ -23,7 +23,7 @@ const lens = () => 3600 * (900 / 3600) ** (view.depth / 100), up = () => 1 / Mat
 const pitch: Pitch = (z, min, max) => { const u = Math.min(1, Math.max(0, Math.log(z / min) / Math.log(max / min))); return view.most * (1 - (1 - u) ** 2); };
 const haze = () => document.body.style.setProperty('--haze', ((B.stage.angle() / 45) ** 1.3 * 0.34).toFixed(2));
 /** Farthest zoom: the whole board just fits between the top line and the hand, seen from above. */
-const whole = () => Math.min((innerWidth - 24) / 1024, (innerHeight - 220) / 1024);
+const whole = () => Math.min((innerWidth - 24) / SIZE(), (innerHeight - 220) / SIZE());
 function look() { B.stage.tilt(view.tilt, lens(), (view.shift / 100) * innerHeight, view.auto ? pitch : null); haze(); }
 /* ---- what stands on the map ---- */
 let fid = 0;
@@ -89,6 +89,7 @@ interface Shown { el: HTMLDivElement; q?: Thing }
 const layer = document.querySelector<HTMLElement>('.sprites')!, paths = document.querySelector<SVGSVGElement>('svg.paths')!, sprites = new Map<string, Shown>();
 /** Keeps the elements in step with the game. Only what changed is drawn again. */
 function draw() {
+  resize();
   const now = new Set<string>();
   for (const q of things(Places.spaces(S.card))) {
     now.add(q.id);
@@ -134,40 +135,59 @@ function reach() {
 /* Bonus resources lie on the ground: painted once into their own layer of the map. */
 let grounded = '';
 function ground() {
+  resize();
   const key = D.open.map((x, c) => (x && D.bonus[c] ? `${c}${colonyAt(c) || settlementAt(c) ? 'x' : ''}` : '')).join(''); if (grounded === key) return; grounded = key;
   const img = new Image(), c = document.querySelector<HTMLCanvasElement>('canvas.ground')!;
-  img.onload = () => { c.width = c.height = 2048; c.getContext('2d')!.drawImage(img, 0, 0); URL.revokeObjectURL(img.src); };
-  img.src = URL.createObjectURL(new Blob([Bonus.picture(D, at)], { type: 'image/svg+xml' }));
+  img.onload = () => { c.width = c.height = SIZE() * 2; c.getContext('2d')!.drawImage(img, 0, 0); URL.revokeObjectURL(img.src); };
+  img.src = URL.createObjectURL(new Blob([Bonus.picture(D, at, SIZE())], { type: 'image/svg+xml' }));
 }
 /* The outer ring of cells is Europe: fine hatching that fades into the open sea, with a thin line on the inner side. Painted once. */
 let edged = '';
 async function edge() {
-  const key = `${lang()} ${B.grid}`; if (edged === key) return; edged = key;
+  resize();
+  const key = `${lang()} ${B.grid} ${W}`; if (edged === key) return; edged = key;
   await document.fonts.load('700 24px "Alegreya SC"', t('europe'));
-  const c = document.querySelector<HTMLCanvasElement>('canvas.edge')!, k = 2; c.width = c.height = 1024 * k;
+  const c = document.querySelector<HTMLCanvasElement>('canvas.edge')!, k = 2, S = SIZE(); c.width = c.height = S * k;
   const g = c.getContext('2d')!, h = document.createElement('canvas'), q = h.getContext('2d')!; g.scale(k, k); h.width = 8; h.height = 13 * k;
   q.fillStyle = '#f6e2ae'; q.fillRect(0, 5.8 * k, 8, 1.35 * k);
   const p = g.createPattern(h, 'repeat')!; p.setTransform(new DOMMatrix().rotate(38).scale(1 / k));
-  const ring = (a: number, r: number, w: number, style: string | CanvasPattern, alpha: number) => { g.globalAlpha = alpha; g.strokeStyle = style; g.lineWidth = w; g.beginPath(); g.roundRect(a, a, 1024 - a * 2, 1024 - a * 2, r); g.stroke(); };
-  if (B.grid) { g.globalAlpha = 0.2; g.strokeStyle = '#fff'; g.beginPath(); for (let i = 64; i < 1024; i += 64) { g.moveTo(i, 0); g.lineTo(i, 1024); g.moveTo(0, i); g.lineTo(1024, i); } g.stroke(); }
+  const ring = (a: number, r: number, w: number, style: string | CanvasPattern, alpha: number) => { g.globalAlpha = alpha; g.strokeStyle = style; g.lineWidth = w; g.beginPath(); g.roundRect(a, a, S - a * 2, S - a * 2, r); g.stroke(); };
+  if (B.grid) { g.globalAlpha = 0.2; g.strokeStyle = '#fff'; g.beginPath(); for (let i = 64; i < S; i += 64) { g.moveTo(i, 0); g.lineTo(i, S); g.moveTo(0, i); g.lineTo(S, i); } g.stroke(); }
   for (let i = 0; i < 30; i++) { const a = 62 - i * 2, m = (1 - i / 30) ** 0.9; ring(a, 29 + i, 2.1, p, 0.46 * m); ring(a, 29 + i, 2.1, '#bfe3ea', 0.06 * m); }
   ring(64, 28, 1.7, '#f6dfa4', 0.72);
   g.globalAlpha = 0.72; g.font = '700 24px "Alegreya SC"'; g.letterSpacing = '6px'; g.textAlign = 'center'; g.fillStyle = '#fbeecb'; g.lineJoin = 'round'; g.lineWidth = 8; g.strokeStyle = '#124468';
   const word = (x: number, y: number, a: number) => { g.save(); g.translate(x, y); g.rotate(a); g.strokeText(t('europe'), 0, 0); g.fillText(t('europe'), 0, 0); g.restore(); };
-  word(512, 1003, 0); word(40, 512, -Math.PI / 2); word(984, 512, Math.PI / 2);
+  word(S / 2, S - 21, 0); word(40, S / 2, -Math.PI / 2); word(S - 40, S / 2, Math.PI / 2);
 }
 /** The box about the clicked cell follows it on the screen. */
 function bubble() { const c = S.look; if ($('look').hidden || c === null) return; const [x, y] = B.stage.point(((c % W) + 0.5) * 64, (Math.floor(c / W) + 0.1) * 64); $('look').style.left = `${Math.min(innerWidth - 130, Math.max(130, x))}px`; $('look').style.top = `${Math.max(200, y)}px`; }
-drawSea(document.querySelector<HTMLCanvasElement>('canvas.sea')!, 4608, 2 / 3).then((c) => { document.querySelector<HTMLElement>('.map-stage')!.style.background = c; });
+/** The open sea around the map, a wide square centred on it. */
+const SEA = 4608;
+function sea() {
+  const c = document.querySelector<HTMLCanvasElement>('canvas.sea')!, o = `${-(SEA - SIZE()) / 2}px`;
+  c.style.left = c.style.top = o;
+  void drawSea(c, SEA, 2 / 3).then((bg) => { document.querySelector<HTMLElement>('.map-stage')!.style.background = bg; });
+}
+/** Fit the board to the width of the game now loaded: the plane, the sea around it, and the pictures drawn for its size. Cheap when nothing changed. */
+function resize(first = false) {
+  if (!syncWidth() && !first) return;
+  const inner = document.querySelector<HTMLElement>('.map-inner')!;
+  inner.style.width = inner.style.height = `${SIZE()}px`;
+  sea();
+  // Drawn again for the new size the next time they are asked for.
+  if (!first) { grounded = '!'; edged = ''; }
+}
+resize(true);
 /* A quick sketch of the land at once, then the sharp one in the background, a few milliseconds at a time. */
 const SHARP = devicePixelRatio > 1 ? 2.2 : 1.6, plan = (k: number, rest?: () => Promise<void>) => ({ K: k, tall: up(), rest, seen: D.open.map((x) => (x ? 1 : 0)).join('') });
 let clock = 0, drawing: Promise<unknown> = Promise.resolve(), drawn = '', shown: string | null = null;
 const rest = async () => { if (performance.now() - clock > 8) { await new Promise((r) => setTimeout(r)); clock = performance.now(); } };
 async function land(sketch = false) {
+  resize();
   const now = plan(SHARP, rest); if (drawn === now.seen + now.tall && !sketch) return;
-  const was = drawn, old = shown, fresh = was && was.slice(-String(now.tall).length) === String(now.tall) && old ? [...now.seen].map((v, c) => (v === '1' && old[c] === '0' ? c : -1)).filter((c) => c >= 0) : [];
+  const was = drawn, old = shown, fresh = was && was.slice(-String(now.tall).length) === String(now.tall) && old && old.length === now.seen.length ? [...now.seen].map((v, c) => (v === '1' && old[c] === '0' ? c : -1)).filter((c) => c >= 0) : [];
   drawn = now.seen + now.tall;
-  // Something just explored: paint only that part, at once, and the rest quietly afterwards.
+  // Something just explored on the same map: paint only that part, at once, and the rest quietly afterwards. A new map of another size is painted whole.
   if (fresh.length && !sketch) {
     const xs = fresh.map((c) => c % W), ys = fresh.map((c) => Math.floor(c / W));
     await drawRich(terrain, { ...plan(SHARP), box: [Math.min(...xs) * 64, Math.min(...ys) * 64, (Math.max(...xs) + 1) * 64, (Math.max(...ys) + 1) * 64] });
@@ -190,9 +210,9 @@ const B = {
   get stage(): Stage { if (!cam) throw new Error('the map is not open yet'); return cam; },
   /** Where the token on the move can still go, and what it could uncover. Only asked during a move, which always has its token and points. */
   moving(): Moving { const move = D.move!; if (moved?.move === move && moved.n === Sim.s.log.length) return moved; const l: Opt[] = Sim.legal(); moved = { move, n: Sim.s.log.length, ways: Places.ways(move.token, move.points), frags: l.filter((c) => c.c === 'explore').map((c): number => c.frag), legal: l }; return moved; },
-  fit() { const a = view.auto ? 0 : view.tilt; B.stage.frame(0, 0, 1024, 1024, [70 - a, 0, 150 - a * 3, 0]); },
+  fit() { resize(); const a = view.auto ? 0 : view.tilt, S = SIZE(); B.stage.frame(0, 0, S, S, [70 - a, 0, 150 - a * 3, 0]); },
   /** The whole inner map between the top line and the hand. */
-  home() { const z = Math.min(innerWidth / 900, (innerHeight - 200) / 715); B.stage.frame(512 - innerWidth / 2 / z, 512 - innerHeight / 2 / z, 512 + innerWidth / 2 / z, 512 + innerHeight / 2 / z); const [x, , k] = B.stage.get(); B.stage.set([x, innerHeight / 2 - 520 * k - 4, k]); },
+  home() { resize(); const z = Math.min(innerWidth / 900, (innerHeight - 200) / 715), m = SIZE() / 2; B.stage.frame(m - innerWidth / 2 / z, m - innerHeight / 2 / z, m + innerWidth / 2 / z, m + innerHeight / 2 / z); const [x, , k] = B.stage.get(); B.stage.set([x, innerHeight / 2 - (m + 8) * k - 4, k]); },
   open(onCell: (c: number) => void) { cam = stage(document.querySelector<HTMLElement>('.map-stage')!, { onMove: place, onCell, min: whole, max: 2.8, zoom: 1, center: 0 }); look(); B.home(); addEventListener('resize', look); },
 };
 export { B as Board };

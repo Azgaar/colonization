@@ -5,7 +5,13 @@ import type { Pair, PlayerView } from './view.ts';
 import { icon } from './icons.ts';
 import { Sim } from './sim.ts';
 
-export const D = Sim.D, W = D.width, CELL = 64;
+export const D = Sim.D, CELL = 64;
+/** The width of the map in cells. Rulesets may change it (no open sea ring: two cells fewer), so it follows the game that is loaded: see `syncWidth`. */
+export let W = D.width;
+/** Take the width of the game now loaded; true when it changed. */
+export function syncWidth() { if (W === D.width) return false; W = D.width; return true; }
+/** The size of the map in map units. */
+export const SIZE = () => W * CELL;
 /** The seat whose view is shown: the player (0), or any seat while watching a replay. */
 export let me = 0;
 export function showSeat(p: number) { me = p; Sim.view(p); }

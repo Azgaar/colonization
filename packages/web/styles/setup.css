@@ -1,11 +1,4 @@
-/* The new game box, and the bar under a replay. */
-.setupbox { right:auto;left:50%;top:50%;transform:translate(-50%,-50%);z-index:30;width:440px }
-.setupbox select,.setupbox input:not([type=range]) { margin-left:auto;max-width:230px;background:#ffffff1a;color:inherit;border:0;border-radius:10px;padding:6px 10px;font:inherit }
-.setupbox select option { color:var(--ink);background:var(--bone) }
-.setupbox .note { opacity:.8;font-size:15px;margin:8px 0 4px }
-.setupbox .row:last-child { justify-content:flex-end;gap:8px;margin-top:6px }
-.setupbox .row:last-child button { background:#ffffff1a;border-radius:99px;padding:7px 18px;font:800 17px var(--sc) }
-.setupbox .row:last-child button.go { background:var(--bone);color:var(--ink) }
+/* The bar under a replay. */
 .replaybar { position:fixed;left:50%;bottom:calc(var(--ch)*.84 + 40px);transform:translateX(-50%);z-index:15;display:flex;align-items:center;gap:8px;background:#0f3436f2;border-radius:99px;padding:8px 14px;box-shadow:0 10px 30px #000b;white-space:nowrap }
 .replaybar[hidden] { display:none }
 .replaybar button { min-width:34px;height:32px;border-radius:99px;background:#ffffff1a;padding:0 10px;font-weight:800 }

@@ -5,9 +5,11 @@ export type Screen = 'map' | 'colony' | 'europe';
 export const S: { card: string | null; drag: string | null; over: string | null; pickAt: { x: number; y: number; id: string } | null; view: Screen; look: number | null; hov: number | null; war: number } =
   { card: null, drag: null, over: null, pickAt: null, view: 'map', look: null, hov: null, war: -1 };
 
-/** Boxes that are open: the King's army, the Governors sheet, the options menu, the new game box, the glimpse behind a door. `last` keeps the order of goods in the heaps. */
-export const U: { king: boolean; sheet: boolean; menu: boolean; setup: boolean; peek: 'west' | 'east' | null; last: { wh: string[]; hold: string[] } } =
-  { king: false, sheet: false, menu: false, setup: false, peek: null, last: { wh: [], hold: [] } };
+/** Pages of the title screen; `null` while playing. */
+export type TitlePage = 'main' | 'new' | 'load' | 'options' | 'about';
+/** Boxes that are open: the King's army, the Governors sheet, the options menu, the glimpse behind a door; the title screen page. `last` keeps the order of goods in the heaps. */
+export const U: { king: boolean; sheet: boolean; menu: boolean; peek: 'west' | 'east' | null; title: TitlePage | null; last: { wh: string[]; hold: string[] } } =
+  { king: false, sheet: false, menu: false, peek: null, title: 'main', last: { wh: [], hold: [] } };
 
 /** A report waiting to be read: a large card, or a short one in a panel. `after` runs once it is closed. */
 export interface Report { html: string; big?: boolean; after?: (() => void) | null }

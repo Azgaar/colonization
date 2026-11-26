@@ -97,7 +97,8 @@ document.addEventListener('click', async (e: MouseEvent) => {
   else if (document.contains(el) && ((U.menu && !q('.menu')) || (U.king && !q('.kingbox')))) { U.menu = U.king = false; paint(); }
 });
 addEventListener('keydown', (e: KeyboardEvent) => {
-  if (e.key === 'Escape') { put(); if (S.pickAt) S.pickAt = null; else if (S.card) S.card = null; else if (S.war >= 0) S.war = -1; else if (U.menu || U.king || U.sheet) U.menu = U.king = U.sheet = false; else S.view = 'map'; bub().hidden = true; paint(); }
+  // Esc puts down or closes what is open, one thing at a time; with nothing left open on the map, it opens the options menu.
+  if (e.key === 'Escape' && !U.title) { put(); if (S.pickAt) S.pickAt = null; else if (S.card) S.card = null; else if (S.war >= 0) S.war = -1; else if (U.menu || U.king || U.sheet) U.menu = U.king = U.sheet = false; else if (S.view !== 'map') S.view = 'map'; else U.menu = true; bub().hidden = true; paint(); }
   if (e.key === 'Enter' && X.reports.length && !Sim.busy) { e.preventDefault(); read(); }
   if (/^[1-9]$/.test(e.key) && Sim.kind() === 'turn' && !Sim.busy && P.hand[+e.key - 1]) { S.card = P.hand[+e.key - 1]; S.pickAt = null; paint(); }
 });

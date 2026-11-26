@@ -21,9 +21,9 @@ const GROUND: Record<string, (x: number, y: number) => string> = {
   silver: (x, y) => P(`M${x - 17} ${y + 9}l6-12 6 2 5-9 7 4 6-2 4 17Z`, '#9aa2a8', 'fill-opacity=".55"') + `<path d="M${x - 13} ${y + 6}l5-7 4 3 6-9 4 4 7-4M${x - 6} ${y + 10}l5-4 7 2 7-6" stroke="#f6f9fb" stroke-width="1.800" fill="none" stroke-linecap="round" stroke-linejoin="round"/>` + many([[-9, -3], [5, -8], [13, 1], [-1, 4]], (a, b) => P(`M${x + a} ${y + b - 3.500}l1 2.500 2.500 1-2.500 1-1 2.500-1-2.500-2.500-1 2.500-1Z`, '#fff')),
 };
 /** Every bonus of the open map as one picture for the ground layer. */
-function picture(D: GameView, at: (c: number) => number[]) {
+function picture(D: GameView, at: (c: number) => number[], size: number) {
   const out: string[] = [];
   D.bonus.forEach((b, c) => { if (!b || !GROUND[b] || colonyAt(c) || settlementAt(c)) return; const [x, y] = at(c); out.push(GROUND[b](x + 32, y + 34)); });
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="2048" height="2048">${out.join('')}</svg>`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}" width="${size * 2}" height="${size * 2}">${out.join('')}</svg>`;
 }
 export const Bonus = { picture };

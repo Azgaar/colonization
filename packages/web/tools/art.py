@@ -11,6 +11,8 @@ for d, name, w in [('Agents', 'agent', 260), ('Buildings', 'building', 300), ('F
         if n in ('back', 'emblems'): continue
         put(f, f'{name}/{n}', w)
 put(A + 'Europe/back raw.png', 'europe', 1600); put(A + 'crate.png', 'crate', 80)
+# Role paintings for the title screen and the opening scene.
+for n in ('royalist', 'admiral', 'patriot', 'conquistador', 'missioner', 'rivalry', 'companier'): put(A + f'Roles/{n}.png', f'role/{n}', 900, 80)
 # One picture for each event, from the art there is.
 EVENTS = {'sugar_act': 'custom house', 'silver_fleet': 'galleon', 'seven_years_war': 'soldier', 'the_great_awakening': 'church', 'smallpox_epidemic': 'iroquois', 'stamp_act': 'newspaper', 'atlantic_storms': 'caravel', 'pontiacs_rebellion': 'cherokee', 'broken_treaties': 'sioux', 'black_market': 'smuggler', 'starving_time': 'colonist', 'prison_ships': 'criminal', 'common_sense': 'politician', 'industrial_boom': 'factory', 'salem_witch_trials': 'puritan', 'mutiny': 'sailor', 'sacred_forest': 'indian', 'el_dorado_rumors': 'inca', 'slave_rebellion': 'slave', 'treaty_of_paris': 'negotiant', 'the_boston_tea_party': 'docks', 'pirate_blockade': 'privateer'}
 # And one for each ruin and wreck.

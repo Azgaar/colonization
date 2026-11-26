@@ -19,7 +19,8 @@ Builds `dist/app.js` and serves this package at http://localhost:8765. While wor
 
 ## What it does
 
-- **New game** (Options → New game): number of players, your nation, the bots' characters, the ruleset and the seed.
+- **Title screen**: Continue, New game, Load game, Options, About, over a living map where bots play a game of their own while the camera glides.
+- **New game**: your nation from a gallery with its starting agents, each rival's nation and character, the rules and the seed. A new game opens with a short film drawn in code (harbour, open sea, storm, landfall, first colony); Enter, Esc, Space or Skip end it.
 - **Saving**: the game is saved in the browser after every decision and taken up again on reload. Options → Save to a file / Open a file moves a game between browsers.
 - **Undo** takes back the player's own choices until something hidden shows: dice, a new tile, a card from a deck, or the bots' turns (FR-U-12).
 - **Replays**: a recorded game is stepped through choice by choice, jumped to any point and seen from any seat.
@@ -51,7 +52,7 @@ Builds `dist/app.js` and serves this package at http://localhost:8765. While wor
 | `paint.ts` | `paint()` draws everything again after any change. Call it rather than a single painter |
 | `icons.ts`, `texts.ts`, `plural.ts` | Flat pictograms and emblems; card texts in both languages; Russian number forms |
 | `map/` | `board.ts` the map and what stands on it, `camera.ts` pan, zoom and tilt, `terrain.ts` the painted ground and sea, `sprites.ts` and `towns.ts` ships, infantry, villages, colonies, `bonus.ts` bonus resources on the ground |
-| `ui/` | One module per part of the screen: `top`, `hand`, `fans` (choices off the map and the glimpse behind a door), `scenes` (Colony and Europe), `look` (a clicked cell), `decisions` (a panel per decision), `reports`, `cards` and `news` (events, ruins, wrecks, other players' turns), `war`, `setup` (new game, files, replays), `toasts`, `goods`, `kit` (shared pieces) |
+| `ui/` | One module per part of the screen: `top`, `hand`, `fans` (choices off the map and the glimpse behind a door), `scenes` (Colony and Europe), `look` (a clicked cell), `decisions` (a panel per decision), `reports`, `cards` and `news` (events, ruins, wrecks, other players' turns), `war`, `title`, `attract`, `newgame` and `intro` (the title screen, its living map, the new game screen, the opening film), `setup` (starting games, files, replays), `toasts`, `goods`, `kit` (shared pieces) |
 
 ## Ways of working
 
