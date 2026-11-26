@@ -20,7 +20,8 @@ const worth = (g: Goal, points: number) => g.value / (Math.max(1, Math.ceil(g.di
 
 const success = (gap: number) => (gap <= 0 ? 0 : 1 - (2 / 3) ** gap);
 
-export function goalBot(seed: string, weights: Partial<Weights> = {}, name = 'goal'): GoalBot {
+/** `keep` is how many of the best candidates stay in `last`, for the search bot and the advisor. */
+export function goalBot(seed: string, weights: Partial<Weights> = {}, name = 'goal', keep = 5): GoalBot {
   const w: Weights = { ...BASE, ...weights };
   const rng = seedRng(`bot-${seed}`);
   const random = () => nextU32(rng) / 4294967296;
@@ -36,7 +37,7 @@ export function goalBot(seed: string, weights: Partial<Weights> = {}, name = 'go
       const scored: Considered[] = d.kind === 'turn' ? scoreTurn(x) : d.kind === 'move' ? scoreMove(x, intent) : v.legal.map((c) => ({ choice: c, score: scoreSmall(x, c), why: d.kind }));
       for (const c of scored) c.score += (random() - 0.5) * 2 * w.noise;
       scored.sort((a, b) => b.score - a.score);
-      bot.last = scored.slice(0, 5);
+      bot.last = scored.slice(0, keep);
       return scored[0].choice;
     },
   };

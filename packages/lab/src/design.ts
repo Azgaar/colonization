@@ -1,5 +1,5 @@
 import type { GameDef } from '@col/data';
-import type { BotSpec, GameSpec } from './pool.ts';
+import type { BotSpec, GameSpec } from './game.ts';
 
 /**
  * A balanced set of games: nations are drawn so that each plays equally often, and

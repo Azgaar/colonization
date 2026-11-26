@@ -8,6 +8,7 @@ const at = (p: string) => fileURLToPath(new URL(p, import.meta.url));
 const workbook = at('../../../Colonization.xlsx');
 const reviewedPath = at('./reviewed-texts.json');
 const outPath = at('../generated/gamedata.json');
+const sourcesPath = at('../generated/sources.json');
 
 const sheets = (await readWorkbook(workbook)) as unknown as RawSheet[];
 let reviewed: Record<string, string> = existsSync(reviewedPath) ? JSON.parse(readFileSync(reviewedPath, 'utf8')) : {};
@@ -17,10 +18,12 @@ if (process.argv.includes('--review')) {
   reviewed = Object.fromEntries(Object.entries(texts).sort(([a], [b]) => (a < b ? -1 : 1)));
   writeFileSync(reviewedPath, JSON.stringify(reviewed, null, 1) + '\n');
 }
-const { data, issues } = importWorkbook(sheets, reviewed);
+const { data, issues, sources } = importWorkbook(sheets, reviewed);
 for (const i of issues) console.log(formatIssue(i));
 if (!data) { console.error('Import failed. Nothing was written.'); process.exit(1); }
 writeFileSync(outPath, JSON.stringify(data, null, 1) + '\n');
+// One path per line keeps workbook edits readable in a diff.
+writeFileSync(sourcesPath, '{\n' + Object.entries(sources).map(([k, v]) => ` ${JSON.stringify(k)}: ${JSON.stringify(v)}`).join(',\n') + '\n}\n');
 const n = (o: object) => Object.keys(o).length;
 console.log(`Imported ${n(data.agents)} agents, ${n(data.nations)} nations, ${n(data.buildings)} buildings, ${n(data.fathers)} Fathers, ${n(data.events)} events, ` +
   `${n(data.ruins)} ruins, ${n(data.wrecks)} wrecks, ${n(data.tactics)} tactics, ${n(data.tribes)} tribes, ${data.tiles.length} tiles.`);

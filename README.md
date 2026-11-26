@@ -7,9 +7,9 @@ Digital version and test bench for the board game. Start with [docs/PRD.md](docs
 | `docs/` | Requirements, rules specification, decisions |
 | `packages/data` | Import of `Colonization.xlsx`, card effects (`src/effects.ts`), settings (`src/settings.ts`) |
 | `packages/engine` | Rules engine: no interface, no I/O, seeded randomness |
-| `packages/bots` | AI players: random, and goal-driven with personalities |
-| `packages/lab` | Playing many games |
-| `packages/web` | The game in the browser: the real rules engine against bots, saving, replays. See [packages/web/README.md](packages/web/README.md) |
+| `packages/bots` | AI players: random, goal-driven with personalities, search (information-set Monte Carlo), difficulty levels, the advisor |
+| `packages/lab` | Playing many games: batches on all cores or in the browser, A/B on paired seeds, sweeps, problem detectors |
+| `packages/web` | The game in the browser: against bots or hot-seat, advisor, saving, replays, the design bench (rules editor, lab, export), and dev mode (Dev menu, forecasts). See [packages/web/README.md](packages/web/README.md) |
 | `rulesets/` | `board` (reference), `pc` (convertible changes), `alternatives` (sandbox) |
 
 `assets/` and `components/` are kept out of git.
@@ -28,11 +28,19 @@ Digital version and test bench for the board game. Start with [docs/PRD.md](docs
 | `pnpm tune`, `pnpm experiments` | Self-play tuning and balance experiments (bots are not strong enough yet to trust the numbers) |
 | `pnpm web` | Build the interface and serve it at http://localhost:8765 |
 | `pnpm replay seed 4` | Play a bot game and save it as a replay for the interface |
+| `pnpm sweep settings.tax.refuseRef=1,2,3 --games 200` | One or two values over a range, on paired seeds; writes `out/sweep-*.md` |
+| `pnpm strength:search [seeds] [iterations] [players]` | Search bot against the tuned bot on paired seeds, e.g. `100 60 2` |
+| `pnpm detect 400 --players 4` | Look for stalls, dead cards, runaway leaders and dominated options; writes `out/detect-*.md` |
+| `pnpm rules list`, `export pc --csv`, `report` | Rulesets and their changes, the cells to edit in the workbook, the conversion report `pc` vs `board` |
+| `pnpm rules promote <id>`, `drop <id>` | Move a change from `pc` to `board`, or drop it; both are logged in `docs/decisions.md` |
+| `pnpm release:patch`, `:minor`, `:major` | Raise the game's version (shown on the title screen) |
 | `pnpm check` | Import, type check (engine and interface) and tests |
 
 ## Changing numbers
 
 - Anything in the workbook: edit it there, then run `pnpm data:import`.
 - Anything else (tax track, limits, war, scoring): `packages/data/src/settings.ts`, then `pnpm data:import`.
-- Trying a change without touching either: add an override to `rulesets/pc.json`, for example
-  `{ "id": "cheap-priest", "why": "never hired", "conversion": "direct", "table": "Priest costs 5 gold", "set": { "agents.priest.price": 5 } }`
+- Trying a change without touching either: in the game, Design bench → Rules: make a ruleset, find the value, change it, give it its label and table wording; then Lab to compare it with `board`, and Export for the cells to edit and the conversion report.
+- Or by hand: add an override to `rulesets/pc.json`, for example
+  `{ "id": "cheap-priest", "why": "never hired", "conversion": "direct", "table": "Priest costs 5 gold", "set": { "agents.priest.price": 5 } }`.
+  Overrides can also add a card as a copy of another (`"copy": { "fathers.minuit_2": "fathers.peter_minuit" }`, label `component`) or remove one (`"remove": ["events.stamp_act"]`).

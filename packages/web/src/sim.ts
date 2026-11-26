@@ -1,7 +1,8 @@
-/* The game session: the real rules engine with the player in seat 0 and test bots in the others; or a recorded game, replayed. */
+/* The game session: the real rules engine with the players in their seats (one or more people, hot-seat) and bots in the others; or a recorded game, replayed. */
 import { applyInPlace, createGame, IllegalChoice, load, map, save, viewFor, type Choice, type Decision, type LogEntry, type State } from '@col/engine';
-import { goalBot, PERSONALITIES, type Bot, type Personality } from '@col/bots';
-import { loadRuleset, rulesets, type GameDef } from '@col/data';
+import { advise, botForLevel, goalBot, PERSONALITIES, type Bot, type Considered, type Level, type Personality } from '@col/bots';
+import type { GameDef } from '@col/data';
+import { defOf, ids } from './rules.ts';
 import { exportRules, exportState, type GameView } from './view.ts';
 
 /** A log entry or a decision as the interface reads them: the engine keeps their fields loose. */
@@ -10,21 +11,31 @@ export type Pending = Decision & Record<string, any>;
 /** A choice the engine offers, with its own fields (card, cell, building…). */
 export type Opt = Choice & Record<string, any>;
 
-/** How a new game is set up (FR-U-1). Seat 0 is the player. */
-export interface Setup { nations: string[]; bots: Personality[]; ruleset: string; seed: string }
+/** How a new game is set up (FR-U-1). Seat 0 is a person; `bots[i - 1]` is the character of seat i when a bot plays it.
+ * `humans` lists the seats people play (hot-seat, FR-U-16; seat 0 alone when left out); `levels[i - 1]` is a bot's difficulty (FR-A-6);
+ * In dev mode (`Dev.on`) every game is a sandbox (FR-U-19, FR-R-6). */
+export interface Setup { nations: string[]; bots: Personality[]; ruleset: string; seed: string; humans?: number[]; levels?: string[] }
 /** A recorded game: what is needed to play it again choice by choice. */
 export interface Replay { ruleset: string; rulesetHash?: string; seed: string; nations: string[]; bots?: string[]; choices: Choice[] }
 
 export const NATIONS = ['french', 'english', 'spanish', 'dutch', 'portuguese', 'swedish', 'danish', 'russian', 'curonian', 'scottish'];
 export const PERSONALITY_NAMES = Object.keys(PERSONALITIES) as Personality[];
-export const RULESETS = Object.keys(rulesets);
+/** The rulesets a new game may use: the built-in ones and the designer's own. */
+export const RULESETS = ids;
 const SAVE = 'game', wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
+/** A copy of the game run on this computer (`pnpm web`), not a deployed one: only there can dev mode be switched on. */
+export const LOCAL = typeof location !== 'undefined' && /^(localhost|127\.0\.0\.1|\[::1\]|.+\.local)$/.test(location.hostname);
+/** Dev mode, switched in Options and kept in this browser: the Dev menu (edit the game, force dice and cards, any seat, unlimited undo, other rules mid-game) and, if chosen, the forecast. */
+export const Dev = {
+  get on() { return LOCAL && localStorage.getItem('dev') === '1'; }, set on(v: boolean) { localStorage.setItem('dev', v ? '1' : ''); },
+  get forecast() { return Dev.on && localStorage.getItem('forecast') === '1'; }, set forecast(v: boolean) { localStorage.setItem('forecast', v ? '1' : ''); },
+};
 /** Log entries that show something hidden: dice, a new tile, a card from a deck. Undo stops there (FR-U-12). */
 const REVEALS = new Set(['roll', 'combat', 'reveal', 'settlement', 'poi', 'event', 'gainAgent', 'siege', 'war']);
 
 /** The first game, before the player sets one up. */
 export const DEFAULT: Setup = { nations: ['french', 'english', 'spanish', 'dutch'], bots: ['balanced', 'trader', 'explorer'], ruleset: 'board', seed: 'start' };
-let def: GameDef = loadRuleset('board'), setup: Setup = DEFAULT;
+let def: GameDef = defOf('board'), setup: Setup = DEFAULT;
 let s: State, bots: Bot[] = [], history: { json: string; placed: Placed[] }[] = [], seen = 0, busy = false, fast = localStorage.getItem('fast') === '1';
 let replay: { data: Replay; at: number; marks: Map<number, string> } | null = null;
 /** A game the bots play alone behind the title screen. Never saved. */
@@ -44,10 +55,19 @@ function refresh() {
   if (P0) { Object.assign(P0, x.players[seat]); x.players[seat] = P0; } else P0 = x.players[seat];
   Object.assign(D, x);
 }
-/** A bot for every seat: the others play with it, and the player's own can play a round for them. */
-const seatBots = () => { bots = s.players.map((_, i) => goalBot(`${s.seed}${i}`, PERSONALITIES[(i === 0 ? 'balanced' : setup.bots[i - 1]) ?? 'balanced'])); };
-const begin = () => { s.logging = true; seen = s.log.length; history = []; Sim.placed.splice(0); seatBots(); refresh(); };
-const mine = () => !replay && !demo && s.pending?.player === 0 && !s.over;
+/** A bot for every seat: the others play at their difficulty (FR-A-6), and a person's seat has one too, to play a round for them. */
+const seatBots = () => {
+  bots = s.players.map((_, i) => {
+    const character = (i === 0 ? 'balanced' : setup.bots[i - 1]) ?? 'balanced', level = setup.levels?.[i - 1];
+    return i > 0 && level && !humans.has(i) ? botForLevel(level as Level, `${s.seed}${i}`, character) : goalBot(`${s.seed}${i}`, PERSONALITIES[character]);
+  });
+};
+const begin = () => { humans = new Set(setup.humans ?? [0]); s.logging = true; seen = s.log.length; history = []; Sim.placed.splice(0); seatBots(); refresh(); };
+/** The seats people play. */
+let humans = new Set<number>([0]);
+const live = () => !replay && !demo && !s.over;
+/** A decision for the interface: a person's, in the seat shown. */
+const mine = () => live() && !!s.pending && humans.has(s.pending.player) && s.pending.player === seat;
 
 export const Sim = {
   D, placed: [] as Placed[],
@@ -59,9 +79,13 @@ export const Sim = {
   pending: () => (mine() ? (s.pending as Pending) : null),
   mine,
   refresh,
+  /** Hot-seat: the person whose decision it is when another one is shown, or null. The interface then shows their seat. */
+  waiting: (): number | null => (live() && s.pending && humans.has(s.pending.player) && s.pending.player !== seat ? s.pending.player : null),
+  get humans() { return humans; },
+  get sandbox() { return Dev.on && !replay && !demo; },
   /** A new game. */
   start(x: Setup) {
-    setup = x; demo = false; def = loadRuleset(x.ruleset); replay = null; seat = 0;
+    setup = x; demo = false; def = defOf(x.ruleset); replay = null; seat = 0;
     s = createGame({ def, seed: x.seed, nations: x.nations, logging: true });
     Object.assign(D, exportRules(def)); begin();
   },
@@ -69,7 +93,7 @@ export const Sim = {
   resume(): boolean {
     const raw = localStorage.getItem(SAVE); if (!raw) return false;
     demo = false;
-    try { const x = JSON.parse(raw) as { setup: Setup; game: string; placed: Placed[] }; setup = x.setup; def = loadRuleset(x.setup.ruleset); replay = null; seat = 0; s = load(x.game, def); Object.assign(D, exportRules(def)); begin(); Sim.placed.push(...x.placed); return true; } catch { localStorage.removeItem(SAVE); return false; }
+    try { const x = JSON.parse(raw) as { setup: Setup; game: string; placed: Placed[] }; setup = x.setup; def = defOf(x.setup.ruleset); replay = null; seat = 0; s = load(x.game, def); Object.assign(D, exportRules(def)); begin(); Sim.placed.push(...x.placed); return true; } catch { localStorage.removeItem(SAVE); return false; }
   },
   /** Save the game at this decision (FR-E-10). */
   keep() { if (!replay && !demo) localStorage.setItem(SAVE, JSON.stringify({ setup, game: save(s), placed: Sim.placed })); },
@@ -87,7 +111,7 @@ export const Sim = {
   /** Save as a file to keep or to send. */
   file: () => JSON.stringify({ setup, game: save(s), placed: Sim.placed }),
   open(text: string) { localStorage.setItem(SAVE, text); return Sim.resume(); },
-  legal: (): Choice[] => (mine() ? viewFor(s, 0).legal : []),
+  legal: (): Choice[] => (mine() ? viewFor(s, seat).legal : []),
   /** Remember this moment, so that it can be taken back. */
   mark() { history.push({ json: save(s), placed: Sim.placed.slice() }); if (history.length > 40) history.shift(); },
   canUndo: () => history.length > 0 && !busy && !replay,
@@ -96,33 +120,56 @@ export const Sim = {
   apply(c: Choice): boolean {
     const from = s.log.length;
     try { applyInPlace(s, c); } catch (e) { if (e instanceof IllegalChoice) { console.warn('refused', JSON.stringify(c), e.message); return false; } throw e; }
-    // Recruiting shows the top agent of the deck: that, too, cannot be taken back.
-    if (s.log.slice(from).some((e) => REVEALS.has(e.e)) || s.pending?.kind === 'recruit') history = [];
+    // Recruiting shows the top agent of the deck: that, too, cannot be taken back. A sandbox takes anything back (FR-U-12).
+    if (!Sim.sandbox && (s.log.slice(from).some((e) => REVEALS.has(e.e)) || s.pending?.kind === 'recruit')) history = [];
     return true;
   },
   /** These entries were already told. */
   seen(l: LogEntry[]) { l.forEach((e) => told.add(e)); },
   /** News since the last look. */
   news(): Entry[] { const l = s.log.slice(seen).filter((e) => !told.has(e) || !['combat', 'attack'].includes(e.e)); seen = s.log.length; return l as Entry[]; },
-  /** Everyone else plays until it is the player's decision again. `show` is called after each of their turns. What they did cannot be undone. */
+  /** The bots play until a person has to decide. `show` is called after each of their turns. What they did cannot be undone (except in a sandbox). */
   async run(show: (p: number, l: Entry[]) => void) {
     if (busy || replay) return; busy = true;
     let last: { p: number; from: number } | null = null, acted = false;
-    while (!s.over && s.pending!.player !== 0) {
+    while (!s.over && !humans.has(s.pending!.player)) {
       const p = s.pending!.player, k = s.pending!.kind, from = s.log.length;
       applyInPlace(s, bots[p].choose(viewFor(s, p)), true); acted = true;
       if (k === 'turn') last = { p, from };
-      const ended = s.over || s.pending!.kind === 'turn' || s.pending!.player === 0;
+      const ended = s.over || s.pending!.kind === 'turn' || humans.has(s.pending!.player);
       if (last && ended) { refresh(); show(last.p, s.log.slice(last.from) as Entry[]); last = null; if (!fast) await wait(650); }
     }
-    if (acted) history = [];
+    if (acted && !Sim.sandbox) history = [];
     busy = false; refresh();
   },
   /** Let a bot play for the player as well, up to some point. */
   async auto(until: (s: State) => boolean) {
     if (busy || replay) return; Sim.mark(); let n = 0;
     while (!s.over && !until(s) && n++ < 5000) { const p = s.pending!.player; applyInPlace(s, bots[p].choose(viewFor(s, p)), true); }
-    history = []; Sim.placed.splice(0); refresh();
+    if (!Sim.sandbox) history = [];
+    Sim.placed.splice(0); refresh();
+  },
+
+  /** The advisor (FR-A-8): the search bot's best suggestions for the decision in front of the person, with its reasons. Takes most of a second. */
+  advise: (): Considered[] => (mine() ? advise(viewFor(s, seat), { ms: 700, seed: `${s.seed}-advice-${s.log.length}` }) : []),
+
+  /** After a suggestion is played: the seat's bot carries the action through (each step of a move, loading, the choices it brings) until the decision is no longer this person's or a new turn begins. `step` runs after each choice, to show it. */
+  async finish(step: () => Promise<void>) {
+    for (let n = 0; n < 300 && mine() && s.pending!.kind !== 'turn'; n++) { if (!Sim.apply(bots[seat].choose(viewFor(s, seat)))) break; await step(); }
+  },
+
+  /* ---- sandbox (FR-U-19, FR-R-6) ---- */
+  /** Change the game directly. Kept for undo first. */
+  edit(f: (s: State) => void) { if (!Sim.sandbox) return; Sim.mark(); f(s); refresh(); },
+  /** A seat is played by a person, or by its bot again. One person at least. */
+  setHuman(p: number, on: boolean) { if (!Sim.sandbox) return; if (on) humans.add(p); else if (humans.size > 1) humans.delete(p); setup.humans = [...humans].sort((a, b) => a - b); },
+  /** Play on under other rules (only in a sandbox, and on a map of the same size). The moments before cannot be taken back: they belong to the old rules. */
+  setRules(id: string): string | null {
+    if (!Sim.sandbox) return 'only in a sandbox';
+    const d = defOf(id), width = (x: GameDef) => x.settings.map.size * 3 + 2 * (x.settings.ring.openSea + x.settings.ring.europe);
+    if (width(d) !== width(def)) return 'the map would be another size';
+    def = d; s.def = d; setup = { ...setup, ruleset: id }; history = [];
+    Object.assign(D, exportRules(def)); refresh(); return null;
   },
 
   /* ---- the game behind the title screen ---- */
@@ -130,7 +177,7 @@ export const Sim = {
   /** A bot game for the title screen, with the seed and nations it is given, already some rounds in, so there is land, colonies and ships to see. The same seed plays the same game. */
   startDemo(seed: string, n: string[]) {
     setup = { nations: n, bots: ['explorer', 'trader', 'balanced'], ruleset: 'board', seed };
-    def = loadRuleset('board'); replay = null; seat = 0; demo = true;
+    def = defOf('board'); replay = null; seat = 0; demo = true;
     s = createGame({ def, seed: setup.seed, nations: n, logging: true }); Object.assign(D, exportRules(def)); begin(); demo = true;
     for (let k = 0; k < 6000 && !s.over && s.round < 3; k++) Sim.demoStep();
     // The whole New World is charted for the title screen: no clouds over the land, every settlement in its place.
@@ -144,7 +191,7 @@ export const Sim = {
   /** Open a recorded game at its start. */
   watch(data: Replay) {
     demo = false;
-    def = loadRuleset(data.ruleset);
+    def = defOf(data.ruleset);
     if (data.rulesetHash && data.rulesetHash !== def.rulesetHash) throw new Error(`recorded with another version of ruleset "${data.ruleset}"`);
     setup = { nations: data.nations, bots: [], ruleset: data.ruleset, seed: data.seed };
     replay = { data, at: 0, marks: new Map() }; seat = 0; Object.assign(D, exportRules(def)); Sim.seek(0);

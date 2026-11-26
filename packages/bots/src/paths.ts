@@ -6,6 +6,8 @@ export interface Paths { dist: Float64Array; from: Int32Array }
 function search(s: State, start: number[], cost: (c: number) => number): Paths {
   const n = s.map.zone.length;
   const dist = new Float64Array(n).fill(Infinity), from = new Int32Array(n).fill(-1);
+  // Each cell is reached from up to 8 neighbours: work out its cost once.
+  const costs = new Float64Array(n).fill(-1);
   // Costs are 1 to 3, so a few buckets do.
   const buckets: number[][] = [[...start]];
   for (const c of start) dist[c] = 0;
@@ -15,7 +17,8 @@ function search(s: State, start: number[], cost: (c: number) => number): Paths {
     for (const c of b) {
       if (dist[c] !== d) continue;
       for (const x of s.map.neighbours[c]) {
-        const k = cost(x);
+        let k = costs[x];
+        if (k < 0) k = costs[x] = cost(x);
         if (!(d + k < dist[x])) continue;
         dist[x] = d + k;
         from[x] = c;

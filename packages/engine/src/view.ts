@@ -8,6 +8,12 @@ export interface View {
   collections: string[][];
 }
 const hide = (a: unknown[]) => a.map(() => '?');
+/** A copy without secret fields: those whose names start with `_`, at any depth. */
+function strip<T>(x: T): T {
+  if (Array.isArray(x)) return x.map(strip) as T;
+  if (x && typeof x === 'object') return Object.fromEntries(Object.entries(x).filter(([k]) => !k.startsWith('_')).map(([k, y]) => [k, strip(y)])) as T;
+  return x;
+}
 
 /** What one seat may know. Hidden cards become '?', unrevealed map cells become null. */
 export function viewFor(s: State, p: number): View {
@@ -15,7 +21,9 @@ export function viewFor(s: State, p: number): View {
   v.rng = [0, 0, 0, 0];
   v.seed = '';
   v.log = [];
-  v.stack = [];
+  delete v.forced;
+  // What the engine will do next is public, except fields kept secret (their names start with `_`, e.g. what each player gave in secret).
+  v.stack = s.stack.map((t) => strip(t));
   v.frags = s.frags.map((f, i) => (s.revealed[i] ? f : -1));
   const open = (i: number) => s.map.frag[i] < 0 || s.revealed[s.map.frag[i]];
   v.map = {

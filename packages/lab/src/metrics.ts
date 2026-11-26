@@ -46,7 +46,7 @@ export function leaderWins(r: GameRecord, round: number): number | null {
   const top = Math.max(...s), lead = s.flatMap((x, p) => (x === top ? [p] : []));
   return mean(lead.map((p) => +r.winners.includes(p)));
 }
-const isShare = (k: string) => /^(ended|patriot col|colonies taken|loyalist wins|a patriot|nobody|no loyalist|taxes|leader)/.test(k);
+export const isShare = (k: string) => /^(ended|patriot col|colonies taken|loyalist wins|a patriot|nobody|no loyalist|taxes|leader)/.test(k);
 export const values = (rs: GameRecord[], k: string) => rs.map(PER_GAME[k]).filter((x): x is number => x !== null);
 export function cell(rs: GameRecord[], k: string): string {
   const v = values(rs, k);

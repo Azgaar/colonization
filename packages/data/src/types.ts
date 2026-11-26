@@ -204,8 +204,17 @@ export interface Override {
   /** How the rule would read at the table. Required for direct and component changes. */
   table?: string;
   components?: string[];
+  /** New entity path → existing entity path in the same collection, e.g. "fathers.my_father": "fathers.peter_minuit". Applied before `set`. */
+  copy?: Record<string, string>;
   /** Dotted paths into game data, e.g. "agents.priest.price". */
-  set: Record<string, unknown>;
+  set?: Record<string, unknown>;
+  /** Entity paths to take out of the game, e.g. "events.stamp_act". Applied after `set`. */
+  remove?: string[];
 }
-export interface Ruleset { id: string; title: string; sandbox?: boolean; overrides: Override[] }
+/** `base` names a ruleset whose overrides come first: `pc` is `board` plus its own changes. */
+export interface Ruleset { id: string; title: string; base?: string; sandbox?: boolean; overrides: Override[] }
+/** Where a value can be edited: a workbook cell, or a key in packages/data/src/settings.ts. `row` is null for a new row. */
+export interface Source { sheet: string; row: number | null; column: string | null; header: string }
 export interface GameDef extends GameData { rulesetId: string; rulesetHash: string }
+/** Path → [sheet, row, column letter, header] of the cell it was read from. Deeper paths fall back to the nearest recorded parent. */
+export type SourceMap = Record<string, [string, number, string, string]>;

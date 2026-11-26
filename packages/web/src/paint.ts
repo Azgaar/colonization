@@ -10,6 +10,8 @@ import { fans, peek } from './ui/fans.ts';
 import { hand } from './ui/hand.ts';
 import { details } from './ui/look.ts';
 import { scenes } from './ui/scenes.ts';
+import { sandbox } from './ui/sandbox.ts';
+import { advisor } from './ui/advisor.ts';
 import { menu, top } from './ui/top.ts';
 import { replayBar } from './ui/setup.ts';
 import { title } from './ui/title.ts';
@@ -18,6 +20,7 @@ import { war } from './ui/war.ts';
 export function paint() {
   Places.forget(); if (S.card && (!P.hand.includes(S.card) || Sim.kind() !== 'turn')) S.card = null;
   const b = document.body; b.classList.toggle('lift', !!S.card); b.dataset.view = S.view; b.classList.toggle('war', S.war >= 0); b.classList.toggle('busy', Sim.busy);
-  const sp = Places.spaces(S.card); top(); menu(); hand(sp); fans(sp); peek(); scenes(sp); details(); paintStep(); war(); replayBar(); title(); Board.edge(); Board.ground(); Board.draw(); picker(); marks();
+  // The title screen first: whether it covers the table decides what can be measured below (card names are fitted to their cards).
+  title(); const sp = Places.spaces(S.card); top(); menu(); hand(sp); fans(sp); peek(); scenes(sp); details(); paintStep(); war(); replayBar(); sandbox(); advisor(); Board.edge(); Board.ground(); Board.draw(); picker(); marks();
 }
 const marks = () => document.querySelectorAll<HTMLElement>('[data-space]').forEach((e) => { const s = S.card ? Places.spaces(S.card)[e.dataset.space!] : null; e.classList.toggle('ok', !!s?.options?.length); e.classList.toggle('off', !!S.card && !s?.options?.length); });

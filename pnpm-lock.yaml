@@ -67,6 +67,9 @@ importers:
       '@col/engine':
         specifier: workspace:*
         version: link:../engine
+      '@col/lab':
+        specifier: workspace:*
+        version: link:../lab
 
 packages:
 

@@ -3,9 +3,10 @@ import { $, D, L, lang, pick } from '../data.ts';
 import { icon } from '../icons.ts';
 import { Board } from '../map/board.ts';
 import { paint } from '../paint.ts';
-import { Sim } from '../sim.ts';
+import { Dev, LOCAL, Sim } from '../sim.ts';
 import { U, type TitlePage } from '../state.ts';
 import { crest, newGame, openNewGame } from './newgame.ts';
+import { bench } from './bench.ts';
 import { chooseFile, enterGame } from './setup.ts';
 import { introPlaying } from './intro.ts';
 import { startAttract, stopAttract } from './attract.ts';
@@ -24,7 +25,7 @@ function savedCard() {
   if (!s) return `<p class="empty">${L('No game is saved in this browser yet.', 'В этом браузере пока нет сохранённой игры.')}</p>`;
   return `<div class="save">${crest(s.nation, 64)}<div><b>${pick(D.names.nations[s.nation] ?? [s.nation, s.nation])}</b><span>${s.over ? L('The war is over', 'Война окончена') : `${year(s.round)} · ${L('round', 'тур')} ${s.round}`} · ${s.players === 1 ? L('solo', 'соло') : L(`${s.players} players`, `игроков: ${s.players}`)}</span></div><div class="sa"><button class="primary" data-t-continue>${L('Continue', 'Продолжить')}</button><button data-t-forget>${L('Forget', 'Забыть')}</button></div></div>`;
 }
-const PAGES: Record<Exclude<TitlePage, 'main' | 'new'>, () => string> = {
+const PAGES: Record<Exclude<TitlePage, 'main' | 'new' | 'bench'>, () => string> = {
   load: () => `<h2>${L('Load game', 'Загрузить игру')}</h2>
 <h3>${L('Saved in this browser', 'Сохранено в этом браузере')}</h3>${savedCard()}
 <h3>${L('From a file', 'Из файла')}</h3><p>${L('A game saved to a file during play (Options → Save to a file).', 'Игра, сохранённая в файл во время игры (Настройки → Сохранить в файл).')}</p>
@@ -32,6 +33,8 @@ const PAGES: Record<Exclude<TitlePage, 'main' | 'new'>, () => string> = {
   options: () => { const v = Board.view; return `<h2>${L('Options', 'Настройки')}</h2>
 ${seg(L('Language', 'Язык'), [['data-lang="en"', 'English', lang() === 'en'], ['data-lang="ru"', 'Русский', lang() === 'ru']])}
 ${seg(L('Other players’ turns', 'Ходы других игроков'), [['data-fast=""', L('Show each', 'Показывать'), !Sim.fast], ['data-fast="1"', L('At once', 'Сразу'), Sim.fast]])}
+${LOCAL ? seg(L('Dev mode', 'Режим разработчика'), [['data-dev="1"', L('On', 'Да'), Dev.on], ['data-dev=""', L('Off', 'Нет'), !Dev.on]]) : ''}
+${Dev.on ? seg(L('Forecast in play', 'Прогноз в игре'), [['data-forecast="1"', L('On', 'Да'), Dev.forecast], ['data-forecast=""', L('Off', 'Нет'), !Dev.forecast]]) : ''}
 <h3>${L('Map', 'Карта')}</h3>
 ${seg(L('Tilt follows zoom', 'Наклон по масштабу'), [['data-follow="1"', L('On', 'Да'), !!v.auto], ['data-follow=""', L('Off', 'Нет'), !v.auto]])}
 ${seg(L('Cell grid', 'Сетка клеток'), [['data-grid=""', L('Off', 'Нет'), !Board.grid], ['data-grid="1"', L('On', 'Да'), Board.grid]])}
@@ -58,15 +61,17 @@ export function title() {
   document.body.classList.toggle('titled', !!page);
   if (!page || introPlaying()) { el.hidden = true; el.dataset.page = ''; shown = ''; stopAttract(); return; }
   el.hidden = false; startAttract();
-  const key = [page, lang(), page === 'new' ? '' : JSON.stringify(Sim.savedInfo()), page === 'options' ? [Sim.fast, Board.view.auto, Board.grid].join() : ''].join('|'), was = shown.split('|')[0];
+  const key = [page, lang(), page === 'new' ? '' : JSON.stringify(Sim.savedInfo()), page === 'options' ? [Sim.fast, Board.view.auto, Board.grid, Dev.on, Dev.forecast].join() : ''].join('|'), was = shown.split('|')[0];
   if (key === shown) return;
   shown = key;
   if (page === 'new') { el.dataset.page = 'new'; el.innerHTML = newGame(); return; }
+  if (page === 'bench') { el.dataset.page = 'bench'; el.innerHTML = bench(); return; }
   const s = Sim.savedInfo(), cont = s && !s.over;
   const items: [string, string, boolean][] = [
     ['data-t-continue', L('Continue', 'Продолжить'), !cont],
     ['data-t-new', L('New game', 'Новая игра'), false],
     ['data-t-page="load"', L('Load game', 'Загрузить игру'), false],
+    ['data-t-page="bench"', L('Design bench', 'Мастерская'), false],
     ['data-t-page="options"', L('Options', 'Настройки'), false],
     ['data-t-page="about"', L('About', 'Об игре'), false],
   ];
@@ -74,7 +79,7 @@ export function title() {
   const first = !was || was === 'new', fresh = was !== page;
   el.dataset.page = page;
   el.innerHTML = `<div class="veil" aria-hidden="true"><div class="mist a"></div><div class="mist b"></div></div>
-<header class="brand${first ? ' enter' : ''}"><h1>${L('Colonization', 'Колонизация')}</h1><span class="rose">${ROSE}</span><p>${L('A New World, a charter from the King, and a question of loyalty', 'Новый Свет, грамота короля и вопрос верности')}</p></header>
+<header class="brand${first ? ' enter' : ''}"><h1>${L('Colonization', 'Колонизация')}</h1><span class="rose">${ROSE}</span><p>${L('A New World and a question of loyalty', 'Новый Свет и вопрос верности')}</p></header>
 <nav class="menu-t${first ? ' enter' : ''}">${items.map(([a, n, off], i) => `<button ${a} class="${page !== 'main' && a.includes(`"${page}"`) ? 'on' : ''}" ${off ? 'disabled' : ''} style="--i:${i}"><b>${n}</b></button>`).join('')}</nav>
 ${page === 'main' ? '' : `<section class="page${fresh ? ' anim' : ''}">${PAGES[page]()}<button class="pback" data-t-page="main">${L('Back', 'Назад')}</button></section>`}
 <small class="ver">v${version}</small>`;

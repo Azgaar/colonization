@@ -1,0 +1,6 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": { "lib": ["ES2023", "DOM", "DOM.Iterable", "WebWorker.ImportScripts"], "types": [], "module": "ESNext", "moduleResolution": "Bundler" },
+  "include": ["src/browser.ts", "src/worker.ts", "src/index.ts"],
+  "exclude": []
+}

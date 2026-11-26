@@ -302,6 +302,15 @@ M2 status (2026-11-25): goal-driven bots, eight personalities, war solver, batch
 
 M3 status (2026-11-26): done. The interface is `packages/web`: new game with players, the player's nation, each bot's character, ruleset and seed; the full map, hand, Colony and Europe screens, every engine decision as a panel, combat, events, ruins, wrecks, the war and the final score by source; saving in the browser at every decision and to a file; undo until something hidden shows; replays of bot games with step, jump and any seat's view; both languages.
 
+M4 status (2026-11-26): built.
+
+- Search AI: information-set Monte Carlo search over the goal bot's candidates, sampling hidden cards and tiles from the seat's view; difficulty levels easy, normal, hard, expert (FR-A-5, FR-A-6); the advisor plays a whole suggested action (FR-A-8).
+- Exit criterion met for the search bot: at 60 samples per decision it beats the tuned bot in 62% of 200 two-player games (95% interval 55–68%, score +1.75 ±0.89) and wins 37% of 200 four-player games against three tuned bots (30–43%, parity 25%). `pnpm strength:search`.
+- Tweak panel (Design bench → Rules): own rulesets on `pc`, every value with default, validation and reset, conversion label and table wording per change (FR-R-4); overrides can add a card as a copy or remove one (FR-R-3); export of the cells to edit by sheet, row and column and the conversion report (FR-R-5, FR-R-8); `pnpm rules promote | drop` with an entry in `decisions.md` (FR-R-9).
+- Lab without the command line (Design bench → Lab, FR-T-8): compare rulesets on paired seeds, sweeps (FR-T-5, also `pnpm sweep`), problem detectors (FR-T-7, also `pnpm detect`).
+- Hot-seat (FR-U-16); in dev mode, the Dev menu (FR-U-19, rules changed mid-game FR-R-6) and forecasts (FR-U-15).
+- Open: the second exit criterion, a tweak-test-export cycle by the designer unaided, needs the designer.
+
 ## 12. Testing
 
 Good tests here check observable behaviour: given a state and a choice, these options are legal and this is the result.

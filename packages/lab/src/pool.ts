@@ -1,34 +1,11 @@
-/** Run many games on all cores. */
+/** Run many games on all cores (Node only; the browser counterpart is browser.ts). */
 import { availableParallelism } from 'node:os';
 import { isMainThread, parentPort, Worker, workerData } from 'node:worker_threads';
 import { fileURLToPath } from 'node:url';
-import { compileRuleset, gameData, rulesets, type GameDef, type Override, type Ruleset } from '@col/data';
-import { goalBot, PERSONALITIES, randomBot, type Bot, type Personality, type Weights } from '@col/bots';
-import { playGame } from './play.ts';
-import { record, type GameRecord } from './record.ts';
+import { runGame, type GameSpec } from './game.ts';
+import type { GameRecord } from './record.ts';
 
-export type BotSpec = { kind: 'random' | 'eager' } | { kind: 'goal'; name: string; weights?: Partial<Weights>; personality?: Personality };
-export interface GameSpec { seed: string; nations: string[]; bots: BotSpec[]; ruleset?: string; changes?: Override['set'] }
-
-export const makeBot = (b: BotSpec, seed: string): Bot =>
-  b.kind === 'goal' ? goalBot(seed, { ...(b.weights ?? {}), ...(b.personality ? PERSONALITIES[b.personality] : {}) }, b.name) : randomBot(seed, b.kind === 'eager');
-
-const defs = new Map<string, GameDef>();
-function defOf(g: GameSpec): GameDef {
-  const key = `${g.ruleset ?? 'board'}|${JSON.stringify(g.changes ?? {})}`;
-  let d = defs.get(key);
-  if (!d) {
-    const base = rulesets[g.ruleset ?? 'board'];
-    const r: Ruleset = g.changes ? { id: `${base.id}+`, title: '', sandbox: true, overrides: [...base.overrides, { id: 'change', why: 'experiment', set: g.changes }] } : base;
-    defs.set(key, (d = compileRuleset(gameData, r)));
-  }
-  return d;
-}
-export function runGame(g: GameSpec): GameRecord {
-  const bots = g.bots.map((b, p) => makeBot(b, `${g.seed}-${p}`));
-  const { state, choices } = playGame({ def: defOf(g), seed: g.seed, nations: g.nations, bots, logging: true });
-  return record(state, choices, bots.map((b) => b.name), g.ruleset ?? 'board');
-}
+export * from './game.ts';
 
 export async function runAll(specs: GameSpec[], onProgress?: (done: number) => void): Promise<GameRecord[]> {
   const n = Math.min(availableParallelism(), Math.max(1, Math.ceil(specs.length / 4)));

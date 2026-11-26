@@ -262,8 +262,9 @@ function end() {
 export function playIntro(nation: string, done: () => void) {
   const el = $('intro');
   list = [harbour(), charter(), chart(), storm(), landfall(), colony()]; finish = done; card = false;
-  el.innerHTML = `<div class="screen"><svg class="film" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet"></svg><div class="fade"></div><div class="sub"></div>
-<section class="finale"><div class="crest">${Places.em(0, 132)}</div><h1>${pick(D.names.nations[nation])}</h1><p class="when">1620</p><p class="sub2">${L('Your charter begins', 'Ваша грамота вступает в силу')}</p></section></div>
+  // The film fills the screen (cut at the edges rather than framed in black); the words and the last card sit on the screen itself, so no cut reaches them.
+  el.innerHTML = `<div class="screen"><svg class="film" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet"></svg><div class="fade"></div></div><div class="sub"></div>
+<section class="finale"><div class="crest">${Places.em(0, 132)}</div><h1>${pick(D.names.nations[nation])}</h1><p class="when">1620</p><p class="sub2">${L('Your charter begins', 'Ваша грамота вступает в силу')}</p></section>
 <div class="dots">${Array.from({ length: list.length + 1 }, () => '<i></i>').join('')}</div><button class="skip" data-intro-skip>${L('Skip', 'Пропустить')}</button>`;
   el.hidden = false;
   go(0); raf = requestAnimationFrame(frame);

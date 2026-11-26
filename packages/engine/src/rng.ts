@@ -19,7 +19,8 @@ export function nextU32(r: [number, number, number, number]): number {
   return t >>> 0;
 }
 export const below = (s: State, n: number): number => Math.floor((nextU32(s.rng) / 4294967296) * n);
-export const die = (s: State): number => below(s, 6) + 1;
+/** A die. In a sandbox, forced results come first. */
+export const die = (s: State): number => s.forced?.dice?.length ? s.forced.dice.shift()! : below(s, 6) + 1;
 export const dice = (s: State, n: number): number[] => Array.from({ length: n }, () => die(s));
 export function shuffle<T>(s: State, a: T[]): T[] {
   for (let i = a.length - 1; i > 0; i--) { const j = below(s, i + 1); [a[i], a[j]] = [a[j], a[i]]; }

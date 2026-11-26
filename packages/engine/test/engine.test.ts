@@ -102,7 +102,9 @@ describe('hidden information', () => {
     expect(v.state.agentDeck.every((c) => c === '?')).toBe(true);
     expect(v.state.map.terrain.filter((t, i) => s.map.zone[i] === 'map').every((t) => t === null)).toBe(true);
     expect(v.state.frags.every((f) => f === -1)).toBe(true);
-    expect([v.state.seed, v.state.stack, v.state.log]).toEqual(['', [], []]);
+    expect([v.state.seed, v.state.log]).toEqual(['', []]);
+    // What comes next is public, but not what was given in secret.
+    expect(v.state.stack).toEqual(s.stack);
   });
   it('cards committed to a battle stay hidden until it is resolved', () => {
     const s = game(2);

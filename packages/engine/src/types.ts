@@ -84,4 +84,6 @@ export interface State {
   over: Result | null;
   logging: boolean;
   log: LogEntry[];
+  /** Sandbox only: dice results to use next, in order, before the random ones. Hidden from every view. */
+  forced?: { dice?: number[] };
 }

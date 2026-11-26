@@ -1,5 +1,6 @@
-import type { Choice, State } from '@col/engine';
+import type { Choice, State, View } from '@col/engine';
 import { components } from '@col/engine';
+import type { Bot } from '@col/bots';
 
 /** What is kept of one game. Everything in reports is computed from these. */
 export interface GameRecord {
@@ -18,11 +19,33 @@ export interface GameRecord {
   peak: Record<string, number>;
   /** Supply cards drawn, sales by resource. */
   sold: Record<string, number>;
+  /** Per seat: decisions in which each card was on offer (`agent.x` to hire, `father.x` to take, `building.x` to build). Missing in older records. */
+  offered?: Record<string, number>[];
+  /** Per seat: decisions taken, and those with a single legal choice. Missing in older records. */
+  decisions?: number[]; forced?: number[];
+}
+
+/** What the seats saw while deciding. Filled by the bots that `watch` wraps. */
+export interface Seen { offered: Record<string, number>[]; decisions: number[]; forced: number[] }
+/** Wrap bots to note what each seat was offered, read from the legal choices of the views they already get. */
+export function watch(bots: Bot[]): { bots: Bot[]; seen: Seen } {
+  const seen: Seen = { offered: bots.map(() => ({})), decisions: bots.map(() => 0), forced: bots.map(() => 0) };
+  const note = (v: View) => {
+    const p = v.player, o = seen.offered[p], got = new Set<string>();
+    seen.decisions[p]++;
+    if (v.legal.length === 1) seen.forced[p]++;
+    for (const c of v.legal) {
+      const k = c.c === 'buy' && c.agent ? `agent.${c.agent}` : c.c === 'take' && c.father ? `father.${c.father}`
+        : c.c === 'build' && c.b ? `building.${c.b}` : c.c === 'play' && c.a === 'build' && c.building ? `building.${c.building}` : null;
+      if (k && !got.has(k)) { got.add(k); bump(o, k); }
+    }
+  };
+  return { bots: bots.map((b) => ({ name: b.name, choose: (v: View) => { note(v); return b.choose(v); } })), seen };
 }
 
 const bump = (o: Record<string, number>, k: string, n = 1) => { o[k] = (o[k] ?? 0) + n; };
 
-export function record(s: State, choices: Choice[], names: string[], ruleset: string): GameRecord {
+export function record(s: State, choices: Choice[], names: string[], ruleset: string, seen?: Seen): GameRecord {
   const n = s.players.length, maps = () => s.players.map(() => ({}) as Record<string, number>);
   const r: GameRecord = {
     seed: s.seed, ruleset, n, nations: s.players.map((p) => p.nation), bots: names, first: -1, rounds: s.round, reason: s.over!.reason, choices: choices.length, plays: 0,
@@ -34,6 +57,7 @@ export function record(s: State, choices: Choice[], names: string[], ruleset: st
     sieges: s.war!.sieges.map((x) => ({ owner: x.owner, cubes: x.cubes, attack: x.attack ?? 0, defence: x.defence ?? 0, dice: x.dice?.length ?? 0, fell: !!x.fell, takenBy: x.takenBy ?? null, loyalist: x.loyalist.length })),
     attacks: [], settlements: { total: s.settlements.length, gone: s.settlements.filter((x) => !x.alive).length, allied: s.settlements.filter((x) => x.alive && x.ally !== null).length, hostile: s.settlements.filter((x) => x.alive && s.hostility[x.tribe] >= 4).length },
     frags: s.revealed.filter(Boolean).length, events: [], poi: {}, raids: 0, gifts: 0, passesWithCards: 0, peak: {}, sold: {},
+    ...(seen ? { offered: seen.offered, decisions: seen.decisions, forced: seen.forced } : {}),
   };
   let round = 0, target = '';
   const peak = (c: Record<string, number>) => { for (const [k, v] of Object.entries(c)) r.peak[k] = Math.max(r.peak[k] ?? 0, v); };

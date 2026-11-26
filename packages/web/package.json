@@ -6,6 +6,7 @@
   "dependencies": {
     "@col/bots": "workspace:*",
     "@col/data": "workspace:*",
-    "@col/engine": "workspace:*"
+    "@col/engine": "workspace:*",
+    "@col/lab": "workspace:*"
   }
 }

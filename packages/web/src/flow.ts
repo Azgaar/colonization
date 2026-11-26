@@ -1,7 +1,7 @@
 /* The flow of the game: the player's choices go to the engine, then the others play until it is the player's turn again. */
 import type { Choice } from '@col/engine';
 import { doing } from './ui/news.ts';
-import { art, D, P, RES, W } from './data.ts';
+import { art, D, P, RES, showSeat, W } from './data.ts';
 import { bub } from './input.ts';
 import { Board } from './map/board.ts';
 import { paint } from './paint.ts';
@@ -42,7 +42,10 @@ export async function go(path: number[], first = false) {
 }
 export async function act(c: Choice) { if (!['move', 'cargo'].includes(Sim.kind() ?? '')) Sim.mark(); Sim.apply(c); return settle(); }
 /** After any choice: show what happened, and let the others play until it is our decision again. */
+/** Hot-seat: the person whose decision it is takes the screen. Hands are no secret between people at one table; bots still see only their own. */
+const take = () => { const p = Sim.waiting(); if (p !== null) showSeat(p); };
 export async function settle() {
+  take();
   const round = D.round;
   // Nothing left to choose: go on.
   while (['hire', 'propaganda'].includes(Sim.kind() ?? '')) { const l = Sim.legal(); if (!(l.length === 1 && l[0].c === 'done' && Sim.apply(l[0]))) break; }
@@ -50,7 +53,7 @@ export async function settle() {
   const pass = () => { if (D.round !== round) Sim.placed.splice(0); paint(); Board.land(); };
   pass();
   if (X.reports.length && !Sim.mine() && !D.over) return; // read first, the others wait
-  if (!Sim.mine() && !D.over) { const run = Sim.run(note); paint(); await run; report(Sim.news()); pass(); }
+  if (!Sim.mine() && !D.over && Sim.waiting() === null) { const run = Sim.run(note); paint(); await run; take(); report(Sim.news()); pass(); }
   if (D.over && S.war < 0 && !X.reports.length) { S.war = 0; S.view = 'map'; focus(); paint(); }
   // Saved at every decision of the player, so a reload goes on from here.
   Sim.keep();
