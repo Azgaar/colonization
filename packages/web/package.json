@@ -1,0 +1,11 @@
+{
+  "name": "@col/web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@col/bots": "workspace:*",
+    "@col/data": "workspace:*",
+    "@col/engine": "workspace:*"
+  }
+}

@@ -56,6 +56,18 @@ importers:
         specifier: workspace:*
         version: link:../engine
 
+  packages/web:
+    dependencies:
+      '@col/bots':
+        specifier: workspace:*
+        version: link:../bots
+      '@col/data':
+        specifier: workspace:*
+        version: link:../data
+      '@col/engine':
+        specifier: workspace:*
+        version: link:../engine
+
 packages:
 
   /@emnapi/core@2.0.0-beta.2:

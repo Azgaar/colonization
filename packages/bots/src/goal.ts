@@ -150,7 +150,7 @@ function landGoals(x: Situation, start: number, paths: Paths): Goal[] {
 
 /** Best peaceful or violent use of a settlement, ignoring how to get there. */
 function nativeValue(x: Situation, n: number): number {
-  const { s, me, w } = x, z = s.settlements[n - 1], pl = s.players[me], h = util.combinedHostility(s, me, z.tribe);
+  const { s, me } = x, z = s.settlements[n - 1], pl = s.players[me], h = util.combinedHostility(s, me, z.tribe);
   let v = 0;
   if (s.nativesLeft > 0 && pl.crosses >= h) v = Math.max(v, preachValue(x, h));
   if (z.ally === null && h <= 1 && x.cards.some((c) => s.def.agents[c].edu === 2 || s.def.agents[c].base === 'scout')) v = Math.max(v, allyValue(x));

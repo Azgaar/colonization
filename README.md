@@ -9,7 +9,7 @@ Digital version and test bench for the board game. Start with [docs/PRD.md](docs
 | `packages/engine` | Rules engine: no interface, no I/O, seeded randomness |
 | `packages/bots` | AI players: random, and goal-driven with personalities |
 | `packages/lab` | Playing many games |
-| `prototypes/` | Official interface prototype. It plays the real rules engine against bots. See [prototypes/README.md](prototypes/README.md) |
+| `packages/web` | The game in the browser: the real rules engine against bots, saving, replays. See [packages/web/README.md](packages/web/README.md) |
 | `rulesets/` | `board` (reference), `pc` (convertible changes), `alternatives` (sandbox) |
 
 `assets/` and `components/` are kept out of git.
@@ -26,8 +26,9 @@ Digital version and test bench for the board game. Start with [docs/PRD.md](docs
 | `pnpm systems 400` | Bot games that list which systems and cards were exercised |
 | `pnpm watch seed 3 trader,rebel` | One game as text |
 | `pnpm tune`, `pnpm experiments` | Self-play tuning and balance experiments (bots are not strong enough yet to trust the numbers) |
-| `pnpm prototype` | Rebuild the engine and the starting position for the interface prototype |
-| `pnpm check` | Import, type check (engine and prototype) and tests |
+| `pnpm web` | Build the interface and serve it at http://localhost:8765 |
+| `pnpm replay seed 4` | Play a bot game and save it as a replay for the interface |
+| `pnpm check` | Import, type check (engine and interface) and tests |
 
 ## Changing numbers
 

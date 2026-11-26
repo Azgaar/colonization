@@ -1,0 +1,6 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": { "lib": ["ES2023", "DOM", "DOM.Iterable"], "types": [], "module": "ESNext", "moduleResolution": "Bundler", "noUnusedLocals": true },
+  "include": ["src", "test"],
+  "exclude": []
+}

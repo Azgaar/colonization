@@ -2,7 +2,7 @@ import type { Icon } from '@col/data';
 import { ICON_RESOURCE } from '@col/data';
 import type { Explained, Part, State } from './types.ts';
 import { log } from './core.ts';
-import { addBells, addCrosses, agent, building, coloniesOf, colonyAt, has, mods, settlementAt } from './util.ts';
+import { addBells, addCrosses, agent, building, coloniesOf, colonyAt, has, settlementAt } from './util.ts';
 import { isOpen, islandSize, nb, tokenAt } from './map.ts';
 
 export interface Yield extends Explained { cell: number; icon: Icon }

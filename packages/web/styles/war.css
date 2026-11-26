@@ -1,0 +1,24 @@
+/* The war, colony by colony. */
+.wl { display:flex;flex-direction:column;gap:7px }
+.wl header { display:flex;gap:16px;align-items:center;flex-wrap:wrap }
+.wl h3 { font-size:23px }
+.wl .out { margin-left:auto;font:800 24px var(--sc);color:#93e09c }
+.wl .out.fell { color:#ff9a82 }
+.wscore { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px 30px }
+.wscore div { display:grid;grid-template-columns:34px auto 1fr auto;gap:12px;align-items:center }
+.wscore strong { font:800 28px/1 var(--sc) }
+.wscore .lost { opacity:.5 }
+.wnav { display:flex;gap:5px;align-items:center;justify-content:center }
+.wnav button { min-width:34px;height:34px;border-radius:99px;display:grid;place-items:center;background:#ffffff1f;font-weight:800 }
+.wnav .wd { background:none;min-width:0;opacity:.6 }
+.wnav .wd.on { opacity:1;transform:scale(1.18) }
+.wnav .fell .em { filter:grayscale(.75) brightness(.7) }
+.wnav .tx { padding:0 14px;background:#ffffff1f;opacity:1 }
+.warbox { position:fixed;left:50%;bottom:20px;transform:translateX(-50%);width:min(860px,94vw);z-index:12;background:#0c2c31f7;border-radius:20px;padding:15px 22px 14px;display:none;flex-direction:column;gap:11px;box-shadow:0 12px 40px #000b }
+body.war .warbox { display:flex }
+.warbox>p { margin:0;text-align:center;font-size:17px }
+body.war .hand,body.war .door,body.war #heaps,body.war .side,body.war .kingbox { display:none }
+/* The final score by source, under each player's total. */
+.wscore div .parts { grid-column:1/-1;display:flex;flex-wrap:wrap;gap:3px 12px;font-size:14px;opacity:.85;margin:-2px 0 4px 44px }
+.wscore .parts .pt { display:inline-flex;align-items:center;gap:3px }
+.wscore .parts svg { opacity:.9 }

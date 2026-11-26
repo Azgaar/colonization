@@ -46,11 +46,12 @@
 | DD-40 | Warehouse and hold goods are both shown as heaps of goods. Dragging an agent never moves the camera |
 | DD-41 | Europe is not drawn as a place. The outer ring of cells on all four sides is marked as Europe cells, as in DD-12, and water fills the whole screen beyond it |
 | DD-42 | Colony preview at the left shows its goods, Europe preview at the right shows prices and the pier. Options are in their own menu |
-| DD-43 | B8, the tilted map, is the official interface prototype (`prototypes/index.html`). Other versions are removed; they remain in git history (commit 5c6d9ac). Design work continues in smaller steps |
+| DD-43 | B8, the tilted map, is the official interface prototype (then `prototypes/index.html`, now `packages/web`). Other versions are removed; they remain in git history (commit 5c6d9ac). Design work continues in smaller steps |
 | DD-44 | The pier at rest shows faces only; names, abilities and prices appear on hover |
 | DD-45 | Hiring, building and Founding Fathers show every choice at once when an agent is lifted, with no second list |
 | DD-46 | The Europe border is subtle: faint hatching without a hard line |
 | DD-47 | Mountains carry no food bonus. The importer drops the three printed ones until the workbook is edited |
+| DD-48 | The prototype phase is over. The interface is TypeScript in `packages/web`, in strict mode, with minimal unit tests and no end-to-end tests for now |
 
 ## Proposed in this PRD, awaiting confirmation
 
@@ -63,7 +64,7 @@
 | PD-6 | Code identifiers in English, from `nickname` | Already in the workbook | Low |
 | PD-7 | Bots are conventional AI, not LLMs | Thousands of reproducible games are needed | Low |
 | PD-8 | Two rulesets, `board` and `pc`, with conversion labels; each `pc` change is promoted or dropped (PRD section 5) | Puts DD-10 into practice | Low |
-| PD-10 | The prototype plays the real rules engine with the test bots (`prototypes/build/engine.js`, built by `pnpm prototype`), so every step of the rules has a place in the interface | Faked steps hid missing screens and wrong numbers | Low |
+| PD-10 | The interface plays the real rules engine with the test bots, bundled from their sources into `packages/web/dist/app.js` by `pnpm web:build`, so every step of the rules has a place in the interface | Faked steps hid missing screens and wrong numbers | Low |
 
 ## Open questions
 
