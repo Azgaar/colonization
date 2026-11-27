@@ -94,12 +94,12 @@ export function apply(o: Override, from?: string): { message: string; todo: stri
   if (!built.data) throw new RulesetError(`"${o.id}" would break the rules: ${built.issues.filter((i) => i.level === 'error').map((i) => i.message).join('; ')}`);
   writeMaster(m); writeGenerated(built);
   if (from) { const r = readRuleset(from); write({ ...r, overrides: r.overrides.filter((x) => x.id !== o.id) }); }
-  log(decisionText('applied', o, rows, todo));
+  log(decisionText('applied', o));
   return { message: `Applied "${o.id}" to the rules (rules/) and logged it in docs/decisions.md.${todo.length ? ` Printed text to update: ${todo.join(', ')} (pnpm rules todo).` : ''}`, todo, rows };
 }
 /** Take a change out of a sandbox ruleset on disk and log the decision. */
 export function drop(rulesetId: string, id: string): string {
   const { ruleset: r, override } = dropOverride(readRuleset(rulesetId), id);
-  write(r); log(decisionText('dropped', override, []));
+  write(r); log(decisionText('dropped', override));
   return `Dropped "${id}" from ${rulesetId} and logged it in docs/decisions.md.`;
 }

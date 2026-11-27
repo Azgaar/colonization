@@ -91,13 +91,10 @@ export function dropOverride(ruleset: Ruleset, id: string): { ruleset: Ruleset; 
   return { ruleset: { ...ruleset, overrides: ruleset.overrides.filter((x) => x !== o) }, override: o };
 }
 
-/** Decision-log line for an applied or dropped change; `todo` lists the cards whose printed text has to follow. */
-export function decisionText(action: 'applied' | 'dropped', o: Override, rows: ChangeRow[], todo: string[] = []): string {
-  const edits = rows.filter((r) => r.override === o.id).map((r) => `${r.path} → ${text(r.to)}`);
-  return action === 'applied'
-    ? `Rule change "${o.id}" (${o.conversion}) applied to the rules: ${o.table!.trim().replace(/\.?$/, '.')}${o.components?.length ? ` Components: ${o.components.join('; ')}.` : ''} ` +
-      `Why: ${(o.why || '-').replace(/\.?$/, '.')} Changed: ${edits.join('; ') || 'nothing'}.${todo.length ? ` Printed text to update: ${todo.join(', ')}.` : ''}`
-    : `Rule change "${o.id}" (${o.conversion ?? 'unlabelled'}) dropped. Why it was tried: ${o.why || '-'}`;
+/** One brief decision-log line for an applied or dropped change: its id and English table wording (or why it was tried). */
+export function decisionText(action: 'applied' | 'dropped', o: Override): string {
+  const brief = (s: string) => s.split(' / ')[0]!.trim().replace(/\.$/, '');
+  return action === 'applied' ? `Applied \`${o.id}\`: ${brief(o.table!)}` : `Dropped \`${o.id}\`: ${brief(o.why || '-')}`;
 }
 
 /** Append a row to the "Decided by the designer (date)" table, creating that section after the last such one. */

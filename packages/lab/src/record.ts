@@ -23,7 +23,7 @@ export interface GameRecord {
   offered?: Record<string, number>[];
   /** Per seat: decisions taken, and those with a single legal choice. Missing in older records. */
   decisions?: number[]; forced?: number[];
-  /** Per seat: what was produced, by icon (corn, fish, leaf, fur, timber, silver). Missing in older records. */
+  /** Per seat: what was produced, by icon (fish, timber, crops, silver). Missing in older records. */
   produced?: Record<string, number>[];
   /** Per seat: colonies founded next to the ocean. Missing in older records. */
   coastal?: number[];

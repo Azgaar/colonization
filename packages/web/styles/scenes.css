@@ -15,6 +15,11 @@ body:not([data-view=map]) .door,body:not([data-view=map]) #heaps,body:not([data-
 .two { display:grid;grid-template-columns:minmax(320px,430px) minmax(0,1fr);gap:42px }
 .land { position:relative;width:100%;aspect-ratio:1;border-radius:20px;overflow:hidden;box-shadow:0 8px 28px #0009 }
 .land canvas { width:100%;height:100%;display:block }
+/* A colony's name over its land: it reads as a heading and is typed into to rename the colony. */
+.cname { display:block;width:100%;font:800 24px/1.2 var(--sc);color:inherit;background:none;border:0;border-bottom:2px dashed transparent;padding:0 2px 2px;margin-bottom:8px;text-overflow:ellipsis }
+.cname:not(:disabled):hover { border-bottom-color:#fff6;cursor:text }
+.cname:focus { outline:none;border-bottom-color:var(--bone) }
+.lands.n2 .cname,.lands.n3 .cname { font-size:19px }
 .land .c { position:absolute;width:33.34%;height:33.34%;display:flex;align-items:center;justify-content:center;gap:5px;flex-wrap:wrap;align-content:center }
 .land .c span.y { background:#1c2a2adb;border-radius:99px;padding:3px 10px 3px 6px;font-weight:800;display:flex;gap:3px;align-items:center }
 .land .c.ok { box-shadow:inset 0 0 0 4px var(--hot);border-radius:16px;cursor:copy }

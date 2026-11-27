@@ -80,7 +80,7 @@
       "copies": 2,
       "nickname": "Farmer",
       "name": "Земледелец",
-      "effect": "производство: +1 🍂",
+      "effect": "производство: +1 🌿",
       "education": "📖",
       "price": "3 🟡",
       "image": "Farmer.jpeg,50,90,100",
@@ -88,13 +88,13 @@
         {
           "mod": "production",
           "icons": [
-            "leaf"
+            "crops"
           ],
           "add": 1
         }
       ],
       "$en": "Planter",
-      "$checked": "c520cd899a"
+      "$checked": "e1ba802c61"
     },
     {
       "copies": 2,
@@ -138,41 +138,36 @@
       "copies": 2,
       "nickname": "Scout",
       "name": "Скаут",
-      "effect": "передвижение пешки: +2 💨\nигнорирует эффект ловушек (💀)",
-      "education": "📖",
-      "price": "4 🟡",
+      "effect": "движение: +1 💨\nигнорирует эффекты 💀",
+      "education": "🎓",
+      "price": "6 🟡",
       "image": "Scout.png,50,100,100",
       "$fx": [
         {
           "mod": "move",
-          "token": "infantry",
-          "add": 2
+          "add": 1
         },
         {
           "mod": "ignoreSkull"
-        },
-        {
-          "mod": "negotiator"
         }
       ],
-      "$checked": "d8ef767d6e"
+      "$checked": "ed2cb1f202"
     },
     {
       "copies": 2,
       "nickname": "Sailor",
       "name": "Матрос",
-      "effect": "передвижение корабля: +2 💨",
+      "effect": "движение: +2 💨",
       "education": "📖",
       "price": "4 🟡",
       "image": "Sailor.jpeg,50,80,110",
       "$fx": [
         {
           "mod": "move",
-          "token": "ship",
           "add": 2
         }
       ],
-      "$checked": "88b6e378fc"
+      "$checked": "0689021f88"
     },
     {
       "copies": 2,

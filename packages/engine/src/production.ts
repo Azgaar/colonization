@@ -52,7 +52,7 @@ export function cellYield(s: State, p: number, card: string, cell: number, icon:
   return { cell, icon, ...sum(parts) };
 }
 
-const CELL_ICONS: Icon[] = ['corn', 'fish', 'timber', 'leaf', 'fur', 'silver'];
+const CELL_ICONS: Icon[] = ['fish', 'timber', 'crops', 'silver'];
 /** Every production a card can make on cells. */
 export function cellYields(s: State, p: number, card: string): Yield[] {
   const out: Yield[] = [];

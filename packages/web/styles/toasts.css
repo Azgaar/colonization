@@ -1,5 +1,17 @@
 /* Notifications. */
-.toasts { position:fixed;right:20px;top:72px;z-index:16;display:flex;flex-direction:column;width:348px;pointer-events:none }
+.toasts { position:fixed;right:8px;top:72px;z-index:16;width:372px;pointer-events:none }
+/* The list scrolls without a bar; where it is cut it fades, and an arrow with the number out of sight leads there. */
+.toasts .tstack { max-height:max(170px,calc(100vh - 300px));overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;padding:2px 12px 18px;display:flex;flex-direction:column;position:relative }
+.toasts .tstack::-webkit-scrollbar { display:none }
+.toasts.cut-up .tstack { mask-image:linear-gradient(transparent,#000 34px) }
+.toasts.cut-down .tstack { mask-image:linear-gradient(#000 calc(100% - 44px),transparent) }
+.toasts.cut-up.cut-down .tstack { mask-image:linear-gradient(transparent,#000 34px,#000 calc(100% - 44px),transparent) }
+.tsc { position:absolute;left:50%;transform:translateX(-50%);z-index:1;display:flex;align-items:center;gap:4px;height:30px;padding:0 12px 0 10px;min-width:48px;justify-content:center;border-radius:15px;background:#164246;border:1px solid #f7f1e13d;color:#f7f1e1;font:800 14px var(--sc);box-shadow:0 4px 12px #0008;pointer-events:auto;transition:background .15s }
+.tsc:hover { background:#1f5a5f }
+.tsc[hidden] { display:none }
+.tsc.up { top:-6px }
+.tsc.down { bottom:4px }
+.tsc span:empty { display:none }
 .toast { display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center;text-align:left;background:#0f3436f2;border-left:5px solid #f7f1e166;border-radius:13px;padding:8px 14px 8px 9px;margin-bottom:8px;box-shadow:0 8px 24px #0008;pointer-events:auto;opacity:0;transform:translateX(40px);transition:opacity .28s,transform .28s,margin .28s;line-height:1.2 }
 .toast.on { opacity:1;transform:none }
 .toast:hover { background:#164246f7 }

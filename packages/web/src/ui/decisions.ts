@@ -75,7 +75,7 @@ const V: Record<string, (d: Pending, legal: Opt[]) => Shown> = {
   move(d, legal) {
     const m = D.move; if (!m) return '';
     const ship = m.token === 'ship', has = (k: string) => legal.some((c) => c.c === k);
-    return { bar: true, html: `<span class="ttl">${t(ship ? 'ship' : 'infantry')}: <b>${m.points}</b> ${t('decisions.points_left', { n: m.points })}</span><span class="tip">${[t('decisions.click_lit'), has('explore') ? t('decisions.click_clouds') : ''].filter(Boolean).join(', ')}</span>${has('cargo') ? btn(t('decisions.load_unload'), choice({ c: 'cargo' }), 'hot') : ''}${has('embark') ? btn(t('decisions.take_infantry'), choice({ c: 'embark' })) : ''}${btn(t('decisions.end_move'), choice({ c: 'end' }), 'go')}` };
+    return { bar: true, html: `<span class="ttl">${t(ship ? 'ship' : 'infantry')}: <b>${m.points}</b> ${t('decisions.points_left', { n: m.points })}</span><span class="tip">${[t('decisions.click_lit'), has('explore') ? t('decisions.click_clouds') : ''].filter(Boolean).join(', ')}</span>${has('cargo') ? btn(t('decisions.load_unload'), choice({ c: 'cargo' }), 'hot') : ''}${has('embark') ? btn(t('decisions.take_infantry'), choice({ c: 'embark' })) : ''}${has('switch') ? btn(t(ship ? 'act.moveInfantry' : 'act.moveShip'), choice({ c: 'switch' })) : ''}${btn(t('decisions.end_move'), choice({ c: 'end' }), 'go')}` };
   },
   cargo() {
     X.cargo ??= { wh: { ...P.wh }, hold: { ...P.hold }, was: { ...P.hold } };

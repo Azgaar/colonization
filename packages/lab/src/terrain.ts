@@ -1,5 +1,5 @@
 /**
- * Evidence for one product per terrain (docs/proposals.md): grassland gives crops only (forest is timber only since DD-56),
+ * Evidence for one product per terrain (DD-63 to DD-67 in docs/decisions.md): grassland gives crops only (forest is timber only since DD-56),
  * alone and with the farmer on crops, Squanto and the Indian on fish; against `board` on paired seeds, at 3 and 4 players, with tuned and with mixed bots. Writes out/terrain.md.
  * Usage: node packages/lab/src/terrain.ts [games=400]
  */
@@ -25,13 +25,11 @@ const sum = (r: GameRecord, f: (p: number) => number) => r.scores.reduce((n, _, 
 const got = (r: GameRecord, p: number, ...icons: string[]) => icons.reduce((n, i) => n + (r.produced?.[p]?.[i] ?? 0), 0);
 /** What each game says, per player where it is a per-player count. */
 const METRICS: [string, (r: GameRecord) => number][] = [
-  ['food produced per player', (r) => sum(r, (p) => got(r, p, 'corn', 'fish')) / r.n],
-  ['  of it fish', (r) => sum(r, (p) => got(r, p, 'fish')) / r.n],
-  ['crops produced per player', (r) => sum(r, (p) => got(r, p, 'leaf', 'fur')) / r.n],
+  ['food produced per player', (r) => sum(r, (p) => got(r, p, 'fish')) / r.n],
+  ['crops produced per player', (r) => sum(r, (p) => got(r, p, 'crops')) / r.n],
   ['timber produced per player', (r) => sum(r, (p) => got(r, p, 'timber')) / r.n],
   ['colonies founded per player', (r) => sum(r, (p) => r.foundRounds[p]!.length) / r.n],
   ['round of the first colony', (r) => mean(r.foundRounds.filter((x) => x.length).map((x) => x[0]!))],
-  ['corn produced per player', (r) => sum(r, (p) => got(r, p, 'corn')) / r.n],
   ['farmers hired per player', (r) => sum(r, (p) => r.hired[p]!.farmer ?? 0) / r.n],
   ['Squanto taken', (r) => +r.fathers.some((f) => f.includes('squanto'))],
   ['Indians per player at the end', (r) => sum(r, (p) => r.agents[p]!.filter((a) => a === 'indian').length) / r.n],

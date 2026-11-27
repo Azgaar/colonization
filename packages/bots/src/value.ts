@@ -109,7 +109,7 @@ export function buildingValue(x: Situation, b: string): number {
     blacksmith_shop: () => 0.2 * left * w.trade * x.gold * 8,
     town_hall: () => 0.9 * left * Math.max(0, x.bell) * 1.4,
     chapel: () => left * (0.2 + 2 * w.cross),
-    school: () => 0.1 * left * w.teach,
+    school: () => schoolGain(x, 'school') * w.teach,
     stockade: () => own * x.strength * (1 - x.loyal),
     custom_house: () => 0.15 * left * w.trade,
     shipyard: () => 0.05,
@@ -120,9 +120,20 @@ export function buildingValue(x: Situation, b: string): number {
     },
     church: () => left * (0.1 + 3 * w.cross),
     fort: () => own * x.strength * 1.2 * (1 - x.loyal) + x.raids * left * 0.8,
-    university: () => 0.1 * left * w.teach,
+    university: () => schoolGain(x, 'university') * w.teach,
   };
   return w.building + (extra[b]?.() ?? 0);
+}
+/**
+ * What a school is worth: each use swaps one of the weakest agents a player has for the best profession it teaches (DD-75),
+ * and a building gets about one use every other round that is left.
+ */
+function schoolGain(x: Situation, b: string): number {
+  const { s } = x, w = s.def.buildings[b].work;
+  if (w?.kind !== 'teach') return 0;
+  const best = Math.max(0, ...Object.values(s.def.agents).filter((a) => a.kind === 'common' && !a.unique && a.edu === w.maxEdu).map((a) => agentValue(x, a.id)));
+  const students = x.cards.filter((c) => c !== '?' && s.def.agents[c].edu >= s.def.buildings[b].edu).map((c) => agentValue(x, c)).sort((p, q) => p - q);
+  return students.slice(0, Math.ceil(Math.max(0, x.left - 1) / 2)).reduce((v, a) => v + Math.max(0, best - a), 0);
 }
 function wantedBuilding(x: Situation): string | null {
   const { s, me } = x, pl = s.players[me];
@@ -167,7 +178,7 @@ export function siteValue(x: Situation, c: number): number {
   const need = timber || had ? 0 : first ? -9 : -2;
   const gain = Math.max(0.5, warPoints(x, { colony: s.def.terrain[s.map.terrain[c]!].defence }) - warPoints(x));
   return gain * w.colony + (first ? w.firstColony : 0) + need + (timber && !had ? 4 : timber ? 0.4 : 0) +
-    (icons.has('corn') ? 0.3 : 0) + (icons.has('silver') ? 0.4 : 0) + icons.size * 0.1 + bonus * 0.15;
+    (icons.has('silver') ? 0.4 : 0) + icons.size * 0.1 + bonus * 0.15;
 }
 
 /** Long-run worth of one agent in the collection. */

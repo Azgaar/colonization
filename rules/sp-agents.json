@@ -19,7 +19,7 @@
       "nickname": "Trapper_French",
       "nation": "French",
       "name": "Траппер",
-      "effect": "производство: +1 🦫 в лесу",
+      "effect": "производство: +1 🌿 в лесу",
       "education": "🎓",
       "emblem": "French.svg",
       "emblem back": "French.svg",
@@ -28,14 +28,14 @@
         {
           "mod": "production",
           "icons": [
-            "fur"
+            "crops"
           ],
           "add": 1,
           "terrain": "forest",
           "enables": true
         }
       ],
-      "$checked": "b18b60301e"
+      "$checked": "62b6e3222d"
     },
     {
       "e": 1,
@@ -63,7 +63,7 @@
       "nickname": "Sailor_French",
       "nation": "French",
       "name": "Матрос",
-      "effect": "передвижение корабля: +2 💨",
+      "effect": "движение: +2 💨",
       "education": "📖",
       "emblem": "French.svg",
       "emblem back": "French.svg",
@@ -124,7 +124,7 @@
       "nickname": "Sailor_Dutch",
       "nation": "Dutch",
       "name": "Матрос",
-      "effect": "передвижение корабля: +2 💨",
+      "effect": "движение: +2 💨",
       "education": "📖",
       "emblem": "Dutch.svg",
       "emblem back": "Dutch.svg",
@@ -189,7 +189,7 @@
       "nickname": "Sailor_English",
       "nation": "English",
       "name": "Матрос",
-      "effect": "передвижение корабля: +2 💨",
+      "effect": "движение: +2 💨",
       "education": "📖",
       "emblem": "English.svg",
       "emblem back": "English.svg",
@@ -211,7 +211,7 @@
       "nickname": "Navigator_Portuguese",
       "nation": "Portuguese",
       "name": "Навигатор",
-      "effect": "передвижение корабля: +4 💨",
+      "effect": "движение: +4 💨",
       "education": "🎓",
       "emblem": "Portuguese.svg",
       "emblem back": "Portuguese.svg",
@@ -219,11 +219,10 @@
       "$fx": [
         {
           "mod": "move",
-          "token": "ship",
           "add": 4
         }
       ],
-      "$checked": "008d1eb49a"
+      "$checked": "31a497f602"
     },
     {
       "e": 1,
@@ -309,7 +308,7 @@
       "nickname": "Sailor_Spanish",
       "nation": "Spanish",
       "name": "Матрос",
-      "effect": "передвижение корабля: +2 💨",
+      "effect": "движение: +2 💨",
       "education": "📖",
       "emblem": "Spanish.svg",
       "emblem back": "Spanish.svg",
@@ -394,7 +393,7 @@
       "nickname": "Planter_Danish",
       "nation": "Danish",
       "name": "Плантатор",
-      "effect": "производство: +1 🍂 на острове из 3 и менее клеток",
+      "effect": "производство: +1 🌿 на острове из 3 и менее клеток",
       "education": "🎓",
       "emblem": "Danish.svg",
       "emblem back": "Danish.svg",
@@ -403,7 +402,7 @@
         {
           "mod": "production",
           "icons": [
-            "leaf"
+            "crops"
           ],
           "add": 1,
           "island": 3,
@@ -411,14 +410,14 @@
         }
       ],
       "$en": "Cane Planter",
-      "$checked": "a13fa269c3"
+      "$checked": "15e0da33fc"
     },
     {
       "e": 1,
       "nickname": "Sailor_Danish",
       "nation": "Danish",
       "name": "Матрос",
-      "effect": "передвижение корабля: +2 💨",
+      "effect": "движение: +2 💨",
       "education": "📖",
       "emblem": "Danish.svg",
       "emblem back": "Danish.svg",
@@ -452,7 +451,7 @@
       "nickname": "Cossack_Russian",
       "nation": "Russian",
       "name": "Казак",
-      "effect": "атака и защита пешки: +2 ⚔️\nпроизводство: +2 🦫 в тундре",
+      "effect": "атака и защита пешки: +2 ⚔️\nпроизводство: +2 🌿 в тундре",
       "education": "🎓",
       "emblem": "Russian.svg",
       "emblem back": "Russian.svg",
@@ -466,14 +465,14 @@
         {
           "mod": "production",
           "icons": [
-            "fur"
+            "crops"
           ],
           "add": 2,
           "terrain": "tundra",
           "enables": true
         }
       ],
-      "$checked": "b1a35dc4f9"
+      "$checked": "188781fa9d"
     },
     {
       "e": 1,
@@ -490,7 +489,7 @@
       "nickname": "Sailor_Russian",
       "nation": "Russian",
       "name": "Матрос",
-      "effect": "передвижение корабля: +2 💨",
+      "effect": "движение: +2 💨",
       "education": "📖",
       "emblem": "Russian.svg",
       "emblem back": "Russian.svg",
@@ -553,7 +552,7 @@
       "nickname": "Sailor_Curonian",
       "nation": "Curonian",
       "name": "Матрос",
-      "effect": "передвижение корабля: +2 💨",
+      "effect": "движение: +2 💨",
       "education": "📖",
       "emblem": "Curonian.svg",
       "emblem back": "Curonian.svg",
@@ -599,7 +598,7 @@
       "nickname": "Sailor_Scottish",
       "nation": "Scottish",
       "name": "Матрос",
-      "effect": "передвижение корабля: +2 💨",
+      "effect": "движение: +2 💨",
       "education": "📖",
       "emblem": "Scottish.svg",
       "emblem back": "Scottish.svg",

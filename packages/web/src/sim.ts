@@ -70,15 +70,20 @@ const seatBots = () => {
     return i > 0 && level && !humans.has(i) ? botForLevel(level as Level, `${s.seed}${i}`, character) : goalBot(`${s.seed}${i}`, PERSONALITIES[character]);
   });
 };
-const begin = () => { humans = new Set(setup.humans ?? [0]); s.logging = true; seen = s.log.length; history = []; Sim.placed.splice(0); seatBots(); refresh(); };
+const begin = () => { humans = new Set(setup.humans ?? [0]); s.logging = true; seen = s.log.length; history = []; Sim.placed.splice(0); names = {}; seatBots(); refresh(); };
 /** The seats people play. */
 let humans = new Set<number>([0]);
+/** Names the players gave their colonies, by cell. A colony without one has its nation's next name (`colonyName`). */
+let names: Record<number, string> = {};
 const live = () => !replay && !demo && !s.over;
 /** A decision for the interface: a person's, in the seat shown. */
 const mine = () => live() && !!s.pending && humans.has(s.pending.player) && s.pending.player === seat;
 
 export const Sim = {
   D, placed: [] as Placed[],
+  get names(): Readonly<Record<number, string>> { return names; },
+  /** Rename a colony; an empty name gives it back its own. Not a move: it is kept with the game and never undone. */
+  rename(cell: number, name: string) { const n = name.replace(/[<>&"]/g, '').trim().slice(0, 24); if (n) names[cell] = n; else delete names[cell]; Sim.keep(); },
   get s() { return s; }, get busy() { return busy; }, get seat() { return seat; }, get setup() { return setup; },
   get fast() { return Options.fast; }, set fast(v: boolean) { Options.fast = v; keepOptions(); },
   get replay() { return replay; },
@@ -101,10 +106,10 @@ export const Sim = {
   resume(): boolean {
     const raw = localStorage.getItem(SAVE); if (!raw) return false;
     demo = false;
-    try { const x = JSON.parse(raw) as { setup: Setup; game: string; placed: Placed[] }; setup = x.setup; def = defOf(x.setup.ruleset); replay = null; seat = 0; s = load(x.game, def); Object.assign(D, exportRules(def)); begin(); Sim.placed.push(...x.placed); return true; } catch { localStorage.removeItem(SAVE); return false; }
+    try { const x = JSON.parse(raw) as { setup: Setup; game: string; placed: Placed[]; names?: Record<number, string> }; setup = x.setup; def = defOf(x.setup.ruleset); replay = null; seat = 0; s = load(x.game, def); Object.assign(D, exportRules(def)); begin(); Sim.placed.push(...x.placed); names = x.names ?? {}; return true; } catch { localStorage.removeItem(SAVE); return false; }
   },
   /** Save the game at this decision (FR-E-10). */
-  keep() { if (!replay && !demo) localStorage.setItem(SAVE, JSON.stringify({ setup, game: save(s), placed: Sim.placed })); },
+  keep() { if (!replay && !demo) localStorage.setItem(SAVE, JSON.stringify({ setup, game: save(s), placed: Sim.placed, names })); },
   hasSaved: () => !!localStorage.getItem(SAVE),
   /** What the saved game is, without loading it: the player's nation, the round, the players, the seed. */
   savedInfo(): { nation: string; round: number; players: number; seed: string; over: boolean } | null {
@@ -117,7 +122,7 @@ export const Sim = {
   /** The setup of the player's last game (not the demo's), to start the new game screen from. */
   lastSetup(): Setup { try { return (JSON.parse(localStorage.getItem(SAVE) ?? '') as { setup: Setup }).setup; } catch { return demo ? DEFAULT : setup; } },
   /** Save as a file to keep or to send. */
-  file: () => JSON.stringify({ setup, game: save(s), placed: Sim.placed }),
+  file: () => JSON.stringify({ setup, game: save(s), placed: Sim.placed, names }),
   open(text: string) { localStorage.setItem(SAVE, text); return Sim.resume(); },
   legal: (): Choice[] => (mine() ? viewFor(s, seat).legal : []),
   /** Remember this moment, so that it can be taken back. */

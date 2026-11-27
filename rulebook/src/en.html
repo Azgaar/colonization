@@ -44,7 +44,7 @@
     <h3>Resources</h3>
     <p>Five kinds of resource, kept as cubes:</p>
     <rv-table of="resources"></rv-table>
-    <p>Resources are kept in one <b>warehouse</b> that serves all your colonies, and sold in Europe for gold. Fur 🦫 is a kind of crops: it matters only for talents and bonuses.</p>
+    <p>Resources are kept in one <b>warehouse</b> that serves all your colonies, and sold in Europe for gold. Crops 🌿 are cash crops and fur alike: one resource and one icon wherever they are gathered.</p>
     <p>Three more things are counted with tokens:</p>
     <ul>
       <li><b>Gold</b> 🟡 hires agents and pays the tax.</li>
@@ -58,10 +58,12 @@
 <section class="chapter">
   <header><img src="../../packages/web/art/event/calm_seas.webp" alt=""><h2>Setting up</h2><p>How to lay out the table for the first round.</p></header>
   <div class="cols">
-    <rv-table of="map"></rv-table>
     <ol class="steps">
       <li><b>The map.</b> Shuffle the <rv p="tiles.total"></rv> map tiles face down. Lay <rv p="tiles.used"></rv> of them in a square, <rv p="settings.map.size"></rv> by <rv p="settings.map.size"></rv>, face down, all with their arrow pointing north. Around the square runs a ring of open sea, and around that a ring of Europe cells.</li>
       <li><b>Europe.</b> Place the Europe board. Put the round marker on <rv p="year.first"></rv>, the tax marker on the first space, and a cube of each resource on its start price.</li>
+    </ol>
+    <rv-table of="map"></rv-table>
+    <ol class="steps" start="3" style="counter-reset: step 2">
       <li><b>The agent deck.</b> Shuffle the common agents into one deck. Deal agents onto the <b>pier</b> until <rv p="settings.pier.slots"></rv> different agents show; a repeat goes on top of its own stack and you keep dealing.</li>
       <li><b>Natives.</b> Put the <rv p="agents.native"></rv> native agents in a pile of their own. Shuffle the tribe cards.</li>
       <li><b>The salon.</b> Shuffle the Founding Fathers and lay <rv p="settings.fathers.salon"></rv> of them face up.</li>
@@ -81,7 +83,7 @@
     <h3>2. Actions</h3>
     <p>Starting with the first player and going clockwise, each player in turn plays <b>one agent</b> and takes <b>one action</b> with it. The agent then goes to its owner’s discard. There are no free actions: everything you do costs a card.</p>
     <p>Turns go round the table until everyone has <b>passed</b>. When you pass, the round is over for you: keep any of your remaining cards for the next round and discard the rest. A player with no cards must pass.</p>
-    <div class="remember" data-title="The warehouse limit"><p>At the end of each of your turns, and after every event, your warehouse may hold at most <rv p="settings.warehouse.base"></rv> resources, or <rv p="warehouse.full"></rv> with a warehouse building. Discard the excess, choosing which.</p></div>
+    <div class="remember" data-title="The warehouse limit"><p>Your warehouse never holds more than <rv p="settings.warehouse.base"></rv> resources, or <rv p="warehouse.full"></rv> with a warehouse building. The moment it would, discard the excess at once, choosing which.</p></div>
 
     <h3>3. Event</h3>
     <p>When everyone has passed, turn over the top event card and resolve it from top to bottom (see <i>Chance and history</i>).</p>
@@ -94,8 +96,8 @@
     <p>If any player has <rv p="settings.war.bells"></rv> 🔔 or more, or this was round <rv p="settings.rounds.max"></rv>, the War of Independence begins. Otherwise move the round marker on by <rv p="year.step"></rv> years, pass the first-player marker to the left, and start the next round.</p>
 
     <h3>Playing a card</h3>
-    <p>Any agent can take any standard action and adds its talent where it applies. Two agents are exceptions: the <b>criminal</b> and the <b>slave</b> may only produce. They still count 1 in battle as support, and may be discarded to pay a card cost or to exchange.</p>
-    <div class="detail" data-title="Your collection"><p>Your hand, deck and discard together are your <b>collection</b>. Some cards make you remove agents from it; removal stops when <rv p="settings.collection.min"></rv> agents are left. A removed common agent goes to the <b>common discard</b>, a native agent back to the native pile, and a nation’s own agent out of the game. The common discard also takes the agents discarded from the pier, and is shuffled into a new agent deck when that deck runs out.</p></div>
+    <p>Any agent can take any standard action and adds its talent where it applies, except where an action asks for a certain agent: an <b>attack</b> needs an agent with ⚔️, an <b>alliance</b> one with 🎓, and <b>work in a building</b> enough education. The <b>criminal</b> and the <b>slave</b> may only produce or be retrained in a school; they still count 1 in battle as support, and may be discarded to pay a card cost or to exchange.</p>
+    <div class="detail" data-title="Your agent pool"><p>Your hand, deck and discard together are your <b>agent pool</b>. Some cards make you remove agents from it; removal stops when <rv p="settings.collection.min"></rv> agents are left. A removed common agent goes to the <b>common discard</b>, a native agent back to the native pile, and a nation’s unique agent out of the game. The common discard also takes the agents discarded from the pier, and is shuffled into a new agent deck when that deck runs out.</p></div>
   </div>
 </section>
 
@@ -103,7 +105,7 @@
   <header><img src="../../packages/web/art/event/drifting_frigate.webp" alt=""><h2>Moving and exploring</h2><p>Sail the coast, march inland, and turn the unknown map face up one tile at a time.</p></header>
   <div class="cols">
     <h3>Move</h3>
-    <p>Move <b>one</b> of your tokens, spending up to <rv p="settings.move.points"></rv> movement points 💨. A sailor, a scout and some Founding Fathers give more. Tokens move to any of the eight neighbouring cells, diagonals included. Entering a cell costs points by its terrain:</p>
+    <p>Move your ship and your pawn, spending up to <rv p="settings.move.points"></rv> movement points 💨 between them, split as you like and in any order. A sailor, a scout and some Founding Fathers give more. Tokens move to any of the eight neighbouring cells, diagonals included. Entering a cell costs points by its terrain:</p>
     <rv-table of="terrain"></rv-table>
     <ul>
       <li>The ship stays on water; the pawn stays on land unless it is aboard.</li>
@@ -118,11 +120,11 @@
     <p>When your ship is on water next to one of your colonies, moving resources between its hold and your warehouse costs <rv p="settings.move.cargo"></rv> 💨 per trip, with any number of resources at once. The hold has <rv p="settings.hold.size"></rv> spaces: one for each resource, one for the pawn and one for each damage.</p>
 
     <h4>Land and embark</h4>
-    <p>Moving the pawn between the ship and a neighbouring land cell costs <rv p="settings.move.embark"></rv> 💨, whatever that cell’s terrain. This is the only way one action moves both tokens: the points left over go on with whichever token keeps moving.</p>
-    <div class="example" data-title="Example"><p>Clara’s ship, with her pawn aboard, sails 3 cells along the coast: 3 💨. She spends 1 💨 to land the pawn on a grassland cell, and her last point to march it one more grassland cell inland.</p></div>
+    <p>To land or board, the pawn simply moves into the target cell and pays its cost, like any move: the land cell when landing, the ship’s cell when boarding.</p>
+    <div class="example" data-title="Example"><p>Clara’s ship, with her pawn aboard, sails 2 cells along the coast: 2 💨. She spends 1 💨 to land the pawn on a grassland cell, as grassland costs 1, and 1 💨 to march it one more grassland cell inland, then sails the ship on with her last point.</p></div>
 
     <h4>Ruins and wrecks</h4>
-    <p>When your pawn enters a ruin, or your ship enters a wreck, remove its black cube and resolve the top card of that deck at once. If the card ends your move, the points you have left are lost.</p>
+    <p>When your pawn enters a ruin, or your ship enters a wreck, remove its black cube and resolve the top card of that deck at once. If the card ends your move, the points you have left are lost, for both tokens.</p>
 
     <h3>Back to Europe</h3>
     <p>A token sent to Europe leaves the map:</p>
@@ -137,12 +139,12 @@
   <header><img src="../../packages/web/art/event/industrial_boom.webp" alt=""><h2>Colonies</h2><p>Found up to <rv p="settings.colony.max"></rv> colonies, then put your agents to work on the land around them and in your buildings.</p></header>
   <div class="cols">
     <h3>Found a colony</h3>
-    <p>Your pawn founds a colony on the land cell it stands on: place one of your colony markers there. The first colony is free; each further one costs <rv p="settings.colony.foundCost.value"></rv> 🟨 from your warehouse. You may have <rv p="settings.colony.max"></rv> colonies. The cell must:</p>
+    <p>Your pawn founds a colony on the land cell it stands on: place one of your colony markers there. The first colony is free; each further one costs <rv p="settings.colony.foundCost.value"></rv> 🟦 from your warehouse. You may have <rv p="settings.colony.max"></rv> colonies. The cell must:</p>
     <ul>
       <li>not touch another colony or a settlement, diagonals included;</li>
       <li>touch at least one ocean cell that connects to Europe through revealed water.</li>
     </ul>
-    <p>The edge of the map is allowed. A settlement revealed later next to your colony is placed as usual: the distance rule only limits founding.</p>
+    <p>A settlement revealed later next to your colony is placed as usual: the distance rule only limits founding.</p>
     <p>Colonies are never removed; only the war can take them. Your warehouse, buildings and Founding Fathers belong to you, not to one colony, and serve all your colonies.</p>
 
     <h3>Produce</h3>
@@ -156,19 +158,23 @@
     <p>Cells and buildings may be worked any number of times in a round.</p>
 
     <h4>Work in a building</h4>
-    <p>Instead of a cell, the agent may work in one of your buildings, one building per action. The agent’s education must be at least the building’s. A workshop turns 1 🟩 into 1 🟦, a town hall makes 🔔, a chapel ✝️; the reference lists them all. Bonuses add to what a building makes, never to what it uses. An improvement works instead of its basic building, not on top of it: with a factory, you work the factory.</p>
-    <p>With <b>docks</b>, the agent works an ocean cell next to your colony through them for +1, so 2 🟨, before the cell’s bonus and the agent’s talent.</p>
-    <div class="example" data-title="Example"><p>Daniel has docks, and his colony touches an ocean cell with a fish bonus. He plays his fisherman there: 1 for the sea, +1 for the docks, +1 for the bonus and +1 for the fisherman, 4 🟨 in all.</p></div>
+    <p>Instead of a cell, the agent may work in one of your buildings, one building per action. The agent’s education must be at least the building’s. A workshop turns 1 🟩 into 1 🟧, a town hall makes 🔔, a chapel ✝️; the reference lists them all. Bonuses add to what a building makes, never to what it uses. An improvement works instead of its basic building, not on top of it: with a factory, you work the factory.</p>
+    <p>With <b>docks</b>, the agent works an ocean cell next to your colony through them for +1, so 2 🟦, before the cell’s bonus and the agent’s talent.</p>
+    <div class="example" data-title="Example"><p>Daniel has docks, and his colony touches an ocean cell with a fish bonus. He plays his fisherman there: 1 for the sea, +1 for the docks, +1 for the bonus and +1 for the fisherman, 4 🟦 in all.</p></div>
 
     <h3>Build</h3>
     <p>Pay the building’s cost in timber 🟫 from your warehouse and put its card by your nation board. You may own up to <rv p="settings.buildings.max"></rv> buildings, never two of a kind. An <b>improvement</b> needs its basic building, which stays and keeps its place. There is only one of each improvement, so only one player can build it. A building destroyed in an attack goes back to the supply.</p>
 
     <h3>Supply</h3>
-    <p>Spend 1 🟨 from your warehouse to draw 1 card. It replaces the agent you played: a way to swap a weak card, not to gain one.</p>
+    <p>Spend 1 🟦 from your warehouse to draw 1 card. It replaces the agent you played: a way to swap a weak card, not to gain one.</p>
 
     <h3>Exchange</h3>
     <p>Discard 2 cards, the played one included, and draw 1.</p>
-    <p>A few buildings do more than produce: the school and university teach, the custom house sells, the shipyard repairs. See <i>Buildings</i> in the reference.</p>
+    <h3>Retrain</h3>
+    <p>Play an agent you no longer need in your <b>school</b> to retrain it. It leaves your agent pool, and in its place you take <b>any 📖 profession</b> into your discard, from the agent deck, the common discard or the pier: your choice. If you search the agent deck, shuffle it after. The school takes any agent, a criminal or a slave too. A <b>university</b> takes agents with 📖 or more and retrains them into any 🎓 profession.</p>
+    <p>The agent you retrain leaves like any removed agent: a common one to the common discard, a native back to the native pile, a nation’s unique agent out of the game. Unique and native agents are never taught.</p>
+    <div class="example" data-title="Example"><p>Hugo has a school and a criminal he cannot use. He plays the criminal in the school, takes a soldier from the agent deck into his discard, and the criminal goes to the common discard.</p></div>
+    <p>The custom house sells and the shipyard repairs: see <i>Buildings</i> in the reference.</p>
   </div>
 </section>
 
@@ -239,17 +245,17 @@
     <h3>Dealing with a settlement</h3>
     <p>These actions need your pawn or ship next to the settlement.</p>
     <ul>
-      <li><b>Gift:</b> give 1 🟦 from your warehouse and roll <rv p="settings.natives.giftDice"></rv> dice. Hostility falls by 1, plus 1 for each success.</li>
+      <li><b>Gift:</b> give 1 🟧 from your warehouse and roll <rv p="settings.natives.giftDice"></rv> dice. Hostility falls by 1, plus 1 for each success.</li>
       <li><b>Preach:</b> spend ✝️ equal to the hostility. Take a native agent into your discard; hostility rises by 1 and population falls by 1. A settlement whose population reaches 0 is gone, with no loot.</li>
       <li><b>Attack:</b> the settlement’s strength is its population plus its terrain; it never adds cards. If you win, you may take a native agent, you gain +1 🔔, and population falls by 1, however much damage you did. Taking the last of them gives you the tribe’s loot (gold, or resources straight into your warehouse) and removes the settlement. Any attack, won or lost, sets the hostility to <rv p="settings.natives.afterAttack"></rv>.</li>
-      <li><b>Alliance:</b> at hostility <rv p="settings.natives.allianceMax"></rv> or lower, an agent with 🎓 or a scout may ally with a settlement that has no ally yet. Put your marker on its card. In the war, each ally sends <rv p="settings.war.allyCubes"></rv> fighters ⬛ to your colonies’ defence. The alliance ends if the hostility reaches <rv p="settings.natives.allianceBreak"></rv>.</li>
+      <li><b>Alliance:</b> at hostility <rv p="settings.natives.allianceMax"></rv> or lower, an agent with 🎓 may ally with a settlement that has no ally yet. Put your marker on its card. In the war, each ally sends <rv p="settings.war.allyCubes"></rv> fighters ⬛ to your colonies’ defence. The alliance ends if the hostility reaches <rv p="settings.natives.allianceBreak"></rv>.</li>
     </ul>
     <p>Native agents come only from settlements, and only while the pile of <rv p="agents.native"></rv> lasts.</p>
 
     <h3>When the natives stir</h3>
     <p>Events activate settlements by number. The player whose colony is nearest to that settlement is affected:</p>
     <ul>
-      <li>at hostility <rv p="settings.activation.giftMaxHostility"></rv> or lower, the natives bring <rv p="settings.activation.gift"></rv> 🟨 as a gift;</li>
+      <li>at hostility <rv p="settings.activation.giftMaxHostility"></rv> or lower, the natives bring <rv p="settings.activation.gift"></rv> 🟦 as a gift;</li>
       <li>at <rv p="hostility.calm"></rv>, nothing happens;</li>
       <li>at <rv p="hostility.raidFrom"></rv> or more, they <b>raid</b> that colony.</li>
     </ul>
@@ -277,9 +283,9 @@
     <ul>
       <li>An option you cannot pay for, or whose need you cannot meet, is not open to you. If no option is open, nothing happens.</li>
       <li>“Needs an agent with ⚔️” or “needs a scout”: the agent you played for this move, or one you discard from your hand.</li>
-      <li>A scout’s move ignores every effect marked 💀, at sea too.</li>
+      <li>A scout ignores effects marked 💀.</li>
       <li>“The nearest settlement” is counted in steps from your token, diagonal steps included; you break ties. With no settlement on the map, skip that part.</li>
-      <li>“The move ends”: the points left are lost, and a later 💨 on the card does nothing, but the rest of the card still happens.</li>
+      <li>“The move ends”: the points left are lost, for both tokens, and a later 💨 on the card does nothing, but the rest of the card still happens.</li>
       <li>Gains into the hold fill only its free space; the rest is lost.</li>
       <li>Losses of ✝️ and 🔔 stop at 0, but an option that costs 🔔 needs you to have them.</li>
       <li>Used cards go to a discard, shuffled into a new deck if the deck runs out.</li>
@@ -335,7 +341,7 @@
     <tbody>
       <tr><td>Each colony you hold</td><td><rv p="settings.score.patriotColony"></rv> 🏅</td><td><rv p="settings.score.loyalistColony"></rv> 🏅, colonies taken in the war included</td></tr>
       <tr><td>Each unspent 🔔</td><td><rv p="settings.score.perBell"></rv> 🏅</td><td>—</td></tr>
-      <tr><td>Every <rv p="settings.score.agentsPerPoint"></rv> agents in your collection</td><td colspan="2">1 🏅</td></tr>
+      <tr><td>Every <rv p="settings.score.agentsPerPoint"></rv> agents in your agent pool</td><td colspan="2">1 🏅</td></tr>
       <tr><td>Every <rv p="settings.score.goldPerPoint"></rv> 🟡</td><td colspan="2">1 🏅</td></tr>
       <tr><td>Each building</td><td colspan="2"><rv p="settings.score.building"></rv> 🏅</td></tr>
       <tr><td>Each Founding Father</td><td colspan="2"><rv p="settings.score.father"></rv> 🏅, plus the points some Fathers give</td></tr>
@@ -352,7 +358,7 @@
 <!-- ============================== REFERENCE ============================== -->
 
 <section class="chapter ref" data-part="Reference" data-toc="short">
-  <header><img src="../../packages/web/art/role/rivalry.webp" alt=""><h2>Nations</h2><p>From the easiest, one ★, to the hardest. Each starts with its own small deck, and one agent in it belongs to that nation alone.</p></header>
+  <header><img src="../../packages/web/art/role/rivalry.webp" alt=""><h2>Nations</h2><p>From the easiest, one ★, to the hardest. Each starts with its own small deck, which holds the nation’s unique agent.</p></header>
   <rv-table of="nations"></rv-table>
 </section>
 
@@ -360,7 +366,7 @@
   <header><img src="../../packages/web/art/role/companier.webp" alt=""><h2>Agents</h2><p>Price, number of cards, education and talent. The talent adds to the action it names; in everything else an agent is like any other.</p></header>
   <h3>Common agents</h3>
   <rv-table of="agents"></rv-table>
-  <h3>Nations’ own agents</h3>
+  <h3>Unique agents</h3>
   <p>One in each nation’s starting deck. They cannot be hired, recruited or taught.</p>
   <rv-table of="nationAgents"></rv-table>
   <h3>Native agents</h3>
@@ -406,13 +412,13 @@
   <div class="cols">
     <dl class="glossary">
       <dt>Agent</dt><dd>A card in your deck: one person, played for one action.</dd>
+      <dt>Agent pool</dt><dd>All your agents: your hand, deck and discard together.</dd>
       <dt>Alliance</dt><dd>A pact with a calm settlement. Allies send fighters to your defence in the war.</dd>
       <dt>Barracks</dt><dd>The space on the Europe board where the Royal Army 🟥 gathers.</dd>
       <dt>Bells 🔔</dt><dd>Liberty. They buy Founding Fathers and militia, decide the loyalist, start the war at <rv p="settings.war.bells"></rv>, and score for patriots.</dd>
       <dt>Bombardment</dt><dd>A ship attacking the land, or a pawn attacking a ship, without the landing penalty.</dd>
-      <dt>Collection</dt><dd>Your hand, deck and discard together.</dd>
       <dt>Colony</dt><dd>Your town on the map, founded by your pawn. You may have <rv p="settings.colony.max"></rv>.</dd>
-      <dt>Common discard</dt><dd>Agents that leave the pier or a collection. Shuffled into a new agent deck when that deck runs out.</dd>
+      <dt>Common discard</dt><dd>Agents that leave the pier or a player’s agent pool. Shuffled into a new agent deck when that deck runs out.</dd>
       <dt>Crosses ✝️</dt><dd>Faith. They recruit agents and convert natives. At most <rv p="settings.crosses.max"></rv>.</dd>
       <dt>Damage</dt><dd>A wound to a ship, taking one space in its hold. A damaged ship cannot move or attack.</dd>
       <dt>Demand track</dt><dd>One per resource, one space per player. When it fills, the price falls.</dd>
@@ -457,12 +463,13 @@
     <h3>Actions</h3>
     <table class="narrow">
       <tbody>
-        <tr><td><b>Move</b></td><td><rv p="settings.move.points"></rv> 💨 for one token; explore for <rv p="settings.move.explore"></rv> 💨</td></tr>
-        <tr><td><b>Found</b></td><td>the first free, then <rv p="settings.colony.foundCost.value"></rv> 🟨</td></tr>
+        <tr><td><b>Move</b></td><td><rv p="settings.move.points"></rv> 💨 for the ship and the pawn; explore for <rv p="settings.move.explore"></rv> 💨</td></tr>
+        <tr><td><b>Found</b></td><td>the first free, then <rv p="settings.colony.foundCost.value"></rv> 🟦</td></tr>
         <tr><td><b>Produce</b></td><td>1 and bonuses, or work a building</td></tr>
         <tr><td><b>Build</b></td><td>pay 🟫</td></tr>
-        <tr><td><b>Supply</b></td><td>1 🟨: draw 1</td></tr>
+        <tr><td><b>Supply</b></td><td>1 🟦: draw 1</td></tr>
         <tr><td><b>Exchange</b></td><td>discard 2: draw 1</td></tr>
+        <tr><td><b>Retrain</b></td><td>in a school: the agent becomes any 📖 (🎓 at a university)</td></tr>
         <tr><td><b>Attack</b></td><td>an agent with ⚔️</td></tr>
         <tr><td><b>Recruit</b></td><td>✝️, at least the round: look, keep 1</td></tr>
         <tr><td><b>Gift, preach, ally</b></td><td>next to a settlement</td></tr>

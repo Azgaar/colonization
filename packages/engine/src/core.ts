@@ -26,9 +26,13 @@ export function ask(s: State, d: Decision) {
 
 export function log(s: State, e: LogEntry) { if (s.logging) s.log.push(e); }
 
+/** Rules that hold at every moment, checked before each step of the game; one returns true when it has asked a player something (the warehouse limit, moves.ts). */
+export const always: ((s: State) => boolean)[] = [];
+
 export function run(s: State) {
   let guard = 0;
   while (!s.pending && !s.over) {
+    if (always.some((check) => check(s))) continue;
     const t = s.stack.pop();
     if (!t) throw new Error('game has nothing left to do');
     if (++guard > 100000) throw new Error(`endless loop at task "${t.t}"`);

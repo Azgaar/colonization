@@ -30,7 +30,7 @@ export interface Editable {
 const EFFECT = new Set(['mods', 'onGain', 'do', 'work', 'effect']);
 const SKIP = new Set(['id', 'ru', 'en', 'flavor', 'color', 'base', 'kind', 'nation', 'unique', 'improvement', 'category']);
 const LAND = ['forest', 'grassland', 'mountains', 'desert', 'tundra'];
-const ICONS = ['corn', 'fish', 'timber', 'leaf', 'fur', 'goods', 'silver', 'bells', 'crosses'];
+const ICONS = ['fish', 'timber', 'crops', 'goods', 'silver', 'bells', 'crosses'];
 const SETTING_OPTIONS: Record<string, readonly string[]> = {
   'settings.cargo.costPer': ['operation', 'unit'],
   'settings.production.emptyMeans': ['noToken', 'noForeignToken'],

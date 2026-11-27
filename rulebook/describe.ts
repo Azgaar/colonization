@@ -6,8 +6,8 @@
 import type { GameDef, Mod } from '../packages/data/src/index.ts';
 
 type Any = Record<string, any>; // the effect nodes, read loosely: every kind is handled by name below
-export const RES: Record<string, string> = { food: '🟨', timber: '🟫', crops: '🟩', goods: '🟦', silver: '⬜', gold: '🟡', bells: '🔔', crosses: '✝️' };
-const ICON: Record<string, string> = { fish: '🐟', timber: '🪵', leaf: '🍂', fur: '🦫', goods: '📦', silver: '🪙', crosses: '✝️', bells: '🔔', corn: '🐟' };
+export const RES: Record<string, string> = { food: '🟦', timber: '🟫', crops: '🟩', goods: '🟧', silver: '⬜', gold: '🟡', bells: '🔔', crosses: '✝️' };
+const ICON: Record<string, string> = { fish: '🐟', timber: '🪵', crops: '🌿', goods: '📦', silver: '🪙', crosses: '✝️', bells: '🔔' };
 const sign = (x: number) => (x > 0 ? `+${x}` : `−${-x}`);
 const list = (xs: string[], and = 'and') => (xs.length < 2 ? xs.join('') : `${xs.slice(0, -1).join(', ')} ${and} ${xs.at(-1)}`);
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
@@ -29,9 +29,8 @@ export function describe(R: GameDef) {
       switch (m.mod) {
         case 'onlyProduce': out.push('May only produce. Still counts 1 in battle'); break;
         case 'production': out.push(`${icons ? `${icons} ${sign(m.add)}` : `Produce ${sign(m.add)}`}${where}${m.enables ? ', even where the land gives nothing' : ''}`); break;
-        case 'move': out.push(`${m.token === 'ship' ? '⛵' : '💂'} ${sign(m.add)} 💨`); break;
+        case 'move': out.push(`${sign(m.add)} 💨`); break;
         case 'ignoreSkull': out.push('Ignores 💀 effects'); break;
-        case 'negotiator': out.push('May make alliances'); break;
         case 'cost': out.push(m.of === 'build' ? `Buildings cost ${sign(m.add)} 🟫` : `Hiring costs ${sign(m.add)} 🟡`); break;
         case 'sellPrice': out.push(`Trade: ${sign(m.add)} 🟡 for each resource sold`); break;
         case 'smuggle': out.push(`Smuggles: sells 1 resource from the warehouse at the market price ${sign(m.add)} 🟡, off the demand track`); break;
@@ -50,7 +49,7 @@ export function describe(R: GameDef) {
     if (b.defence) return `${sign(b.defence)} ⚔️ to every colony’s defence${b.id === 'fort' ? '; replaces the stockade; stops native raids' : ''}`;
     if (w?.kind === 'ocean') return `Work an ocean cell: ${sign(w.add)} 🐟`;
     if (w?.kind === 'produce') return `${w.consumes ? `${w.consumes.amount} ${RES[w.consumes.res]} → ` : '→ '}${w.amount} ${ICON[w.icon] ?? RES[w.icon] ?? w.icon}`;
-    if (w?.kind === 'teach') return w.maxEdu === 2 ? 'Teaches 🎓 professions' : 'Teaches 📖 professions';
+    if (w?.kind === 'teach') return `Retrain the agent played here, ${b.edu ? 'one with 📖 or more' : 'any agent'}, into any ${w.maxEdu === 2 ? '🎓' : '📖'} profession`;
     if (w?.kind === 'sell') return `Sell ${w.amount} resource from the warehouse at the market price`;
     if (w?.kind === 'repair') return 'Repair the ship fully while it lies next to your colony';
     return '';
@@ -92,7 +91,7 @@ export function describe(R: GameDef) {
     if (c.agent) out.push(c.agent === 'scout' ? 'needs a scout' : 'needs an agent with ⚔️');
     for (const q of ['gold', 'bells'] as const) if (c[q]) out.push(`${m}${c[q]} ${RES[q]}`);
     if (c.cards) out.push(`discard ${plural(c.cards, 'card')} from your hand`);
-    if (c.anyFood) out.push(`${m}${c.anyFood} 🟨 from the hold or the warehouse`);
+    if (c.anyFood) out.push(`${m}${c.anyFood} 🟦 from the hold or the warehouse`);
     if (c.anyResource) out.push(`${m}${c.anyResource} resource of any kind`);
     if (c.holdResource) out.push(`discard ${c.holdResource} resource from the hold`);
     if (c.wholeHold) out.push(`discard the whole cargo, at least ${c.wholeHold} resources`);
@@ -133,13 +132,13 @@ export function describe(R: GameDef) {
       case 'raidAll': return `Every settlement with 💢 ${S.activation.raidMinHostility} or more ${raid}.`;
       case 'ref': return n.perPlayer ? `Add ${n.perPlayer} 🟥 for each player.` : `Add ${n.add} 🟥 for every ${n.perBells} 🔔 the players hold together.`;
       case 'breakAlliances': return `Alliances with settlements at 💢 ${n.min} or more end.`;
-      case 'nativeGifts': return `Every settlement with 💢 ${n.min}–${n.max} gives ${n.food} 🟨 to the player whose colony is nearest.`;
-      case 'winter': return `Each player discards ${n.food} 🟨 for each of their colonies, and removes the top card of their deck for each colony left hungry.`;
+      case 'nativeGifts': return `Every settlement with 💢 ${n.min}–${n.max} gives ${n.food} 🟦 to the player whose colony is nearest.`;
+      case 'winter': return `Each player discards ${n.food} 🟦 for each of their colonies, and removes the top card of their deck for each colony left hungry.`;
       case 'refreshSalon': return 'Replace the Founding Fathers in the salon with new ones.';
       case 'cheapBuild': return `In turn order, players may build ${list((n.options as string[]).map((b) => a(building(b))), 'or')} at once for ${n.timber} 🟫.`;
       case 'witchTrial': return `The player with the most ✝️ picks any player, who removes one of their 🎓 agents, or gains ${n.crosses} ✝️ if they have none.`;
       case 'payOrRemove': return `Each player pays ${n.gold} 🟡 for each ${n.which === 'military' ? 'agent with ⚔️' : agent(n.which)} they own, or removes it. Add ${n.refEach} 🟥 for each one removed.`;
-      case 'sacredForest': return `The player with the most 🟫 (if nobody has any, the most buildings) pays the natives ${n.goods} 🟦 or ${n.gold} 🟡, or the 💢 of every settlement rises by ${n.hostility}.`;
+      case 'sacredForest': return `The player with the most 🟫 (if nobody has any, the most buildings) pays the natives ${n.goods} 🟧 or ${n.gold} 🟡, or the 💢 of every settlement rises by ${n.hostility}.`;
       case 'priceReset': return `The prices of ${resList(n.res)} return to their start.`;
       case 'hostilityAll': return `The 💢 of every settlement ${n.add < 0 ? 'falls' : 'rises'} by ${Math.abs(n.add)}.`;
       case 'boycott': return `Each player with ${RES[n.res]} pays ${n.goldPerUnit} 🟡 for each one, or boycotts: discards them all and gains 1 🔔 for each. Add ${n.refPerUnit} 🟥 for each one discarded.`;

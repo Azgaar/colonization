@@ -81,27 +81,33 @@
     },
     {
       "copies": 1,
-      "nickname": "good",
-      "name": "товар",
-      "icon": "📦"
-    },
-    {
-      "copies": 1,
       "nickname": "fish",
       "name": "рыба",
       "icon": "🐟"
     },
     {
       "copies": 1,
-      "nickname": "ocean",
-      "name": "океан",
-      "icon": "🟦"
+      "nickname": "logs",
+      "name": "брёвна",
+      "icon": "🪵"
     },
     {
       "copies": 1,
-      "nickname": "plantation",
-      "name": "плантация",
-      "icon": "🟩"
+      "nickname": "crops",
+      "name": "сырьё",
+      "icon": "🌿"
+    },
+    {
+      "copies": 1,
+      "nickname": "crate",
+      "name": "ящик",
+      "icon": "📦"
+    },
+    {
+      "copies": 1,
+      "nickname": "ingot",
+      "name": "слиток",
+      "icon": "🪙"
     },
     {
       "copies": 1,

@@ -6,7 +6,7 @@ The rules as the engine must implement them. Each rule has an ID used in code, t
 
 - no mark: stated in `Колонизация.docx` or the spreadsheet (now `rules/`, the master of the rules)
 - **[A]** answered by the designer on 2026-11-25 (listed in [decisions.md](decisions.md)). Answers override the document and the spreadsheet
-- **[D]** default chosen because the sources are silent or unclear. Each is a named setting, shown as `setting = value`. Those worth a designer's answer are listed as questions (Q) in [decisions.md](decisions.md#open-questions).
+- **[D]** default chosen because the sources are silent or unclear. Each is a named setting, shown as `setting = value`. Those worth a designer's answer are listed as questions (Q) in [decisions.md](decisions.md#open).
 
 When the document and spreadsheet disagree, the spreadsheet wins **[A]**.
 
@@ -30,7 +30,7 @@ These are the rules of the board game. PC rules start identical and may change o
 | Patriot / Loyalist | патриот / лоялист | Sides in the war |
 | Education | 🚫 / 📖 / 🎓 | none / basic / higher. There is no "middle" level **[A]** |
 
-Resources: food 🟨 (🐟), timber 🟫 (🪵), crops 🟩 (🍂, 🦫), goods 🟦 (📦), silver ⬜ (🪙). Food is fish (corn is gone, DD-67); leaf and fur are both crops. The icon matters only for bonuses.
+Resources, as cube colour (icon): food blue 🟦 (fish 🐟), timber brown 🟫 (logs 🪵), crops green 🟩 (🌿), goods orange 🟧 (crate 📦), silver light grey ⬜ (ingot 🪙). One icon per resource (DD-76): food is fish (corn is gone, DD-67); crops are cash crops and fur, both 🌿 (`crops`). The PC map may draw a 🌿 bonus on forest or tundra as fur; the table always shows the crops icon.
 
 
 ## S. Setup
@@ -57,7 +57,7 @@ Resources: food 🟨 (🐟), timber 🟫 (🪵), crops 🟩 (🍂, 🦫), goods 
 | T-4 | **Event.** When all have passed, resolve the top event (section V) |
 | T-5 | **Tax.** If the rate is above 0, each player pays and gains +1 🔔 (DD-71; was nothing), or refuses: +1 🟥 to the REF (DD-52; was +2) (solo: +3 🟥), and no 🔔 (DD-50; was +1 🔔). A player who cannot pay must refuse **[D]** |
 | T-6 | **End.** Check for war (W-1), advance the round and year (1620 + 20 per round), pass the first-player marker left |
-| T-7 | At the end of a player's turn, warehouse excess is discarded by choice. **[D]** The check also applies after events |
+| T-7 | **[A]** The warehouse never holds more than its capacity (F-5): the moment it would, its owner discards the excess, by choice, before anything else happens (DD-72; was: at the end of the owner's turn and after events) |
 | T-8 | There are no free actions: recruiting takes an agent (DD-60; was free, on one's own turn, any number of times) |
 
 ## P. Playing a card
@@ -73,18 +73,18 @@ Resources: food 🟨 (🐟), timber 🟫 (🪵), crops 🟩 (🍂, 🦫), goods 
 
 | ID | Rule |
 |---|---|
-| M-1 | 5 movement points for one token per action. Eight directions |
+| M-1 | 5 movement points per action, shared by the ship and the pawn in any order (DD-73). Eight directions |
 | M-2 | Cost to enter: ocean, grassland 1; forest, desert, tundra 2; mountains need at least 1 and use all that remain |
 | M-3 | Ships stay on water. The pawn stays on land unless aboard. One token per cell, except pawn aboard a ship |
 | M-4 | **[D]** The pawn may enter an own colony. No token may enter a settlement or a foreign colony |
 | M-5 | **Explore:** 1 point, reveals a closed fragment. From a fragment, the neighbours are those sharing a side **[D]** (`explore.diagonal`). From the rings, any fragment touching the token's cell **[D]** |
 | M-6 | On reveal: mark ruins and wrecks as unexplored; place settlements in reading order **[D]** per N-1 |
 | M-7 | **Load and unload:** 1 point per operation, any amount **[D]** `cargo.costPer = operation`. Goods move between hold and warehouse when the ship is on water next to an own colony |
-| M-8 | **Embark and disembark:** 1 point between adjacent ship and land. This is the only way one action can move both ship and pawn, using the remaining points **[A]**. **[D]** It can be part of either token's action. The point paid covers the first cell, whatever its terrain |
+| M-8 | **Landing and boarding:** the pawn moves into the target cell and pays its cost, like any move: the land cell when landing, the ship's cell when boarding (DD-74) |
 | M-9 | Hold has 4 slots: 1 per resource, 1 for the pawn, 1 per damage |
 | M-10 | A damaged ship cannot move or attack |
-| M-11 | Entering an unexplored ruin or wreck triggers it at once (section X). "Token ends its move" stops further movement in this action |
-| M-12 | A pawn sent to Europe waits off the map. **[D]** Its ship may board it from any Europe cell for 1 point |
+| M-11 | Entering an unexplored ruin or wreck triggers it at once (section X). "Token ends its move" stops further movement in this action, for both tokens (DD-73) |
+| M-12 | A pawn sent to Europe waits off the map. **[D]** Its ship may board it from any Europe cell for 1 point, the cost of its water cell |
 | M-13 | A ship sent to Europe goes to the nearest free Europe cell **[D]**, with its pawn and, unless stated, its cargo |
 | M-14 | **[A]** A ship that takes damage from any cause goes to Europe, or next to an own colony if its owner has a shipyard (`damage.sendsToEurope = true`, DD-54). Otherwise a ship damaged by a storm or wreck could never be repaired, since it cannot move |
 
@@ -135,7 +135,7 @@ Require the player's ship on a Europe cell.
 | ID | Rule |
 |---|---|
 | R-1 | **Produce on a cell:** 1 resource from a colony's cell (it may be worked itself **[A]**) or one of its 8 neighbours that is empty. **[D]** Empty means no colony, settlement or token |
-| R-2 | Terrain yields: forest timber only **[A]** (DD-56; fur needs a fur bonus or a trapper; `board` sets `terrain.forest.yields`); grassland crops (leaf) only **[A]** (DD-63); mountains silver; ocean food (fish); desert and tundra nothing. One product per terrain; corn is gone (DD-67) |
+| R-2 | Terrain yields: forest timber only **[A]** (DD-56; 🌿 fur needs a bonus or a trapper; `board` sets `terrain.forest.yields`); grassland crops (🌿) only **[A]** (DD-63); mountains silver; ocean food (fish); desert and tundra nothing. One product per terrain; corn is gone (DD-67) |
 | R-3 | **Ocean.** Working an ocean cell directly gives 1 food (fish) and needs no building. Docks are a building to work in (R-7, no education needed): the agent works an ocean cell through them for +1, so 2 food **[A]** . The player picks an eligible ocean cell (R-1), so its fish bonus adds +1, and a fisherman +1 more: up to 4 food **[A]** |
 | R-4 | A cell's bonus icon adds +1 when that resource is produced. **[D]** A bonus on terrain that does not normally yield the resource allows producing it, for 1 in total |
 | R-5 | Agent and Father bonuses add to each matching production. A location-bound agent bonus (cossack, trapper, cane planter) also allows that production where the terrain yields nothing **[A]**. The cossack gives 2 crops on empty tundra |
@@ -143,7 +143,7 @@ Require the player's ship on a Europe cell.
 | R-7 | **Produce in a building:** one building per action; the agent's education must be at least the building's. No limit on reuse of cells and buildings |
 | R-8 | Workshop: 1 crops → 1 goods. Factory: 1 crops → 2 goods. Bonuses add output, not input. Factory, newspaper and church do not add to the basic building; the better one is used **[D]** |
 | R-9 | **Build:** pay timber, at most 6 buildings, one of each type. **[D]** An improvement requires the basic building, which stays and keeps its slot |
-| R-10 | **School and university:** the played agent is the teacher. Another card in hand is replaced by a copy of the teacher's type from the agent deck or common discard; both cards go to the player's discard, the replaced one to the common discard **[D]**. School teaches 📖 professions, university also 🎓, never unique agents; the teacher's own education must fit. Not allowed if no copy is available **[D]** |
+| R-10 | **[A]** **School and university** (DD-75): the agent played there leaves the player's collection (as a removed card, B-10) and is replaced, in the discard, by any profession the building teaches, taken, at the player's choice, from the agent deck (then shuffled), the common discard or the pier. School: any agent, criminals and slaves included; teaches 📖 professions. University: agents with 📖 or more; teaches 🎓 professions. Never a nation's or a native profession. No card other than the one played is spent (was: the played 📖/🎓 agent taught its own profession to another card in hand) |
 | R-11 | **Custom house:** sell 1 resource from the warehouse at market price, trader bonus included **[D]**; it counts towards demand **[D]** |
 | R-12 | **Supply:** spend 1 food, draw 1 card. A swap, not a gain **[A]** (DD-57) |
 | R-13 | **Exchange:** discard 2 cards, the played one included **[D]**, draw 1 |
@@ -162,7 +162,7 @@ Require the player's ship on a Europe cell.
 | N-6 | **Preach:** pay crosses equal to hostility; native agent to discard; hostility +1; population -1. **[D]** At population 0 the settlement disappears with no loot |
 | N-7 | **Attack:** settlement strength = population + terrain. Victory: optional native agent, +1 🔔, population -1 whatever the damage. Last one gives loot. Any attack, won or lost, sets hostility to 5 |
 | N-8 | Loot resources go straight to the warehouse, gold to the player |
-| N-9 | **Alliance:** hostility 0–1 (0–3 with John Smith); 🎓 agent or scout; settlement not yet allied. Alliance ends at hostility 4–5 |
+| N-9 | **Alliance:** hostility 0–1 (0–3 with John Smith); 🎓 agent (the scout has 🎓, DD-73); settlement not yet allied. Alliance ends at hostility 4–5 |
 | N-10 | Native agents are limited to the pile of 8; none left means none gained **[D]** |
 | N-11 | **Activation of settlement N [A].** Affects the owner of the colony nearest to that settlement. Hostility 0–2: the owner receives 1 food. 3: nothing. 4–5: raid on that colony (N-12). Nothing happens if settlement N or any colony does not exist **[A]**. **[D]** A gift that does not fit falls under T-7 |
 | N-12 | **Raid** on the nearest colony (straight distance; ties by turn order **[D]**): its owner discards 2 resources or loses 1 building; a fort prevents it. With fewer than 2 resources and no buildings, all resources are lost **[D]** |
@@ -179,7 +179,7 @@ All 34 cards are implemented as printed in the spreadsheet. Clarifications:
 | B-2 | Sepúlveda gives 2 slaves **[A]**, or as many as the agent deck and common discard still hold **[D]** |
 | B-3 | Equiano: slaves are removed from the player's collection (spreadsheet) to the common discard **[D]**, and each is replaced by the top card of the agent deck. P-4 applies |
 | B-4 | Las Casas: preaching is free; attacks on natives are forbidden. Both last all game |
-| B-5 | Franklin, Hooker, Rolfe, Squanto, Whitney add to each production action that yields that resource. Rolfe counts only 🍂, Squanto only 🐟 (DD-65) |
+| B-5 | Franklin, Hooker, Rolfe, Squanto, Whitney add to each production action that yields that resource. Rolfe counts every 🌿, fur included (DD-76), Squanto only 🐟 (DD-65) |
 | B-6 | Champlain: any revealed legal cell, within the limit of 3 |
 | B-7 | Jefferson: the cheapest Father in the salon, owner's choice among ties **[D]** |
 | B-8 | Kościuszko: +1 for a stockade or +2 for a fort, on top of the usual bonus |
@@ -210,7 +210,7 @@ All 34 cards are implemented as printed in the spreadsheet. Clarifications:
 | X-2 | Used cards go to a discard, reshuffled if the deck runs out **[D]** |
 | X-3 | Options need their cost and requirement to be met. If no option is available, nothing happens **[D]** |
 | X-4 | "Requires an agent with ⚔️" or a scout: **[D]** the agent played for this move, or one discarded from hand |
-| X-5 | A scout's move ignores effects marked 💀, including for ships **[D]** |
+| X-5 | A scout ignores effects marked 💀, for the ship too **[D]** |
 | X-6 | "Nearest settlement" uses straight distance; ties by the player's choice **[D]**. None on the map: that part is skipped |
 | X-7 | Losses of crosses and bells stop at 0 **[D]**. Bell costs on "pay" options must be affordable **[D]** |
 

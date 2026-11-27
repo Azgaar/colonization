@@ -64,7 +64,7 @@
       "region": "Аппалачи",
       "initial alert": "3 💢",
       "initial population": "3 🏹",
-      "loot": "5 🦫",
+      "loot": "5 🌿",
       "image": "cherokee.png"
     },
     {
@@ -75,7 +75,7 @@
       "region": "Великие озёра",
       "initial alert": "4 💢",
       "initial population": "3 🏹",
-      "loot": "6 🦫",
+      "loot": "6 🌿",
       "image": "iroquois.png"
     },
     {
@@ -86,7 +86,7 @@
       "region": "Великие равнины",
       "initial alert": "3 💢",
       "initial population": "2 🏹",
-      "loot": "3 🦫",
+      "loot": "3 🌿",
       "image": "sioux.png,50,100,100"
     },
     {
@@ -141,7 +141,7 @@
       "region": "Арктика",
       "initial alert": "2 💢",
       "initial population": "1 🏹",
-      "loot": "2 🦫",
+      "loot": "2 🌿",
       "image": "inuit.png,50,50,100"
     },
     {

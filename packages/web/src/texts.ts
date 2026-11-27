@@ -7,7 +7,7 @@ import { Places } from './places.ts';
 /** Card texts as printed, from the spreadsheet: `father.<id>`, `event.<id>`, `ruin.<id>`… */
 const PRINTED: Record<string, string> = texts;
 const TACTIC: Record<string, Pair> = table('tactic');
-const EMOJI: Record<string, string> = { '🟡': 'gold', '🔔': 'bells', '✝️': 'crosses', '🟥': 'ref', '🟨': 'food', '🟫': 'timber', '🟩': 'crops', '🟦': 'goods', '⬜': 'silver', '🌽': 'food', '🐟': 'fish', '🪵': 'timber', '🍂': 'crops', '🦫': 'crops', '📦': 'goods', '🪙': 'silver', '⚔️': 'sword', '💢': 'anger', '📖': 'book', '🎓': 'cap' };
+const EMOJI: Record<string, string> = { '🟡': 'gold', '🔔': 'bells', '✝️': 'crosses', '🟥': 'ref', '🟦': 'food', '🟫': 'timber', '🟩': 'crops', '🟧': 'goods', '⬜': 'silver', '🐟': 'fish', '🪵': 'timber', '🌿': 'crops', '📦': 'goods', '🪙': 'silver', '⚔️': 'sword', '💢': 'anger', '📖': 'book', '🎓': 'cap' };
 const draw = (s: string, size = 16) => Object.entries(EMOJI).reduce((x, [e, k]) => x.replaceAll(e, icon(k, size)), s.replace(/\{(\w+)\}/g, (_: string, k: string) => icon(k, size)).replace(/(\d) ПО(?![А-Яа-я])/g, (_: string, n: string) => `${n} ${icon('vp', size)}`).replace(/<\/?i>/g, '')).replace(/ ?\/ /g, '. ').replace(/\.\. /g, '. ').replace(/[🛖💨🎲💀👨🏻‍🌾🛠️]/gu, '').trim();
 /** A card's text: Russian as printed in the workbook, other languages from the locale files. */
 const text = (key: string, size: number) => draw(lang() === 'ru' && PRINTED[key] ? PRINTED[key] : t(key), size);
@@ -18,7 +18,7 @@ export function traits(id: string) {
   const sword = { infantry: 0, ship: 0 };
   for (const m of D.agents[id].mods) {
     if (m.mod === 'production') out.push(`${n(m.add)} ${m.icons ? m.icons.map((i) => icon(Places.ico(i), 15)).join('') : icon('gather', 15)}${m.terrain ? icon(m.terrain, 15) : ''}`);
-    if (m.mod === 'move') out.push(`${n(m.add)} ${icon('move', 15)}${icon(m.token, 15)}`);
+    if (m.mod === 'move') out.push(`${n(m.add)} ${icon('move', 15)}`);
     if (m.mod === 'combat' && m.terrain && !m.vs) out.push(`${n(m.add)} ${icon('sword', 14)}${icon(m.terrain, 15)}`);
     if (m.mod === 'combat') sword[m.token] += m.vs || m.terrain ? 0 : m.add;
     if (m.mod === 'cost') out.push(`${m.add} ${m.of === 'hire' ? icon('gold', 15) : icon('timber', 15)}`);
@@ -31,4 +31,5 @@ export function traits(id: string) {
   return out;
 }
 export const trait = (c: string) => `${eduIcon(D.agents[c].edu)} ${traits(c).join(' ')}`;
-export const work = (id: string) => { const b = D.buildings[id], w = b.work; if (b.storage) return `+${b.storage} ${t('texts.places')}`; if (b.defence) return `+${b.defence} ${icon('sword', 14)}`; if (!w) return ''; if (w.kind === 'ocean') return `2 ${icon('fish', 16)}`; if (w.kind === 'sell') return t('texts.sells_1'); if (w.kind === 'repair') return t('texts.full_repair'); if (w.kind === 'teach') return `${t('texts.teaches')} ${icon(w.maxEdu === 2 ? 'cap' : 'book', 15)}`; return `${w.consumes ? `${w.consumes.amount}${icon(w.consumes.res, 16)} ▸ ` : ''}${w.amount}${icon(Places.ico(w.icon), 16)}`; };
+/** What a building does, in signs: schools show who may enter ▸ what they become (DD-75). */
+export const work = (id: string) => { const b = D.buildings[id], w = b.work; if (b.storage) return `+${b.storage} ${t('texts.places')}`; if (b.defence) return `+${b.defence} ${icon('sword', 14)}`; if (!w) return ''; if (w.kind === 'ocean') return `2 ${icon('fish', 16)}`; if (w.kind === 'sell') return t('texts.sells_1'); if (w.kind === 'repair') return t('texts.full_repair'); if (w.kind === 'teach') return `${b.edu ? eduIcon(b.edu) : icon('people', 15)} ▸ ${icon(w.maxEdu === 2 ? 'cap' : 'book', 15)}`; return `${w.consumes ? `${w.consumes.amount}${icon(w.consumes.res, 16)} ▸ ` : ''}${w.amount}${icon(Places.ico(w.icon), 16)}`; };

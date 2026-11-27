@@ -13,3 +13,15 @@
 .riv .two-l { display:flex;gap:4px;align-items:center;font-weight:500;font-size:15px }
 .log li.at { cursor:pointer }
 .log li.at:hover { text-decoration:underline dotted;text-underline-offset:3px }
+/* The Chronicle: the notices of one round, with buttons to the rounds before and after. */
+.chron { display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:20px }
+.chron h2 { margin-bottom:0 }
+.chron .pg { display:flex;align-items:center;gap:6px }
+.chron .pg b { font:800 16px var(--sc);white-space:nowrap }
+.chron .pg small { font-weight:600;opacity:.7 }
+.chron .pg button { width:30px;height:30px;border-radius:9px;background:#ffffff1f;font:800 19px/1 var(--sc) }
+.chron .pg button:disabled { opacity:.3;cursor:default }
+.news { list-style:none;margin:10px 0 0;padding:0 }
+.news .toast { box-shadow:none;cursor:default }
+.news .toast.at { cursor:pointer }
+.news .none { opacity:.7;font-size:15px }

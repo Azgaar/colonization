@@ -313,7 +313,7 @@ M4 status (2026-11-26): built.
 
 M5 status (2026-11-26): scope agreed with the designer: the tutorial and the rules reference first.
 - Built (FR-U-20): the tutorial is part of every new game until the player turns it off in Options or ends it (no separate tutorial game); a coach gives one step at a time, points at what to use and moves on when the game shows the step done; Rules on the title screen; the rules reference in both languages (F1, or Rules in the game menu), with the numbers of the rules being played.
-- Rule changes proposed from lab evidence (2026-11-26): [proposals.md](proposals.md), candidates in `rulesets/proposed.json`, decisions Q19 and Q20 in [decisions.md](decisions.md); nothing promoted until the designer chooses.
+- Rule changes proposed from lab evidence (2026-11-26): candidates in `rulesets/proposed.json`, tracked in [decisions.md](decisions.md#open); nothing applied until the designer chooses.
 - Sound (FR-U-21): effects for what happens in the game, music by the game's stage (title, exploring, colonies, tension, war) with crossfades, Music, Effects and Sound on/off in both Options screens. Effects from Kenney's CC0 packs; music from real baroque recordings under free licences (Wikimedia Commons), credited on the About page; see [audio.md](audio.md).
 - Applying changes from dev mode (FR-R-9): Design bench → Export → Into the rules writes a change into `rules/` or drops it, through the local server (`pnpm web`), as `pnpm rules apply | drop` does on the command line; each decision is logged in decisions.md, and printed texts still to update are listed.
 - Not planned yet: the desktop package.

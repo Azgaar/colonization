@@ -1,13 +1,15 @@
 /* The top line, the King's army box, the Governors sheet and the game menu. */
 import { Sprite } from '../map/sprites.ts';
-import { $, cap, D, logLine, me, P, placeOf, t } from '../data.ts';
+import { $, cap, D, me, P, t } from '../data.ts';
 import type { Entry } from '../sim.ts';
 import { icon } from '../icons.ts';
 import { Places } from '../places.ts';
 import { Dev, Sim } from '../sim.ts';
 import { outlook } from '../forecast.ts';
 import { S, U } from '../state.ts';
+import { live, pages, year } from './notices.ts';
 import { named } from './score.ts';
+import { face } from './toasts.ts';
 import { settings } from './settings.ts';
 /** The Royal Army's sign in the top line: one of its grenadiers. */
 const SOLDIER = `<svg class="ic" viewBox="0 0 64 64" width="22" height="22" aria-hidden="true">${Sprite.redcoat()}</svg>`;
@@ -20,7 +22,16 @@ export function top() {
   $('king').hidden = !U.king || S.war >= 0 || !!S.card; $('king').innerHTML = `<h3>${t('ref')}</h3><dl><dt>${t('top.barracks')}</dt><dd>${D.ref}</dd><dt>${t('top.hostile_settlements')}</dt><dd>+${A.hostile}</dd><dt class="sum">${t('forecast')}</dt><dd class="sum">${A.pool}</dd><dt>${t('top.patriot_colonies')}</dt><dd>${A.targets}</dd>${A.targets ? `<dt>${t('top.redcoats')}</dt><dd>${Math.floor(A.pool / A.targets)}–${Math.ceil(A.pool / A.targets)}</dd>` : ''}${A.loyal === me ? '' : mine.map((c) => `<dt>${t('top.colony_attack')}</dt><dd>${(A.per[c.cell] || 0) * 2} / ${c.defence}</dd>`).join('')}</dl><p>${t('loyalist')}: <b>${A.loyal === null ? t('none') : Places.name(A.loyal)}</b>${A.loyal === me ? ` (${t('you')})` : ''}. ${t('top.player_fewest')}</p>`;
   $('vpbox').hidden = U.vp === null || S.war >= 0 || !!S.card; $('vpbox').classList.toggle('by-sheet', U.sheet); if (U.vp !== null) $('vpbox').innerHTML = points(U.vp);
   $('sheet').className = `sheet${U.sheet ? ' on' : ''}`;
-  $('sheet').innerHTML = `<button class="x" data-sheet>${t('close')}</button><h2>${t('rivals')}</h2>${D.players.map((p, i) => `<div class="riv${i === me ? ' me' : ''}">${Places.em(i, 44)}<span>${Places.name(i)}${i === me ? ` <small>(${t('you')})</small>` : ''}<small class="two-l"><span title="${t('top.agents')}">${icon('people', 15)}${p.agents}</span> <span title="${t('gold')}">${icon('gold', 15)}${p.gold}</span> <span title="${t('buildings')}">${icon('house', 15)}${p.buildings.length}</span> <span title="${t('fathers')}">${icon('father', 15)}${p.fathers.length}</span> <span title="${t('bells')}">${icon('bells', 15)}${p.bells}</span> <span title="${t('crosses')}">${icon('crosses', 15)}${p.crosses}</span></small></span><span class="v" data-vp="${i}" title="${t('vp')}">${icon('vp', 26)}${p.score}</span></div>`).join('')}${U.sheet && Dev.forecast ? foresight() : ''}<h2 style="margin-top:20px">${t('log')}</h2><ul class="log">${D.log.slice().reverse().map((e) => { const l = logLine(e as Entry), at = placeOf(e as Entry); return l ? `<li${at === null ? '' : ` class="at" data-look="${at}" title="${t('top.show_map')}"`}>${l}</li>` : ''; }).join('')}</ul>`;
+  $('sheet').innerHTML = `<button class="x" data-sheet>${t('close')}</button><h2>${t('rivals')}</h2>${D.players.map((p, i) => `<div class="riv${i === me ? ' me' : ''}">${Places.em(i, 44)}<span>${Places.name(i)}${i === me ? ` <small>(${t('you')})</small>` : ''}<small class="two-l"><span title="${t('top.agents')}">${icon('people', 15)}${p.agents}</span> <span title="${t('gold')}">${icon('gold', 15)}${p.gold}</span> <span title="${t('buildings')}">${icon('house', 15)}${p.buildings.length}</span> <span title="${t('fathers')}">${icon('father', 15)}${p.fathers.length}</span> <span title="${t('bells')}">${icon('bells', 15)}${p.bells}</span> <span title="${t('crosses')}">${icon('crosses', 15)}${p.crosses}</span></small></span><span class="v" data-vp="${i}" title="${t('vp')}">${icon('vp', 26)}${p.score}</span></div>`).join('')}${U.sheet && Dev.forecast ? foresight() : ''}${U.sheet ? chronicle() : ''}`;
+}
+/** The Chronicle: the notices of the game, a page per round, the latest first shown. */
+function chronicle() {
+  const all = pages(Sim.s.log as Entry[], live()).filter((p, i, l) => p.notes.some((n) => n.only !== 'toast') || i === l.length - 1);
+  const i = Math.max(0, U.page === null ? all.length - 1 : all.findIndex((p) => p.id === U.page)), pg = all[i];
+  if (!pg) return '';
+  const go = (k: number, sign: string) => `<button data-page="${k === all.length - 1 ? '' : all[k]?.id ?? ''}"${all[k] ? '' : ' disabled'} aria-label="${sign === '‹' ? t('top.earlier') : t('top.later')}">${sign}</button>`;
+  const notes = pg.notes.filter((n) => n.only !== 'toast').map((n) => `<li class="toast on ${n.tone ?? ''}${n.cell === undefined ? '' : ' at'}"${n.cell === undefined ? '' : ` data-look="${n.cell}" title="${t('top.show_map')}"`}>${face(n)}</li>`).join('');
+  return `<div class="chron"><h2>${t('log')}</h2><span class="pg">${go(i - 1, '‹')}<b>${pg.war ? t('war') : `${t('round')} ${pg.round}`}${pg.war ? '' : ` <small>${year(pg.round)}</small>`}</b>${go(i + 1, '›')}</span></div><ul class="news">${notes || `<li class="none">${t('top.nothing_yet')}</li>`}</ul>`;
 }
 /** Where a governor's victory points come from, if the game ended now: each source with its count and rate, then the total. */
 function points(i: number) {

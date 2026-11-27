@@ -3,10 +3,10 @@
 export type Resource = 'food' | 'timber' | 'crops' | 'goods' | 'silver';
 export const RESOURCES: readonly Resource[] = ['food', 'timber', 'crops', 'goods', 'silver'];
 
-/** What a production action yields. Corn and fish are both food, leaf and fur are both crops. */
-export type Icon = 'corn' | 'fish' | 'timber' | 'leaf' | 'fur' | 'goods' | 'silver' | 'bells' | 'crosses';
+/** What a production action yields: one icon per resource (fish is food), plus bells and crosses. */
+export type Icon = 'fish' | 'timber' | 'crops' | 'goods' | 'silver' | 'bells' | 'crosses';
 export const ICON_RESOURCE: Record<Exclude<Icon, 'bells' | 'crosses'>, Resource> = {
-  corn: 'food', fish: 'food', timber: 'timber', leaf: 'crops', fur: 'crops', goods: 'goods', silver: 'silver',
+  fish: 'food', timber: 'timber', crops: 'crops', goods: 'goods', silver: 'silver',
 };
 
 export type TerrainId = 'ocean' | 'forest' | 'grassland' | 'mountains' | 'desert' | 'tundra';
@@ -19,14 +19,14 @@ export interface Named { id: string; ru: string; en: string }
 /** Passive modifiers carried by agents and Fathers. */
 export type Mod =
   | { mod: 'production'; icons?: Icon[]; add: number; terrain?: TerrainId; island?: number; enables?: boolean }
-  | { mod: 'move'; token: TokenKind; add: number }
+  | { mod: 'move'; add: number }
   | { mod: 'combat'; token: TokenKind; add: number; vs?: 'native'; terrain?: TerrainId }
   /** Added once per battle for the owner's side, not per card. */
   | { mod: 'battle'; add: number; vs?: 'native'; token?: TokenKind; role?: 'attack' }
   | { mod: 'cost'; of: 'hire' | 'build' | 'preach'; add: number }
   | { mod: 'sellPrice'; add: number }
   | { mod: 'bombard' } | { mod: 'bombardAny' } | { mod: 'smuggle'; add: number }
-  | { mod: 'ignoreSkull' } | { mod: 'onlyProduce' } | { mod: 'negotiator' }
+  | { mod: 'ignoreSkull' } | { mod: 'onlyProduce' }
   | { mod: 'noAttackNatives' } | { mod: 'preachFree' } | { mod: 'preachCalm' }
   | { mod: 'nativeHostility'; add: number } | { mod: 'allianceMax'; value: number }
   | { mod: 'fatherLimit'; value: number } | { mod: 'lootFactor'; value: number }
@@ -144,7 +144,7 @@ export interface Settings {
   tax: { track: number[]; refuseRef: number; refuseRefSolo: number; refuseBells: number; payBells: number };
   map: { size: number };
   ring: { openSea: number; europe: number };
-  move: { points: number; explore: number; cargo: number; embark: number };
+  move: { points: number; explore: number; cargo: number };
   cargo: { costPer: 'operation' | 'unit' };
   explore: { diagonal: boolean };
   hold: { size: number; maxDamage: number };

@@ -74,7 +74,7 @@ function describe(a: Advice): string {
       }
       case 'repair': return t('advisor.repair_1');
       case 'shipyard': return t('advisor.repair_ship');
-      case 'teach': { const base = D.agents[card]?.base; return `${t('advisor.teach')} ${agent(c.target)} → ${base && D.agents[base] ? agent(base) : agent(card)}`; }
+      case 'teach': return `${t('advisor.teach')} ${agent(card)} → ${agent(c.target)}`;
       case 'customs': return `${t('advisor.sell_custom')} ${signs(c)}`;
       case 'smuggle': return `${t('advisor.smuggle')} ${signs(c)}`;
       case 'supply': return `${t('advisor.supply')} ${signs(c)}`;

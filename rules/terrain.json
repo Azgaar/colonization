@@ -18,7 +18,7 @@
       "nickname": "ocean",
       "name": "океан",
       "color": "#0066CC",
-      "production": "🟨",
+      "production": "🟦",
       "bonus resource": "8%: 🐟",
       "movement cost": "1 💨",
       "cells": 398,
@@ -27,14 +27,14 @@
       "$fx": [
         "fish"
       ],
-      "$checked": "beeb44b6f7"
+      "$checked": "328b0d3dfa"
     },
     {
       "nickname": "forest",
       "name": "лес",
       "color": "#228B22",
       "production": "🟫",
-      "bonus resource": "10%: 🪵, 5%: 🦫",
+      "bonus resource": "10%: 🪵, 5%: 🌿",
       "defence bonus": "+1 ⚔️",
       "movement cost": "2 💨",
       "cells": 78,
@@ -50,13 +50,13 @@
       "name": "луг",
       "color": "#A8DF00",
       "production": "🟩",
-      "bonus resource": "8%: 🍂",
+      "bonus resource": "8%: 🌿",
       "movement cost": "1 💨",
       "cells": 100,
       "indian tribes": 3,
       "village cells": 17,
       "$fx": [
-        "leaf"
+        "crops"
       ],
       "$checked": "c170f83adc"
     },
@@ -92,7 +92,7 @@
       "nickname": "tundra",
       "name": "тундра",
       "color": "#B3CBB9",
-      "bonus resource": "8%: 🦫",
+      "bonus resource": "8%: 🌿",
       "movement cost": "2 💨",
       "cells": 20,
       "indian tribes": 1,

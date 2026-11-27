@@ -33,7 +33,7 @@ Digital version and test bench for the board game. Start with [docs/PRD.md](docs
 | `pnpm replay seed 4` | Play a bot game and save it as a replay for the interface |
 | `pnpm sweep settings.tax.refuseRef=1,2,3 --games 200` | One or two values over a range, on paired seeds; writes `out/sweep-*.md` |
 | `pnpm strength:search [seeds] [iterations] [players]` | Search bot against the tuned bot on paired seeds, e.g. `100 60 2` |
-| `pnpm proposals 400` | The evidence for the candidate rule changes in `rulesets/proposed.json` against `board`; writes `out/proposals.md` (see [docs/proposals.md](docs/proposals.md)) |
+| `pnpm proposals 400` | The evidence for the candidate rule changes in `rulesets/proposed.json` against `board`; writes `out/proposals.md` (open candidates in [docs/decisions.md](docs/decisions.md#open)) |
 | `pnpm detect 400 --players 4` | Look for stalls, dead cards, runaway leaders and dominated options; writes `out/detect-*.md` |
 | `pnpm rules list`, `export <ruleset> --csv`, `report <ruleset>` | Rulesets and their changes against the rules, where each value is printed, the conversion report |
 | `pnpm rules apply <ruleset> <id>`, `drop <ruleset> <id>`, `todo` | Write a change into `rules/` (and rebuild), or drop it; both are logged in `docs/decisions.md`. `todo` lists printed texts still to follow an applied change. In dev mode the same steps are in Design bench → Export |

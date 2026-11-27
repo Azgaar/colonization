@@ -21,6 +21,10 @@
 .paths .closed.area { fill:#fff08a;fill-opacity:.24 }
 .paths .closed.rim { stroke:#fff08a }
 .paths .way { fill:none;stroke:#fff6da;stroke-width:6;stroke-dasharray:2 13;stroke-linecap:round }
+.paths .pace circle, .paths .spent rect { fill:#0f3436f2;stroke:#fff6da;stroke-width:2 }
+.paths .pace text, .paths .spent text { fill:#fff6da;font:800 13px var(--ui);text-anchor:middle }
+.paths .spent rect { fill:#fff08a;stroke:#3a2614 }
+.paths .spent text { fill:#3a2614;font-size:15px }
 .sp { position:absolute;left:0;top:0;width:0;height:0;will-change:transform }
 /* Between the overview and the pictures: one fades out as the other fades in. */
 .sp.in { animation:sp-in .4s ease-out }

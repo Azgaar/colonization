@@ -2,11 +2,11 @@ import type { Resource } from '@col/data';
 import { RESOURCES } from '@col/data';
 import type { Choice, State } from './types.ts';
 import { ask, decision, log, push, task } from './core.ts';
-import { dice } from './rng.ts';
+import { dice, shuffle } from './rng.ts';
 import {
-  addBells, addCrosses, addGold, addRef, agent, baseOf, building, canRemove, cardHas, changePrice, coloniesOf, combinedHostility, commonAvailable,
+  addBells, addCrosses, addGold, addRef, agent, building, canRemove, cardHas, changePrice, coloniesOf, combinedHostility,
   drawAgent, drawCard, fillPier, fillSalon, gainNative, has, mods, reducePopulation, removeOne, retire, setHostility, stockKinds,
-  takeCommon, takeFromPier, total, turnOrder, uniq,
+  takeFromPier, total, turnOrder, uniq,
 } from './util.ts';
 import { adjacent, colonyProblem, inEurope } from './map.ts';
 import { attackOptions, startAttack } from './combat.ts';
@@ -57,7 +57,7 @@ task('endTurn', (s, t) => {
   const pl = s.players[t.p];
   if (pl.inPlay) { pl.discard.push(pl.inPlay); pl.inPlay = null; }
   s.current = (t.p + 1) % s.players.length;
-  push(s, { t: 'overflow', p: t.p, from: 'wh' }, { t: 'turnLoop' });
+  push(s, { t: 'turnLoop' });
 });
 task('taxPhase', (s) => {
   const rate = taxRate(s);
@@ -148,6 +148,14 @@ export function actionsFor(s: State, p: number, card: string): { action: string;
   const can = work.filter((b) => typeof buildingYield(s, p, card, b) !== 'string');
   const whyWork = work.map((b) => buildingYield(s, p, card, b)).find((x) => typeof x === 'string') as string | undefined;
   add('work', work.length ? (can.length ? null : whyWork!) : 'no producing building', can.map((building_) => ({ building: building_ })));
+  // Schooling (DD-75): the agent played goes to school and leaves as any profession the school teaches, from the agent deck, the common discard or the pier.
+  // A school takes anyone, criminals and slaves too, and teaches 📖 professions; a university takes agents with 📖 or more and teaches 🎓 ones.
+  const schools = pl.buildings.filter((b) => building(s, b).work?.kind === 'teach' && a.edu >= building(s, b).edu);
+  // The player chooses where the new agent comes from: the agent deck, the common discard or the pier.
+  const from = (x: string) => [...(s.agentDeck.includes(x) ? ['deck'] : []), ...(s.agentDiscard.includes(x) ? ['discard'] : []), ...(s.pier.some((st) => st[0] === x) ? ['pier'] : [])];
+  const taught = schools.flatMap((b) => schoolProfessions(s, b).filter((x) => x !== a.base).flatMap((target) => from(target).map((f) => ({ building: b, target, from: f }))));
+  add('teach', !pl.buildings.some((b) => building(s, b).work?.kind === 'teach') ? 'needs a school' : !schools.length ? 'not enough education for the university'
+    : taught.length ? null : 'no profession left to learn', taught);
   if (cardHas(s, card, 'onlyProduce')) return out;
 
   add('moveShip', canMove(s, p, 'ship'));
@@ -174,12 +182,6 @@ export function actionsFor(s: State, p: number, card: string): { action: string;
   const buildable = Object.keys(s.def.buildings).filter((b) => !canOwnBuilding(s, p, b) && buildPrice(s, p, card, b) <= pl.wh.timber);
   add('build', noColony ?? (buildable.length ? null : 'nothing affordable to build'), buildable.map((b) => ({ building: b })));
 
-  const schools = pl.buildings.filter((b) => building(s, b).work?.kind === 'teach');
-  const teachOk = schools.some((b) => { const w = building(s, b).work; return w?.kind === 'teach' && a.edu >= building(s, b).edu && a.edu <= w.maxEdu; });
-  add('teach', !schools.length ? 'needs a school' : a.unique || a.kind === 'native' ? 'unique agents cannot teach' : a.edu === 0 || !teachOk ? 'this profession cannot be taught here'
-    : !commonAvailable(s, a.base) ? 'no copy of this agent is available' : null,
-  uniq(pl.hand.filter((_, i) => i !== pl.hand.indexOf(card))).filter((x) => baseOf(s, x) !== a.base).map((target) => ({ target })));
-
   const customs = pl.buildings.find((b) => building(s, b).work?.kind === 'sell');
   add('customs', !customs ? 'needs a custom house' : a.edu < building(s, customs).edu ? 'not enough education' : total(pl.wh) ? null : 'the warehouse is empty', stockKinds(pl.wh).map((r) => ({ r })));
   if (cardHas(s, card, 'smuggle')) add('smuggle', noColony ?? (total(pl.wh) ? null : 'the warehouse is empty'), stockKinds(pl.wh).map((r) => ({ r })));
@@ -199,7 +201,7 @@ export function actionsFor(s: State, p: number, card: string): { action: string;
   const none = near.length ? null : 'no settlement next to a token';
   add('gift', none ?? (pl.wh.goods ? null : 'needs 1 goods'), natives((x) => s.hostility[x.tribe] > 0));
   add('preach', none ?? (s.nativesLeft ? null : 'no native agents left'), natives((x) => preachCost(s, p, x.tribe, card) <= pl.crosses));
-  add('alliance', none ?? (a.edu === 2 || cardHas(s, card, 'negotiator') ? null : 'needs higher education or a scout'),
+  add('alliance', none ?? (a.edu === 2 ? null : 'needs higher education'),
     natives((x) => x.ally === null && combinedHostility(s, p, x.tribe) <= allianceMax(s, p)));
   return out;
 }
@@ -219,7 +221,7 @@ decision('turn', {
     const p = d.player as number, pl = s.players[p];
     if (c.c === 'pass') {
       pl.passed = true;
-      log(s, pl.hand.length ? { e: 'pass', p } : { e: 'pass', p, forced: true });
+      log(s, pl.hand.length ? { e: 'pass', p, n: pl.hand.length } : { e: 'pass', p, forced: true });
       return push(s, { t: 'discardHand', p }, { t: 'endTurn', p });
     }
     if (c.c === 'recruit') {
@@ -233,6 +235,12 @@ decision('turn', {
     actions[c.a as string](s, p, c);
   },
 });
+
+/** The professions a school building teaches: every common agent of its level (work.maxEdu), never a nation's or a native. */
+export const schoolProfessions = (s: State, b: string) => {
+  const w = building(s, b).work;
+  return w?.kind === 'teach' ? Object.values(s.def.agents).filter((x) => x.kind === 'common' && !x.unique && x.edu === w.maxEdu).map((x) => x.id) : [];
+};
 
 const actions: Record<string, (s: State, p: number, c: any) => void> = {
   produce(s, p, c) { store(s, p, c.icon, cellYields(s, p, c.card).find((y) => y.cell === c.cell && y.icon === c.icon)!.total); },
@@ -258,10 +266,16 @@ const actions: Record<string, (s: State, p: number, c: any) => void> = {
   shipyard(s, p) { s.players[p].damage = 0; },
   build(s, p, c) { s.players[p].wh.timber -= buildPrice(s, p, c.card, c.building); addBuilding(s, p, c.building); },
   teach(s, p, c) {
+    // The agent played leaves for good; the new one comes from where the player chose. A searched agent deck is shuffled.
     const pl = s.players[p];
-    removeOne(pl.hand, c.target);
-    retire(s, c.target);
-    pl.discard.push(takeCommon(s, baseOf(s, c.card))!);
+    retire(s, pl.inPlay!);
+    pl.inPlay = null;
+    if (c.from === 'pier') pl.discard.push(takeFromPier(s, s.pier.findIndex((st) => st[0] === c.target)));
+    else {
+      const pile = c.from === 'deck' ? s.agentDeck : s.agentDiscard;
+      pl.discard.push(pile.splice(pile.lastIndexOf(c.target), 1)[0]!);
+      if (c.from === 'deck') s.agentDeck = shuffle(s, s.agentDeck);
+    }
   },
   customs(s, p, c) {
     s.players[p].wh[c.r as Resource]--;

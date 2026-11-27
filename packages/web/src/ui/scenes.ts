@@ -1,6 +1,6 @@
 /* The full Colony and Europe screens. Agents, Fathers and buildings all appear as cards in the proportions of printed ones. */
 import type { Snapshot } from '../view.ts';
-import { $, ACT, art, cap, D, P, pick, RES, t, W } from '../data.ts';
+import { $, ACT, art, cap, colonyName, D, P, pick, RES, t, W } from '../data.ts';
 import { icon } from '../icons.ts';
 import { Board } from '../map/board.ts';
 import { Sprite } from '../map/sprites.ts';
@@ -23,7 +23,7 @@ function land(home: Snapshot['colonies'][number], ys: Snapshot['land']) {
     const c = home.cell + a * W + b, y = ys.filter((q) => q.cell === c), here = !a && !b;
     return `<div class="c${here ? ' here' : ''}" ${y.length || Places.tokens(`cell:${c}`) ? `data-space="cell:${c}"` : ''} style="left:${(b + 1) * 33.33}%;top:${(a + 1) * 33.33}%">${here ? `<svg class="town" viewBox="0 0 64 64">${Sprite.colony(home)}</svg>` : ''}${y.map((q) => `<span class="y">${icon(Places.ico(q.icon), 20)}${q.n}</span>`).join('')}${Places.tokens(`cell:${c}`)}</div>`;
   })).join('');
-  return `<div class="land"><canvas width="520" height="520" data-home="${home.cell}"></canvas>${cells}</div>`;
+  return `<div class="home"><input class="cname" data-rename="${home.cell}" value="${colonyName(home)}" maxlength="24" spellcheck="false" title="${t('scenes.rename')}"${Sim.replay ? ' disabled' : ''}><div class="land"><canvas width="520" height="520" data-home="${home.cell}"></canvas>${cells}</div></div>`;
 }
 /** A colony's defence and where it comes from: the colony itself, its terrain, defensive buildings. */
 function defence(h: { defence: number; parts: { label: string; value: number }[] }) {
@@ -46,11 +46,15 @@ function colony(sp: Spaces) {
   const seats = `${P.fathers.map((f) => deck({ pic: art.father(f), name: pick(D.fathers[f]), does: Texts.father(f, 14), story: lore(f), cls: 'fa' })).join('')}${'<div class="dk seat"></div>'.repeat(Math.max(0, D.settings.fathers.max - P.fathers.length))}`;
   const supply = S.card ? `<small>${pick(ACT.supply)}: ${sp.deck?.options ? `${Places.plus(-1, 'food')}, ${t('places.draw_1')}` : Places.label(sp.deck)}</small>` : '';
   $('sCol').style.backgroundImage = `url(${art.nation(P.nation)})`;
+  // A name being typed survives the screen being drawn again.
+  const ed = document.activeElement instanceof HTMLInputElement && document.activeElement.dataset.rename ? { cell: document.activeElement.dataset.rename, value: document.activeElement.value, at: document.activeElement.selectionStart } : null;
   $('sCol').innerHTML = `${back()}<div class="in"><h2>${pick(D.names.nations[P.nation])}</h2><div class="two">
-<div><div class="lands n${homes.length}">${homes.map((h) => land(h, ys)).join('') || `<p>${t('scenes.no_colony')}</p>`}</div>${homes.length ? `<p class="defs">${homes.map((h) => defence(h)).join('<br>')}</p>` : ''}
+<div><div class="lands n${homes.length}">${homes.map((h) => land(h, ys)).join('') || `<p>${t('scenes.no_colony')}</p>`}</div>${homes.length ? `<p class="defs">${homes.map((h) => `${homes.length > 1 ? `${colonyName(h)}: ` : ''}${defence(h)}`).join('<br>')}</p>` : ''}
 <div class="stores"><div data-space="deck" class="wz"><h4>${t('warehouse')} ${Places.sum(P.wh)}/${D.cap} ${supply}</h4><div class="heap wide">${goods(P.wh).map((r) => `<span>${icon(r, 27)}</span>`).join('')}${'<i></i>'.repeat(Math.max(0, D.cap - Places.sum(P.wh)))}</div></div><div><h4>${t('hold')}</h4>${hull()}</div></div></div>
 <div><h4>${t('buildings')} ${P.buildings.length}/${D.settings.buildings.max} <small>${t('scenes.under_building')}</small></h4><div class="tree">${tree}</div>
 <h4>${t('fathers')} ${P.fathers.length}/${D.settings.fathers.max}</h4><div class="row-dk">${seats}</div></div></div></div>`;
+  const again = ed && $('sCol').querySelector<HTMLInputElement>(`[data-rename="${ed.cell}"]`);
+  if (again) { again.value = ed.value; again.focus(); again.setSelectionRange(ed.at, ed.at); }
   const T = Board.terrain, k = T.width / W;
   $('sCol').querySelectorAll('canvas').forEach((c) => { const h = +c.dataset.home!, x = (h % W) - 1, y = Math.floor(h / W) - 1; c.getContext('2d')!.drawImage(T, x * k, y * k, 3 * k, 3 * k, 0, 0, 520, 520); });
 }

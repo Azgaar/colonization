@@ -17,16 +17,16 @@ export interface Space {
   gather?: Opt[]; village?: Settlement; attack?: boolean; found?: boolean; sea?: boolean; foot?: boolean; site?: boolean; own?: 'ship' | 'infantry';
 }
 export type Spaces = Record<string, Space>;
-/** A cell a token can reach: the points left and the way there. `foot` is true once the infantry walks. */
-export interface Way { c: number; left: number; path: number[]; foot: boolean }
+/** A cell a token can reach: the points left, the way there and what each step of it costs. `foot` is true once the infantry walks. */
+export interface Way { c: number; left: number; path: number[]; costs: number[]; foot: boolean }
 /** Modifiers of one kind, typed by their kind. */
 const mods = <K extends Mod['mod']>(l: Mod[], kind: K) => l.filter((m): m is Extract<Mod, { mod: K }> => m.mod === kind);
 /** The agent's own modifiers and those of the player's Fathers. */
 const allMods = (card: string) => [...D.agents[card].mods, ...P.fathers.flatMap((f) => Sim.s.def.fathers[f].mods)];
 /** What working in a building uses up, if anything. */
 const uses = (w: BuildingWork | undefined) => (w?.kind === 'produce' ? w.consumes : undefined);
-/** The resource a gathered icon becomes: corn is food, leaf and fur are crops. Fish keeps its own sign (food from water). */
-const ico = (i: string) => ({ corn: 'food', leaf: 'crops', fur: 'crops' } as Record<string, string>)[i] || i;
+/** The pictogram of a gathered icon: its own name. Fish keeps its own sign (food from water). */
+const ico = (i: string) => i;
 const homes = () => D.colonies.filter((c) => c.owner === me);
 const inEurope = () => D.zone[P.ship] === 'europe';
 const sum = (x: Record<string, number>) => RES.reduce((n, r) => n + x[r], 0);
@@ -36,18 +36,20 @@ const AWAY = () => t('places.ship_europe');
 function ways(token: 'ship' | 'infantry', points: number): Map<number, Way> {
   const s = Sim.s, start = token === 'ship' || P.inf === 'ship' ? P.ship : P.inf, best = new Map<number, Way>(), aboard = P.inf === 'ship';
   if (typeof start !== 'number') return best;
-  const todo: Way[] = [{ c: start, left: points, path: [], foot: token === 'infantry' && !aboard }], go = (n: Way, c: number, left: number, foot: boolean) => { if (left < 0) return; const old = best.get(c); if (old && old.left >= left) return; const x = { c, left, path: [...n.path, c], foot }; best.set(c, x); if (left > 0) todo.push(x); };
+  const todo: Way[] = [{ c: start, left: points, path: [], costs: [], foot: token === 'infantry' && !aboard }], go = (n: Way, c: number, left: number, foot: boolean) => { if (left < 0) return; const old = best.get(c); if (old && old.left >= left) return; const x = { c, left, path: [...n.path, c], costs: [...n.costs, n.left - left], foot }; best.set(c, x); if (left > 0) todo.push(x); };
   while (todo.length) {
     const n = todo.shift()!;
     if (!n.foot && (token === 'ship' || aboard)) {
       if (token === 'ship') for (const c of s.map.neighbours[n.c]) if (map.canShipEnter(s, c)) { const k = map.enterCost(s, c, n.left); if (k !== null && k <= n.left) go(n, c, n.left - k, false); }
-      if (aboard && n.left >= 1) for (const c of s.map.neighbours[n.c]) if (map.canInfantryEnter(s, me, c)) go(n, c, n.left - 1, true);
+      if (aboard) for (const c of s.map.neighbours[n.c]) if (map.canInfantryEnter(s, me, c)) { const k = map.enterCost(s, c, n.left); if (k !== null) go(n, c, n.left - k, true); }
     } else if (n.foot) for (const c of s.map.neighbours[n.c]) if (c !== start && map.canInfantryEnter(s, me, c)) { const k = map.enterCost(s, c, n.left); if (k !== null) go(n, c, n.left - k, true); }
   }
   best.delete(start);
   return best;
 }
-const points = (card: string, token: 'ship' | 'infantry') => D.settings.move.points + mods(allMods(card), 'move').filter((m) => m.token === token).reduce((n, m) => n + m.add, 0);
+const points = (card: string) => D.settings.move.points + mods(allMods(card), 'move').reduce((n, m) => n + m.add, 0);
+/** The way a move option of a played agent takes, with what each step costs. */
+const wayOf = (o: Opt): Way | undefined => (o.path?.length ? ways(o.a === 'moveInfantry' ? 'infantry' : 'ship', points(o.card)).get(o.cell) : undefined);
 /* ---- spaces ---- */
 let kept: { card: string; sp: Spaces } | null = null;
 const forget = () => { kept = null; };
@@ -59,9 +61,9 @@ function work(card: string): Spaces {
   // Buildings that stand.
   for (const b of P.buildings) {
     const w = D.buildings[b].work, k = w?.kind, need = uses(w), act = k ? ({ produce: 'work', ocean: 'docks', sell: 'customs', repair: 'shipyard', teach: 'teach' } as Record<string, string>)[k] : undefined;
-    let o: Opt[] = k === 'produce' ? has('work').filter((q) => q.building === b) : k === 'ocean' ? has('docks').map((o) => ({ ...o, n: D.docks[card]?.find((y) => y.cell === o.cell)?.n ?? 1 })).sort((a, b) => b.n - a.n).slice(0, 1) : act ? has(act) : [];
+    let o: Opt[] = k === 'produce' ? has('work').filter((q) => q.building === b) : k === 'ocean' ? has('docks').map((o) => ({ ...o, n: D.docks[card]?.find((y) => y.cell === o.cell)?.n ?? 1 })).sort((a, b) => b.n - a.n).slice(0, 1) : k === 'teach' ? has('teach').filter((q) => q.building === b) : act ? has(act) : [];
     if (k === 'ocean' && !has('docks').length) o = [];
-    out[`lot:${b}`] = o.length ? { options: o } : { why: !w ? t('places.works_itself') : only && k !== 'produce' && k !== 'ocean' ? gathers : D.buildings[b].edu > D.agents[card].edu ? t('places.needs_education') : need && P.wh[need.res] < need.amount ? t('places.needs_crops') : why(act ?? '', t('why')), passive: !w, need: !w || (only && k !== 'produce' && k !== 'ocean') ? null : D.buildings[b].edu > D.agents[card].edu ? [['', D.buildings[b].edu === 2 ? 'cap' : 'book']] : need && P.wh[need.res] < need.amount ? [[need.amount - P.wh[need.res], need.res]] : null };
+    out[`lot:${b}`] = o.length ? { options: o } : { why: !w ? t('places.works_itself') : only && k !== 'produce' && k !== 'ocean' && k !== 'teach' ? gathers : D.buildings[b].edu > D.agents[card].edu ? t('places.needs_education') : need && P.wh[need.res] < need.amount ? t('places.needs_crops') : why(act ?? '', t('why')), passive: !w, need: !w || (only && k !== 'produce' && k !== 'ocean') ? null : D.buildings[b].edu > D.agents[card].edu ? [['', D.buildings[b].edu === 2 ? 'cap' : 'book']] : need && P.wh[need.res] < need.amount ? [[need.amount - P.wh[need.res], need.res]] : null };
   }
   // Buildings that could stand.
   for (const [b, def] of Object.entries(D.buildings)) if (!P.buildings.includes(b)) {
@@ -91,8 +93,8 @@ function work(card: string): Spaces {
   for (const o of has('attack')) cell(o.cell, { attack: true, options: [o] });
   if (has('found').length && typeof P.inf === 'number') cell(P.inf, { found: true, options: has('found') });
   out.found = has('found').length && typeof P.inf === 'number' ? { options: has('found'), cell: P.inf } : { why: only ? gathers : why('found', t('why')) };
-  if (has('moveShip').length) { for (const [c, n] of ways('ship', points(card, 'ship'))) cell(c, { options: [play('moveShip', { cell: c, path: n.path, foot: n.foot })], sea: !n.foot, foot: n.foot, site: n.foot && !map.colonyProblem(Sim.s, c) }); if (typeof P.ship === 'number') cell(P.ship, { own: 'ship', options: [play('moveShip', { cell: P.ship, path: [] })] }); }
-  if (has('moveInfantry').length && typeof P.inf === 'number') { for (const [c, n] of ways('infantry', points(card, 'infantry'))) cell(c, { options: [play('moveInfantry', { cell: c, path: n.path, foot: true })], foot: true, site: !map.colonyProblem(Sim.s, c) }); cell(P.inf, { own: 'infantry', options: [play('moveInfantry', { cell: P.inf, path: [] })] }); }
+  if (has('moveShip').length) { for (const [c, n] of ways('ship', points(card))) cell(c, { options: [play('moveShip', { cell: c, path: n.path, foot: n.foot })], sea: !n.foot, foot: n.foot, site: n.foot && !map.colonyProblem(Sim.s, c) }); if (typeof P.ship === 'number') cell(P.ship, { own: 'ship', options: [play('moveShip', { cell: P.ship, path: [] })] }); }
+  if (has('moveInfantry').length && typeof P.inf === 'number') { for (const [c, n] of ways('infantry', points(card))) cell(c, { options: [play('moveInfantry', { cell: c, path: n.path, foot: true })], foot: true, site: !map.colonyProblem(Sim.s, c) }); cell(P.inf, { own: 'infantry', options: [play('moveInfantry', { cell: P.inf, path: [] })] }); }
   // The hand and the piles.
   for (const q of has('exchange')) out[`who:${q.other}`] = { options: [q] };
   out.deck = has('supply').length ? { options: has('supply') } : { why: only ? gathers : why('supply', t('places.needs_1')), need: !only && P.wh.food < 1 ? [[1, 'food']] : null };
@@ -106,6 +108,7 @@ const plus = (n: number, i: string, s = 18) => `${n > 0 ? '+' : '−'}${Math.abs
 function effect(o: Opt): string[] {
   if (o.a === 'produce') return [plus(o.n, ico(o.icon))];
   if (o.a === 'docks') return [plus(o.n, 'fish')];
+  if (o.a === 'teach') return [o.from === 'pier' ? t('places.from_pier') : o.from === 'deck' ? t('places.from_deck') : t('places.from_discard')];
   if (o.a === 'work') { const w = D.buildings[o.building].work; if (w?.kind !== 'produce') return []; const n = D.works[o.card]?.[o.building]; return [...(w.consumes ? [plus(-w.consumes.amount, w.consumes.res)] : []), plus(typeof n === 'number' ? n : w.amount, ico(w.icon))]; }
   if (o.a === 'build') return [plus(-(D.build[o.card]?.[o.building] ?? 0), 'timber'), plus(D.settings.score.building, 'vp')];
   if (o.a === 'trade') return o.all ? [plus(worth(o.card), 'gold')] : [];
@@ -119,11 +122,12 @@ function effect(o: Opt): string[] {
   if (o.a === 'preach') return [t('places.native_agent')];
   if (o.a === 'recruit') return [plus(-o.n, 'crosses')];
   if (o.a === 'found') return [...(homes().length ? [plus(-5, 'food')] : []), plus(D.settings.score.patriotColony, 'vp')];
+  const w = wayOf(o); if (w) { const spent = w.costs.reduce((n, k) => n + k, 0); return [`${spent}/${spent + w.left} ${icon('move', 18)}`]; }
   if (o.path && !o.path.length) return [];
   return [];
 }
 const verb = (o: Opt): string => (o.a === 'hire' ? (o.refresh ? t('places.new_agents') : pick(D.agents[o.agent])) : o.a === 'propaganda' ? pick(D.fathers[o.father]) : o.a === 'build' || o.a === 'work' ? pick(D.buildings[o.building]) : o.a === 'teach' ? pick(D.agents[o.target]) : o.a === 'recruit' ? t('places.look', { n: o.n }) : o.a === 'customs' || o.a === 'smuggle' ? pick(D.names.resources[o.r]) : o.a === 'trade' && o.all ? t('places.sell_everything') : o.path && !o.path.length ? (o.a === 'moveShip' ? t('places.load_unload') : t('places.explore_go')) : o.foot && o.a === 'moveShip' ? t('places.land_infantry') : pick(ACT[o.a] || [o.a, o.a]));
-const face = (o: Opt): string | null => (o.a === 'hire' && o.agent ? art.agent(o.agent) : o.father ? art.father(o.father) : o.building ? art.building(o.building) : o.a === 'docks' ? art.building('docks') : o.target ? art.agent(o.target) : null);
+const face = (o: Opt): string | null => (o.a === 'hire' && o.agent ? art.agent(o.agent) : o.a === 'teach' && o.target ? art.agent(o.target) : o.father ? art.father(o.father) : o.building ? art.building(o.building) : o.a === 'docks' ? art.building('docks') : o.target ? art.agent(o.target) : null);
 const lack = (s: Space | undefined) => (s?.need ? s.need.map(([n, i]) => `<span class="lack" title="${s.why}">${n}${icon(i, 17)}</span>`).join('') : '');
 function label(s: Space | undefined): string {
   if (!s) return '';
@@ -141,4 +145,4 @@ function army() {
 const tokens = (id: string) => Sim.placed.filter((x) => x.space === id).map((x) => `<span class="placed" title="${pick(D.agents[x.card])}"><img src="${art.agent(x.card)}" alt=""></span>`).join('');
 const em = playerEmblem;
 const name = (p: number) => pick(D.names.nations[D.players[p].nation]);
-export const Places = { spaces, forget, ways, effect, verb, face, label, lack, army, tokens, em, name, homes, inEurope, worth, price, sum, ico, AWAY, plus, gain };
+export const Places = { spaces, forget, ways, wayOf, effect, verb, face, label, lack, army, tokens, em, name, homes, inEurope, worth, price, sum, ico, AWAY, plus, gain };

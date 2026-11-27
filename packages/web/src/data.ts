@@ -1,7 +1,5 @@
 /* The game as the interface sees it, the player's language and the words, where the art is. No look of its own. */
 import { RESOURCES, type Resource } from "@col/data";
-import { icon } from "./icons.ts";
-import type { Entry } from "./sim.ts";
 import { Sim } from "./sim.ts";
 import type { Pair, PlayerView } from "./view.ts";
 import { lang, LOCALES, msg, t, table, type Msg } from "./i18n.ts";
@@ -66,6 +64,12 @@ export const tokenAt = (c: number) => {
   return null;
 };
 export const colonyAt = (c: number) => D.colonies.find(x => x.cell === c);
+/** A colony's name: the one its owner gave it, or the next of its nation's names, in the order its colonies were founded (`colonies.<nation>`, comma-separated). */
+export const colonyName = (c: { cell: number; owner: number }) => {
+  if (Sim.names[c.cell]) return Sim.names[c.cell];
+  const n = D.colonies.filter((x) => x.owner === c.owner).findIndex((x) => x.cell === c.cell), key = `colonies.${D.players[c.owner].nation}`, list = t(key) === key ? [] : t(key).split(", ");
+  return list[n] ?? `${t("colony")} ${n + 1}`;
+};
 export const settlementAt = (c: number) => D.settlements.find(x => x.alive && x.cell === c);
 /** Top left corner of a cell, in map units. */
 export const at = (c: number) => [(c % W) * CELL, Math.floor(c / W) * CELL];
@@ -74,31 +78,4 @@ export const at = (c: number) => [(c % W) * CELL, Math.floor(c / W) * CELL];
 export const column = (x: number): string =>
   (x >= 26 ? column(Math.floor(x / 26) - 1) : "") + String.fromCharCode(65 + (x % 26));
 export const cellName = (c: number) => `${column(c % D.width)}${Math.floor(c / D.width) + 1}`;
-/** The cell a log entry is about, if any: where a colony was founded, an attack or a siege took place, a settlement acted. */
-export function placeOf(e: Entry): number | null {
-  if (typeof e.cell === "number") return e.cell;
-  if (typeof e.settlement === "number") return D.settlements.find(x => x.n === e.settlement)?.cell ?? null;
-  return null;
-}
-/** One line of the chronicle. */
-export function logLine(e: Entry) {
-  const who =
-    e.p === undefined
-      ? ""
-      : `<b style="--c:${D.players[e.p].color}" class="who">${pick(D.names.nations[D.players[e.p].nation])}</b> `;
-  const A = (k: string) => pick(ACT[k] || [k, k]).toLowerCase();
-  if (e.e === "play") return `${who}${pick(D.agents[e.card])}: ${A(e.a)}`;
-  if (e.e === "event") return `<em>${pick(D.names.events[e.id])}</em>`;
-  if (e.e === "build") return `${who}${t('data.built')}: ${pick(D.buildings[e.building])}`;
-  if (e.e === "found") return `${who}${t('data.founded_colony')}`;
-  if (e.e === "raid") return `${who}${t('data.raided_natives')}`;
-  if (e.e === "tax")
-    return `${who}${e.pay ? t('data.paid_tax') : t('data.refused_tax')} (${e.rate})`;
-  if (e.e === "father") return `${who}${pick(D.fathers[e.father])}`;
-  if (e.e === "hire") return `${who}${t('data.hired')}: ${pick(D.agents[e.agent])}`;
-  if (e.e === "reveal") return `${who}${t('data.charted_new')}`;
-  if (e.e === "poi") return `${who}${t('data.explored')}: ${e.deck === "ruin" ? t("ruin") : t("wreck")}`;
-  if (e.e === "sell") return `${who}${t('data.sold')} ${e.n} ${icon(e.r, 14)} × ${e.price}`;
-  return "";
-}
 export const cap = (x: string) => x.charAt(0).toUpperCase() + x.slice(1);

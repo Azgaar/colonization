@@ -240,7 +240,7 @@ describe('Colony actions', () => {
   it('[R-2] terrain yields', () => {
     const s = farm({ [at(5, 6)]: 'forest', [at(6, 5)]: 'mountains', [at(6, 6)]: 'desert', [at(4, 4)]: 'tundra' });
     const y = (cell: number) => cellYields(s, 0, 'colonist').filter((x) => x.cell === cell).map((x) => `${x.icon}${x.total}`);
-    expect(y(at(5, 5))).toEqual(['leaf1']); // DD-63: grassland gives crops only
+    expect(y(at(5, 5))).toEqual(['crops1']); // DD-63: grassland gives crops only
     expect(y(at(5, 6))).toEqual(['timber1']);
     expect(y(at(6, 5))).toEqual(['silver1']);
     expect(y(at(6, 6))).toEqual([]);
@@ -249,8 +249,8 @@ describe('Colony actions', () => {
   });
   it('[R-2] forest gives fur only with its bonus (DD-56)', () => {
     const s = farm({ [at(5, 6)]: 'forest' });
-    s.map.bonus[at(5, 6)] = 'fur';
-    expect(cellYields(s, 0, 'colonist').filter((x) => x.cell === at(5, 6)).map((x) => `${x.icon}${x.total}`)).toEqual(['timber1', 'fur1']);
+    s.map.bonus[at(5, 6)] = 'crops';
+    expect(cellYields(s, 0, 'colonist').filter((x) => x.cell === at(5, 6)).map((x) => `${x.icon}${x.total}`)).toEqual(['timber1', 'crops1']);
   });
   it('[R-3] ocean gives 1, through docks 2, with fish 3, with a fisherman 4', () => {
     const s = farm();
@@ -270,26 +270,26 @@ describe('Colony actions', () => {
     expect(P(s).wh.food).toBe(4);
   });
   it('[R-4] bonus icons add one, or allow one where the terrain yields nothing', () => {
-    const s = farm({ [at(5, 5)]: { t: 'grassland', bonus: 'leaf' }, [at(5, 6)]: { t: 'mountains', bonus: 'leaf' } });
-    expect(cellYield(s, 0, 'colonist', at(5, 5), 'leaf')!.total).toBe(2);
+    const s = farm({ [at(5, 5)]: { t: 'grassland', bonus: 'crops' }, [at(5, 6)]: { t: 'mountains', bonus: 'crops' } });
+    expect(cellYield(s, 0, 'colonist', at(5, 5), 'crops')!.total).toBe(2);
     expect(cellYield(s, 0, 'colonist', at(5, 5), 'fish')).toBe(null);
-    expect(cellYield(s, 0, 'colonist', at(5, 6), 'leaf')!.total).toBe(1);
-    expect(cellYield(s, 0, 'farmer', at(5, 6), 'leaf')!.total).toBe(2);
+    expect(cellYield(s, 0, 'colonist', at(5, 6), 'crops')!.total).toBe(1);
+    expect(cellYield(s, 0, 'farmer', at(5, 6), 'crops')!.total).toBe(2);
   });
   it('[R-5] the cossack works empty tundra', () => {
     const s = farm({ [at(5, 6)]: 'tundra', [at(6, 5)]: 'forest' });
-    expect(cellYield(s, 0, 'cossack_russian', at(5, 6), 'fur')!.total).toBe(2);
-    expect(cellYield(s, 0, 'colonist', at(5, 6), 'fur')).toBe(null);
-    expect(cellYield(s, 0, 'slave', at(5, 6), 'fur')).toBe(null);
-    expect(cellYield(s, 0, 'trapper_french', at(6, 5), 'fur')!.total).toBe(1);
+    expect(cellYield(s, 0, 'cossack_russian', at(5, 6), 'crops')!.total).toBe(2);
+    expect(cellYield(s, 0, 'colonist', at(5, 6), 'crops')).toBe(null);
+    expect(cellYield(s, 0, 'slave', at(5, 6), 'crops')).toBe(null);
+    expect(cellYield(s, 0, 'trapper_french', at(6, 5), 'crops')!.total).toBe(1);
   });
   it('[R-6] the planter needs an island of three cells or fewer', () => {
     const s = farm({ [at(5, 6)]: 'desert', [at(6, 7)]: 'grassland' });
-    expect(cellYield(s, 0, 'planter_danish', at(5, 5), 'leaf')!.total).toBe(2);
-    expect(cellYield(s, 0, 'planter_danish', at(5, 6), 'leaf')!.total).toBe(1);
+    expect(cellYield(s, 0, 'planter_danish', at(5, 5), 'crops')!.total).toBe(2);
+    expect(cellYield(s, 0, 'planter_danish', at(5, 6), 'crops')!.total).toBe(1);
     s.map.terrain[at(7, 7)] = 'grassland';
-    expect(cellYield(s, 0, 'planter_danish', at(5, 5), 'leaf')!.total).toBe(1);
-    expect(cellYield(s, 0, 'planter_danish', at(5, 6), 'leaf')).toBe(null);
+    expect(cellYield(s, 0, 'planter_danish', at(5, 5), 'crops')!.total).toBe(1);
+    expect(cellYield(s, 0, 'planter_danish', at(5, 6), 'crops')).toBe(null);
   });
   it('[R-7] buildings need education and can be worked repeatedly', () => {
     const s = farm();
@@ -327,21 +327,31 @@ describe('Colony actions', () => {
     turn(s, 0, 'colonist', 'colonist');
     expect(canPlay(s, 'colonist', 'build')).toBe(false);
   });
-  it('[R-10] school and university', () => {
+  it('[R-10] schooling: the agent played becomes any profession the school teaches, from the deck, the discard or the pier (DD-73)', () => {
     const s = farm();
     build(s, 0, 'school');
-    turn(s, 0, 'farmer', 'criminal', 'priest', 'puritan_english', 'colonist_english');
+    s.agentDeck.push('soldier');
+    turn(s, 0, 'criminal', 'farmer');
     P(s).discard = [];
-    expect(canPlay(s, 'priest', 'teach')).toBe(false);
-    play(s, 'farmer', 'teach', { target: 'criminal' });
-    expect(P(s).discard.filter((c) => c === 'farmer').length).toBe(2);
+    // A school takes anyone, a criminal too, and teaches 📖 professions only.
+    expect(canPlay(s, 'criminal', 'teach', { target: 'soldier' })).toBe(true);
+    expect(canPlay(s, 'criminal', 'teach', { target: 'priest' })).toBe(false);
+    play(s, 'criminal', 'teach', { target: 'soldier' });
+    expect(P(s).discard).toEqual(['soldier']);
     expect(s.agentDiscard).toContain('criminal');
+    expect(P(s).hand).toEqual(['farmer']);
+    // A university takes agents with 📖 or more and teaches 🎓 professions; a nation's agent leaves the game; the copy may come from the pier.
     build(s, 0, 'university');
-    turn(s, 0, 'priest', 'colonist_english', 'puritan_english', 'sailor');
-    expect(canPlay(s, 'puritan_english', 'teach')).toBe(false);
-    expect(canPlay(s, 'priest', 'teach')).toBe([...s.agentDeck, ...s.agentDiscard].includes('priest'));
-    s.agentDeck = s.agentDeck.filter((c) => c !== 'sailor');
-    expect(canPlay(s, 'sailor', 'teach')).toBe(false);
+    s.agentDeck = s.agentDeck.filter((c) => c !== 'dragoon');
+    s.agentDiscard = s.agentDiscard.filter((c) => c !== 'dragoon');
+    s.pier[0] = ['dragoon'];
+    turn(s, 0, 'puritan_english', 'criminal');
+    expect(canPlay(s, 'criminal', 'teach', { target: 'dragoon' })).toBe(false);
+    play(s, 'puritan_english', 'teach', { target: 'dragoon' });
+    expect(P(s).discard).toContain('dragoon');
+    expect([...P(s).hand, ...P(s).deck, ...P(s).discard]).not.toContain('puritan_english');
+    expect(s.agentDiscard).not.toContain('puritan_english');
+    expect(s.pier.some((st) => st[0] === 'dragoon')).toBe(false);
   });
   it('[R-11] custom house', () => {
     const s = farm();
@@ -620,10 +630,10 @@ describe('Founding Father rules', () => {
     world(s, { [at(5, 5)]: 'grassland', [at(5, 6)]: 'forest' });
     colony(s, 0, at(5, 5));
     father(s, 0, 'john_rolfe', 'squanto');
-    s.map.bonus[at(5, 6)] = 'fur';
-    const y = (cell: number, icon: 'leaf' | 'fur' | 'fish') => cellYield(s, 0, 'colonist', cell, icon)!.total;
-    // John Rolfe adds to leaf, not fur; Squanto to fish (DD-65).
-    expect([y(at(5, 5), 'leaf'), y(at(5, 6), 'fur'), y(at(4, 4), 'fish')]).toEqual([2, 1, 2]);
+    s.map.bonus[at(5, 6)] = 'crops';
+    const y = (cell: number, icon: 'crops' | 'fish') => cellYield(s, 0, 'colonist', cell, icon)!.total;
+    // John Rolfe adds to all crops, fur in the forest too (DD-76); Squanto to fish (DD-65).
+    expect([y(at(5, 5), 'crops'), y(at(5, 6), 'crops'), y(at(4, 4), 'fish')]).toEqual([2, 2, 2]);
   });
   it('[B-6] Champlain founds anywhere legal, within the limit', () => {
     const s = game(2);

@@ -55,7 +55,8 @@ export function outlook(s: State, collections: string[][], p: number, loyalist: 
   if (!base.length) return { points: 0, qualifies: 0, progress: 0 };
   const civ = (collections[p] ?? []).filter((c) => c !== '?' && !util.isMilitary(s, c)).length;
   const allies = s.settlements.filter((z) => z.alive && z.ally === p).length * set.war.allyCubes;
-  const free = power(p) + allies + util.mods(s, p, 'freeMilitia').reduce((k, m) => k + m.value, 0) + (o.strength ?? 0) + 1 + rounds * 1.2;
+  // Only the strength a player has now: counting on more to come made bots wait for an army they never raised (2.5 ⚔️ at the war, on average, against about 7 cubes a colony).
+  const free = power(p) + allies + util.mods(s, p, 'freeMilitia').reduce((k, m) => k + m.value, 0) + (o.strength ?? 0) + 1;
   const paid = Math.floor(gold / set.war.mercenaryGold) + Math.min(civ, pl.bells) * 0.6;
   let points = 0, qualifies = 0;
   // One clear colony to save: the sum of what it has against what comes.

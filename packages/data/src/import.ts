@@ -27,7 +27,7 @@ export const printedText = (...parts: string[]) => parts.map((p) => String(p ?? 
 export const toId = (s: string) => s.toLowerCase().replace(/[’'`]/g, '').replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
 const title = (s: string) => { const t = s.replace(/_/g, ' ').trim(); return t.charAt(0).toUpperCase() + t.slice(1); };
 const EDU: Record<string, Education> = { '🚫': 0, '📖': 1, '🎓': 2 };
-const ICONS: Record<string, Icon> = { '🌽': 'corn', '🐟': 'fish', '🪵': 'timber', '🍂': 'leaf', '🦫': 'fur', '📦': 'goods', '🪙': 'silver' };
+const ICONS: Record<string, Icon> = { '🐟': 'fish', '🪵': 'timber', '🌿': 'crops', '📦': 'goods', '🪙': 'silver' };
 const POIS: Record<string, Poi> = { 'village.png': 'village', 'burial.png': 'ruin', 'wreck.png': 'wreck' };
 const TERRAINS: TerrainId[] = ['ocean', 'forest', 'grassland', 'mountains', 'desert', 'tundra'];
 const NATIVE_IDS = new Set(['indian']);

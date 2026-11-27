@@ -39,8 +39,7 @@
   "move": {
     "points": 5,
     "explore": 1,
-    "cargo": 1,
-    "embark": 1
+    "cargo": 1
   },
   "cargo": {
     "costPer": "operation"

@@ -42,7 +42,7 @@
       "copies": 5,
       "nickname": "blacksmith shop",
       "name": "мастерская",
-      "effect": "1 🍂→ 1 📦",
+      "effect": "1 🌿→ 1 📦",
       "education": "📖",
       "price": "2 🪵",
       "image": "blacksmiths shop.png",
@@ -57,7 +57,7 @@
           }
         }
       },
-      "$checked": "43e5c20d50"
+      "$checked": "56bd2fcff3"
     },
     {
       "copies": 5,
@@ -109,9 +109,8 @@
       "copies": 5,
       "nickname": "school",
       "name": "школа",
-      "effect": "👨🏻‍🌾 → 📖",
-      "education": "📖",
-      "price": "3 🪵",
+      "effect": "любой агент → 📖",
+      "price": "2 🪵",
       "image": "school.jpeg,50,70,100",
       "$fx": {
         "work": {
@@ -119,7 +118,7 @@
           "maxEdu": 1
         }
       },
-      "$checked": "280dbd4f8b"
+      "$checked": "98f8342384"
     },
     {
       "copies": 1,
@@ -158,7 +157,7 @@
       "copies": 1,
       "nickname": "factory",
       "name": "фабрика",
-      "effect": "1 🍂→ 2 📦",
+      "effect": "1 🌿→ 2 📦",
       "education": "📖",
       "requires": "мастерская",
       "price": "4 🪵",
@@ -174,7 +173,7 @@
           }
         }
       },
-      "$checked": "e06a6743f0"
+      "$checked": "3ba791c510"
     },
     {
       "copies": 1,
@@ -229,10 +228,10 @@
       "copies": 1,
       "nickname": "university",
       "name": "университет",
-      "effect": "👨🏻‍🌾 → 🎓 (кроме уникальных)",
-      "education": "🎓",
+      "effect": "📖 → 🎓",
+      "education": "📖",
       "requires": "школа",
-      "price": "6 🪵",
+      "price": "4 🪵",
       "image": "university.jpeg,50,60,100",
       "$fx": {
         "work": {
@@ -240,7 +239,7 @@
           "maxEdu": 2
         }
       },
-      "$checked": "aca9dada90"
+      "$checked": "3cc038bfe8"
     }
   ]
 }

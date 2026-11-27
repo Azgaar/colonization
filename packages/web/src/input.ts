@@ -74,7 +74,7 @@ document.addEventListener('click', async (e: MouseEvent) => {
   if ((x = q('[data-opt]'))) { const at = S.pickAt, o = at && Places.spaces(S.card)[at.id]?.options?.[+x.dataset.opt!]; if (at && o) commit(o, at.id); return; }
   if (q('[data-agent]')) return;
   if (S.card && !q('button:not([data-space])')) { const id = find(e.clientX, e.clientY); if (id && drop(e.clientX, e.clientY)) return; if (S.pickAt && !q('.kp')) { S.pickAt = null; paint(); return; } }
-  if (Sim.busy && !q('[data-menu],[data-fast],[data-mute],[data-sheet],[data-king],[data-vp],[data-deck]')) return;
+  if (Sim.busy && !q('[data-menu],[data-fast],[data-mute],[data-sheet],[data-page],[data-king],[data-vp],[data-deck]')) return;
   if (q('[data-ok]')) read();
   else if ((x = q('[data-do]'))) act(JSON.parse(x.dataset.do!));
   else if ((x = q('[data-cargo]'))) cargo(x.dataset.cargo!, x.dataset.r ?? '');
@@ -98,7 +98,8 @@ document.addEventListener('click', async (e: MouseEvent) => {
   else if (q('[data-menu]')) { U.menu = !U.menu; U.king = U.sheet = false; U.vp = null; paint(); }
   else if (q('[data-king]')) { U.king = !U.king; U.sheet = U.menu = false; U.vp = null; paint(); }
   else if ((x = q('[data-vp]'))) { const i = +x.dataset.vp!; U.vp = U.vp === i ? null : i; U.king = U.menu = false; paint(); }
-  else if (q('[data-sheet]')) { U.sheet = !U.sheet; U.king = U.menu = false; U.vp = null; paint(); }
+  else if (q('[data-sheet]')) { U.sheet = !U.sheet; U.page = null; U.king = U.menu = false; U.vp = null; paint(); }
+  else if ((x = q('[data-page]'))) { U.page = x.dataset.page || null; paint(); }
   else if (q('[data-deck]')) { U.deck = !U.deck; U.king = U.sheet = U.menu = false; U.vp = null; paint(); }
   else if (q('[data-close]')) { S.view = 'map'; paint(); }
   else if ((x = q('[data-go]'))) { const g = x.dataset.go; if (!deciding() && (g === 'colony' || g === 'europe')) { S.view = S.view === g ? 'map' : g; U.peek = null; paint(); } }
@@ -107,7 +108,10 @@ document.addEventListener('click', async (e: MouseEvent) => {
 // The map sliders of the game menu: seen at once while dragged, kept when let go; a new tilt grows the trees differently, so the land is painted again.
 document.addEventListener('input', (e) => { const el = e.target as HTMLInputElement, k = el.dataset.viewSet as keyof typeof Board.view | undefined; if (!k) return; Board.view[k] = +el.value; el.nextElementSibling!.textContent = `${Board.view[k]}${el.dataset.unit}`; Board.look(); });
 document.addEventListener('change', (e) => { const k = (e.target as HTMLElement).dataset.viewSet; if (!k) return; keepOptions(); if (['tilt', 'most'].includes(k)) void Board.land(); });
+document.addEventListener('change', (e) => { const el = e.target as HTMLInputElement; if (el.dataset.rename === undefined) return; Sim.rename(+el.dataset.rename, el.value); paint(); });
 addEventListener('keydown', (e: KeyboardEvent) => {
+  const field = e.target instanceof HTMLInputElement && e.target.dataset.rename !== undefined ? e.target : null;
+  if (field) { if (e.key === 'Enter') field.blur(); if (e.key !== 'Escape') return; }
   // Esc puts down or closes what is open, one thing at a time; with nothing left open on the map, it opens the options menu.
   if (e.key === 'Escape' && !U.title) { put(); if (S.pickAt) S.pickAt = null; else if (S.card) S.card = null; else if (S.war >= 0) S.war = -1; else if (U.vp !== null) U.vp = null; else if (U.menu || U.king || U.sheet || U.deck) U.menu = U.king = U.sheet = U.deck = false; else if (S.view !== 'map') S.view = 'map'; else U.menu = true; bub().hidden = true; paint(); }
   if (e.key === 'Enter' && X.reports.length && !Sim.busy) { e.preventDefault(); read(); }

@@ -8,6 +8,7 @@ import {
   settlementAt, stockKinds, total, uniq,
 } from './util.ts';
 import { colonyWater, inEurope, nb, nearestColony, nearestEurope, tokenAt } from './map.ts';
+import { tokenStops } from './moves.ts';
 
 type Kind = 'infantry' | 'ship' | 'best';
 const terrainOf = (s: State, c: number) => s.def.terrain[s.map.terrain[c]!];
@@ -140,7 +141,7 @@ task('resolveCombat', (s) => {
   const n = Math.max(0, set.diceCap === null ? gap : Math.min(gap, set.diceCap));
   const rolled = dice(s, n);
   const hits = rolled.filter((x) => set.successFaces.includes(x)).length;
-  log(s, { e: 'combat', p: c.attacker, attack, defence, dice: rolled, hits, a: [c.card, ...c.a], d: c.d });
+  log(s, { e: 'combat', p: c.attacker, defender: c.defender, target: c.target, cell: c.cell, attack, defence, dice: rolled, hits, a: [c.card, ...c.a], d: c.d });
   s.players[c.attacker].discard.push(...c.a);
   if (c.defender !== null) s.players[c.defender].discard.push(...c.d);
   s.combat = null;
@@ -199,7 +200,7 @@ decision('plunder', {
     if (c.c === 'destroy') return loseBuilding(s, d.from, c.b);
     s.players[d.from].wh[c.r as Resource]--;
     s.players[d.player].wh[c.r as Resource]++;
-    log(s, { e: 'plunder', p: d.player, r: c.r });
+    log(s, { e: 'plunder', p: d.player, from: d.from, r: c.r });
   },
 });
 
@@ -231,7 +232,7 @@ task('damage', (s, t) => {
   const pl = s.players[t.p], set = s.def.settings;
   pl.damage = Math.min(set.hold.maxDamage, pl.damage + t.amount);
   log(s, { e: 'damage', p: t.p, n: t.amount });
-  if (s.move && s.move.player === t.p && s.move.token === 'ship') s.move.ended = true;
+  tokenStops(s, t.p, 'ship');
   push(s, { t: 'overflow', p: t.p, from: 'hold' }, ...(t.forced || set.damage.sendsToEurope ? [{ t: 'refuge', p: t.p }] : []));
 });
 task('refuge', (s, t) => {
@@ -246,6 +247,6 @@ decision('refuge', {
 export function shipToEurope(s: State, p: number) {
   const pl = s.players[p];
   if (!inEurope(s, pl.ship)) pl.ship = nearestEurope(s, pl.ship);
-  if (s.move && s.move.player === p && s.move.token === 'ship') s.move.ended = true;
+  tokenStops(s, p, 'ship');
   log(s, { e: 'toEurope', p, token: 'ship' });
 }

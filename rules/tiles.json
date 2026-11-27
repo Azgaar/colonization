@@ -65,7 +65,7 @@
       "nickname": 3,
       "cell 1": "ocean.png",
       "cell 2": "grassland.png",
-      "resource 2": "🍂",
+      "resource 2": "🌿",
       "cell 3": "ocean.png",
       "resource 3": "🐟",
       "cell 4": "desert.png",
@@ -101,7 +101,7 @@
       "bonus 6": "village.png",
       "cell 7": "grassland.png",
       "bonus 7": "burial.png",
-      "resource 7": "🍂",
+      "resource 7": "🌿",
       "cell 8": "ocean.png",
       "cell 9": "ocean.png"
     },
@@ -118,7 +118,7 @@
       "cell 7": "ocean.png",
       "cell 8": "grassland.png",
       "cell 9": "grassland.png",
-      "resource 9": "🍂"
+      "resource 9": "🌿"
     },
     {
       "nickname": 7,
@@ -167,7 +167,7 @@
       "nickname": 10,
       "cell 1": "ocean.png",
       "cell 2": "forest.png",
-      "resource 2": "🦫",
+      "resource 2": "🌿",
       "cell 3": "ocean.png",
       "cell 4": "ocean.png",
       "cell 5": "forest.png",
@@ -176,7 +176,7 @@
       "cell 8": "grassland.png",
       "bonus 8": "village.png",
       "cell 9": "grassland.png",
-      "resource 9": "🍂"
+      "resource 9": "🌿"
     },
     {
       "nickname": 11,
@@ -215,7 +215,7 @@
       "cell 4": "grassland.png",
       "cell 5": "desert.png",
       "cell 6": "grassland.png",
-      "resource 6": "🍂",
+      "resource 6": "🌿",
       "cell 7": "grassland.png",
       "cell 8": "desert.png",
       "cell 9": "desert.png",
@@ -233,7 +233,7 @@
       "cell 6": "ocean.png",
       "bonus 6": "wreck.png",
       "cell 7": "grassland.png",
-      "resource 7": "🍂",
+      "resource 7": "🌿",
       "cell 8": "forest.png",
       "cell 9": "forest.png",
       "resource 9": "🪵"
@@ -251,7 +251,7 @@
       "cell 7": "ocean.png",
       "resource 7": "🐟",
       "cell 8": "forest.png",
-      "resource 8": "🦫",
+      "resource 8": "🌿",
       "cell 9": "ocean.png"
     },
     {
@@ -263,7 +263,7 @@
       "cell 4": "mountains.png",
       "cell 5": "forest.png",
       "bonus 5": "village.png",
-      "resource 5": "🦫",
+      "resource 5": "🌿",
       "cell 6": "ocean.png",
       "cell 7": "ocean.png",
       "cell 8": "ocean.png",
@@ -276,7 +276,7 @@
       "cell 3": "ocean.png",
       "cell 4": "forest.png",
       "bonus 4": "village.png",
-      "resource 4": "🦫",
+      "resource 4": "🌿",
       "cell 5": "grassland.png",
       "bonus 5": "burial.png",
       "cell 6": "grassland.png",
@@ -348,7 +348,7 @@
     {
       "nickname": 22,
       "cell 1": "grassland.png",
-      "resource 1": "🍂",
+      "resource 1": "🌿",
       "cell 2": "grassland.png",
       "bonus 2": "burial.png",
       "cell 3": "desert.png",
@@ -399,7 +399,7 @@
       "cell 5": "grassland.png",
       "bonus 5": "village.png",
       "cell 6": "grassland.png",
-      "resource 6": "🍂",
+      "resource 6": "🌿",
       "cell 7": "mountains.png",
       "cell 8": "grassland.png",
       "cell 9": "ocean.png"
@@ -436,7 +436,7 @@
       "nickname": 28,
       "cell 1": "ocean.png",
       "cell 2": "forest.png",
-      "resource 2": "🦫",
+      "resource 2": "🌿",
       "cell 3": "ocean.png",
       "cell 4": "grassland.png",
       "bonus 4": "village.png",
@@ -457,7 +457,7 @@
       "cell 6": "grassland.png",
       "cell 7": "ocean.png",
       "cell 8": "grassland.png",
-      "resource 8": "🍂",
+      "resource 8": "🌿",
       "cell 9": "ocean.png"
     },
     {
@@ -485,7 +485,7 @@
       "cell 6": "grassland.png",
       "bonus 6": "village.png",
       "cell 7": "grassland.png",
-      "resource 7": "🍂",
+      "resource 7": "🌿",
       "cell 8": "grassland.png",
       "cell 9": "desert.png"
     },
@@ -500,7 +500,7 @@
       "bonus 6": "village.png",
       "cell 7": "ocean.png",
       "cell 8": "grassland.png",
-      "resource 8": "🍂",
+      "resource 8": "🌿",
       "cell 9": "grassland.png"
     },
     {
@@ -538,7 +538,7 @@
       "cell 1": "desert.png",
       "cell 2": "grassland.png",
       "cell 3": "grassland.png",
-      "resource 3": "🍂",
+      "resource 3": "🌿",
       "cell 4": "forest.png",
       "cell 5": "mountains.png",
       "bonus 5": "village.png",
@@ -567,7 +567,7 @@
       "cell 3": "ocean.png",
       "cell 4": "ocean.png",
       "cell 5": "grassland.png",
-      "resource 5": "🍂",
+      "resource 5": "🌿",
       "cell 6": "ocean.png",
       "cell 7": "mountains.png",
       "cell 8": "mountains.png",
@@ -764,7 +764,7 @@
       "bonus 6": "village.png",
       "cell 7": "grassland.png",
       "bonus 7": "village.png",
-      "resource 7": "🍂",
+      "resource 7": "🌿",
       "cell 8": "ocean.png",
       "cell 9": "ocean.png"
     },
@@ -823,7 +823,7 @@
       "cell 8": "ocean.png",
       "resource 8": "🐟",
       "cell 9": "tundra.png",
-      "resource 9": "🦫"
+      "resource 9": "🌿"
     },
     {
       "nickname": 55,
@@ -885,7 +885,7 @@
       "nickname": 59,
       "cell 1": "ocean.png",
       "cell 2": "grassland.png",
-      "resource 2": "🍂",
+      "resource 2": "🌿",
       "cell 3": "grassland.png",
       "cell 4": "ocean.png",
       "cell 5": "grassland.png",
@@ -905,7 +905,7 @@
       "cell 6": "ocean.png",
       "cell 7": "ocean.png",
       "cell 8": "forest.png",
-      "resource 8": "🦫",
+      "resource 8": "🌿",
       "cell 9": "grassland.png"
     },
     {
@@ -924,7 +924,7 @@
     {
       "nickname": 62,
       "cell 1": "grassland.png",
-      "resource 1": "🍂",
+      "resource 1": "🌿",
       "cell 2": "forest.png",
       "cell 3": "ocean.png",
       "cell 4": "ocean.png",
@@ -938,7 +938,7 @@
     {
       "nickname": 63,
       "cell 1": "forest.png",
-      "resource 1": "🦫",
+      "resource 1": "🌿",
       "cell 2": "forest.png",
       "cell 3": "ocean.png",
       "cell 4": "ocean.png",

@@ -24,16 +24,16 @@ const strength = (card: string, kind: 'infantry' | 'ship', native = false, cell 
 
 /** One test per card. The last test checks that none is missing. */
 const agents: Record<string, () => void> = {
-  criminal: () => { const s = home(); turn(s, 0, 'criminal', 'colonist'); expect(yields(s, 'criminal', at(5, 5), 'leaf')).toBe(1); expect(canPlay(s, 'criminal', 'moveShip')).toBe(false); },
-  slave: () => { const s = home(); build(s, 0, 'docks'); expect(yields(s, 'slave', at(5, 5), 'leaf')).toBe(2); turn(s, 0, 'slave', 'slave'); play(s, 'slave', 'docks'); expect(P(s).wh.food).toBe(3); },
-  colonist: () => { const s = home(); expect(yields(s, 'colonist', at(5, 5), 'leaf')).toBe(1); },
-  fisherman: () => { const s = home(); expect(yields(s, 'fisherman', at(4, 4), 'fish')).toBe(2); expect(yields(s, 'fisherman', at(5, 5), 'leaf')).toBe(1); },
+  criminal: () => { const s = home(); turn(s, 0, 'criminal', 'colonist'); expect(yields(s, 'criminal', at(5, 5), 'crops')).toBe(1); expect(canPlay(s, 'criminal', 'moveShip')).toBe(false); },
+  slave: () => { const s = home(); build(s, 0, 'docks'); expect(yields(s, 'slave', at(5, 5), 'crops')).toBe(2); turn(s, 0, 'slave', 'slave'); play(s, 'slave', 'docks'); expect(P(s).wh.food).toBe(3); },
+  colonist: () => { const s = home(); expect(yields(s, 'colonist', at(5, 5), 'crops')).toBe(1); },
+  fisherman: () => { const s = home(); expect(yields(s, 'fisherman', at(4, 4), 'fish')).toBe(2); expect(yields(s, 'fisherman', at(5, 5), 'crops')).toBe(1); },
   // DD-64: the farmer works crops.
-  farmer: () => { const s = home(); expect(yields(s, 'farmer', at(5, 5), 'leaf')).toBe(2); expect(yields(s, 'farmer', at(4, 4), 'fish')).toBe(1); },
+  farmer: () => { const s = home(); expect(yields(s, 'farmer', at(5, 5), 'crops')).toBe(2); expect(yields(s, 'farmer', at(4, 4), 'fish')).toBe(1); },
   lumberjack: () => expect(yields(home(), 'lumberjack', at(5, 6), 'timber')).toBe(2),
   miner: () => expect(yields(home(), 'miner', at(6, 5), 'silver')).toBe(2),
-  scout: () => { expect(points('scout', 'moveInfantry')).toBe(7); expect(points('scout', 'moveShip')).toBe(5); },
-  sailor: () => { expect(points('sailor', 'moveShip')).toBe(7); expect(points('sailor', 'moveInfantry')).toBe(5); },
+  scout: () => { expect(points('scout', 'moveInfantry')).toBe(6); expect(points('scout', 'moveShip')).toBe(6); },
+  sailor: () => { expect(points('sailor', 'moveShip')).toBe(7); expect(points('sailor', 'moveInfantry')).toBe(7); },
   builder: () => { const s = home(); turn(s, 0, 'builder', 'builder'); P(s).wh = stock({ timber: 1 }); play(s, 'builder', 'build', { building: 'chapel' }); expect(P(s).wh.timber).toBe(0); },
   preacher: () => { const s = home(); build(s, 0, 'chapel'); expect(work(s, 'preacher', 'chapel')).toBe(2); },
   recruiter: () => { const s = home(); s.pier[0] = ['soldier']; s.pier = s.pier.slice(0, 1); P(s).gold = 5; turn(s, 0, 'recruiter', 'recruiter'); play(s, 'recruiter', 'hire'); act(s, { c: 'buy', agent: 'soldier' }); expect(P(s).gold).toBe(0); },
@@ -47,18 +47,18 @@ const agents: Record<string, () => void> = {
   dragoon: () => expect([strength('dragoon', 'infantry'), strength('dragoon', 'ship')]).toEqual([3, 0]),
   captain: () => expect([strength('captain', 'infantry'), strength('captain', 'ship')]).toEqual([3, 3]),
   politician: () => { const s = home(); build(s, 0, 'town_hall'); expect(work(s, 'politician', 'town_hall')).toBe(2); },
-  trapper: () => expect([yields(home(), 'trapper_french', at(5, 6), 'fur'), yields(home(), 'trapper_french', at(6, 6), 'fur')]).toEqual([1, 0]),
+  trapper: () => expect([yields(home(), 'trapper_french', at(5, 6), 'crops'), yields(home(), 'trapper_french', at(6, 6), 'crops')]).toEqual([1, 0]),
   negotiant: () => { const s = home(); P(s).hold = stock({ goods: 1 }); turn(s, 0, 'negotiant_dutch', 'sailor'); play(s, 'negotiant_dutch', 'trade'); act(s, { c: 'sell' }); expect(P(s).gold).toBe(6); },
   puritan: () => { const s = home(); build(s, 0, 'chapel'); expect(work(s, 'puritan_english', 'chapel')).toBe(3); },
   navigator: () => expect(points('navigator_portuguese', 'moveShip')).toBe(9),
   conquistador: () => expect([strength('conquistador_spanish', 'infantry'), strength('conquistador_spanish', 'infantry', true)]).toEqual([2, 4]),
   settler: () => { const s = home(); turn(s, 0, 'settler_swedish', 'sailor'); P(s).wh = stock({ timber: 2 }); build(s, 0, 'docks'); play(s, 'settler_swedish', 'build', { building: 'shipyard' }); expect(P(s).wh.timber).toBe(1); },
-  planter: () => { const s = game(1); world(s, { [at(5, 5)]: 'grassland' }); colony(s, 0, at(5, 5)); expect(yields(s, 'planter_danish', at(5, 5), 'leaf')).toBe(2); },
-  cossack: () => { expect(strength('cossack_russian', 'infantry')).toBe(2); expect(yields(home(), 'cossack_russian', at(6, 6), 'fur')).toBe(2); },
+  planter: () => { const s = game(1); world(s, { [at(5, 5)]: 'grassland' }); colony(s, 0, at(5, 5)); expect(yields(s, 'planter_danish', at(5, 5), 'crops')).toBe(2); },
+  cossack: () => { expect(strength('cossack_russian', 'infantry')).toBe(2); expect(yields(home(), 'cossack_russian', at(6, 6), 'crops')).toBe(2); },
   adventurer: () => { const s = home(); s.pier = [['soldier']]; P(s).gold = 4; turn(s, 0, 'adventurer_curonian', 'sailor'); play(s, 'adventurer_curonian', 'hire'); act(s, { c: 'buy', agent: 'soldier' }); expect(P(s).gold).toBe(0); },
   highlander: () => expect([strength('highlander_scottish', 'infantry'), strength('highlander_scottish', 'infantry', false, at(6, 5))]).toEqual([1, 3]),
   // DD-66: the Indian works the sea.
-  indian: () => { const s = home(); expect(yields(s, 'indian', at(4, 4), 'fish')).toBe(2); expect(yields(s, 'indian', at(5, 5), 'leaf')).toBe(1); turn(s, 0, 'indian', 'sailor'); expect(canPlay(s, 'indian', 'moveShip')).toBe(true); },
+  indian: () => { const s = home(); expect(yields(s, 'indian', at(4, 4), 'fish')).toBe(2); expect(yields(s, 'indian', at(5, 5), 'crops')).toBe(1); turn(s, 0, 'indian', 'sailor'); expect(canPlay(s, 'indian', 'moveShip')).toBe(true); },
 };
 
 const buildings: Record<string, () => void> = {
@@ -68,14 +68,14 @@ const buildings: Record<string, () => void> = {
   town_hall: () => { const s = home(); build(s, 0, 'town_hall'); expect(work(s, 'colonist', 'town_hall')).toBe(1); },
   chapel: () => { const s = home(); build(s, 0, 'chapel'); expect(work(s, 'colonist', 'chapel')).toBe(1); },
   stockade: () => { const s = home(); build(s, 0, 'stockade'); expect(buildingDefence(s, 0)).toEqual([{ label: 'stockade', value: 1 }]); },
-  school: () => { const s = home(); build(s, 0, 'school'); turn(s, 0, 'farmer', 'criminal'); expect(canPlay(s, 'farmer', 'teach', { target: 'criminal' })).toBe(true); },
+  school: () => { const s = home(); build(s, 0, 'school'); s.agentDeck.push('soldier'); turn(s, 0, 'criminal'); expect(canPlay(s, 'criminal', 'teach', { target: 'soldier' })).toBe(true); },
   custom_house: () => { const s = home(); build(s, 0, 'warehouse', 'custom_house'); P(s).wh.silver = 1; turn(s, 0, 'priest', 'sailor'); play(s, 'priest', 'customs'); expect(P(s).gold).toBe(5); },
   shipyard: () => { const s = home(); build(s, 0, 'docks', 'shipyard'); P(s).damage = 3; P(s).ship = at(4, 4); turn(s, 0, 'criminal', 'indian', 'colonist'); expect(canPlay(s, 'indian', 'shipyard')).toBe(false); play(s, 'colonist', 'shipyard'); expect(P(s).damage).toBe(0); },
   factory: () => { const s = home(); build(s, 0, 'blacksmith_shop', 'factory'); P(s).wh.crops = 1; expect(work(s, 'colonist', 'factory')).toBe(2); },
   newspaper: () => { const s = home(); build(s, 0, 'town_hall', 'newspaper'); expect(work(s, 'priest', 'newspaper')).toBe(3); expect(work(s, 'colonist', 'newspaper')).toMatch(/education/); },
   church: () => { const s = home(); build(s, 0, 'chapel', 'church'); expect(work(s, 'politician', 'church')).toBe(3); },
   fort: () => { const s = home(); build(s, 0, 'stockade', 'fort'); expect(buildingDefence(s, 0)).toEqual([{ label: 'fort', value: 2 }]); },
-  university: () => { const s = home(); build(s, 0, 'school', 'university'); s.agentDeck.push('politician'); turn(s, 0, 'politician', 'criminal'); expect(canPlay(s, 'politician', 'teach')).toBe(true); },
+  university: () => { const s = home(); build(s, 0, 'school', 'university'); s.agentDeck.push('politician'); turn(s, 0, 'colonist', 'criminal'); expect([canPlay(s, 'colonist', 'teach', { target: 'politician' }), canPlay(s, 'criminal', 'teach', { target: 'politician' })]).toEqual([true, false]); },
 };
 
 const take = (s: State, f: string) => {
@@ -104,8 +104,8 @@ const fathers: Record<string, () => void> = {
   samuel_de_champlain: () => { const s = home(); s.map.terrain[at(9, 9)] = 'grassland'; take(s, 'samuel_de_champlain'); expect(can(s, { c: 'cell', cell: at(5, 6) })).toBe(false); act(s, { c: 'cell', cell: at(9, 9) }); expect(s.colonies.length).toBe(2); },
   john_smith: () => { const s = home(); father(s, 0, 'john_smith'); s.map.terrain[at(9, 9)] = 'grassland'; settle(s, 'aztec', at(9, 9), { hostility: 3 }); P(s).ship = at(8, 8); turn(s, 0, 'scout', 'sailor'); expect(canPlay(s, 'scout', 'alliance')).toBe(true); },
   // DD-65: Squanto helps fishing.
-  squanto: () => { const s = home(); father(s, 0, 'squanto'); expect([yields(s, 'colonist', at(5, 5), 'leaf'), yields(s, 'colonist', at(4, 4), 'fish')]).toEqual([1, 2]); },
-  john_rolfe: () => { const s = home(); father(s, 0, 'john_rolfe'); s.map.bonus[at(5, 6)] = 'fur'; expect([yields(s, 'colonist', at(5, 5), 'leaf'), yields(s, 'colonist', at(5, 6), 'fur')]).toEqual([2, 1]); },
+  squanto: () => { const s = home(); father(s, 0, 'squanto'); expect([yields(s, 'colonist', at(5, 5), 'crops'), yields(s, 'colonist', at(4, 4), 'fish')]).toEqual([1, 2]); },
+  john_rolfe: () => { const s = home(); father(s, 0, 'john_rolfe'); s.map.bonus[at(5, 6)] = 'crops'; expect([yields(s, 'colonist', at(5, 5), 'crops'), yields(s, 'colonist', at(5, 6), 'crops')]).toEqual([2, 2]); },
   thomas_hooker: () => { const s = home(); father(s, 0, 'thomas_hooker'); build(s, 0, 'chapel'); expect(work(s, 'colonist', 'chapel')).toBe(2); },
   peter_minuit: () => { const s = home(); father(s, 0, 'peter_minuit'); settle(s, 'aztec', at(9, 9), { ally: 0, hostility: 0 }); expect(scorePlayer(s, 0).parts).toContainEqual({ label: 'alliances', value: 1 }); },
   william_bradford: () => { const s = home(); P(s).crosses = 9; take(s, 'william_bradford'); expect(legal(s).length).toBe(6); act(s, { c: 'convert', n: 5 }); expect([P(s).crosses, P(s).bells]).toEqual([4, 5]); },
@@ -198,7 +198,7 @@ const ruins: Record<string, () => void> = {
   native_burial: () => { for (const [d, g, h] of [[1, 0, 2], [3, 5, 3], [6, 10, 4]]) { const s = near(); poi(s, 'ruin', 'native_burial'); rig(s, d); opt(s, 'loot'); expect([P(s).gold, s.hostility.sioux, ended(s)]).toEqual([g, h, true]); } const s = near(); poi(s, 'ruin', 'native_burial'); opt(s, 'respect'); expect(s.hostility.sioux).toBe(1); },
   desecrated_burial: () => { const s = near(); poi(s, 'ruin', 'desecrated_burial'); opt(s, 'take'); expect([P(s).gold, s.hostility.sioux]).toEqual([5, 3]); poi(s, 'ruin', 'desecrated_burial'); opt(s, 'rebury'); expect([P(s).crosses, ended(s)]).toEqual([9, true]); },
   sacred_totem_circle: () => { for (const [d, g, v] of [[1, 0, 0], [3, 0, 3], [6, 20, 0]]) { const s = near(); poi(s, 'ruin', 'sacred_totem_circle'); rig(s, d); opt(s, 'dismantle'); expect([P(s).gold, P(s).wh.silver, s.hostility.sioux]).toEqual([g, v, 4]); } const s = near(); P(s).wh.food = 1; poi(s, 'ruin', 'sacred_totem_circle'); opt(s, 'offer'); expect([P(s).wh.food, P(s).crosses, s.hostility.sioux]).toEqual([0, 1, 0]); poi(s, 'ruin', 'sacred_totem_circle'); opt(s, 'study'); expect(P(s).bells).toBe(2); },
-  guide: () => { const s = near(); P(s).gold = 2; s.ruinDeck.push('hidden_granaries', 'mere_rumors'); poi(s, 'ruin', 'guide'); opt(s, 'pay'); act(s, { c: 'play', card: 'hidden_granaries' }); expect([P(s).gold, P(s).wh.food, s.ruinDiscard.includes('mere_rumors')]).toEqual([0, 4, true]); s.ruinDeck.push('hidden_granaries'); poi(s, 'ruin', 'guide'); opt(s, 'threaten'); expect([s.hostility.sioux, P(s).wh.food]).toEqual([1, 8]); poi(s, 'ruin', 'guide'); opt(s, 'leave'); expect(s.move!.points).toBe(4); },
+  guide: () => { const s = near(); P(s).gold = 2; s.ruinDeck.push('hidden_granaries', 'mere_rumors'); poi(s, 'ruin', 'guide'); opt(s, 'pay'); act(s, { c: 'play', card: 'hidden_granaries' }); expect([P(s).gold, P(s).wh.food, s.ruinDiscard.includes('mere_rumors')]).toEqual([0, 4, true]); s.ruinDeck.push('hidden_granaries'); poi(s, 'ruin', 'guide'); opt(s, 'threaten'); expect([s.hostility.sioux, P(s).wh.food]).toEqual([1, 6]); poi(s, 'ruin', 'guide'); opt(s, 'leave'); expect(s.move!.points).toBe(4); },
   warrior_burial: () => { const s = near(); poi(s, 'ruin', 'warrior_burial'); opt(s, 'loot'); expect([P(s).gold, P(s).crosses, s.hostility.sioux]).toEqual([6, 4, 3]); poi(s, 'ruin', 'warrior_burial'); opt(s, 'leave'); expect(s.move!.points).toBe(4); },
   bandeirante_tracks: () => { const s = near(); poi(s, 'ruin', 'bandeirante_tracks', 'scout'); opt(s, 'track'); expect([P(s).gold, ended(s)]).toEqual([15, false]); for (const [d, g, eu] of [[3, 0, false], [4, 0, true], [5, 15, false]] as const) { const t = near(); P(t).hand = []; poi(t, 'ruin', 'bandeirante_tracks'); rig(t, d); opt(t, 'comb'); expect([P(t).gold, P(t).inf === 'europe', ended(t)]).toEqual([g, eu, true]); } },
   stone_wall: () => { for (const [d, g, eu] of [[1, 0, true], [4, 10, false], [5, 15, false]] as const) { const t = near(); poi(t, 'ruin', 'stone_wall'); rig(t, d); opt(t, 'dig'); expect([P(t).gold, P(t).inf === 'europe']).toEqual([g, eu]); } },

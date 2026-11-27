@@ -1,6 +1,6 @@
 {
   "id": "proposed",
-  "title": "Candidate changes for the designer, on top of board (docs/proposals.md); nothing here is decided",
+  "title": "Candidate changes for the designer, on top of board (docs/decisions.md, Open); nothing here is decided",
   "base": "board",
   "sandbox": true,
   "overrides": [

@@ -1,130 +1,143 @@
-# Decisions and open questions
+# Decisions
+
+The tracker for rule changes and design choices. A change reaches `rules/` only by the designer's choice (`pnpm rules apply | drop`, which adds a line to the log below). Details live in `rules/`, [rules-spec.md](rules-spec.md), the lab reports in `out/` and git history.
+
+## Open
+
+Questions and candidates awaiting the designer. Candidates are the overrides of [`rulesets/proposed.json`](../rulesets/proposed.json); evidence: `pnpm proposals 400` → `out/proposals.md`.
+
+| # | Item | Note |
+|---|---|---|
+| O-1 | Candidate `events-1-cube`: five event cards add 1 cube instead of 2 | Moves the loyalist only 4–9 points; kept for tuning one player count |
+| O-2 | Early endings: 56–67% of games end before round 8 at 4–5 players | Find where the racing player's bells come from before choosing a fix |
+| O-3 | 5 players may overshoot: loyalist wins 6% | Event cards can tune it later |
+| O-4 | Tuned bots still let the loyalist win 29–49% at 3–5 players | Retune the bots under the new war first |
+| O-5 | Dead cards: school (before DD-75), slave, smuggler | May be the bots, not the cards |
+| O-6 | Town hall, stockade, work action, alliances look dominated | Recheck after the war changes |
+| O-7 | Bots move one token per action | Lab numbers understate DD-73 |
+
+## Where the board stands
+
+4 players, mixed bots, before DD-71 and later changes. Targets in [ai-and-testlab.md](ai-and-testlab.md#balance-targets).
+
+| | Now | Target |
+|---|---|---|
+| Loyalist wins | 11% | about 15% |
+| Patriot colonies that survive | 56% | 40–70% |
+| Games ending before round 8 | 56% | under 25% |
 
 ## Decided by the designer (2026-11-25)
 
 | # | Decision |
 |---|---|
-| DD-1 | "Активация индейцев: 🛖 N" activates settlement number N |
+| DD-1 | "Активация индейцев: 🛖 N" activates settlement N |
 | DD-2 | Solo has no loyalist |
 | DD-3 | Buildings belong to the player and serve all colonies |
-| DD-4 | One sale may fill the demand track several times. The whole trade action uses the old price; the new price applies from the next trade action |
-| DD-5 | "Среднее" education was a mistake; it is basic 📖 |
+| DD-4 | One sale may fill the demand track several times; the price changes from the next trade action |
+| DD-5 | "Среднее" education is basic 📖 |
 | DD-6 | Where sources disagree, the spreadsheet is correct |
 | DD-7 | Outdated component exports are ignored |
-| DD-8 | Write the PRD before building anything |
-| DD-9 | The computer version may look like a PC 4X and must be easy to tweak. How far rules may differ is set by DD-10 |
-| DD-10 | PC rules follow board rules. They may change to suit the PC, but the goal is a board game, so rules must stay convertible to it |
-| DD-11 | Settlement activation affects the player with the nearest colony. Hostility 0–2: gives 1 🟨; 3: nothing; 4–5: raid |
+| DD-8 | Write the PRD before building |
+| DD-9 | The PC version may look like a PC 4X and must be easy to tweak |
+| DD-10 | PC rules follow board rules and must stay convertible to them |
+| DD-11 | Activation affects the nearest colony's player. Hostility 0–2: 1 🟨; 3: nothing; 4–5: raid |
 | DD-12 | Around the map: inner ring open sea, outer ring Europe |
-| DD-13 | Tax track 0, 1, 3, 6, 10, 10, 15, 15, 20, 25 and price cap 5 are current |
-| DD-14 | Ocean cells need no docks and give 1 🟨. Docks are a building to work in and give +1 🟨 for an ocean cell, so 2 |
+| DD-13 | Tax track 0, 1, 3, 6, 10, 10, 15, 15, 20, 25; price cap 5 |
+| DD-14 | Ocean cells give 1 🟨 without docks; docks give +1 |
 | DD-15 | The warehouse is shared by all the player's colonies |
-| DD-16 | Desert producing nothing and nearly empty tundra are intended. The Cossack can use empty tundra |
-| DD-17 | Sepúlveda gives 2 slaves for now |
-| DD-18 | Bonus frequencies in the spreadsheet are untested, not guidance |
-| DD-19 | Four-card starting decks are intended: those nations are harder |
-| DD-20 | Activation does nothing if there is no settlement with that number or no colony |
-| DD-21 | The Cossack principle also covers the Trapper and Planter |
+| DD-16 | Empty desert and tundra are intended; the Cossack can use tundra |
+| DD-17 | Sepúlveda gives 2 slaves |
+| DD-18 | Spreadsheet bonus frequencies are untested |
+| DD-19 | Four-card starting decks are intended |
+| DD-20 | Activation with no such settlement or no colony does nothing |
+| DD-21 | The Cossack principle covers the Trapper and Planter |
 | DD-22 | Propaganda takes up to 2 Fathers |
-| DD-23 | The action card counts as 1 in combat strength |
-| DD-24 | "All patriots" stays as written; it is meant to be very rare |
-| DD-25 | The designer will apply the source edits below later; until then this specification is ahead of them |
-| DD-26 | Loyalist win rate with 4 players should be about 15%. Other balance targets are accepted, except the round 5 leader (Q14) |
-| DD-27 | Numbers missing from the workbook stay in a separate settings file; no new sheet |
+| DD-23 | The action card counts 1 in combat |
+| DD-24 | "All patriots" stays; meant to be very rare |
+| DD-25 | The designer applies source edits later; the spec is ahead of them |
+| DD-26 | Loyalist win rate at 4 players about 15%; other balance targets accepted |
+| DD-27 | Numbers missing from the workbook go in a settings file |
 | DD-28 | Criminals and slaves count as support in battle |
-| DD-29 | One action moves both ship and pawn only through embarking or disembarking |
+| DD-29 | Ship and pawn move in one action only by embarking. Replaced by DD-73 |
 | DD-30 | Solo is won by keeping a colony |
-| DD-31 | Working in docks includes the cell's fish bonus (+1), and a fisherman adds +1 more |
-| DD-32 | Balance is not needed now; first check that the systems work in general |
-| DD-33 | Interface follows direction B, painted world. A and C are abandoned |
-| DD-34 | Nation emblems are white on the nation's colour, with shadow and texture |
-| DD-35 | B2's look is preferred. Map at least 80% of the screen in map view; colony west, Europe east |
-| DD-36 | Dragging an agent shows every possible action, off the map as well |
-| DD-37 | The King's army must be readable as an exact number. The war needs no full screen of its own |
-| DD-38 | Keep B2's large agent cards, full-screen Colony and Europe views, and Governors view |
-| DD-39 | Placed agents stay visible where they were placed until the round ends |
-| DD-40 | Warehouse and hold goods are both shown as heaps of goods. Dragging an agent never moves the camera |
-| DD-41 | Europe is not drawn as a place. The outer ring of cells on all four sides is marked as Europe cells, as in DD-12, and water fills the whole screen beyond it |
-| DD-42 | Colony preview at the left shows its goods, Europe preview at the right shows prices and the pier. Options are in their own menu |
-| DD-43 | B8, the tilted map, is the official interface prototype (then `prototypes/index.html`, now `packages/web`). Other versions are removed; they remain in git history (commit 5c6d9ac). Design work continues in smaller steps |
-| DD-44 | The pier at rest shows faces only; names, abilities and prices appear on hover |
-| DD-45 | Hiring, building and Founding Fathers show every choice at once when an agent is lifted, with no second list |
-| DD-46 | The Europe border is subtle: faint hatching without a hard line |
-| DD-47 | Mountains carry no food bonus. The importer drops the three printed ones until the workbook is edited |
-| DD-48 | The prototype phase is over. The interface is TypeScript in `packages/web`, in strict mode, with minimal unit tests and no end-to-end tests for now |
+| DD-31 | Docks include the fish bonus; a fisherman adds +1 more |
+| DD-32 | Balance later; first check the systems work |
+| DD-33 | Interface direction B, painted world |
+| DD-34 | Nation emblems white on the nation's colour |
+| DD-35 | Map at least 80% of the screen; colony west, Europe east |
+| DD-36 | Dragging an agent shows every possible action |
+| DD-37 | The King's army is shown as an exact number; no war screen |
+| DD-38 | Keep large agent cards, full-screen Colony and Europe, Governors view |
+| DD-39 | Placed agents stay visible until the round ends |
+| DD-40 | Goods are drawn as heaps; dragging never moves the camera |
+| DD-41 | Europe is the marked outer ring of cells, water beyond |
+| DD-42 | Colony preview left, Europe preview right; options in their own menu |
+| DD-43 | The tilted map (B8) is the interface, now `packages/web` |
+| DD-44 | The pier shows faces; details on hover |
+| DD-45 | Hiring, building and Fathers show all choices when an agent is lifted |
+| DD-46 | The Europe border is faint hatching |
+| DD-47 | Mountains carry no food bonus |
+| DD-48 | The interface is strict TypeScript with minimal unit tests |
 
 ## Decided by the designer (2026-11-26)
 
 | # | Decision |
 |---|---|
-| DD-49 | Rule change "cube-strength-1" (direct) promoted from pc to board: Each King's army cube attacks with 1 ⚔️, not 2. / Каждый кубик армии короля атакует с силой 1 ⚔️, а не 2. Why: The King's army grows with every refusal at every seat (about 104 cubes at 4 players); colonies are defended by about 5, so 5% survive and the loyalist wins 87%. To carry into the sources: settings.war.refStrength → 1 (packages/data/src/settings.ts: war.refStrength) |
-| DD-50 | Rule change "refusal-no-bell" (direct) promoted from pc to board: Refusing the tax adds cubes to the King's army but gives no bell. / Отказ от налога добавляет кубики в армию короля, но не даёт колокола. Why: Refusing is free in bells and feeds the race to 15: refusals give 9 of 15 bells and end games early. To carry into the sources: settings.tax.refuseBells → 0 (packages/data/src/settings.ts: tax.refuseBells) |
-| DD-51 | Rule change "base-defence-4" (direct) dropped from pc. Why it was tried: A colony's own defence in the war is 1, too small against any share of the King's army |
-| DD-52 | Rule change "refusal-1-cube" (direct) promoted from pc to board: Refusing the tax adds 1 cube to the King's army, not 2 (solo unchanged). / Отказ от налога добавляет в армию короля 1 кубик, а не 2 (соло без изменений). Why: Each refusal adds 2 cubes to a pool shared by all patriots, so refusing is cheap for the refuser and costly for the others (H2). To carry into the sources: settings.tax.refuseRef → 1 (packages/data/src/settings.ts: tax.refuseRef) |
+| DD-49 | Applied: each Royal Army cube attacks with 1 ⚔️, not 2 |
+| DD-50 | Applied: refusing the tax gives no bell |
+| DD-51 | Dropped: base colony defence 4. The King's cubes balance the colony instead |
+| DD-52 | Applied: refusing the tax adds 1 cube, not 2 (solo unchanged) |
 
 ## Decided by the designer (2026-11-27)
 
 | # | Decision |
 |---|---|
-| DD-53 | "Leader at round 5 wins … very rare" (Q14) meant that games rarely end by round 5. The target "games ending before round 8: under 25%" covers it; who leads at round 5 is still reported, with no target |
-| DD-54 | A ship damaged by any cause (battle, storm, pirates, wreck) goes to Europe, or next to an own colony if its owner has a shipyard (Q15, the default kept) |
-| DD-55 | A settlement revealed next to an existing colony is placed as usual: the distance rule limits founding only (Q16, the default kept) |
-| DD-56 | Forest gives timber only; fur needs a fur bonus (R-4) or a trapper (R-5). The document is right here and the spreadsheet is to be corrected, an exception to DD-6 (Q17). In `board` as `forest-timber-only` (`terrain.forest.yields` → timber). A trapper on plain forest now gives 1 fur, 2 with the bonus |
-| DD-57 | Supply stays as written: spend 1 food, play 1 card, draw 1. It is a way to swap a card, not to gain one; H13 is answered as intended (Q18) |
-| DD-58 | A 2-player game has no loyalist. The war plays as with 3+ players without the loyalist's steps: the King's army attacks both players' colonies alone and the game rolls the dice, as in W-12 without a loyalist (Q20). In `board` as `two-players-no-loyalist` (new setting `war.loyalistFrom`: 2 as printed, 3 in `board`) |
-| DD-59 | It should be easy for the loyalist to take a colony. The loyalist's threshold for taking a fallen colony (W-13) uses the same strength per cube as the attack, so DD-49 lowered it from 2 to 1 per cube; that is intended |
-| DD-60 | Rule change "recruit-action" (direct) promoted from pc to board: Recruit (action). Play any agent. Spend any number of crosses, at least the round number, and look at that many top agents of the Europe deck. You may put one in your discard; the rest go to the bottom of the Europe deck in any order. Recruiting is no longer free. Roger Williams: when recruiting, take up to 2 of the agents you look at. / Вербовка (действие). Сыграйте любого агента. Сбросьте любое количество ✝️, но не меньше номера тура, и посмотрите столько же верхних агентов колоды Европы. Одного можете положить в свой сброс, остальных — под низ колоды Европы в любом порядке. Вербовка больше не бесплатна. Роджер Уильямс: при вербовке возьми до 2 из просмотренных агентов. Why: Every action takes an agent, except recruiting with crosses (T-8), which can also be done with an empty hand. As a card action it needs more pull: the crosses spent buy that many looks, so saving crosses pays. To carry into the sources: settings.crosses.recruitAction → true (packages/data/src/settings.ts: crosses.recruitAction); fathers.roger_williams.mods → [{"mod":"recruitTake","value":2}] (Fathers, F22 (effect)) |
-| DD-61 | The King's army is called the Royal Army (Королевская армия) in the game, its rules and the rulebook. Entries above keep the wording they were decided with |
-| DD-62 | Rule change "colony-on-edge" (direct) promoted from pc to board: A colony may be founded on the edge of the map. / Колонию можно основать на краю карты. Why: The printed rule keeps colonies off the outer edge of the map. It dates from when the tiles touched Europe; with the ring of open sea between the map and Europe (DD-12) an edge colony is two cells from Europe and still needs a sea passage, so the rule only blocks good-looking sites. To carry into the sources: settings.colony.onEdge → true (packages/data/src/settings.ts: colony.onEdge) |
-| DD-63 | Rule change "grassland-crops-only" (direct) promoted from pc to board: Grassland gives 🍂 only, not 🌽. / Луг даёт только 🍂, без 🌽. Why: Grassland gives both food and crops, so food is everywhere and the coast matters little; with crops only, every terrain gives one product (forest timber since DD-56) and food comes from fish (and corn bonuses), so where to found a colony becomes a choice between the sea and the fields. To carry into the sources: terrain.grassland.yields → ["leaf"] (Terrain, D4 (production)) |
-| DD-64 | Rule change "farmer-crops" (direct) promoted from pc to board: Farmer: +1 🍂, not +1 🌽. / Фермер: +1 🍂 вместо +1 🌽. Why: With grassland on crops only, the farmer's +1 corn works only on the 11 corn-bonus cells; on crops he keeps his place on grassland. To carry into the sources: agents.farmer.mods.0.icons → ["leaf"] (Agents, D6 (effect)) |
-| DD-65 | Rule change "squanto-fish" (direct) promoted from pc to board: Squanto: +1 🐟, not +1 🌽. / Скванто: +1 🐟 вместо +1 🌽. Why: With grassland on crops only, Squanto's +1 corn works only on corn-bonus cells; fish is then the food every colony gathers. To carry into the sources: fathers.squanto.mods.0.icons → ["fish"] (Fathers, F16 (effect)) |
-| DD-66 | Rule change "indian-fish" (direct) promoted from pc to board: Indian: +1 🐟, not +1 🍂. / Индеец: +1 🐟 вместо +1 🍂. Why: With the farmer on crops, the converted Indian turns to the sea, so food has a helper of its own. To carry into the sources: agents.indian.mods.0.icons → ["fish"] (Sp Agents, E47 (effect)) |
-| DD-67 | Corn is gone from the game: food comes from fish only, so no tile carries a corn bonus (the importer drops all 14 printed ones, the 3 of DD-47 among them, until the workbook is edited), and food is drawn as a fish. One product per terrain (Q21: DD-63 to DD-66) |
-| DD-68 | Card names: the farmer is the Planter (Земледелец), and the Danish planter the Cane Planter (Плантатор), so that the common crops worker and the Danish expert never share a name. Ids, art and effects stay; the importer applies the names until the workbook carries them |
-| DD-69 | One master for the rules: `rules/`, one file per sheet of the spreadsheet (every cell as printed, each card's effect, English name and text check) plus `settings.json`, with `board`'s 11 changes and the import-time patches baked in. The game data is compiled from it, the Google Sheet that Dextrous prints from is published from it (values only), and the rulebook takes its values from it. `rulesets/board.json`, `pc.json`, `effects.ts`, `settings.ts` and `Colonization.xlsx` are gone; a change is tried in a sandbox ruleset and applied to `rules/` or dropped |
-| DD-70 | The Docks building is «Доки» in Russian, so that «Причал» names only the pier in Europe. Id, art and effect stay; the shipyard requires «Доки» |
-| DD-71 | Rule change "tax-pay-bell" (direct) applied to the rules: Paying the tax gives +1 🔔. / Уплата налога даёт +1 🔔. Why: Nobody pays the tax: refusing costs 1 shared cube and paying gives nothing, so from round 4 no one paid (4 players, mixed bots). A bell for paying makes the cheap early taxes worth paying; the late ones stay too dear, so it adds about 0.5 bells per player. Changed: settings.tax.payBells → 1. |
+| DD-53 | Games rarely end by round 5 (Q14); covered by the "before round 8" target |
+| DD-54 | A damaged ship goes to Europe, or next to an own colony with a shipyard |
+| DD-55 | Settlements next to colonies are placed as usual; the distance rule limits founding only |
+| DD-56 | Forest gives timber only; fur needs a bonus or a trapper |
+| DD-57 | Supply stays as written: a card swap |
+| DD-58 | A 2-player game has no loyalist |
+| DD-59 | The loyalist takes a fallen colony at 1 per cube; intended |
+| DD-60 | Applied: recruiting with crosses is an action; crosses spent = agents looked at; Roger Williams takes up to 2 |
+| DD-61 | The King's army is called the Royal Army (Королевская армия) |
+| DD-62 | Applied: a colony may be founded on the map edge |
+| DD-63 | Applied: grassland gives 🍂 only |
+| DD-64 | Applied: Planter (farmer) gives +1 🍂 |
+| DD-65 | Applied: Squanto gives +1 🐟 |
+| DD-66 | Applied: Indian gives +1 🐟 |
+| DD-67 | Corn is gone; food is fish only |
+| DD-68 | Farmer renamed Planter (Земледелец); Danish planter renamed Cane Planter (Плантатор) |
+| DD-69 | `rules/` is the one master; the game data, the Google Sheet and the rulebook come from it |
+| DD-70 | The Docks building is «Доки»; «Причал» is only the pier |
+| DD-71 | Applied: paying the tax gives +1 🔔 |
+| DD-72 | Applied: excess warehouse goods are discarded at once |
+| DD-73 | Applied: one pool of 💨 for ship and pawn; move bonuses name no token; Scout 🎓, 6 🟡 |
+| DD-74 | Applied: landing or boarding costs the target cell, like any move |
+| DD-75 | Applied: a school swaps the agent for a profession it teaches; school 2 🟫, university 4 🟫 |
+| DD-76 | Applied: one icon and cube colour per resource: food 🟦 blue (🐟), timber 🟫 brown (🪵), crops 🟩 green (🌿: cash crops and fur), goods 🟧 orange (📦), silver ⬜ light grey (🪙 ingot). 🦫 fur is folded into 🌿, so John Rolfe also adds to fur. Earlier rows keep the old signs (🟨 food, 🟦 goods, 🍂 leaf) |
 
-## Proposed in this PRD, awaiting confirmation
-
-| # | Proposal | Why | Cost if reversed |
-|---|---|---|---|
-| PD-2 | Balance evidence (M2) before the interface (M3) | It may change rules the interface depends on | Low |
-| PD-3 | Web app in TypeScript, local, no server | Same code for simulation and play; easy to run and share | High |
-| PD-4 | Structured effects in a file beside the workbook, with out-of-date detection | Parsing Russian card text automatically would be unreliable | Medium |
-| PD-5 | Russian and English from the start | Content is Russian; retrofitting language support is costly | Medium |
-| PD-6 | Code identifiers in English, from `nickname` | Already in the workbook | Low |
-| PD-7 | Bots are conventional AI, not LLMs | Thousands of reproducible games are needed | Low |
-| PD-8 | Two rulesets, `board` and `pc`, with conversion labels; each `pc` change is promoted or dropped (PRD section 5) | Puts DD-10 into practice | Low |
-| PD-10 | The interface plays the real rules engine with the test bots, bundled from their sources into `packages/web/dist/app.js` by `pnpm web:build`, so every step of the rules has a place in the interface | Faked steps hid missing screens and wrong numbers | Low |
-
-## Open questions
-
-Work can start with the defaults. "Matters" is an estimate of the effect on results.
-
-None at the moment. Smaller defaults are marked **[D]** in [rules-spec.md](rules-spec.md).
-
-Answered: Q1 (DD-11), Q2 (DD-12), Q3 (DD-13), Q4 (DD-22), Q5 (DD-14), Q6 (DD-15), Q7 (DD-23), Q8 (DD-26), Q9 (DD-27), Q10 (DD-28), Q11 (DD-29), Q12 (DD-30), Q13 (DD-31), Q14 (DD-53), Q15 (DD-54), Q16 (DD-55), Q17 (DD-56), Q18 (DD-57), Q19 (DD-49 to DD-52), Q20 (DD-58), Q21 (DD-63 to DD-67).
+Questions Q1–Q21 are answered in DD-11 to DD-67.
 
 ## Source edits still to make
 
-Checked on the 15:13 versions. Done by the designer: activation rule, docks, ocean, Sepúlveda, terrain costs, spreadsheet wording of events. Since DD-69 the spreadsheet is published from `rules/`, so every spreadsheet edit is made there; what is left is the document, which the new rulebook replaces.
+The spreadsheet is published from `rules/`; what is left is the document, which the new rulebook replaces.
 
-| Where | Edit | From |
-|---|---|---|
-| Document, Принципы | Describe the two rings | DD-12 |
-| Document, Салон | "1 Отца-Основателя" → up to 2 | DD-22 |
-| Document, starting decks and stars | Follow the spreadsheet | DD-6 |
-| Document, Торговец | Education 🎓 in the document, 📖 in the spreadsheet | DD-6 |
-| Document, Поселенец | "Базовых построек" is not in the spreadsheet; every building is cheaper | DD-6 |
-| Document | Food is 🐟 only; the rules and resource lists lose 🌽 | DD-67 |
-| Document, agents | Farmer → Planter (Земледелец); Danish Planter → Cane Planter | DD-68 |
-| Document, Эквиано | Slaves go under the deck in the document, are removed in the spreadsheet | DD-6 |
-| Document, war | Each Royal Army cube attacks with 1 ⚔️, not 2 | DD-49 |
-| Document, tax | Refusing the tax gives no bell | DD-50 |
-| Document, tax | Refusing the tax adds 1 cube to the Royal Army, not 2 (solo unchanged) | DD-52 |
-| Document, war | With 2 players there is no loyalist; the war plays without the loyalist's steps | DD-58 |
-| Document | Call the King's army the Royal Army (Королевская армия) everywhere | DD-61 |
-| Document, Кресты | Recruiting is an action: play an agent, spend ✝️ (at least the round number), look at that many agents, take one to the discard, the rest to the bottom | DD-60 |
-| Document, Колонии | Remove «на краю карты»: a colony may be founded on the edge of the map | DD-62 |
+| Edit in the document | From |
+|---|---|
+| Describe the two rings | DD-12 |
+| Salon: up to 2 Fathers | DD-22 |
+| Starting decks, stars, Торговец, Поселенец, Эквиано: follow the spreadsheet | DD-6 |
+| Food is 🐟 only | DD-67 |
+| Planter and Cane Planter names | DD-68 |
+| Royal Army: cube attacks with 1; called Royal Army | DD-49, DD-61 |
+| Tax: no bell for refusing; 1 cube | DD-50, DD-52 |
+| 2 players: no loyalist | DD-58 |
+| Recruiting is an action | DD-60 |
+| Colonies may be on the map edge | DD-62 |
+
+## To adopt a change
+
+1. `pnpm rules apply proposed <id>` (or Design bench → Export → Into the rules): writes `rules/`, rebuilds, logs here.
+2. Update the printed texts it lists (`pnpm rules todo`), then `pnpm rules:review`.
+3. `pnpm rules:sheet publish`.

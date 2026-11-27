@@ -138,7 +138,7 @@ describe('Round', () => {
     runTasks(s, { t: 'roundEnd' });
     expect([s.round, s.first, year(s)]).toEqual([2, 1, 1640]);
   });
-  it('[T-7] warehouse excess is discarded at the end of the turn and after events', () => {
+  it('[T-7] the warehouse never holds more than its limit: the excess is discarded at once (DD-71)', () => {
     const s = game(1);
     colony(s, 0, at(5, 5));
     world(s, { [at(5, 5)]: 'grassland', [at(4, 4)]: 'ocean' });
@@ -146,12 +146,11 @@ describe('Round', () => {
     P(s).wh = stock({ food: 6 });
     play(s, 'farmer', 'produce', { icon: 'fish' });
     expect(total(P(s).wh)).toBe(6); // only food to discard, so no choice was needed
-    P(s).wh = stock({ food: 5, timber: 5 });
-    s.eventDeck = ['pontiacs_rebellion'];
-    act(s, { c: 'pass' }, { c: 'keep' });
-    expect(s.pending).toMatchObject({ kind: 'overflow', player: 0 });
-    act(s, { c: 'discard', r: 'food' }, { c: 'discard', r: 'food' }, { c: 'discard', r: 'timber' }, { c: 'discard', r: 'timber' });
-    expect(total(P(s).wh)).toBe(6);
+    P(s).wh = stock({ food: 5, timber: 2 });
+    act(s, { c: 'pass' });
+    expect(s.pending).toMatchObject({ kind: 'overflow', player: 0 }); // before anything else, the pass's own choices included
+    act(s, { c: 'discard', r: 'timber' });
+    expect([total(P(s).wh), s.pending?.kind]).toEqual([6, expect.not.stringMatching(/^overflow$/)]);
   });
   it('[T-8] recruiting takes an agent: with no cards there is nothing but to pass (DD-60)', () => {
     const s = game(1);
@@ -256,7 +255,7 @@ describe('Movement', () => {
     turn(s, 0, 'colonist');
     expect(canPlay(s, 'colonist', 'moveInfantry')).toBe(true); // only to embark
     play(s, 'colonist', 'moveInfantry');
-    expect(legal(s).map((c) => c.c).sort()).toEqual(['embark', 'end']);
+    expect(legal(s).map((c) => c.c).sort()).toEqual(['embark', 'end', 'switch']);
   });
   it('[M-4] own colonies may be entered, foreign ones and settlements not', () => {
     const s = game(2);
@@ -318,18 +317,30 @@ describe('Movement', () => {
     act(u, { c: 'cargo' }, { c: 'load', r: 'goods', n: 2 });
     expect(u.move!.points).toBe(3);
   });
-  it('[M-8] disembarking and embarking let the other token use what is left', () => {
+  it('[M-1] the ship and the pawn share the points of one move, in any order', () => {
+    const s = game(1);
+    world(s, { [at(5, 5)]: 'grassland', [at(5, 6)]: 'grassland' });
+    P(s).ship = at(3, 5);
+    P(s).inf = at(5, 5);
+    turn(s, 0, 'colonist');
+    play(s, 'colonist', 'moveShip');
+    act(s, { c: 'step', cell: at(3, 6) }, { c: 'switch' });
+    expect(can(s, { c: 'switch' })).toBe(false); // switching back needs a step in between
+    act(s, { c: 'step', cell: at(5, 6) }, { c: 'switch' }, { c: 'step', cell: at(3, 7) });
+    expect([s.move!.token, s.move!.points, P(s).ship, P(s).inf]).toEqual(['ship', 2, at(3, 7), at(5, 6)]);
+  });
+  it('[M-8] landing and boarding are steps that cost what the cell costs', () => {
     const s = game(1);
     world(s, { [at(5, 5)]: 'mountains', [at(5, 6)]: 'grassland' });
     P(s).ship = at(3, 5);
     turn(s, 0, 'colonist', 'colonist', 'colonist');
     play(s, 'colonist', 'moveShip');
-    act(s, { c: 'step', cell: at(4, 5) }, { c: 'disembark', cell: at(5, 5) });
-    expect([s.move!.token, s.move!.points, P(s).inf]).toEqual(['infantry', 3, at(5, 5)]);
-    act(s, { c: 'step', cell: at(5, 6) }, { c: 'embark' });
-    expect([s.move!.token, s.move!.points, P(s).inf]).toEqual(['ship', 1, 'ship']);
-    act(s, { c: 'step', cell: at(3, 5) });
-    expect(P(s).ship).toBe(at(3, 5));
+    act(s, { c: 'step', cell: at(4, 5) }, { c: 'disembark', cell: at(5, 6) });
+    expect([s.move!.token, s.move!.points, P(s).inf]).toEqual(['infantry', 3, at(5, 6)]);
+    act(s, { c: 'embark' }); // boarding enters the ship's water cell: 1
+    expect([s.move!.token, s.move!.points, P(s).inf]).toEqual(['ship', 2, 'ship']);
+    act(s, { c: 'disembark', cell: at(5, 5) }); // mountains take all that remain
+    expect([s.move, P(s).inf]).toEqual([null, at(5, 5)]);
   });
   it('[M-9] the hold has four slots for goods, infantry and damage', () => {
     const s = game(1);
@@ -473,7 +484,7 @@ describe('Colonies', () => {
     build(s, 0, 'stockade');
     turn(s, 0, 'colonist', 'colonist');
     play(s, 'colonist', 'produce', { icon: 'silver' });
-    play(s, 'colonist', 'produce', { icon: 'leaf' });
+    play(s, 'colonist', 'produce', { icon: 'crops' });
     expect([P(s).wh.silver, P(s).wh.crops]).toEqual([1, 1]);
   });
   it('[F-5] capacity 6, or 12 with a warehouse', () => {

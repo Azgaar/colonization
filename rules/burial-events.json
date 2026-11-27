@@ -343,7 +343,7 @@
       "nickname": "Hidden Granaries",
       "name": "Тайные амбары",
       "flavor": "Скрытые в пещерах запасы маиса, оставленные прошлыми поколениями.",
-      "effect 1": "Получите 4 🟨",
+      "effect 1": "Получите 4 🟦",
       "image": "burial-back.png",
       "type": "🌟",
       "$fx": [
@@ -354,14 +354,14 @@
           }
         }
       ],
-      "$checked": "dde8da3088"
+      "$checked": "7542122c71"
     },
     {
       "copies": 1,
       "nickname": "Smugglers Cave",
       "name": "Пещера контрабандистов",
       "flavor": "Кто-то спрятал здесь плоды своего нелегального труда.",
-      "effect 1": "Получите 2 🟩 и 2 🟦",
+      "effect 1": "Получите 2 🟩 и 2 🟧",
       "image": "burial-back.png",
       "type": "🌟",
       "$fx": [
@@ -373,7 +373,7 @@
           }
         }
       ],
-      "$checked": "74cfe32320"
+      "$checked": "93c4c1847a"
     },
     {
       "copies": 1,

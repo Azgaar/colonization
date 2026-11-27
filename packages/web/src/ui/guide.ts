@@ -12,7 +12,7 @@ export const openGuide = (at = G.at) => { G.open = true; G.at = at; guide(); };
 export const guideOpen = () => G.open;
 
 function sections(): Section[] {
-  const s = D.settings, tax = s.tax.track, ic = (n: string) => icon(n, 17), fur = D.terrainYields.forest?.includes('fur');
+  const s = D.settings, tax = s.tax.track, ic = (n: string) => icon(n, 17), fur = D.terrainYields.forest?.includes('crops');
   return [
     { id: 'goal', title: msg('guide.goal'), items: [
       msg('guide.govern_colony', { firstYear: s.rounds.firstYear, v: s.rounds.firstYear + (s.rounds.max - 1) * s.rounds.yearStep, max: s.colony.max }),
@@ -35,13 +35,13 @@ function sections(): Section[] {
     { id: 'move', title: msg('guide.moving_exploring'), items: [
       msg('guide.one_action', { ship: ic('ship'), infantry: ic('infantry'), points: s.move.points }),
       msg('guide.moving_clouds', { explore: s.move.explore }),
-      msg('guide.infantry_rides', { embark: s.move.embark }),
+      msg('guide.infantry_rides'),
       msg('guide.hold_places', { size: s.hold.size, cargo: s.move.cargo }),
       msg('guide.edge_map'),
     ] },
     { id: 'colony', title: msg('guide.colonies'), items: [
       msg('guide.infantry_founds', { edge: s.colony.onEdge ? '' : t('guide.not_edge'), value: s.colony.foundCost.value, v: ic(s.colony.foundCost.resource) }),
-      msg('guide.produce', { forest: t(fur ? 'guide.forest_fur' : 'guide.forest', { timber: ic('timber'), fur: ic('fur') }), food: ic('food'), silver: ic('silver'), fish: ic('fish') }),
+      msg('guide.produce', { forest: t(fur ? 'guide.forest_fur' : 'guide.forest', { timber: ic('timber') }), food: ic('food'), silver: ic('silver'), fish: ic('fish') }),
       msg('guide.build_timber', { max: s.buildings.max }),
       msg('guide.warehouse_resources', { base: s.warehouse.base }),
       msg('guide.supply_1'),

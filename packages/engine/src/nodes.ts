@@ -10,6 +10,7 @@ import {
 } from './util.ts';
 import { colonyProblem, colonyWater, distance, explorable, inEurope, nearestColony, reveal, tokenAt } from './map.ts';
 import { loseBuilding, shipToEurope } from './combat.ts';
+import { tokenStops } from './moves.ts';
 import { addBuilding, canOwnBuilding, foundColony, gainFather, refreshPier, removeAgent } from './turn.ts';
 
 interface Ctx { p: number; cell?: number }
@@ -141,7 +142,7 @@ const nodes: { [K in Node['n']]: Fn<K> } = {
   moves(s, n) { if (s.move && !s.move.ended) s.move.points += n.add; },
   toEurope(s, n, { p }) {
     if (scoutIgnores(s, n)) return;
-    if (s.move?.token === 'infantry') { s.players[p].inf = 'europe'; s.move.ended = true; log(s, { e: 'toEurope', p, token: 'infantry' }); }
+    if (s.move?.token === 'infantry') { s.players[p].inf = 'europe'; tokenStops(s, p, 'infantry'); log(s, { e: 'toEurope', p, token: 'infantry' }); }
     else shipToEurope(s, p);
   },
   toColonyWater(s, _, { p }) { if (s.move) s.move.ended = true; ask(s, { kind: 'colonyWater', player: p }); },
@@ -287,7 +288,7 @@ task('eventPhase', (s) => {
   log(s, { e: 'event', id });
   push(s,
     ...(id ? [{ t: 'nodes', nodes: s.def.events[id].do, p: s.first }] : []),
-    { t: 'eventDone' }, ...turnOrder(s).map((p) => ({ t: 'overflow', p, from: 'wh' })), { t: 'taxPhase' }, { t: 'roundEnd' });
+    { t: 'eventDone' }, { t: 'taxPhase' }, { t: 'roundEnd' });
 });
 task('eventDone', (s) => { s.event = null; });
 

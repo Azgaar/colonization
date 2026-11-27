@@ -1,6 +1,6 @@
 # Interface
 
-The game in the browser (milestones M3 and M4). It plays the real rules engine: people in their seats (seat 0, and more for hot-seat), bots in the others at their difficulty, plus the design bench for changing and testing rules. It grew out of the interface prototype (DD-43, PD-10) and is now TypeScript in strict mode, built with rolldown.
+The game in the browser (milestones M3 and M4). It plays the real rules engine: people in their seats (seat 0, and more for hot-seat), bots in the others at their difficulty, plus the design bench for changing and testing rules. It grew out of the interface prototype (DD-43) and is now TypeScript in strict mode, built with rolldown.
 
 ## Running
 

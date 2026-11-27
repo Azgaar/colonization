@@ -32,9 +32,9 @@ h4 .ic, th .ic { width: 1.1em; height: 1.1em; }
 /* Headings: chapters run on, each under a slim picture band; sections stay with their text. */
 h2, h3, h4 { font-family: var(--sc); color: var(--teal); line-height: 1.12; break-after: avoid; }
 .chapter { margin-top: 7mm; }
-.chapter > header { margin: 0 0 3mm; break-inside: avoid; break-after: avoid; }
-.chapter > header + *, .chapter > header + h3 + * { break-before: avoid; }
-.chapter > header + .cols > :first-child, .chapter > header + .cols > :first-child + * { break-before: avoid; }
+.chapter > header { margin: 0 0 3mm; break-inside: avoid; }
+/* A header never ends a page: its unbreakable box reserves room for the first lines of its chapter, which then flow back up over that room. */
+.chapter > header { padding-bottom: 26mm; margin-bottom: -23mm; }
 .chapter > header img { display: block; width: 100%; height: 22mm; object-fit: cover; object-position: 50% 30%; border-radius: 2.5mm; }
 .chapter.ref > header img { height: 13mm; }
 .chapter > header h2 { font-size: 18pt; margin: 2.5mm 0 .8mm; }
@@ -68,6 +68,11 @@ table { width: 100%; border-collapse: collapse; margin: 1.5mm 0 3mm; font: 400 8
 th { text-align: left; font: 700 8pt var(--sc); color: var(--teal); border-bottom: .4mm solid var(--teal); padding: .7mm 1.2mm; }
 td { padding: .7mm 1.2mm; border-bottom: .2mm solid var(--line); vertical-align: middle; }
 .cols table.terrain, .cols table.res, .cols table.narrow { column-span: none; }
+td.nw { white-space: nowrap; }
+th.num, td.num { text-align: right; }
+td.num { white-space: nowrap; }
+/* A resource cube as the table uses it: a small square in the cube's colour. */
+.cube { display: inline-block; width: .85em; height: .85em; margin-right: .35em; vertical-align: -.08em; border-radius: .14em; background: var(--c); box-shadow: inset 0 -.12em 0 #0003, 0 0 0 .2mm #0004; }
 tr { break-inside: avoid; }
 
 /* Card references: a picture, the name and what the card costs, its text and its ruling.
@@ -164,7 +169,7 @@ body { counter-reset: chapter; }
 .chapter:not(.ref) > .cols > p:first-child::first-letter { float: left; font: 800 25pt/.82 var(--sc); color: var(--teal); padding: 1mm 1.3mm 0 0; }
 
 /* An anchor closes each chapter of the rules. */
-.chapter:not(.ref) > :last-child::after { content: ""; display: block; break-before: avoid; height: 4.5mm; margin: 2mm auto 0; max-width: 30mm; background: var(--orn-anchor) center / contain no-repeat; column-span: all; }
+.chapter:not(.ref) > :last-child::after { content: ""; display: block; height: 4.5mm; margin: 2mm auto 0; max-width: 30mm; background: var(--orn-anchor) center / contain no-repeat; column-span: all; }
 
 /* Box emblems. */
 .example::before, .remember::before, .detail::before { padding-left: 4.6mm; background: left center / 3.6mm no-repeat; }
@@ -174,3 +179,6 @@ body { counter-reset: chapter; }
 
 /* The reference starts a page of its own. */
 .chapter.new-page { break-before: page; margin-top: 0; }
+
+/* The quick reference is one page to keep at hand: never split. */
+.book > .chapter:last-child > * { break-inside: avoid; }

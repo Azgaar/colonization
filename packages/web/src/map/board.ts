@@ -1,6 +1,6 @@
 /* The map: a tilted plane of fixed pictures, with everything that stands on it as separate upright elements. */
 import { map, type Move } from '@col/engine';
-import { $, ACT, art, at, colonyAt, column, D, lang, me, P, pick, RES, settlementAt, SIZE, syncWidth, t, tokenAt, W } from '../data.ts';
+import { $, ACT, art, at, colonyAt, colonyName, column, D, lang, me, P, pick, RES, settlementAt, SIZE, syncWidth, t, tokenAt, W } from '../data.ts';
 import { DEFS, roundel, SHAPES } from '../icons.ts';
 import { Bonus } from './bonus.ts';
 import { stage, type Pitch, type Stage } from './camera.ts';
@@ -54,10 +54,16 @@ function cargoPlate(i: number, x: number, y: number) {
   const w = l.length ? l.length * 34 + 10 : 66, item = ([k, n]: [string, number], j: number) => `<svg x="${7 + j * 34}" y="2" width="15" height="15" viewBox="0 0 24 24" color="#f7f1e1">${SHAPES[k]}</svg><text x="${24 + j * 34}" y="15" font-size="14.500" font-weight="800" fill="#f7f1e1">${n}</text>`;
   return `<g transform="translate(${x - w / 2} ${y})"><rect width="${w}" height="19" rx="9.500" fill="#0f3436e6"/>${l.length ? l.map(item).join('') : `<text x="${w / 2}" y="14.500" text-anchor="middle" font-size="13" font-weight="700" fill="#f7f1e1" fill-opacity=".8">${t('board.empty')}</text>`}</g>`;
 }
-/** A colony under the pointer: how well it holds. */
+/** How wide a line of the map's plates is, in map units. */
+let pen: CanvasRenderingContext2D | null = null;
+function wide(s: string, px: number) {
+  if (!pen) { pen = document.createElement('canvas').getContext('2d')!; pen.font = `800 ${px}px ${getComputedStyle(document.body).getPropertyValue('--ui') || 'sans-serif'}`; }
+  return pen.measureText(s).width;
+}
+/** A colony under the pointer: its name and how well it holds. */
 function colonyPlate(c: Colony, x: number, y: number) {
-  const mine = c.owner === me, w = 56;
-  return `<g transform="translate(${x - w / 2} ${y})"><rect width="${w}" height="20" rx="10" fill="${mine ? D.players[me].color : '#0f3436e6'}" ${mine ? 'stroke="#fff" stroke-width="2"' : ''}/>${roundel(-4, -3, c.owner, 26)}<text x="28" y="15" font-size="14.500" font-weight="800" fill="#f7f1e1">${c.defence}</text><svg x="38" y="4" width="12" height="12" viewBox="0 0 24 24" color="#f7f1e1">${SHAPES.sword}</svg></g>`;
+  const mine = c.owner === me, name = colonyName(c), nw = Math.ceil(wide(name, 13.5)), d = 28 + nw + 8, w = d + 30;
+  return `<g transform="translate(${x - w / 2} ${y})"><rect width="${w}" height="20" rx="10" fill="${mine ? D.players[me].color : '#0f3436e6'}" ${mine ? 'stroke="#fff" stroke-width="2"' : ''}/>${roundel(-4, -3, c.owner, 26)}<text x="28" y="15" font-size="13.500" font-weight="800" fill="#f7f1e1">${name}</text><text x="${d}" y="15" font-size="14.500" font-weight="800" fill="#f7f1e1">${c.defence}</text><svg x="${d + 10}" y="4" width="12" height="12" viewBox="0 0 24 24" color="#f7f1e1">${SHAPES.sword}</svg></g>`;
 }
 /** Something that stands on the map: where (map units), how high in the stack, whether it takes the pointer, and its picture. */
 interface Thing { id: string; x: number; y: number; z: number; hit: boolean; html: string }
@@ -81,7 +87,7 @@ const GLYPH: Record<string, string> = {
   wreck: '<path d="M8 18 14.500 3.500" stroke="currentColor" stroke-width="2.200" stroke-linecap="round"/><path d="M13.500 6.500l6.500 3-2.200 4-1.800-1.600-1.800 2.600Z" fill="currentColor"/><path d="M2 20.500q2.500-2.500 5 0t5 0 5 0 5 0" stroke="currentColor" stroke-width="1.800" fill="none" stroke-linecap="round"/>',
 };
 /** The pictogram of the good each bonus resource gives, as in the warehouse. */
-const BONUS: Record<string, string> = { corn: 'food', fish: 'fish', leaf: 'crops', fur: 'fur', timber: 'timber', silver: 'silver' };
+const BONUS: Record<string, string> = { fish: 'fish', crops: 'crops', timber: 'timber', silver: 'silver' };
 /** What stands on the map, each as one sign in the middle of its cell. Squares are places: a colony in its nation's colour, a smaller settlement in the natives' brown. Discs are units in their nation's colour.
  * All of these have a white rim, but a settlement alarmed enough to attack (hostility 4 or more) has a red one. Ruins and wrecks are dark grey hexagons. A bonus resource is the bare pictogram of its good, thinly outlined, in the bottom right corner of its cell. */
 function overview(sp: Spaces, at: Put, near: (c: number) => boolean) {
@@ -249,7 +255,13 @@ function reach() {
   // The closed land to explore, and the pointer over it, are marked over the clouds.
   const hit = o?.length && h !== null ? `<path d="${quad(h, 3)}" fill="#fff08a" fill-opacity=".4" stroke="#fff" stroke-width="3.500" stroke-linejoin="round"/>` : '', up = h !== null && !D.open[h];
   above.innerHTML = area(closed, 'closed') + (up ? hit : '');
-  paths.innerHTML = area(sea, 'sea') + area(foot, 'foot') + (up ? '' : hit) + sites.map(flag).join('') + (go?.path ? `<polyline points="${[from, ...go.path].map((c: number) => { const [x, y] = at(c); return pt(x + 32, y + 32); }).join(',')}" class="way"/>` : '');
+  paths.innerHTML = area(sea, 'sea') + area(foot, 'foot') + (up ? '' : hit) + sites.map(flag).join('') + (go?.path ? `<polyline points="${[from, ...go.path].map((c: number) => { const [x, y] = at(c); return pt(x + 32, y + 32); }).join(',')}" class="way"/>` : '') + (mv ? cost(way, true) : go ? cost(Places.wayOf(go as Opt), false) : '');
+}
+/* What the way costs: each step's points on the cell it enters; on a move, also the points spent of those there were at its end (an agent in hand says it in the bubble by the pointer). */
+function cost(w: Way | undefined, total: boolean) {
+  if (!w?.path.length) return '';
+  const spot = (c: number, dy: number) => { const [x, y] = at(c), [a, b] = B.stage.point(x + 32, y + 32 + dy); return `translate(${a.toFixed(1)} ${b.toFixed(1)})`; }, spent = w.costs.reduce((n, k) => n + k, 0);
+  return w.path.map((c, i) => `<g class="pace" transform="${spot(c, 0)}"><circle r="10"/><text y="4.500">${w.costs[i]}</text></g>`).join('') + (total ? `<g class="spent" transform="${spot(w.c, -26)}"><rect x="-21" y="-12" width="42" height="24" rx="12"/><text y="5">${spent}/${spent + w.left}</text></g>` : '');
 }
 /* Bonus resources lie on the ground: painted once into their own layer of the map. */
 let grounded = '';

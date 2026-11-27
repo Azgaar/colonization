@@ -29,7 +29,7 @@ export interface Player {
 
 export interface Colony { cell: number; owner: number }
 export interface Settlement { n: number; cell: number; tribe: string; pop: number; ally: number | null; alive: boolean }
-export interface Move { player: number; token: 'ship' | 'infantry'; points: number; ended: boolean; scout: boolean; card: string }
+export interface Move { player: number; token: 'ship' | 'infantry'; points: number; ended: boolean; scout: boolean; card: string; switched?: boolean }
 
 export type AttackMode = 'land' | 'landing' | 'shore' | 'naval' | 'bombard';
 export interface Combat {

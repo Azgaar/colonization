@@ -177,7 +177,7 @@ function scoreTurn(x: Situation): Considered[] {
   const sPaths = pl.damage === 0 ? shipPaths(s, pl.ship) : null;
   const sg = sPaths ? shipGoals(x, pl.ship, sPaths) : [];
   const lg = typeof pl.inf === 'number' ? landGoals(x, pl.inf, landPaths(s, me, [pl.inf])) : [];
-  const points = (card: string, token: 'ship' | 'infantry') => util.mods(s, me, 'move', card).reduce((n, m) => n + (m.token === token ? m.add : 0), s.def.settings.move.points);
+  const points = (card: string) => util.mods(s, me, 'move', card).reduce((n, m) => n + m.add, s.def.settings.move.points);
   const top = (goals: Goal[], p: number) => goals.reduce<Goal | null>((b, g) => (g.dist > 0 && (!b || worth(g, p) > worth(b, p)) ? g : b), null);
 
   const base: Considered[] = [];
@@ -189,7 +189,7 @@ function scoreTurn(x: Situation): Considered[] {
     switch (c.a) {
       case 'produce': case 'docks': {
         const y = cellYield(s, me, card, c.cell as number, (c.icon ?? 'fish') as 'fish', c.a === 'docks' ? 1 : 0)!;
-        const r = ({ corn: 'food', fish: 'food', timber: 'timber', leaf: 'crops', fur: 'crops', silver: 'silver' } as Record<string, Resource>)[(c.icon ?? 'fish') as string];
+        const r = ({ fish: 'food', timber: 'timber', crops: 'crops', silver: 'silver' } as Record<string, Resource>)[(c.icon ?? 'fish') as string];
         const free = Math.max(0, util.warehouseCap(s, me) - util.total(pl.wh));
         score = Math.min(y.total, free) * x.res[r];
         if (x.last && r === 'timber' && x.target && pl.wh.timber + y.total >= s.def.buildings[x.target].timber) score = 0.6;
@@ -204,9 +204,9 @@ function scoreTurn(x: Situation): Considered[] {
         else score = n * Math.max(x.res.goods, x.gold * s.price.goods * 0.6 * w.trade * (x.left > 1 ? 1 : 0)) - x.res.crops * 0.5;
         break;
       }
-      case 'moveShip': { const g = top(sg, points(card, 'ship')); score = g ? worth(g, points(card, 'ship')) : -0.1; why = g ? `ship: ${g.name}` : 'ship'; to = g?.to; break; }
+      case 'moveShip': { const g = top(sg, points(card)); score = g ? worth(g, points(card)) : -0.1; why = g ? `ship: ${g.name}` : 'ship'; to = g?.to; break; }
       case 'moveInfantry': {
-        const p = points(card, 'infantry'), g = pl.inf === 'ship' ? top(sg.filter((q) => q.then === 'disembark' && q.dist <= 1), p) : top(lg, p);
+        const p = points(card), g = pl.inf === 'ship' ? top(sg.filter((q) => q.then === 'disembark' && q.dist <= 1), p) : top(lg, p);
         score = g ? worth(g, p) : -0.1; why = g ? `infantry: ${g.name}` : 'infantry'; to = g?.to; break;
       }
       case 'found': score = siteValue(x, pl.inf as number) * (x.last ? 0.6 : 1); break;
@@ -229,7 +229,8 @@ function scoreTurn(x: Situation): Considered[] {
       }
       case 'repair': case 'shipyard': score = x.last ? 0 : 0.9 * Math.min(pl.damage, c.a === 'repair' ? 1 : 4); break;
       case 'build': score = buildingValue(x, c.building as string) - buildPrice(s, me, card, c.building as string) * 0.15; if (c.building !== x.target && !x.last && x.target && pl.wh.timber - buildPrice(s, me, card, c.building as string) < s.def.buildings[x.target].timber) score -= 0.2 + buildPrice(s, me, card, c.building as string) * w.timber; break;
-      case 'teach': score = w.teach * (agentValue(x, s.def.agents[card].base) - agentValue(x, c.target as string)); break;
+      // Schooling swaps the agent played for the profession chosen (DD-75).
+      case 'teach': score = w.teach * (agentValue(x, c.target as string) - agentValue(x, card)); break;
       case 'customs': score = (sellPrice(s, me, card, c.r as Resource) - 0.5) * x.gold; break;
       case 'smuggle': score = (s.price[c.r as Resource] - 1) * x.gold; break;
       case 'supply': score = 0.02 - (x.last ? 0 : x.res.food); break;
