@@ -1,6 +1,6 @@
 {
  "schema": 1,
- "sourceHash": "cb3d74979430fb98",
+ "sourceHash": "8db281e80a74a69a",
  "resources": {
   "food": {
    "id": "food",
@@ -39,7 +39,7 @@
    "ru": "океан",
    "en": "Ocean",
    "yields": [
-    "fish"
+    "food"
    ],
    "defence": 0,
    "move": 1
@@ -154,7 +154,7 @@
     {
      "mod": "production",
      "icons": [
-      "fish"
+      "food"
      ],
      "add": 1
     }
@@ -1373,7 +1373,7 @@
     {
      "mod": "production",
      "icons": [
-      "fish"
+      "food"
      ],
      "add": 1
     }
@@ -1584,7 +1584,7 @@
    "work": {
     "kind": "produce",
     "icon": "crosses",
-    "amount": 1
+    "amount": 2
    }
   },
   "stockade": {
@@ -1615,13 +1615,13 @@
    "ru": "таможня",
    "en": "Custom house",
    "copies": 1,
-   "edu": 2,
-   "timber": 4,
+   "edu": 1,
+   "timber": 3,
    "improvement": true,
    "requires": "warehouse",
    "work": {
     "kind": "sell",
-    "amount": 1
+    "amount": 2
    }
   },
   "shipyard": {
@@ -1668,7 +1668,7 @@
    "work": {
     "kind": "produce",
     "icon": "bells",
-    "amount": 3
+    "amount": 2
    }
   },
   "church": {
@@ -1683,7 +1683,7 @@
    "work": {
     "kind": "produce",
     "icon": "crosses",
-    "amount": 3
+    "amount": 4
    }
   },
   "fort": {
@@ -1692,7 +1692,7 @@
    "en": "Fort",
    "copies": 1,
    "edu": 0,
-   "timber": 5,
+   "timber": 3,
    "improvement": true,
    "requires": "stockade",
    "defence": 2
@@ -1945,7 +1945,7 @@
     {
      "mod": "production",
      "icons": [
-      "fish"
+      "food"
      ],
      "add": 1
     }
@@ -5224,7 +5224,7 @@
     },
     {
      "terrain": "ocean",
-     "bonus": "fish"
+     "bonus": "food"
     }
    ]
   },
@@ -5243,7 +5243,7 @@
     },
     {
      "terrain": "ocean",
-     "bonus": "fish"
+     "bonus": "food"
     },
     {
      "terrain": "grassland",
@@ -5276,7 +5276,7 @@
     },
     {
      "terrain": "ocean",
-     "bonus": "fish"
+     "bonus": "food"
     },
     {
      "terrain": "desert",
@@ -5311,7 +5311,7 @@
     },
     {
      "terrain": "ocean",
-     "bonus": "fish"
+     "bonus": "food"
     },
     {
      "terrain": "ocean"
@@ -5383,7 +5383,7 @@
     },
     {
      "terrain": "ocean",
-     "bonus": "fish"
+     "bonus": "food"
     },
     {
      "terrain": "grassland"
@@ -5458,7 +5458,7 @@
     },
     {
      "terrain": "ocean",
-     "bonus": "fish"
+     "bonus": "food"
     },
     {
      "terrain": "ocean"
@@ -5482,7 +5482,7 @@
     },
     {
      "terrain": "ocean",
-     "bonus": "fish"
+     "bonus": "food"
     },
     {
      "terrain": "ocean"
@@ -5549,7 +5549,7 @@
     },
     {
      "terrain": "ocean",
-     "bonus": "fish"
+     "bonus": "food"
     },
     {
      "terrain": "ocean"
@@ -5572,7 +5572,7 @@
     },
     {
      "terrain": "ocean",
-     "bonus": "fish"
+     "bonus": "food"
     }
    ]
   },
@@ -5600,7 +5600,7 @@
     },
     {
      "terrain": "ocean",
-     "bonus": "fish"
+     "bonus": "food"
     },
     {
      "terrain": "ocean"
@@ -5690,7 +5690,7 @@
     },
     {
      "terrain": "ocean",
-     "bonus": "fish"
+     "bonus": "food"
     },
     {
      "terrain": "ocean"
@@ -5706,7 +5706,7 @@
     },
     {
      "terrain": "ocean",
-     "bonus": "fish"
+     "bonus": "food"
     },
     {
      "terrain": "forest",
@@ -5873,7 +5873,7 @@
     },
     {
      "terrain": "ocean",
-     "bonus": "fish"
+     "bonus": "food"
     },
     {
      "terrain": "mountains"
@@ -5902,18 +5902,18 @@
     },
     {
      "terrain": "ocean",
-     "bonus": "fish"
+     "bonus": "food"
     },
     {
      "terrain": "ocean",
-     "bonus": "fish"
+     "bonus": "food"
     },
     {
      "terrain": "forest"
     },
     {
      "terrain": "ocean",
-     "bonus": "fish"
+     "bonus": "food"
     },
     {
      "terrain": "ocean",
@@ -5960,7 +5960,7 @@
     },
     {
      "terrain": "ocean",
-     "bonus": "fish"
+     "bonus": "food"
     }
    ]
   },
@@ -6018,7 +6018,7 @@
     },
     {
      "terrain": "ocean",
-     "bonus": "fish"
+     "bonus": "food"
     },
     {
      "terrain": "desert"
@@ -6028,7 +6028,7 @@
     },
     {
      "terrain": "ocean",
-     "bonus": "fish"
+     "bonus": "food"
     }
    ]
   },
@@ -6208,7 +6208,7 @@
    "cells": [
     {
      "terrain": "ocean",
-     "bonus": "fish"
+     "bonus": "food"
     },
     {
      "terrain": "ocean"
@@ -6334,7 +6334,7 @@
     },
     {
      "terrain": "ocean",
-     "bonus": "fish"
+     "bonus": "food"
     },
     {
      "terrain": "mountains"
@@ -6502,7 +6502,7 @@
     },
     {
      "terrain": "ocean",
-     "bonus": "fish"
+     "bonus": "food"
     },
     {
      "terrain": "forest"
@@ -6575,7 +6575,7 @@
     },
     {
      "terrain": "ocean",
-     "bonus": "fish"
+     "bonus": "food"
     },
     {
      "terrain": "tundra",
@@ -6594,7 +6594,7 @@
     },
     {
      "terrain": "ocean",
-     "bonus": "fish"
+     "bonus": "food"
     },
     {
      "terrain": "ocean"
@@ -6614,7 +6614,7 @@
     },
     {
      "terrain": "ocean",
-     "bonus": "fish"
+     "bonus": "food"
     }
    ]
   },
@@ -6630,7 +6630,7 @@
     },
     {
      "terrain": "ocean",
-     "bonus": "fish"
+     "bonus": "food"
     },
     {
      "terrain": "ocean",
@@ -6666,7 +6666,7 @@
     },
     {
      "terrain": "ocean",
-     "bonus": "fish"
+     "bonus": "food"
     },
     {
      "terrain": "tundra"
@@ -6699,7 +6699,7 @@
     },
     {
      "terrain": "ocean",
-     "bonus": "fish"
+     "bonus": "food"
     },
     {
      "terrain": "ocean"
@@ -6752,7 +6752,7 @@
     },
     {
      "terrain": "ocean",
-     "bonus": "fish"
+     "bonus": "food"
     }
    ]
   },
@@ -6761,7 +6761,7 @@
    "cells": [
     {
      "terrain": "ocean",
-     "bonus": "fish"
+     "bonus": "food"
     },
     {
      "terrain": "forest"
@@ -6787,7 +6787,7 @@
     },
     {
      "terrain": "ocean",
-     "bonus": "fish"
+     "bonus": "food"
     }
    ]
   },
@@ -6799,7 +6799,7 @@
     },
     {
      "terrain": "ocean",
-     "bonus": "fish"
+     "bonus": "food"
     },
     {
      "terrain": "ocean"
@@ -6847,7 +6847,7 @@
     },
     {
      "terrain": "ocean",
-     "bonus": "fish"
+     "bonus": "food"
     },
     {
      "terrain": "tundra"
@@ -6872,7 +6872,7 @@
     },
     {
      "terrain": "ocean",
-     "bonus": "fish"
+     "bonus": "food"
     },
     {
      "terrain": "ocean"
@@ -6882,7 +6882,7 @@
     },
     {
      "terrain": "ocean",
-     "bonus": "fish"
+     "bonus": "food"
     },
     {
      "terrain": "grassland"
@@ -6900,7 +6900,7 @@
    "cells": [
     {
      "terrain": "ocean",
-     "bonus": "fish"
+     "bonus": "food"
     },
     {
      "terrain": "tundra"
@@ -7006,7 +7006,7 @@
     },
     {
      "terrain": "ocean",
-     "bonus": "fish"
+     "bonus": "food"
     },
     {
      "terrain": "ocean"
@@ -7022,7 +7022,7 @@
     },
     {
      "terrain": "ocean",
-     "bonus": "fish"
+     "bonus": "food"
     },
     {
      "terrain": "ocean"
@@ -7060,7 +7060,7 @@
     },
     {
      "terrain": "ocean",
-     "bonus": "fish"
+     "bonus": "food"
     },
     {
      "terrain": "tundra",
@@ -7083,7 +7083,7 @@
     },
     {
      "terrain": "ocean",
-     "bonus": "fish"
+     "bonus": "food"
     },
     {
      "terrain": "forest"
@@ -7143,7 +7143,7 @@
    "cells": [
     {
      "terrain": "ocean",
-     "bonus": "fish"
+     "bonus": "food"
     },
     {
      "terrain": "grassland"
@@ -7381,11 +7381,11 @@
     },
     {
      "terrain": "ocean",
-     "bonus": "fish"
+     "bonus": "food"
     },
     {
      "terrain": "ocean",
-     "bonus": "fish"
+     "bonus": "food"
     },
     {
      "terrain": "ocean"
@@ -7405,7 +7405,7 @@
     },
     {
      "terrain": "ocean",
-     "bonus": "fish"
+     "bonus": "food"
     }
    ]
   },
@@ -7481,7 +7481,7 @@
     },
     {
      "terrain": "ocean",
-     "bonus": "fish"
+     "bonus": "food"
     },
     {
      "terrain": "tundra"
@@ -7595,7 +7595,7 @@
     },
     {
      "terrain": "ocean",
-     "bonus": "fish"
+     "bonus": "food"
     },
     {
      "terrain": "ocean"
@@ -7622,7 +7622,7 @@
     },
     {
      "terrain": "ocean",
-     "bonus": "fish"
+     "bonus": "food"
     },
     {
      "terrain": "ocean"
@@ -7791,7 +7791,9 @@
    "maxDamage": 4
   },
   "damage": {
-   "sendsToEurope": true
+   "sendsToEurope": true,
+   "shipyardRepairs": true,
+   "repairOnBuild": false
   },
   "warehouse": {
    "base": 6
@@ -7826,7 +7828,8 @@
   "crosses": {
    "max": 15,
    "recruitPerRound": 1,
-   "recruitAction": true
+   "recruitAction": true,
+   "everyRound": false
   },
   "collection": {
    "min": 4
@@ -7836,10 +7839,11 @@
    "maxHostility": 5,
    "allianceMax": 1,
    "allianceBreak": 4,
-   "giftDice": 3,
-   "giftBase": 1,
+   "giftDice": 0,
+   "giftBase": 3,
    "preachMin": 0,
-   "afterAttack": 5
+   "afterAttack": 5,
+   "giftResource": "any"
   },
   "activation": {
    "giftMaxHostility": 2,
@@ -7847,7 +7851,8 @@
    "gift": 1
   },
   "raid": {
-   "resources": 2
+   "resources": 2,
+   "stoppedBy": "stockade"
   },
   "production": {
    "emptyMeans": "noToken"
@@ -7867,9 +7872,6 @@
   },
   "europe": {
    "safe": true
-  },
-  "fort": {
-   "replacesStockade": true
   },
   "war": {
    "bells": 15,

@@ -4,9 +4,9 @@ export type Resource = 'food' | 'timber' | 'crops' | 'goods' | 'silver';
 export const RESOURCES: readonly Resource[] = ['food', 'timber', 'crops', 'goods', 'silver'];
 
 /** What a production action yields: one icon per resource (fish is food), plus bells and crosses. */
-export type Icon = 'fish' | 'timber' | 'crops' | 'goods' | 'silver' | 'bells' | 'crosses';
+export type Icon = 'food' | 'timber' | 'crops' | 'goods' | 'silver' | 'bells' | 'crosses';
 export const ICON_RESOURCE: Record<Exclude<Icon, 'bells' | 'crosses'>, Resource> = {
-  fish: 'food', timber: 'timber', crops: 'crops', goods: 'goods', silver: 'silver',
+  food: 'food', timber: 'timber', crops: 'crops', goods: 'goods', silver: 'silver',
 };
 
 export type TerrainId = 'ocean' | 'forest' | 'grassland' | 'mountains' | 'desert' | 'tundra';
@@ -148,7 +148,11 @@ export interface Settings {
   cargo: { costPer: 'operation' | 'unit' };
   explore: { diagonal: boolean };
   hold: { size: number; maxDamage: number };
-  damage: { sendsToEurope: boolean };
+  damage: { sendsToEurope: boolean;
+    /** A damaged ship that takes refuge by its owner's shipyard is fully repaired there at once. Off: it arrives damaged. */
+    shipyardRepairs: boolean;
+    /** Building a shipyard repairs its owner's ship at once, wherever it is. */
+    repairOnBuild: boolean };
   warehouse: { base: number };
   colony: {
     max: number; foundCost: { resource: Resource; value: number };
@@ -165,18 +169,23 @@ export interface Settings {
     max: number; recruitPerRound: number;
     /** Recruiting is a card action: spend at least the round number in crosses and look at that many agents. Off: a free look at the top agent (A-7, T-8). */
     recruitAction: boolean;
+    /** On: a chapel or church is not worked but gives its ✝️ at the end of every round (the best one a player owns). */
+    everyRound: boolean;
   };
   collection: { min: number };
-  natives: { maxSettlements: number; maxHostility: number; allianceMax: number; allianceBreak: number; giftDice: number; giftBase: number; preachMin: number; afterAttack: number };
+  natives: { maxSettlements: number; maxHostility: number; allianceMax: number; allianceBreak: number; giftDice: number; giftBase: number; preachMin: number; afterAttack: number;
+    /** What a gift costs: 1 goods, or 1 resource of any kind. */
+    giftResource: 'goods' | 'any' };
   activation: { giftMaxHostility: number; raidMinHostility: number; gift: number };
-  raid: { resources: number };
+  raid: { resources: number;
+    /** The building whose owner is never raided. */
+    stoppedBy: string };
   production: { emptyMeans: 'noToken' | 'noForeignToken' };
   combat: {
     successFaces: number[]; diceCap: number | null; countPlayedCard: boolean; supportFromCriminalSlave: boolean;
     landingPenalty: number; infantryVsShipPenalty: number; colonyDefence: number; victoryBells: number;
   };
   europe: { safe: boolean };
-  fort: { replacesStockade: boolean };
   war: {
     bells: number; refStrength: number; hostileCubes: number; hostileFrom: number; allyCubes: number; mercenaryGold: number;
     diceCap: number; refStrengthIncludesTactic: boolean;

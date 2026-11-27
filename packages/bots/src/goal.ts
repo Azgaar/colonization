@@ -2,11 +2,11 @@ import type { ChoiceOption, Resource } from '@col/data';
 import { RESOURCES } from '@col/data';
 import type { Choice } from '@col/engine';
 import {
-  buildingYield, buildPrice, cardStrength, cellYield, fatherLimit, foundCost, map, nextU32, scorePlayer, seedRng, sellPrice, taxRate, util,
+  buildingYield, buildPrice, cardStrength, cellYield, fatherLimit, foundCost, map, nextU32, recruitCost, scorePlayer, seedRng, sellPrice, taxRate, util,
 } from '@col/engine';
 import type { Bot } from './random.ts';
 import { firstStep, landPaths, shipPaths, type Paths } from './paths.ts';
-import { agentValue, buildingValue, fatherValue, hireValue, lead, nodesValue, read, siteValue, warPoints, type Situation } from './value.ts';
+import { agentValue, buildingValue, fatherValue, giftGain, hireValue, lead, nodesValue, raidExposure, read, recruitPick, siteValue, warPoints, type Situation } from './value.ts';
 import { cardPower, outlook } from './outlook.ts';
 import { planAssault, planDefence } from './war.ts';
 import { BASE, type Weights } from './weights.ts';
@@ -155,18 +155,31 @@ function nativeValue(x: Situation, n: number): number {
   const { s, me } = x, z = s.settlements[n - 1], pl = s.players[me], h = util.combinedHostility(s, me, z.tribe);
   let v = 0;
   if (s.nativesLeft > 0 && pl.crosses >= h) v = Math.max(v, preachValue(x, h));
+  if (canGift(x)) v = Math.max(v, giftValue(x, n));
   if (z.ally === null && h <= 1 && x.cards.some((c) => s.def.agents[c].edu === 2 || s.def.agents[c].base === 'scout')) v = Math.max(v, allyValue(x));
   const best = Math.max(0, ...pl.hand.map((c) => (c === '?' ? 0 : cardStrength(s, c, 'infantry', true, z.cell))));
   if (best > 0) v = Math.max(v, conquestValue(x, n, 1 + best));
   return v;
 }
+/** What a gift costs us: 1 goods, or our cheapest resource where any will do. */
+const giftCost = (x: Situation) => (x.s.def.settings.natives.giftResource === 'any' ? Math.min(...RESOURCES.filter((r) => x.s.players[x.me].wh[r] > 0).map((r) => x.res[r]), 9) : x.res.goods);
+const canGift = (x: Situation) => (x.s.def.settings.natives.giftResource === 'any' ? util.total(x.s.players[x.me].wh) > 0 : x.s.players[x.me].wh.goods >= 1);
+/** A gift: the raids it spares us, and a step towards an alliance, against the goods it costs. */
+function giftValue(x: Situation, n: number): number {
+  const z = x.s.settlements[n - 1];
+  return (z.ally === null && x.s.hostility[z.tribe] >= 2 ? 0.5 * allyValue(x) : 0) + giftGain(x, z.tribe) - giftCost(x) - (x.last ? 0.6 : 0.1);
+}
+/** Raids a preaching may bring: hostility rises by 1, unless John Eliot keeps it calm. */
+const preachAnger = (x: Situation, tribe: string) => (x.s.players[x.me].fathers.includes('john_eliot') ? 0 : Math.max(0, raidExposure(x, tribe, x.s.hostility[tribe] + 1) - raidExposure(x)));
 const allyValue = (x: Situation) => x.w.alliance * 3 * x.strength * (1 - x.loyal) + (x.s.players[x.me].fathers.includes('peter_minuit') ? 1 : 0);
 const preachValue = (x: Situation, cost: number) => x.w.native * 1.2 + (x.last ? 0 : agentValue(x, 'indian')) - cost * x.w.cross * 0.6 - 0.1;
 function conquestValue(x: Situation, n: number, strength: number): number {
   const { s, w } = x, z = s.settlements[n - 1], t = s.def.tribes[z.tribe];
   const p = success(strength - z.pop - s.def.terrain[s.map.terrain[z.cell]!].defence);
   const loot = z.pop === 1 ? (t.loot.gold ?? 0) * x.gold + (t.loot.res ? t.loot.amount! * x.res[t.loot.res] : 0) : ((t.loot.gold ?? 0) * x.gold * 0.5) / z.pop;
-  const angry = s.hostility[z.tribe] < 5 ? (x.colonies ? 0.4 : 0.15) : 0;
+  // An attack sets the tribe's hostility to the top, which may bring raids; taking the last of its people ends that settlement's raids for good.
+  const after = raidExposure(x, z.tribe, s.def.settings.natives.afterAttack);
+  const angry = (s.hostility[z.tribe] < 5 ? (x.colonies ? 0.4 : 0.15) : 0) + Math.max(0, after - raidExposure(x)) - (z.pop === 1 ? p * Math.max(0, after - raidExposure(x, z.tribe, s.def.settings.natives.afterAttack, undefined, 0, z.n)) : 0);
   return w.native * (p * (x.bell + 0.5 + loot)) - angry * (1 - x.loyal);
 }
 
@@ -183,13 +196,13 @@ function scoreTurn(x: Situation): Considered[] {
   const base: Considered[] = [];
   for (const c of v.legal) {
     if (c.c === 'pass') { base.push({ choice: c, score: 0, why: 'pass' }); continue; }
-    if (c.c === 'recruit') { base.push({ choice: c, score: (0.5 + agentValue(x, 'colonist')) * 0.9 - s.round * w.cross * 1.1 + (x.last ? -0.3 : 0.3), why: 'recruit with crosses' }); continue; }
+    if (c.c === 'recruit') { base.push({ choice: c, score: (0.5 + recruitPick(x, 1)) * 0.9 - recruitCost(s) * w.cross * 1.1 + (x.last ? -0.3 : 0.3), why: 'recruit with crosses' }); continue; }
     const card = c.card as string;
     let score = 0, why = c.a as string, to: number | undefined;
     switch (c.a) {
       case 'produce': case 'docks': {
-        const y = cellYield(s, me, card, c.cell as number, (c.icon ?? 'fish') as 'fish', c.a === 'docks' ? 1 : 0)!;
-        const r = ({ fish: 'food', timber: 'timber', crops: 'crops', silver: 'silver' } as Record<string, Resource>)[(c.icon ?? 'fish') as string];
+        const y = cellYield(s, me, card, c.cell as number, (c.icon ?? 'food') as 'food', c.a === 'docks' ? 1 : 0)!;
+        const r = ({ food: 'food', timber: 'timber', crops: 'crops', silver: 'silver' } as Record<string, Resource>)[(c.icon ?? 'food') as string];
         const free = Math.max(0, util.warehouseCap(s, me) - util.total(pl.wh));
         score = Math.min(y.total, free) * x.res[r];
         if (x.last && r === 'timber' && x.target && pl.wh.timber + y.total >= s.def.buildings[x.target].timber) score = 0.6;
@@ -235,11 +248,11 @@ function scoreTurn(x: Situation): Considered[] {
       case 'smuggle': score = (s.price[c.r as Resource] - 1) * x.gold; break;
       case 'supply': score = 0.02 - (x.last ? 0 : x.res.food); break;
       case 'exchange': score = 0.02 - 0.1; break;
-      case 'gift': { const z = s.settlements[(c.settlement as number) - 1]; score = (z.ally === null && s.hostility[z.tribe] >= 2 ? 0.5 * allyValue(x) : 0) + (s.hostility[z.tribe] >= 4 && x.colonies ? 0.5 : 0) - x.res.goods - (x.last ? 0.6 : 0.1); break; }
-      case 'preach': score = preachValue(x, 0) - 0.12 * w.cross * util.combinedHostility(s, me, s.settlements[(c.settlement as number) - 1].tribe); break;
+      case 'gift': score = giftValue(x, c.settlement as number) + giftCost(x) - (c.r ? x.res[c.r as Resource] : x.res.goods); break;
+      case 'preach': { const z = s.settlements[(c.settlement as number) - 1]; score = preachValue(x, 0) - 0.12 * w.cross * util.combinedHostility(s, me, z.tribe) - preachAnger(x, z.tribe); break; }
       case 'alliance': score = allyValue(x); break;
       // Each extra look is a better pick.
-      case 'recruit': score = (0.5 + agentValue(x, 'colonist')) * (0.9 + Math.min(0.5, 0.06 * ((c.n as number) - 1))) - (c.n as number) * w.cross * 1.1; break;
+      case 'recruit': score = recruitPick(x, c.n as number) * 0.9 - (c.n as number) * w.cross * 1.1 - (x.last ? 0.3 : 0); break;
     }
     base.push({ choice: c, score, why, ...(to !== undefined ? { to } : {}) });
   }
@@ -268,7 +281,7 @@ function endGame(x: Situation, n: number): number {
 }
 
 /** Crosses decide ties for the loyalist, so they are a risk to anyone who wants that role. */
-const crossWorth = (x: Situation) => (x.loyal > 0.5 ? -0.15 : x.w.cross);
+const crossWorth = (x: Situation) => x.cross;
 
 function attackValue(x: Situation, c: Choice): number {
   const { s, me, w } = x, cell = c.cell as number, card = c.card as string, pl = s.players[me];

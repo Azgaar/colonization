@@ -9,39 +9,33 @@
   "rows": [
     {
       "copies": 1,
-      "nickname": "player",
-      "name": "игрок",
-      "icon": "👤"
+      "nickname": "food",
+      "name": "еда",
+      "icon": "🐟"
     },
     {
       "copies": 1,
-      "nickname": "turn",
-      "name": "ход",
-      "icon": "⏳"
+      "nickname": "timber",
+      "name": "древесина",
+      "icon": "🪵"
     },
     {
       "copies": 1,
-      "nickname": "colonist",
-      "name": "колонист",
-      "icon": "👨🏻‍🌾"
+      "nickname": "crops",
+      "name": "сырьё",
+      "icon": "🌿"
     },
     {
       "copies": 1,
-      "nickname": "slave",
-      "name": "раб",
-      "icon": "🧑🏿‍🌾"
+      "nickname": "goods",
+      "name": "товары",
+      "icon": "📦"
     },
     {
       "copies": 1,
-      "nickname": "colony",
-      "name": "колония",
-      "icon": "🏘️"
-    },
-    {
-      "copies": 1,
-      "nickname": "native village",
-      "name": "поселение индейцев",
-      "icon": "🛖"
+      "nickname": "silver",
+      "name": "серебро",
+      "icon": "🪙"
     },
     {
       "copies": 1,
@@ -57,163 +51,109 @@
     },
     {
       "copies": 1,
-      "nickname": "loyalty",
-      "name": "верность",
-      "icon": "👑"
-    },
-    {
-      "copies": 1,
       "nickname": "crosses",
-      "name": "вера",
+      "name": "кресты",
       "icon": "✝️"
     },
     {
       "copies": 1,
-      "nickname": "native alarm",
-      "name": "агрессивность индейцев",
-      "icon": "💢"
+      "nickname": "vp",
+      "name": "победные очки",
+      "icon": "🏅"
     },
     {
       "copies": 1,
-      "nickname": "hammers",
-      "name": "молотки",
-      "icon": "🪚"
+      "nickname": "king",
+      "name": "королевская армия",
+      "icon": "🟥"
     },
     {
       "copies": 1,
-      "nickname": "fish",
-      "name": "рыба",
-      "icon": "🐟"
+      "nickname": "marker",
+      "name": "чёрный кубик",
+      "icon": "⬛"
     },
     {
       "copies": 1,
-      "nickname": "logs",
-      "name": "брёвна",
-      "icon": "🪵"
-    },
-    {
-      "copies": 1,
-      "nickname": "crops",
-      "name": "сырьё",
-      "icon": "🌿"
-    },
-    {
-      "copies": 1,
-      "nickname": "crate",
-      "name": "ящик",
-      "icon": "📦"
-    },
-    {
-      "copies": 1,
-      "nickname": "ingot",
-      "name": "слиток",
-      "icon": "🪙"
-    },
-    {
-      "copies": 1,
-      "nickname": "forest",
-      "name": "лес",
-      "icon": "🌲"
-    },
-    {
-      "copies": 1,
-      "nickname": "tile",
-      "name": "клетка",
-      "icon": "🔲"
-    },
-    {
-      "copies": 1,
-      "nickname": "boat",
-      "name": "судно",
+      "nickname": "ship",
+      "name": "корабль",
       "icon": "⛵"
     },
     {
       "copies": 1,
-      "nickname": "soldier",
-      "name": "солдат",
-      "icon": "🤺"
+      "nickname": "pawn",
+      "name": "пешка",
+      "icon": "♟️"
     },
     {
       "copies": 1,
-      "nickname": "dragoon",
-      "name": "драгун",
-      "icon": "💂"
-    },
-    {
-      "copies": 1,
-      "nickname": "artillery",
-      "name": "артиллерия",
-      "icon": "💥"
-    },
-    {
-      "copies": 1,
-      "nickname": "brave",
-      "name": "индеец",
-      "icon": "🏹"
-    },
-    {
-      "copies": 1,
-      "nickname": "scout",
-      "name": "скаут",
-      "icon": "🐎"
-    },
-    {
-      "copies": 1,
-      "nickname": "privateer",
-      "name": "капер",
-      "icon": "🏴‍☠"
-    },
-    {
-      "copies": 1,
-      "nickname": "attack",
-      "name": "атака",
-      "icon": "⚔️"
-    },
-    {
-      "copies": 1,
-      "nickname": "defence",
-      "name": "защита",
-      "icon": "🛡️"
-    },
-    {
-      "copies": 1,
-      "nickname": "speed",
-      "name": "скорость",
+      "nickname": "move",
+      "name": "очки движения",
       "icon": "💨"
     },
     {
       "copies": 1,
-      "nickname": "supply",
-      "name": "предложение",
-      "icon": "🫳"
+      "nickname": "power",
+      "name": "боевая сила",
+      "icon": "🗡️"
     },
     {
       "copies": 1,
-      "nickname": "demand",
-      "name": "спрос",
-      "icon": "🫴"
+      "nickname": "danger",
+      "name": "опасность",
+      "icon": "💀"
     },
     {
       "copies": 1,
-      "nickname": "luck marker",
-      "name": "жетон удачи",
-      "icon": "🍀"
+      "nickname": "repair",
+      "name": "ремонт",
+      "icon": "🛠️"
     },
     {
       "copies": 1,
-      "nickname": "event card",
-      "name": "карта события",
-      "icon": "🃏"
+      "nickname": "die",
+      "name": "кубик",
+      "icon": "🎲"
     },
     {
       "copies": 1,
-      "nickname": "basic edication",
+      "nickname": "natives",
+      "name": "поселение индейцев",
+      "icon": "🛖"
+    },
+    {
+      "copies": 1,
+      "nickname": "hostility",
+      "name": "враждебность",
+      "icon": "💢"
+    },
+    {
+      "copies": 1,
+      "nickname": "nativePopulation",
+      "name": "население племени",
+      "icon": "🏹"
+    },
+    {
+      "copies": 1,
+      "nickname": "population",
+      "name": "население",
+      "icon": "👥"
+    },
+    {
+      "copies": 1,
+      "nickname": "eduNone",
+      "name": "без образования",
+      "icon": "👒"
+    },
+    {
+      "copies": 1,
+      "nickname": "eduBasic",
       "name": "базовое образование",
       "icon": "📖"
     },
     {
       "copies": 1,
-      "nickname": "higher education",
+      "nickname": "eduHigher",
       "name": "высшее образование",
       "icon": "🎓"
     }

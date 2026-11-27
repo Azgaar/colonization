@@ -10,7 +10,7 @@ export { createGame, type GameConfig } from './setup.ts';
 export { applyInPlace, choiceKey, clone, IllegalChoice, legal } from './core.ts';
 export { components } from './turn.ts';
 export { viewFor, type View } from './view.ts';
-export { actionsFor, buildPrice, fatherLimit, foundCost, recruitCost, sellPrice, taxRate, year } from './turn.ts';
+export { actionsFor, buildPrice, crossIncome, fatherLimit, foundCost, recruitCost, sellPrice, taxRate, year } from './turn.ts';
 export { attackOptions, buildingDefence, cardStrength, combatStrength } from './combat.ts';
 export { buildingYield, cellYield, cellYields, docksYields, workableCells } from './production.ts';
 export { attacked, findLoyalist, hasLoyalist, rebelOrder, scorePlayer, siegeStrength } from './war.ts';

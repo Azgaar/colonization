@@ -28,7 +28,7 @@ These are the rules of the board game. PC rules start identical and may change o
 | REF | КЭК 🟥 | Royal Expeditionary Force cubes |
 | Bells, Crosses, Gold | 🔔, ✝️, 🟡 | Special resources |
 | Patriot / Loyalist | патриот / лоялист | Sides in the war |
-| Education | 🚫 / 📖 / 🎓 | none / basic / higher. There is no "middle" level **[A]** |
+| Education | 👒 / 📖 / 🎓 | none / basic / higher. There is no "middle" level **[A]** |
 
 Resources, as cube colour (icon): food blue 🟦 (fish 🐟), timber brown 🟫 (logs 🪵), crops green 🟩 (🌿), goods orange 🟧 (crate 📦), silver light grey ⬜ (ingot 🪙). One icon per resource (DD-76): food is fish (corn is gone, DD-67); crops are cash crops and fur, both 🌿 (`crops`). The PC map may draw a 🌿 bonus on forest or tundra as fur; the table always shows the crops icon.
 
@@ -116,16 +116,16 @@ Require the player's ship on a Europe cell.
 
 | ID | Rule |
 |---|---|
-| C-1 | Attacks target an adjacent cell. Attacker must play an agent with the right ⚔️ type (pawn or ship; captain is both) |
+| C-1 | Attacks target an adjacent cell. Attacker must play an agent with the right 🗡️ type (pawn or ship; captain is both) |
 | C-2 | Both sides then secretly add any number of hand cards. The defender may add the unseen top card of their deck |
-| C-3 | Strength = number of cards, including the played one **[A]**, plus matching ⚔️ bonuses, plus terrain and other bonuses. Cards without ⚔️ count 1 |
-| C-4 | **[D]** Each side uses the ⚔️ of its own token: a ship's battle uses ship ⚔️, anything else pawn ⚔️. A bombarding side uses the higher of the two on each card. Terrain-bound bonuses (highlander) look at the fighter's own cell |
+| C-3 | Strength = number of cards, including the played one **[A]**, plus matching 🗡️ bonuses, plus terrain and other bonuses. Cards without 🗡️ count 1 |
+| C-4 | **[D]** Each side uses the 🗡️ of its own token: a ship's battle uses ship 🗡️, anything else pawn 🗡️. A bombarding side uses the higher of the two on each card. Terrain-bound bonuses (highlander) look at the fighter's own cell |
 | C-5 | Attacker's strength not greater: the attack fails, no further effect. Otherwise roll dice equal to the difference; 5 and 6 are successes. One success = 1 damage. **[D]** `combat.diceCap = none` outside the war |
 | C-6 | **Land token:** 1+ damage sends the defender to Europe. Tokens are never destroyed |
 | C-7 | **Ship vs ship:** each damage fills one hold slot (maximum 4 **[D]**); the loser moves to Europe, or next to an own colony if its owner has a shipyard. Winner takes cargo up to free hold space; the rest is lost if the winner wishes. Cargo beyond the damaged hold's capacity is discarded. A pawn that beats a ship takes no cargo **[D]** |
 | C-8 | **Colony:** defender gets +1, terrain, stockade +1 or fort +2 (a fort replaces the stockade **[D]**). Each success: take 1 chosen resource to own warehouse, or destroy 1 of the cheapest buildings. Destroying a building an improvement depends on is not allowed while the improvement stands **[D]**. The pawn then moves to the attacker's nearest colony, or to Europe if none **[D]**; a bombarding ship stays **[D]**. Pawn inside a colony cannot be attacked separately **[D]** |
 | C-9 | **Landing attack** from a ship: -1. **Pawn against a ship:** -1 |
-| C-10 | **Bombardment** (cannoneer, or any ⚔️ agent with de Ruyter): ship attacks land, or a pawn attacks a ship, without penalty |
+| C-10 | **Bombardment** (cannoneer, or any 🗡️ agent with de Ruyter): ship attacks land, or a pawn attacks a ship, without penalty |
 | C-11 | Any victory (1+ success) gives +1 🔔 |
 | C-12 | **[D]** Combat is not allowed against tokens on Europe cells: `europe.safe = true` |
 | C-13 | All committed cards go to their owners' discards |
@@ -144,7 +144,7 @@ Require the player's ship on a Europe cell.
 | R-8 | Workshop: 1 crops → 1 goods. Factory: 1 crops → 2 goods. Bonuses add output, not input. Factory, newspaper and church do not add to the basic building; the better one is used **[D]** |
 | R-9 | **Build:** pay timber, at most 6 buildings, one of each type. **[D]** An improvement requires the basic building, which stays and keeps its slot |
 | R-10 | **[A]** **School and university** (DD-75): the agent played there leaves the player's collection (as a removed card, B-10) and is replaced, in the discard, by any profession the building teaches, taken, at the player's choice, from the agent deck (then shuffled), the common discard or the pier. School: any agent, criminals and slaves included; teaches 📖 professions. University: agents with 📖 or more; teaches 🎓 professions. Never a nation's or a native profession. No card other than the one played is spent (was: the played 📖/🎓 agent taught its own profession to another card in hand) |
-| R-11 | **Custom house:** sell 1 resource from the warehouse at market price, trader bonus included **[D]**; it counts towards demand **[D]** |
+| R-11 | **Custom house:** sell up to 2 of one resource from the warehouse, each at the market price of the moment, trader bonus included **[D]**; each counts towards demand **[D]** (DD-79) |
 | R-12 | **Supply:** spend 1 food, draw 1 card. A swap, not a gain **[A]** (DD-57) |
 | R-13 | **Exchange:** discard 2 cards, the played one included **[D]**, draw 1 |
 | R-14 | **Smuggling** (smuggler): sell 1 warehouse resource at price -1; does not count towards demand **[D]** |
@@ -158,14 +158,14 @@ Require the player's ship on a Europe cell.
 | N-2 | Settlements take numbers 1–6 in order of appearance **[D]** on the order. Events refer to these numbers **[A]** |
 | N-3 | Hostility is shared by the tribe, limited to 0–5. A second settlement of a tribe joins at the current value **[D]** |
 | N-4 | Native actions need pawn or ship adjacent to the settlement |
-| N-5 | **Gift:** 1 goods from the warehouse, roll 3 dice, hostility falls by 1 + successes |
+| N-5 | **Gift:** 1 resource of any kind from the warehouse (DD-78); hostility falls by 3, no dice (DD-86) |
 | N-6 | **Preach:** pay crosses equal to hostility; native agent to discard; hostility +1; population -1. **[D]** At population 0 the settlement disappears with no loot |
 | N-7 | **Attack:** settlement strength = population + terrain. Victory: optional native agent, +1 🔔, population -1 whatever the damage. Last one gives loot. Any attack, won or lost, sets hostility to 5 |
 | N-8 | Loot resources go straight to the warehouse, gold to the player |
 | N-9 | **Alliance:** hostility 0–1 (0–3 with John Smith); 🎓 agent (the scout has 🎓, DD-73); settlement not yet allied. Alliance ends at hostility 4–5 |
 | N-10 | Native agents are limited to the pile of 8; none left means none gained **[D]** |
 | N-11 | **Activation of settlement N [A].** Affects the owner of the colony nearest to that settlement. Hostility 0–2: the owner receives 1 food. 3: nothing. 4–5: raid on that colony (N-12). Nothing happens if settlement N or any colony does not exist **[A]**. **[D]** A gift that does not fit falls under T-7 |
-| N-12 | **Raid** on the nearest colony (straight distance; ties by turn order **[D]**): its owner discards 2 resources or loses 1 building; a fort prevents it. With fewer than 2 resources and no buildings, all resources are lost **[D]** |
+| N-12 | **Raid** on the nearest colony (straight distance; ties by turn order **[D]**): its owner discards 2 resources or loses 1 building; a stockade (or the fort over it) prevents it (DD-77). With fewer than 2 resources and no buildings, all resources are lost **[D]** |
 | N-13 | Pocahontas lowers hostility by 1 for her owner in all checks, but not the stored value |
 | N-14 | **[A]** A settlement revealed next to an existing colony is placed as usual: the distance rule limits founding only (DD-55) |
 
@@ -209,7 +209,7 @@ All 34 cards are implemented as printed in the spreadsheet. Clarifications:
 | X-1 | A pawn entering a ruin draws from the ruins deck; a ship entering a wreck draws from the wrecks deck. The marker is removed |
 | X-2 | Used cards go to a discard, reshuffled if the deck runs out **[D]** |
 | X-3 | Options need their cost and requirement to be met. If no option is available, nothing happens **[D]** |
-| X-4 | "Requires an agent with ⚔️" or a scout: **[D]** the agent played for this move, or one discarded from hand |
+| X-4 | "Requires an agent with 🗡️" or a scout: **[D]** the agent played for this move, or one discarded from hand |
 | X-5 | A scout ignores effects marked 💀, for the ship too **[D]** |
 | X-6 | "Nearest settlement" uses straight distance; ties by the player's choice **[D]**. None on the map: that part is skipped |
 | X-7 | Losses of crosses and bells stop at 0 **[D]**. Bell costs on "pay" options must be affordable **[D]** |
@@ -224,10 +224,10 @@ All 34 cards are implemented as printed in the spreadsheet. Clarifications:
 | W-4 | REF pool = accumulated 🟥, plus 1 per settlement with hostility 4–5, plus tactic additions |
 | W-5 | Deal 🟥 one per patriot colony, in order of most 🔔 (then ✝️, 🟡), repeating until the pool is empty. **[D]** Within a player, colonies go in founding order |
 | W-6 | Loyalist places any of their agents face down at patriot colonies. Counts are public |
-| W-7 | Patriots then choose, secretly and at the same time **[D]**: army cards (any with ⚔️, pawn or ship value), militia (1 🔔 each, up to the number of their non-military cards), mercenaries (5 🟡 each), 3 cubes per allied settlement, and their placement |
+| W-7 | Patriots then choose, secretly and at the same time **[D]**: army cards (any with 🗡️, pawn or ship value), militia (1 🔔 each, up to the number of their non-military cards), mercenaries (5 🟡 each), 3 cubes per allied settlement, and their placement |
 | W-8 | Washington: 2 militia per bell, still limited by non-military cards **[D]**. Revere: 4 free militia, not limited **[D]** |
-| W-9 | Attack = 1 × 🟥 (DD-49; was 2 ×) + tactic + loyalist cards' ⚔️ + loyalist militia. Card count does not add strength here, unlike C-3 |
-| W-10 | Defence = 1 + terrain + buildings + 1 per own token on or next to the colony + cards' ⚔️ + support cubes |
+| W-9 | Attack = 1 × 🟥 (DD-49; was 2 ×) + tactic + loyalist cards' 🗡️ + loyalist militia. Card count does not add strength here, unlike C-3 |
+| W-10 | Defence = 1 + terrain + buildings + 1 per own token on or next to the colony + cards' 🗡️ + support cubes |
 | W-11 | A colony not attacked, with no 🟥 and no loyalist card, is kept **[D]** |
 | W-12 | If attack is greater, the loyalist rolls (solo and no loyalist: the game rolls **[D]**) dice equal to the difference, at most 10. No success: colony holds. 1+ success: colony falls. Equal or less: colony holds |
 | W-13 | If the colony falls and the loyalist's own strength there is at least the REF strength, the loyalist takes it. REF strength = 1 × 🟥 (as W-9, `war.refStrength`) + tactic. Taking a colony is meant to be easy **[A]** (DD-59) |
@@ -253,7 +253,7 @@ All numbers above are ruleset values. Settings that choose between readings, plu
 | `activation.raidMinHostility` | 4 | 3, 5 |
 | `activation.gift` | 1 food | 2 food, none |
 | `natives.preachMin` | 0 | 1 |
-| `fort.replacesStockade` | true | false (adds up to +3) |
+| `buildings.upgradeSlot` | true | false (an upgrade shares the slot of the building under it) |
 | `damage.sendsToEurope` | true | false |
 | docks bonus, Sepúlveda's slaves and other card values | as printed | any |
 | `ring.openSea`, `ring.europe` | 1, 1 | 0, 1 |

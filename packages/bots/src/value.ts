@@ -1,7 +1,7 @@
 import type { Icon, Node, Resource } from '@col/data';
 import { RESOURCES } from '@col/data';
 import type { State, View } from '@col/engine';
-import { foundCost, map, util } from '@col/engine';
+import { foundCost, map, recruitCost, util } from '@col/engine';
 import { cardPower, expectedLoyalist, forecast, outlook, type Change } from './outlook.ts';
 import type { Weights } from './weights.ts';
 
@@ -20,6 +20,8 @@ export interface Situation {
   colonies: number; sites: number[]; canFound: boolean;
   /** Expected raids on this player per round. */
   raids: number;
+  /** Worth of one cross: what recruiting makes of it now (see crossWorth). */
+  cross: number;
   target: string | null;
 }
 
@@ -60,7 +62,7 @@ export function read(v: View, w: Weights): Situation {
   const loyalist = expectedLoyalist(s, me, loyal > 0.4);
   const x: Situation = {
     v, s, me, w, cards: v.collections[me] ?? util.collection(pl), left, last, loyal, loyalist, bell, gold: w.gold, strength: 0, ref: 0, res: {} as Record<Resource, number>,
-    colonies, sites, canFound, raids: 0, target: null,
+    colonies, sites, canFound, raids: 0, target: null, cross: w.cross,
   };
   const here = warPoints(x);
   // The forecast is flat when the war looks lost or won, so both have a floor.
@@ -79,12 +81,14 @@ export function read(v: View, w: Weights): Situation {
   }
   x.raids = raidRisk(x);
   const gold = x.gold;
+  // Resources at their market worth first: the buildings wanted are priced by what working them makes.
+  for (const r of RESOURCES) x.res[r] = last ? 0 : gold * s.price[r] * 0.5 * Math.min(1.5, w.trade);
+  x.cross = crossWorth(x);
   x.target = wantedBuilding(x);
   const build = x.target ? s.def.buildings[x.target].timber : 0;
   // Timber and food are worth their share of what they lead to.
   const timberWorth = x.target ? Math.min(2.5, buildingValue(x, x.target) / (build + 1)) : 0;
   const wantsSite = colonies > 0 && colonies < set.colony.max && left > 1;
-  for (const r of RESOURCES) x.res[r] = last ? 0 : gold * s.price[r] * 0.5 * Math.min(1.5, w.trade);
   if (!last) {
     if (pl.wh.timber < build) x.res.timber = w.timber * timberWorth;
     else if (pl.wh.timber < build + 2) x.res.timber = Math.max(x.res.timber, 0.35 * w.timber);
@@ -95,34 +99,101 @@ export function read(v: View, w: Weights): Situation {
     if (util.has(pl, 'blacksmith_shop') || util.has(pl, 'factory')) x.res.crops = Math.max(x.res.crops, w.crops, gold * s.price.goods * 0.35);
     // Two spare resources keep a raid from taking a building.
     if (util.total(pl.wh) < set.raid.resources && x.raids > 0.2 && pl.buildings.length) for (const r of RESOURCES) x.res[r] = Math.max(x.res[r], x.raids * 1.1);
+    // Goods buy gifts that calm a tribe about to raid us.
+    if (s.def.settings.natives.giftResource === 'goods' && pl.wh.goods < 1) x.res.goods = Math.max(x.res.goods, 0.8 * bestGift(x));
   } else if (pl.wh.timber < build) x.res.timber = 0.3;
   return x;
+}
+
+/* ---- Raids: the settlements whose nearest colony is ours raid it when angry enough (6 of 22 events call a given number or all of them). ---- */
+const RAID_ODDS = 6 / 22;
+/** Points one raid takes: two of our cheapest resources, or our cheapest building that nothing needs, whichever we give up. */
+export function raidLoss(x: Situation): number {
+  const { s, me } = x, pl = s.players[me], n = s.def.settings.raid.resources;
+  const vals = RESOURCES.flatMap((r) => Array<number>(pl.wh[r]).fill((x.res[r] ?? 0) + 0.05)).sort((a, b) => a - b);
+  const blds = pl.buildings.filter((b) => !pl.buildings.some((o) => s.def.buildings[o].requires === b)).map((b) => x.w.building + s.def.buildings[b].timber * 0.3);
+  const res = vals.length >= n ? vals.slice(0, n).reduce((a, b) => a + b, 0) : blds.length ? Infinity : vals.reduce((a, b) => a + b, 0);
+  return Math.min(res, blds.length ? Math.min(...blds) + 0.2 : Infinity);
+}
+/**
+ * Points we may lose to raids before the war: from every settlement that would raid us, its tribe at hostility `h` if given (stored value)
+ * and, with `site`, as if we had a colony there too, and without settlement number `gone`. A fort stops all raids.
+ */
+export function raidExposure(x: Situation, tribe?: string, h?: number, site?: number, minLoss = 0, gone?: number): number {
+  const { s, me } = x, min = s.def.settings.activation.raidMinHostility;
+  if (s.players[me].buildings.includes(s.def.settings.raid.stoppedBy) || x.last) return 0;
+  let n = 0;
+  for (const z of s.settlements) {
+    if (!z.alive || z.n === gone) continue;
+    const now = util.combinedHostility(s, me, z.tribe), hz = z.tribe === tribe && h !== undefined ? Math.max(0, h - (s.hostility[z.tribe] - now)) : now;
+    if (hz < min) continue;
+    const near = map.nearestColony(s, z.cell);
+    if (near?.owner === me || (site !== undefined && (!near || map.distance(s, site, z.cell) < map.distance(s, near.cell, z.cell)))) n++;
+  }
+  return n ? n * RAID_ODDS * Math.max(0.5, x.left - 1) * Math.max(minLoss, raidLoss(x)) : 0;
+}
+/** Raids a gift would spare us: hostility falls by 1 and by each success of 3 dice, about 2 in all. */
+/** How much hostility a gift takes away on average: the fixed part and the dice that succeed. */
+export const giftDrop = (s: State) => { const n = s.def.settings.natives; return n.giftBase + (n.giftDice * s.def.settings.combat.successFaces.length) / 6; };
+export const giftGain = (x: Situation, tribe: string) => Math.max(0, raidExposure(x) - raidExposure(x, tribe, Math.max(0, Math.round(x.s.hostility[tribe] - giftDrop(x.s)))));
+const bestGift = (x: Situation) => Math.max(0, ...x.s.settlements.filter((z) => z.alive).map((z) => giftGain(x, z.tribe)));
+
+/* ---- Crosses and the buildings that make things ---- */
+/** Expected worth of the best of `n` common agents seen when recruiting. */
+export function recruitPick(x: Situation, n: number): number {
+  const vals = Object.values(x.s.def.agents).filter((a) => a.kind === 'common').flatMap((a) => Array<number>(a.copies).fill(agentValue(x, a.id))).sort((p, q) => p - q);
+  return vals[Math.min(vals.length - 1, Math.floor((vals.length * n) / (n + 1)))] ?? 0;
+}
+/** One cross is worth its share of a recruit: crosses at least the round look at that many agents and keep the best. Never below the weight. */
+export function crossWorth(x: Situation): number {
+  const r = recruitCost(x.s);
+  return Math.max(x.w.cross, Math.min(0.5, (recruitPick(x, r) * 0.9) / r));
+}
+/** With crosses every round (crosses.everyRound): what a cross building gives without an action for the rounds that are left. */
+function crossGain(x: Situation, b: string): number {
+  const w = x.s.def.buildings[b]?.work;
+  return w?.kind === 'produce' ? w.amount * x.cross * Math.max(0, x.left - 1) : 0;
+}
+/** Points from working a building for the rest of the game: what one action there makes above an ordinary action, about every other round. */
+function workGain(x: Situation, b: string): number {
+  const w = x.s.def.buildings[b]?.work;
+  if (w?.kind !== 'produce') return 0;
+  const unit = w.icon === 'bells' ? Math.max(0, x.bell) : w.icon === 'crosses' ? x.cross : Math.max(x.res.goods, x.gold * x.s.price.goods * 0.6);
+  const per = w.amount * unit - (w.consumes ? w.consumes.amount * x.res[w.consumes.res] * 0.5 : 0);
+  const ordinary = Math.max(0.3, x.res.timber, x.res.food) * 1.5;
+  return Math.max(0, per - ordinary) * Math.max(0, x.left - 1) * 0.6;
 }
 
 /** Points expected from owning a building, apart from its price. */
 export function buildingValue(x: Situation, b: string): number {
   const { w, s } = x, left = x.left - 1;
-  const own = Math.max(1, x.colonies);
   const extra: Record<string, () => number> = {
     warehouse: () => 0.1 * left,
     docks: () => (x.colonies < s.def.settings.colony.max ? 0.15 * left : 0.02 * left),
-    blacksmith_shop: () => 0.2 * left * w.trade * x.gold * 8,
+    blacksmith_shop: () => workGain(x, 'blacksmith_shop'),
     town_hall: () => 0.9 * left * Math.max(0, x.bell) * 1.4,
-    chapel: () => left * (0.2 + 2 * w.cross),
+    chapel: () => (s.def.settings.crosses.everyRound ? crossGain(x, 'chapel') : workGain(x, 'chapel')),
     school: () => schoolGain(x, 'school') * w.teach,
-    stockade: () => own * x.strength * (1 - x.loyal),
+    stockade: () => defenceGain(x, 'stockade') + (s.def.settings.raid.stoppedBy === 'stockade' ? raidExposure(x) : 0),
     custom_house: () => 0.15 * left * w.trade,
-    shipyard: () => 0.05,
-    factory: () => 0.2 * left * w.trade * x.gold * 12,
+    // About 0.6 damages a player a game (0.07 a round): a refuge by the colony saves the voyage home, and the repair actions when the shipyard repairs at once.
+    shipyard: () => 0.07 * Math.max(0, left) * (s.def.settings.damage.shipyardRepairs ? 2.5 : 1) + (s.def.settings.damage.repairOnBuild ? x.s.players[x.me].damage * 0.8 : 0),
+    factory: () => Math.max(0, workGain(x, 'factory') - workGain(x, 'blacksmith_shop')),
     newspaper: () => {
       const higher = x.cards.filter((c) => s.def.agents[c].edu === 2).length;
       return higher * 2 * left * Math.max(0, x.bell) * Math.min(1, 5 / Math.max(5, x.cards.length));
     },
-    church: () => left * (0.1 + 3 * w.cross),
-    fort: () => own * x.strength * 1.2 * (1 - x.loyal) + x.raids * left * 0.8,
+    church: () => (s.def.settings.crosses.everyRound ? crossGain(x, 'church') - crossGain(x, 'chapel') : Math.max(0, workGain(x, 'church') - workGain(x, 'chapel'))),
+    fort: () => defenceGain(x, 'fort') + (s.def.settings.raid.stoppedBy === 'fort' ? raidExposure(x) : 0),
     university: () => schoolGain(x, 'university') * w.teach,
   };
   return w.building + (extra[b]?.() ?? 0);
+}
+/** What a defence building is worth: the war points it adds to every colony's defence, as the forecast of the war sees them. Small but not nothing before the first colony. */
+function defenceGain(x: Situation, b: string): number {
+  const add = x.s.def.buildings[b]!.defence ?? 0;
+  if (x.loyal > 0.5 || add <= 0) return 0;
+  return Math.max(0.1 * add, warPoints(x, { defence: add }) - warPoints(x));
 }
 /**
  * What a school is worth: each use swaps one of the weakest agents a player has for the best profession it teaches (DD-75),
@@ -154,7 +225,7 @@ export function warPoints(x: Situation, o: Change = {}, rounds = x.left - 1): nu
 }
 
 function raidRisk(x: Situation): number {
-  if (!x.colonies || x.s.players[x.me].buildings.includes('fort')) return 0;
+  if (!x.colonies || x.s.players[x.me].buildings.includes(x.s.def.settings.raid.stoppedBy)) return 0;
   let n = 0;
   for (const z of x.s.settlements) if (z.alive && util.combinedHostility(x.s, x.me, z.tribe) >= x.s.def.settings.activation.raidMinHostility && map.nearestColony(x.s, z.cell)?.owner === x.me) n++;
   return n * (6 / 22);
@@ -177,7 +248,9 @@ export function siteValue(x: Situation, c: number): number {
   const timber = icons.has('timber'), had = ownTimber(x);
   const need = timber || had ? 0 : first ? -9 : -2;
   const gain = Math.max(0.5, warPoints(x, { colony: s.def.terrain[s.map.terrain[c]!].defence }) - warPoints(x));
-  return gain * w.colony + (first ? w.firstColony : 0) + need + (timber && !had ? 4 : timber ? 0.4 : 0) +
+  // A colony that becomes the nearest to an angry tribe will be raided: a new colony has little to lose yet, but will.
+  const raided = raidExposure(x, undefined, undefined, c, 1) - raidExposure(x, undefined, undefined, undefined, 1);
+  return gain * w.colony + (first ? w.firstColony : 0) + need - raided + (timber && !had ? 4 : timber ? 0.4 : 0) +
     (icons.has('silver') ? 0.4 : 0) + icons.size * 0.1 + bonus * 0.15;
 }
 

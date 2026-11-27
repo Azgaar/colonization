@@ -74,7 +74,7 @@
       "nickname": "Soldier_French",
       "nation": "French",
       "name": "Солдат",
-      "effect": "атака и защита пешки: +2 ⚔️",
+      "effect": "атака и защита пешки: +2 🗡️",
       "education": "📖",
       "emblem": "French.svg",
       "emblem back": "French.svg",
@@ -135,7 +135,7 @@
       "nickname": "Soldier_Dutch",
       "nation": "Dutch",
       "name": "Солдат",
-      "effect": "атака и защита пешки: +2 ⚔️",
+      "effect": "атака и защита пешки: +2 🗡️",
       "education": "📖",
       "emblem": "Dutch.svg",
       "emblem back": "Dutch.svg",
@@ -169,7 +169,7 @@
       "name": "Раб",
       "effect": "производство: +1",
       "comment": "Только действие производство",
-      "education": "🚫",
+      "education": "👒",
       "emblem": "English.svg",
       "emblem back": "English.svg",
       "image": "Slave.png,50,100,100"
@@ -200,7 +200,7 @@
       "nickname": "Soldier_English",
       "nation": "English",
       "name": "Солдат",
-      "effect": "атака и защита пешки: +2 ⚔️",
+      "effect": "атака и защита пешки: +2 🗡️",
       "education": "📖",
       "emblem": "English.svg",
       "emblem back": "English.svg",
@@ -231,7 +231,7 @@
       "name": "Раб",
       "effect": "производство: +1",
       "comment": "Только действие производство",
-      "education": "🚫",
+      "education": "👒",
       "emblem": "Portuguese.svg",
       "emblem back": "Portuguese.svg",
       "image": "Slave.png,50,100,100"
@@ -262,7 +262,7 @@
       "nickname": "Soldier_Portuguese",
       "nation": "Portuguese",
       "name": "Солдат",
-      "effect": "атака и защита пешки: +2 ⚔️",
+      "effect": "атака и защита пешки: +2 🗡️",
       "education": "📖",
       "emblem": "Portuguese.svg",
       "emblem back": "Portuguese.svg",
@@ -273,7 +273,7 @@
       "nickname": "Conquistador_Spanish",
       "nation": "Spanish",
       "name": "Конкистадор",
-      "effect": "атака и защита пешки: +2 ⚔️ и ещё +2 ⚔️ против индейцев",
+      "effect": "атака и защита пешки: +2 🗡️ и ещё +2 🗡️ против индейцев",
       "education": "🎓",
       "emblem": "Spanish.svg",
       "emblem back": "Spanish.svg",
@@ -291,7 +291,7 @@
           "vs": "native"
         }
       ],
-      "$checked": "f1ff652cea"
+      "$checked": "90e26b8ce7"
     },
     {
       "e": 1,
@@ -332,7 +332,7 @@
       "name": "Раб",
       "effect": "производство: +1",
       "comment": "Только действие производство",
-      "education": "🚫",
+      "education": "👒",
       "emblem": "Spanish.svg",
       "emblem back": "Spanish.svg",
       "image": "Slave.png,50,100,100"
@@ -361,7 +361,7 @@
       "nickname": "Soldier_Swedish",
       "nation": "Swedish",
       "name": "Солдат",
-      "effect": "атака и защита пешки: +2 ⚔️",
+      "effect": "атака и защита пешки: +2 🗡️",
       "education": "📖",
       "emblem": "Swedish.svg",
       "emblem back": "Swedish.svg",
@@ -441,7 +441,7 @@
       "name": "Раб",
       "effect": "производство: +1",
       "comment": "Только действие производство",
-      "education": "🚫",
+      "education": "👒",
       "emblem": "Danish.svg",
       "emblem back": "Danish.svg",
       "image": "Slave.png,50,100,100"
@@ -451,7 +451,7 @@
       "nickname": "Cossack_Russian",
       "nation": "Russian",
       "name": "Казак",
-      "effect": "атака и защита пешки: +2 ⚔️\nпроизводство: +2 🌿 в тундре",
+      "effect": "атака и защита пешки: +2 🗡️\nпроизводство: +2 🌿 в тундре",
       "education": "🎓",
       "emblem": "Russian.svg",
       "emblem back": "Russian.svg",
@@ -472,7 +472,7 @@
           "enables": true
         }
       ],
-      "$checked": "188781fa9d"
+      "$checked": "aeb6ff960b"
     },
     {
       "e": 1,
@@ -530,7 +530,7 @@
       "nickname": "Soldier_Curonian",
       "nation": "Curonian",
       "name": "Солдат",
-      "effect": "атака и защита пешки: +2 ⚔️",
+      "effect": "атака и защита пешки: +2 🗡️",
       "education": "📖",
       "emblem": "Curonian.svg",
       "emblem back": "Curonian.svg",
@@ -563,7 +563,7 @@
       "nickname": "Highlander_Scottish",
       "nation": "Scottish",
       "name": "Горец",
-      "effect": "атака и защита пешки: +1⚔️ и ещё +2 ⚔️ в горах",
+      "effect": "атака и защита пешки: +1🗡️ и ещё +2 🗡️ в горах",
       "education": "🎓",
       "emblem": "Scottish.svg",
       "emblem back": "Scottish.svg",
@@ -581,7 +581,7 @@
           "terrain": "mountains"
         }
       ],
-      "$checked": "7e667d5be7"
+      "$checked": "ca97440fd7"
     },
     {
       "e": 1,
@@ -620,14 +620,14 @@
       "nickname": "Indian",
       "name": "Индеец",
       "effect": "производство: +1 🐟",
-      "education": "🚫",
-      "price": "🚫",
+      "education": "👒",
+      "price": "👒",
       "image": "Indian.jpeg,50,70,100",
       "$fx": [
         {
           "mod": "production",
           "icons": [
-            "fish"
+            "food"
           ],
           "add": 1
         }

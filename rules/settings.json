@@ -52,7 +52,9 @@
     "maxDamage": 4
   },
   "damage": {
-    "sendsToEurope": true
+    "sendsToEurope": true,
+    "shipyardRepairs": true,
+    "repairOnBuild": false
   },
   "warehouse": {
     "base": 6
@@ -87,7 +89,8 @@
   "crosses": {
     "max": 15,
     "recruitPerRound": 1,
-    "recruitAction": true
+    "recruitAction": true,
+    "everyRound": false
   },
   "collection": {
     "min": 4
@@ -97,10 +100,11 @@
     "maxHostility": 5,
     "allianceMax": 1,
     "allianceBreak": 4,
-    "giftDice": 3,
-    "giftBase": 1,
+    "giftDice": 0,
+    "giftBase": 3,
     "preachMin": 0,
-    "afterAttack": 5
+    "afterAttack": 5,
+    "giftResource": "any"
   },
   "activation": {
     "giftMaxHostility": 2,
@@ -108,7 +112,8 @@
     "gift": 1
   },
   "raid": {
-    "resources": 2
+    "resources": 2,
+    "stoppedBy": "stockade"
   },
   "production": {
     "emptyMeans": "noToken"
@@ -128,9 +133,6 @@
   },
   "europe": {
     "safe": true
-  },
-  "fort": {
-    "replacesStockade": true
   },
   "war": {
     "bells": 15,

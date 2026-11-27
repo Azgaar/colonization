@@ -144,7 +144,7 @@ describe('Round', () => {
     world(s, { [at(5, 5)]: 'grassland', [at(4, 4)]: 'ocean' });
     turn(s, 0, 'farmer', 'colonist');
     P(s).wh = stock({ food: 6 });
-    play(s, 'farmer', 'produce', { icon: 'fish' });
+    play(s, 'farmer', 'produce', { icon: 'food' });
     expect(total(P(s).wh)).toBe(6); // only food to discard, so no choice was needed
     P(s).wh = stock({ food: 5, timber: 2 });
     act(s, { c: 'pass' });

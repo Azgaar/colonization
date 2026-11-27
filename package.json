@@ -26,6 +26,7 @@
     "sweep": "node packages/lab/src/sweep.ts",
     "detect": "node packages/lab/src/detect.ts",
     "strength:search": "node packages/lab/src/search-strength.ts",
+    "seat": "node packages/lab/src/seat.ts",
     "proposals": "node packages/lab/src/proposals.ts",
     "lab:typecheck": "tsc --noEmit -p packages/lab/tsconfig.browser.json",
     "check": "pnpm rules:build && pnpm typecheck && pnpm test",

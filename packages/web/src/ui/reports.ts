@@ -16,20 +16,20 @@ const gains = (l: Entry[]): string[] => l.filter((e) => e.p === me && ['gold', '
 /** The war begins: who sides with the King, and who rises against him. */
 const warStart = (e: Entry) => {
   const patriots = D.players.map((_, p) => p).filter((p) => p !== e.loyalist), you = (p: number) => (p === me ? ` (${t('you')})` : '');
-  return `<div class="wcard two"><div class="wct"><span class="wpic">${e.loyalist === null ? icon('people', 30) : Places.em(e.loyalist, 34)}</span><b>${e.loyalist === null ? t('none') : name(e.loyalist)}${e.loyalist === null ? '' : you(e.loyalist)}</b><small>${t('loyalist')}</small></div>`
+  return `<div class="wcard two"><div class="wct"><span class="wpic">${e.loyalist === null ? icon('population', 30) : Places.em(e.loyalist, 34)}</span><b>${e.loyalist === null ? t('none') : name(e.loyalist)}${e.loyalist === null ? '' : you(e.loyalist)}</b><small>${t('loyalist')}</small></div>`
     + `<div class="wct"><span class="wpic">${patriots.map((p) => Places.em(p, 30)).join('')}</span>${patriots.length === 1 ? `<b>${name(patriots[0]!)}${you(patriots[0]!)}</b><small>${t('patriot')}</small>` : `<b>${t('patriots')}</b>`}</div></div>`;
 };
 /** The King's tactic, drawn from its deck: the top card lifts off and turns over; under it, the army it leads. */
 const tacticDraw = (e: Entry) => {
-  const left = Math.min(5, Math.max(1, Object.keys(D.names.tactics).length - 1)), back = `<i class="tback">${icon('ref', 34)}</i>`;
+  const left = Math.min(5, Math.max(1, Object.keys(D.names.tactics).length - 1)), back = `<i class="tback">${icon('king', 34)}</i>`;
   return `<article class="rc war tdraw"><div class="in"><div class="tstage"><div class="tdeck">${back.repeat(left)}</div>`
-    + `<div class="tcard">${back}<div class="tfront"><span class="tcrown">${icon('ref', 30)}</span><b>${pick(D.names.tactics[e.tactic])}</b><span class="rule"></span><p>${Texts.tactic(e.tactic)}</p></div></div></div>`
+    + `<div class="tcard">${back}<div class="tfront"><span class="tcrown">${icon('king', 30)}</span><b>${pick(D.names.tactics[e.tactic])}</b><span class="rule"></span><p>${Texts.tactic(e.tactic)}</p></div></div></div>`
     + `<h2>${t('tactic')}</h2><div class="rule"></div><div class="tx"><p class="tarmy">${men(Math.min(e.pool, 10))}<b>${e.pool}</b>${t('ref')}</p></div><div class="bts">${btn(t('reports.continue'), 'data-ok', 'go')}</div></div></article>`;
 };
 export function results(l: Entry[]): string {
   const { by, ref } = lines(l), tribes = lines(l).tribes.map(({ v, p, what }) => `<li class="tr"><img class="chf" src="${art.tribe(v.tribe)}" alt=""><span><b>${pick(D.names.tribes[v.tribe])}</b> ${what} <span class="pl">${Places.em(p, 22)}<b>${name(p)}</b></span></span></li>`);
   const rows = [...by].map(([p, xs]) => `<li><span class="pl">${Places.em(p, 22)}<b>${name(p)}</b></span><span>${xs.join(', ')}</span></li>`).join('');
-  return rows || tribes.length || ref ? `<ul class="who">${rows}${tribes.join('')}${ref ? `<li><span class="kg">${icon('ref', 22)}</span><b>${t('ref')}</b><span>${Places.plus(ref, 'ref', 17)}</span></li>` : ''}</ul>` : '';
+  return rows || tribes.length || ref ? `<ul class="who">${rows}${tribes.join('')}${ref ? `<li><span class="kg">${icon('king', 22)}</span><b>${t('ref')}</b><span>${Places.plus(ref, 'ref', 17)}</span></li>` : ''}</ul>` : '';
 }
 /** Turn news from the engine into large cards to read. The short notices are told apart (notices.ts). */
 export function report(l: Entry[]) {

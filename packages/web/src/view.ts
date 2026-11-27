@@ -2,7 +2,7 @@
 import { actionsFor, buildingDefence, buildPrice, buildingYield, cellYield, combatStrength, docksYields, findLoyalist, map, recruitCost, scorePlayer, sellPrice, siegeStrength, taxRate, util, workableCells, year, type State } from '@col/engine';
 import type { GameDef, Icon, TerrainId } from '@col/data';
 
-const ICONS: Icon[] = ['fish', 'timber', 'crops', 'silver'];
+const ICONS: Icon[] = ['food', 'timber', 'crops', 'silver'];
 /** A name in both languages: English first, Russian second. */
 export type Pair = [string, string];
 /** A record built from keys, keeping the value type (unlike Object.fromEntries). */

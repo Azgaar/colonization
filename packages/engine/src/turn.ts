@@ -75,7 +75,13 @@ decision('tax', {
     addBells(s, d.player, set.refuseBells, 'tax');
   },
 });
+/** With crosses.everyRound, the best cross building each player owns gives its ✝️ without an action. */
+export function crossIncome(s: State, p: number): number {
+  if (!s.def.settings.crosses.everyRound) return 0;
+  return Math.max(0, ...s.players[p].buildings.map((b) => { const w = building(s, b).work; return w?.kind === 'produce' && w.icon === 'crosses' ? w.amount : 0; }));
+}
 task('roundEnd', (s) => {
+  for (const p of turnOrder(s)) { const n = crossIncome(s, p); if (n) addCrosses(s, p, n, 'income'); }
   const { war, rounds } = s.def.settings;
   const bells = s.players.some((p) => p.bells >= war.bells);
   if (bells || s.round >= rounds.max) return push(s, { t: 'warStart', reason: bells ? 'bells' : 'rounds' });
@@ -104,6 +110,8 @@ export function addBuilding(s: State, p: number, b: string) {
   s.players[p].buildings.push(b);
   s.buildingsLeft[b]--;
   log(s, { e: 'build', p, building: b });
+  const pl = s.players[p];
+  if (s.def.settings.damage.repairOnBuild && building(s, b).work?.kind === 'repair' && pl.damage) { pl.damage = 0; log(s, { e: 'repaired', p }); }
 }
 export function foundCost(s: State, p: number): { resource: Resource; value: number } | null {
   if (coloniesOf(s, p).length === 0) return null;
@@ -144,7 +152,7 @@ export function actionsFor(s: State, p: number, card: string): { action: string;
   add('produce', noColony, noColony ? [] : once(cellYields(s, p, card)).map((y) => ({ cell: y.cell, icon: y.icon })));
   add('docks', has(pl, 'docks') || pl.buildings.some((b) => building(s, b).work?.kind === 'ocean') ? noColony : 'needs docks',
     once(docksYields(s, p, card)).map((y) => ({ cell: y.cell })));
-  const work = pl.buildings.filter((b) => building(s, b).work?.kind === 'produce');
+  const work = pl.buildings.filter((b) => { const w = building(s, b).work; return w?.kind === 'produce' && !(w.icon === 'crosses' && s.def.settings.crosses.everyRound); });
   const can = work.filter((b) => typeof buildingYield(s, p, card, b) !== 'string');
   const whyWork = work.map((b) => buildingYield(s, p, card, b)).find((x) => typeof x === 'string') as string | undefined;
   add('work', work.length ? (can.length ? null : whyWork!) : 'no producing building', can.map((building_) => ({ building: building_ })));
@@ -167,7 +175,7 @@ export function actionsFor(s: State, p: number, card: string): { action: string;
       : colonyProblem(s, pl.inf) ?? (cost && pl.wh[cost.resource] < cost.value ? `needs ${cost.value} ${cost.resource}` : null));
 
   const atk = attackOptions(s, p, card);
-  add('attack', cardHas(s, card, 'combat') ? (atk.length ? null : 'no target in reach') : 'needs an agent with ⚔️', atk.map(({ token, mode, cell }) => ({ token, mode, cell })));
+  add('attack', cardHas(s, card, 'combat') ? (atk.length ? null : 'no target in reach') : 'needs an agent with 🗡️', atk.map(({ token, mode, cell }) => ({ token, mode, cell })));
 
   const eu = inEurope(s, pl.ship) ? null : 'the ship must be in Europe';
   add('trade', eu ?? (total(pl.hold) ? null : 'the hold is empty'));
@@ -199,7 +207,10 @@ export function actionsFor(s: State, p: number, card: string): { action: string;
   const near = nearSettlements(s, p);
   const natives = (f: (x: (typeof near)[number]) => boolean) => near.filter(f).map((x) => ({ settlement: x.n }));
   const none = near.length ? null : 'no settlement next to a token';
-  add('gift', none ?? (pl.wh.goods ? null : 'needs 1 goods'), natives((x) => s.hostility[x.tribe] > 0));
+  // A gift costs 1 goods, or 1 resource of any kind (natives.giftResource): then the player picks which.
+  const anyGift = s.def.settings.natives.giftResource === 'any';
+  add('gift', none ?? (anyGift ? (total(pl.wh) ? null : 'needs 1 resource') : pl.wh.goods ? null : 'needs 1 goods'),
+    natives((x) => s.hostility[x.tribe] > 0).flatMap((o) => (anyGift ? stockKinds(pl.wh).map((r) => ({ ...o, r })) : [o])));
   add('preach', none ?? (s.nativesLeft ? null : 'no native agents left'), natives((x) => preachCost(s, p, x.tribe, card) <= pl.crosses));
   add('alliance', none ?? (a.edu === 2 ? null : 'needs higher education'),
     natives((x) => x.ally === null && combinedHostility(s, p, x.tribe) <= allianceMax(s, p)));
@@ -244,7 +255,7 @@ export const schoolProfessions = (s: State, b: string) => {
 
 const actions: Record<string, (s: State, p: number, c: any) => void> = {
   produce(s, p, c) { store(s, p, c.icon, cellYields(s, p, c.card).find((y) => y.cell === c.cell && y.icon === c.icon)!.total); },
-  docks(s, p, c) { store(s, p, 'fish', docksYields(s, p, c.card).find((y) => y.cell === c.cell)!.total); },
+  docks(s, p, c) { store(s, p, 'food', docksYields(s, p, c.card).find((y) => y.cell === c.cell)!.total); },
   work(s, p, c) {
     const y = buildingYield(s, p, c.card, c.building), w = building(s, c.building).work!;
     if (typeof y === 'string' || w.kind !== 'produce') throw new Error('unreachable');
@@ -278,9 +289,14 @@ const actions: Record<string, (s: State, p: number, c: any) => void> = {
     }
   },
   customs(s, p, c) {
-    s.players[p].wh[c.r as Resource]--;
-    addGold(s, p, sellPrice(s, p, c.card, c.r), 'customs');
-    demand(s, c.r, 1);
+    // Up to the building's amount of the resource chosen, each at the price of the moment.
+    const w = s.players[p].buildings.map((b) => building(s, b).work).find((x) => x?.kind === 'sell');
+    const n = Math.min(w?.kind === 'sell' ? w.amount : 1, s.players[p].wh[c.r as Resource]);
+    for (let i = 0; i < n; i++) {
+      s.players[p].wh[c.r as Resource]--;
+      addGold(s, p, sellPrice(s, p, c.card, c.r), 'customs');
+      demand(s, c.r, 1);
+    }
   },
   smuggle(s, p, c) {
     s.players[p].wh[c.r as Resource]--;
@@ -301,7 +317,7 @@ const actions: Record<string, (s: State, p: number, c: any) => void> = {
   },
   gift(s, p, c) {
     const x = s.settlements[c.settlement - 1], set = s.def.settings;
-    s.players[p].wh.goods--;
+    s.players[p].wh[(c.r ?? 'goods') as Resource]--;
     const hits = dice(s, set.natives.giftDice).filter((d) => set.combat.successFaces.includes(d)).length;
     setHostility(s, x.tribe, s.hostility[x.tribe] - set.natives.giftBase - hits);
     log(s, { e: 'gift', p, settlement: x.n, hits });

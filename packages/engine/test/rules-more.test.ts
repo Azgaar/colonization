@@ -130,10 +130,7 @@ describe('Combat', () => {
     P(s, 1).wh = stock({ silver: 1 });
     expect(buildingDefence(s, 1).map((x) => x.value)).toEqual([1]);
     build(s, 1, 'fort');
-    expect(buildingDefence(s, 1).map((x) => x.value)).toEqual([2]);
-    const both = game(2, defWith({ 'settings.fort.replacesStockade': false }));
-    build(both, 1, 'stockade', 'fort');
-    expect(buildingDefence(both, 1).reduce((n, x) => n + x.value, 0)).toBe(3);
+    expect(buildingDefence(s, 1).map((x) => x.value)).toEqual([1, 2]);
     turn(s, 0, 'dragoon', 'dragoon', 'dragoon');
     play(s, 'dragoon', 'attack');
     rig(s, 5, 5, 1, 1, 1);
@@ -245,7 +242,7 @@ describe('Colony actions', () => {
     expect(y(at(6, 5))).toEqual(['silver1']);
     expect(y(at(6, 6))).toEqual([]);
     expect(y(at(4, 4))).toEqual([]);
-    expect(y(at(4, 5))).toEqual(['fish1']);
+    expect(y(at(4, 5))).toEqual(['food1']);
   });
   it('[R-2] forest gives fur only with its bonus (DD-56)', () => {
     const s = farm({ [at(5, 6)]: 'forest' });
@@ -254,14 +251,14 @@ describe('Colony actions', () => {
   });
   it('[R-3] ocean gives 1, through docks 2, with fish 3, with a fisherman 4', () => {
     const s = farm();
-    const fish = (card: string, a: string) => { turn(s, 0, card, card); P(s).wh = stock({}); play(s, card, a, a === 'docks' ? {} : { icon: 'fish' }); return P(s).wh.food; };
+    const fish = (card: string, a: string) => { turn(s, 0, card, card); P(s).wh = stock({}); play(s, card, a, a === 'docks' ? {} : { icon: 'food' }); return P(s).wh.food; };
     expect(fish('colonist', 'produce')).toBe(1);
     expect(canPlay(s, 'colonist', 'docks')).toBe(false);
     build(s, 0, 'docks');
     turn(s, 0, 'colonist', 'colonist');
     expect(fish('colonist', 'docks')).toBe(2);
     expect(fish('criminal', 'docks')).toBe(2);
-    s.map.bonus[at(4, 4)] = 'fish';
+    s.map.bonus[at(4, 4)] = 'food';
     turn(s, 0, 'fisherman', 'fisherman');
     const best = legal(s).filter((c) => c.a === 'docks').map((c) => c.cell as number);
     expect(best).toContain(at(4, 4));
@@ -272,7 +269,7 @@ describe('Colony actions', () => {
   it('[R-4] bonus icons add one, or allow one where the terrain yields nothing', () => {
     const s = farm({ [at(5, 5)]: { t: 'grassland', bonus: 'crops' }, [at(5, 6)]: { t: 'mountains', bonus: 'crops' } });
     expect(cellYield(s, 0, 'colonist', at(5, 5), 'crops')!.total).toBe(2);
-    expect(cellYield(s, 0, 'colonist', at(5, 5), 'fish')).toBe(null);
+    expect(cellYield(s, 0, 'colonist', at(5, 5), 'food')).toBe(null);
     expect(cellYield(s, 0, 'colonist', at(5, 6), 'crops')!.total).toBe(1);
     expect(cellYield(s, 0, 'farmer', at(5, 6), 'crops')!.total).toBe(2);
   });
@@ -300,7 +297,7 @@ describe('Colony actions', () => {
     play(s, 'colonist', 'work', { building: 'town_hall' });
     play(s, 'politician', 'work', { building: 'newspaper' });
     play(s, 'politician', 'work', { building: 'newspaper' });
-    expect(P(s).bells).toBe(1 + 4 + 4);
+    expect(P(s).bells).toBe(1 + 3 + 3);
   });
   it('[R-8] workshop and factory', () => {
     const s = farm();
@@ -315,7 +312,7 @@ describe('Colony actions', () => {
   });
   it('[R-9] building limits', () => {
     const s = farm();
-    P(s).wh = stock({ timber: 6 });
+    P(s).wh = stock({ timber: 4 });
     turn(s, 0, 'colonist', 'colonist', 'builder', 'builder');
     expect(canPlay(s, 'colonist', 'build', { building: 'fort' })).toBe(false);
     play(s, 'colonist', 'build', { building: 'stockade' });
@@ -356,11 +353,12 @@ describe('Colony actions', () => {
   it('[R-11] custom house', () => {
     const s = farm();
     build(s, 0, 'warehouse', 'custom_house');
-    P(s).wh = stock({ goods: 1 });
-    turn(s, 0, 'negotiant_dutch', 'colonist');
-    expect(canPlay(s, 'colonist', 'customs')).toBe(false);
+    P(s).wh = stock({ goods: 2 });
+    turn(s, 0, 'negotiant_dutch', 'smuggler');
+    expect(canPlay(s, 'smuggler', 'customs')).toBe(false);
     play(s, 'negotiant_dutch', 'customs', { r: 'goods' });
-    expect([P(s).gold, s.price.goods]).toEqual([6, 4]);
+    // Two goods (DD-79), each at the price of the moment: 5 + 1, then 4 + 1.
+    expect([P(s).gold, s.price.goods]).toEqual([11, 3]);
   });
   it('[R-12] supply', () => {
     const s = farm();
@@ -450,9 +448,9 @@ describe('Natives', () => {
     const s = village({ hostility: 5 });
     P(s).wh = stock({ goods: 2 });
     turn(s, 0, 'colonist', 'colonist');
-    rig(s, 4, 6, 1);
+    // No dice: hostility falls by 3 (DD-86).
     play(s, 'colonist', 'gift');
-    expect([s.hostility.sioux, P(s).wh.goods]).toEqual([3, 1]);
+    expect([s.hostility.sioux, P(s).wh.goods]).toEqual([2, 1]);
   });
   it('[N-6] preach', () => {
     const s = village({ hostility: 3, pop: 1 });
@@ -631,9 +629,9 @@ describe('Founding Father rules', () => {
     colony(s, 0, at(5, 5));
     father(s, 0, 'john_rolfe', 'squanto');
     s.map.bonus[at(5, 6)] = 'crops';
-    const y = (cell: number, icon: 'crops' | 'fish') => cellYield(s, 0, 'colonist', cell, icon)!.total;
+    const y = (cell: number, icon: 'crops' | 'food') => cellYield(s, 0, 'colonist', cell, icon)!.total;
     // John Rolfe adds to all crops, fur in the forest too (DD-76); Squanto to fish (DD-65).
-    expect([y(at(5, 5), 'crops'), y(at(5, 6), 'crops'), y(at(4, 4), 'fish')]).toEqual([2, 2, 2]);
+    expect([y(at(5, 5), 'crops'), y(at(5, 6), 'crops'), y(at(4, 4), 'food')]).toEqual([2, 2, 2]);
   });
   it('[B-6] Champlain founds anywhere legal, within the limit', () => {
     const s = game(2);
@@ -659,7 +657,7 @@ describe('Founding Father rules', () => {
     build(s, 0, 'stockade');
     expect(d()).toBe(2);
     build(s, 0, 'fort');
-    expect(d()).toBe(4);
+    expect(d()).toBe(5);
   });
   it('[B-9] Arnold acts only for the loyalist', () => {
     const s = game(2);

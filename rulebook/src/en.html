@@ -36,10 +36,10 @@
 
     <h3>Agents are your actions</h3>
     <p>Everything you do, you do by playing an <b>agent</b> card from your hand: one card, one action. Any agent can take any of the standard actions, and most have a talent that makes one of them better. A fisherman catches more fish, a sailor sails further, a soldier fights harder. The same agents fight for you in battle and in the war.</p>
-    <p>Your agents form your own deck. You start with your nation’s <rv p="deck.min"></rv> or <rv p="deck.max"></rv>, and hire, recruit and train more as the game goes on. Each has an education: none 🚫, basic 📖 or higher 🎓. The better buildings need better educated workers.</p>
+    <p>Your agents form your own deck. You start with your nation’s <rv p="deck.min"></rv> or <rv p="deck.max"></rv>, and hire, recruit and train more as the game goes on. Each has an education: none 👒, basic 📖 or higher 🎓. The better buildings need better educated workers.</p>
 
     <h3>Two tokens on the map</h3>
-    <p>You have one <b>ship</b> ⛵ and one <b>pawn</b> 💂. The ship sails the ocean and carries your pawn and up to <rv p="settings.hold.size"></rv> resources in its hold. The pawn walks the land, explores, and founds your colonies. Tokens are never destroyed: a beaten token goes back to Europe.</p>
+    <p>You have one <b>ship</b> ⛵ and one <b>pawn</b> ♟️. The ship sails the ocean and carries your pawn and up to <rv p="settings.hold.size"></rv> resources in its hold. The pawn walks the land, explores, and founds your colonies. Tokens are never destroyed: a beaten token goes back to Europe.</p>
 
     <h3>Resources</h3>
     <p>Five kinds of resource, kept as cubes:</p>
@@ -96,7 +96,7 @@
     <p>If any player has <rv p="settings.war.bells"></rv> 🔔 or more, or this was round <rv p="settings.rounds.max"></rv>, the War of Independence begins. Otherwise move the round marker on by <rv p="year.step"></rv> years, pass the first-player marker to the left, and start the next round.</p>
 
     <h3>Playing a card</h3>
-    <p>Any agent can take any standard action and adds its talent where it applies, except where an action asks for a certain agent: an <b>attack</b> needs an agent with ⚔️, an <b>alliance</b> one with 🎓, and <b>work in a building</b> enough education. The <b>criminal</b> and the <b>slave</b> may only produce or be retrained in a school; they still count 1 in battle as support, and may be discarded to pay a card cost or to exchange.</p>
+    <p>Any agent can take any standard action and adds its talent where it applies, except where an action asks for a certain agent: an <b>attack</b> needs an agent with 🗡️, an <b>alliance</b> one with 🎓, and <b>work in a building</b> enough education. The <b>criminal</b> and the <b>slave</b> may only produce or be retrained in a school; they still count 1 in battle as support, and may be discarded to pay a card cost or to exchange.</p>
     <div class="detail" data-title="Your agent pool"><p>Your hand, deck and discard together are your <b>agent pool</b>. Some cards make you remove agents from it; removal stops when <rv p="settings.collection.min"></rv> agents are left. A removed common agent goes to the <b>common discard</b>, a native agent back to the native pile, and a nation’s unique agent out of the game. The common discard also takes the agents discarded from the pier, and is shuffled into a new agent deck when that deck runs out.</p></div>
   </div>
 </section>
@@ -158,7 +158,7 @@
     <p>Cells and buildings may be worked any number of times in a round.</p>
 
     <h4>Work in a building</h4>
-    <p>Instead of a cell, the agent may work in one of your buildings, one building per action. The agent’s education must be at least the building’s. A workshop turns 1 🟩 into 1 🟧, a town hall makes 🔔, a chapel ✝️; the reference lists them all. Bonuses add to what a building makes, never to what it uses. An improvement works instead of its basic building, not on top of it: with a factory, you work the factory.</p>
+    <p>Instead of a cell, the agent may work in one of your buildings, one building per action. The agent’s education must be at least the building’s. A workshop turns 1 🟩 into 1 🟧, a town hall makes 🔔, a chapel ✝️; the reference lists them all. Bonuses add to what a building makes, never to what it uses. One action works one building, so an improvement never adds to the output of its basic building; the basic building stays open to agents without the education for the improvement.</p>
     <p>With <b>docks</b>, the agent works an ocean cell next to your colony through them for +1, so 2 🟦, before the cell’s bonus and the agent’s talent.</p>
     <div class="example" data-title="Example"><p>Daniel has docks, and his colony touches an ocean cell with a fish bonus. He plays his fisherman there: 1 for the sea, +1 for the docks, +1 for the bonus and +1 for the fisherman, 4 🟦 in all.</p></div>
 
@@ -205,11 +205,11 @@
   <header><img src="../../packages/web/art/event/pirate_ambush.webp" alt=""><h2>Combat</h2><p>Battles are decided by the cards both sides commit, and a handful of dice.</p></header>
   <div class="cols">
     <h3>Attack</h3>
-    <p>Your token attacks a token, a colony or a settlement on a neighbouring cell. Play, face up, an agent with ⚔️ of the right kind: pawn ⚔️ for a battle on land, ship ⚔️ for a battle between ships. A captain has both.</p>
+    <p>Your token attacks a token, a colony or a settlement on a neighbouring cell. Play, face up, an agent with 🗡️ of the right kind: pawn 🗡️ for a battle on land, ship 🗡️ for a battle between ships. A captain has both.</p>
     <ul>
       <li>A ship cannot attack the land, except by bombardment.</li>
-      <li>A pawn attacking from its ship, or attacking a ship by the coast, fights at <rv p="settings.combat.landingPenalty"></rv> ⚔️.</li>
-      <li>A <b>bombardment</b> lets a ship attack the land, or a pawn attack a ship, without that penalty. A cannoneer bombards; with Michiel de Ruyter, so does any agent with ⚔️.</li>
+      <li>A pawn attacking from its ship, or attacking a ship by the coast, fights at <rv p="settings.combat.landingPenalty"></rv> 🗡️.</li>
+      <li>A <b>bombardment</b> lets a ship attack the land, or a pawn attack a ship, without that penalty. A cannoneer bombards; with Michiel de Ruyter, so does any agent with 🗡️.</li>
       <li>A pawn inside a colony cannot be attacked on its own: attack the colony.</li>
     </ul>
 
@@ -217,20 +217,20 @@
     <p>Both players secretly choose any number of cards from their hands to join the battle, and reveal them together. The defender may also add the top card of their deck, unseen. Each side then counts:</p>
     <ul>
       <li><b>1 for every card</b> it committed, the played card included;</li>
-      <li>the ⚔️ printed on those cards for this kind of battle;</li>
+      <li>the 🗡️ printed on those cards for this kind of battle;</li>
       <li>its other bonuses; the defender also adds the terrain of its cell.</li>
     </ul>
     <p>All committed cards go to their owners’ discards.</p>
 
     <h3>The dice</h3>
     <p>If the attacker is not stronger, the attack fails and nothing more happens. Otherwise the attacker rolls one die 🎲 for each point of difference. Every <rv p="success"></rv> is a success, and every success does 1 damage. A victory with at least one success gives the winner +<rv p="settings.combat.victoryBells"></rv> 🔔.</p>
-    <div class="example" data-title="Example"><p>Eva attacks Fiona’s pawn in a forest with a soldier (1 for the card, +2 ⚔️) and adds a colonist from her hand: 4. Fiona adds one card, 1, and the forest gives her +1: 2. Eva rolls 2 dice and gets a 6: one success. Fiona’s pawn goes back to Europe, and Eva gains 1 🔔.</p></div>
+    <div class="example" data-title="Example"><p>Eva attacks Fiona’s pawn in a forest with a soldier (1 for the card, +2 🗡️) and adds a colonist from her hand: 4. Fiona adds one card, 1, and the forest gives her +1: 2. Eva rolls 2 dice and gets a 6: one success. Fiona’s pawn goes back to Europe, and Eva gains 1 🔔.</p></div>
 
     <h3>What damage does</h3>
     <ul>
       <li><b>A pawn:</b> one success sends it to Europe.</li>
       <li><b>A ship:</b> each success is 1 damage, taking a space in its hold, up to <rv p="settings.hold.maxDamage"></rv>. The ship goes to Europe, or next to its owner’s colony if they have a shipyard. A winning ship may take the loser’s cargo into its free hold space; the rest is lost, and so is any cargo that no longer fits the damaged hold. A pawn that beats a ship takes nothing.</li>
-      <li><b>A colony:</b> the defender adds +<rv p="settings.combat.colonyDefence"></rv>, the terrain, and a stockade (+1) or a fort (+2), which replaces the stockade. Each success takes 1 resource of the attacker’s choice into their warehouse, or destroys one of the cheapest buildings. A building that an improvement stands on cannot be destroyed while the improvement stands. Then the attacking pawn moves to its owner’s nearest colony, or to Europe if they have none; a bombarding ship stays where it is.</li>
+      <li><b>A colony:</b> the defender adds +<rv p="settings.combat.colonyDefence"></rv>, the terrain, and a stockade (+<rv p="buildings.stockade.defence"></rv>) and a fort (+<rv p="buildings.fort.defence"></rv>), which add up. Each success takes 1 resource of the attacker’s choice into their warehouse, or destroys one of the cheapest buildings. A building that an improvement stands on cannot be destroyed while the improvement stands. Then the attacking pawn moves to its owner’s nearest colony, or to Europe if they have none; a bombarding ship stays where it is.</li>
     </ul>
   </div>
 </section>
@@ -245,7 +245,7 @@
     <h3>Dealing with a settlement</h3>
     <p>These actions need your pawn or ship next to the settlement.</p>
     <ul>
-      <li><b>Gift:</b> give 1 🟧 from your warehouse and roll <rv p="settings.natives.giftDice"></rv> dice. Hostility falls by 1, plus 1 for each success.</li>
+      <li><b>Gift:</b> give 1 resource of any kind from your warehouse. The tribe’s hostility falls by <rv p="settings.natives.giftBase"></rv>.</li>
       <li><b>Preach:</b> spend ✝️ equal to the hostility. Take a native agent into your discard; hostility rises by 1 and population falls by 1. A settlement whose population reaches 0 is gone, with no loot.</li>
       <li><b>Attack:</b> the settlement’s strength is its population plus its terrain; it never adds cards. If you win, you may take a native agent, you gain +1 🔔, and population falls by 1, however much damage you did. Taking the last of them gives you the tribe’s loot (gold, or resources straight into your warehouse) and removes the settlement. Any attack, won or lost, sets the hostility to <rv p="settings.natives.afterAttack"></rv>.</li>
       <li><b>Alliance:</b> at hostility <rv p="settings.natives.allianceMax"></rv> or lower, an agent with 🎓 may ally with a settlement that has no ally yet. Put your marker on its card. In the war, each ally sends <rv p="settings.war.allyCubes"></rv> fighters ⬛ to your colonies’ defence. The alliance ends if the hostility reaches <rv p="settings.natives.allianceBreak"></rv>.</li>
@@ -259,7 +259,7 @@
       <li>at <rv p="hostility.calm"></rv>, nothing happens;</li>
       <li>at <rv p="hostility.raidFrom"></rv> or more, they <b>raid</b> that colony.</li>
     </ul>
-    <p>In a raid, the colony’s owner discards <rv p="settings.raid.resources"></rv> resources or loses 1 building; with fewer resources and no building, all their resources are lost. A fort in any of your colonies stops raids on all of them. Distances are counted in steps, diagonal steps included; ties go to the player first in turn order. If that settlement, or any colony, does not exist, nothing happens.</p>
+    <p>In a raid, the colony’s owner discards <rv p="settings.raid.resources"></rv> resources or loses 1 building; with fewer resources and no building, all their resources are lost. A stockade in any of your colonies stops raids on all of them. Distances are counted in steps, diagonal steps included; ties go to the player first in turn order. If that settlement, or any colony, does not exist, nothing happens.</p>
   </div>
 </section>
 
@@ -282,7 +282,7 @@
     <p>The ruins deck holds <rv p="ruins.count"></rv> cards and the wrecks deck <rv p="wrecks.count"></rv>. Resolve the card at once; most offer a choice.</p>
     <ul>
       <li>An option you cannot pay for, or whose need you cannot meet, is not open to you. If no option is open, nothing happens.</li>
-      <li>“Needs an agent with ⚔️” or “needs a scout”: the agent you played for this move, or one you discard from your hand.</li>
+      <li>“Needs an agent with 🗡️” or “needs a scout”: the agent you played for this move, or one you discard from your hand.</li>
       <li>A scout ignores effects marked 💀.</li>
       <li>“The nearest settlement” is counted in steps from your token, diagonal steps included; you break ties. With no settlement on the map, skip that part.</li>
       <li>“The move ends”: the points left are lost, for both tokens, and a later 💨 on the card does nothing, but the rest of the card still happens.</li>
@@ -317,20 +317,20 @@
     <h3>3. The patriots defend</h3>
     <p>Each patriot chooses, in secret and at the same time as the others, how to defend:</p>
     <ul>
-      <li><b>The army:</b> their agents with ⚔️, pawn or ship.</li>
-      <li><b>Militia:</b> 1 🔔 each, at most one for each of their agents without ⚔️. Each is a black cube ⬛ worth 1 ⚔️.</li>
-      <li><b>Mercenaries:</b> <rv p="settings.war.mercenaryGold"></rv> 🟡 each; a black cube ⬛ worth 1 ⚔️.</li>
+      <li><b>The army:</b> their agents with 🗡️, pawn or ship.</li>
+      <li><b>Militia:</b> 1 🔔 each, at most one for each of their agents without 🗡️. Each is a black cube ⬛ worth 1 🗡️.</li>
+      <li><b>Mercenaries:</b> <rv p="settings.war.mercenaryGold"></rv> 🟡 each; a black cube ⬛ worth 1 🗡️.</li>
       <li><b>Allies:</b> <rv p="settings.war.allyCubes"></rv> black cubes ⬛ for each allied settlement.</li>
     </ul>
     <p>They then spread these cards and cubes among their attacked colonies. Everything is fixed before the first siege.</p>
 
     <h3>4. The sieges</h3>
     <p>Resolve the attacked colonies in the order the cubes were dealt. A colony with no 🟥 and no loyalist card is not attacked.</p>
-    <p><b>Attack:</b> <rv p="settings.war.refStrength"></rv> ⚔️ for each 🟥, plus the tactic, plus the ⚔️ of the loyalist’s cards there, plus the loyalist’s militia. Here a card adds only its ⚔️, not 1 for being played.</p>
-    <p><b>Defence:</b> <rv p="settings.war.baseDefence"></rv>, plus the terrain, plus your stockade or fort, plus <rv p="settings.war.tokenBonus"></rv> for each of your tokens on or next to the colony, plus the ⚔️ of your cards there, plus your black cubes.</p>
+    <p><b>Attack:</b> <rv p="settings.war.refStrength"></rv> 🗡️ for each 🟥, plus the tactic, plus the 🗡️ of the loyalist’s cards there, plus the loyalist’s militia. Here a card adds only its 🗡️, not 1 for being played.</p>
+    <p><b>Defence:</b> <rv p="settings.war.baseDefence"></rv>, plus the terrain, plus your stockade or fort, plus <rv p="settings.war.tokenBonus"></rv> for each of your tokens on or next to the colony, plus the 🗡️ of your cards there, plus your black cubes.</p>
     <p>If the attack is not stronger, the colony holds. Otherwise the loyalist rolls one die for each point of difference, at most <rv p="settings.war.diceCap"></rv>; with no loyalist, another player rolls. No success: against the odds, the colony holds. One success or more: the colony falls.</p>
     <p>If a colony falls and the loyalist’s own strength there is at least the Royal Army’s, the loyalist takes it: replace the colony marker with one of theirs.</p>
-    <div class="example" data-title="Example"><p>Gregor’s colony faces 9 🟥, worth 9 ⚔️, and two loyalist cards worth 3 ⚔️: 12. Gregor defends with 1, +1 for the forest, +1 for his stockade, +1 for his ship next to the colony, his soldier’s 2 ⚔️ and 3 mercenaries: 9. The loyalist rolls 3 dice and gets 2, 4 and 5: one success, and the colony falls. The loyalist’s 3 ⚔️ are less than the army’s 9, so the colony is not theirs to take.</p></div>
+    <div class="example" data-title="Example"><p>Gregor’s colony faces 9 🟥, worth 9 🗡️, and two loyalist cards worth 3 🗡️: 12. Gregor defends with 1, +1 for the forest, +1 for his stockade, +1 for his ship next to the colony, his soldier’s 2 🗡️ and 3 mercenaries: 9. The loyalist rolls 3 dice and gets 2, 4 and 5: one success, and the colony falls. The loyalist’s 3 🗡️ are less than the army’s 9, so the colony is not theirs to take.</p></div>
   </div>
 </section>
 
@@ -422,11 +422,11 @@
       <dt>Crosses ✝️</dt><dd>Faith. They recruit agents and convert natives. At most <rv p="settings.crosses.max"></rv>.</dd>
       <dt>Damage</dt><dd>A wound to a ship, taking one space in its hold. A damaged ship cannot move or attack.</dd>
       <dt>Demand track</dt><dd>One per resource, one space per player. When it fills, the price falls.</dd>
-      <dt>Education</dt><dd>None 🚫, basic 📖 or higher 🎓. A building needs a worker educated at least as well as itself.</dd>
+      <dt>Education</dt><dd>None 👒, basic 📖 or higher 🎓. A building needs a worker educated at least as well as itself.</dd>
       <dt>Europe</dt><dd>The outer ring of cells. Trade, hire, propaganda and repair happen there.</dd>
       <dt>Hold</dt><dd>Your ship’s <rv p="settings.hold.size"></rv> spaces: resources, the pawn and damage.</dd>
       <dt>Hostility 💢</dt><dd>How angry a tribe is, from 0 to <rv p="settings.natives.maxHostility"></rv>.</dd>
-      <dt>Improvement</dt><dd>The stronger version of a basic building. One of each.</dd>
+      <dt>Improvement</dt><dd>A building that needs a basic one, which stays. One of each in the game.</dd>
       <dt>Loyalist</dt><dd>The player who sides with the King in the war.</dd>
       <dt>Militia, mercenaries</dt><dd>Black cubes ⬛ a patriot buys with 🔔 or 🟡 to defend in the war.</dd>
       <dt>Patriot</dt><dd>A player who fights for independence.</dd>
@@ -459,7 +459,7 @@
       <li>Prices 0 to <rv p="settings.market.maxPrice"></rv> 🟡</li>
     </ul>
     <h3>Combat</h3>
-    <p>1 per card, plus ⚔️, plus bonuses. Roll a die for each point of difference; every <rv p="success"></rv> is a success.</p>
+    <p>1 per card, plus 🗡️, plus bonuses. Roll a die for each point of difference; every <rv p="success"></rv> is a success.</p>
     <h3>Actions</h3>
     <table class="narrow">
       <tbody>
@@ -470,7 +470,7 @@
         <tr><td><b>Supply</b></td><td>1 🟦: draw 1</td></tr>
         <tr><td><b>Exchange</b></td><td>discard 2: draw 1</td></tr>
         <tr><td><b>Retrain</b></td><td>in a school: the agent becomes any 📖 (🎓 at a university)</td></tr>
-        <tr><td><b>Attack</b></td><td>an agent with ⚔️</td></tr>
+        <tr><td><b>Attack</b></td><td>an agent with 🗡️</td></tr>
         <tr><td><b>Recruit</b></td><td>✝️, at least the round: look, keep 1</td></tr>
         <tr><td><b>Gift, preach, ally</b></td><td>next to a settlement</td></tr>
         <tr><td><b>In Europe</b></td><td>trade; hire <rv p="settings.hire.max"></rv>; propaganda <rv p="settings.propaganda.maxFathers"></rv>; repair 1</td></tr>

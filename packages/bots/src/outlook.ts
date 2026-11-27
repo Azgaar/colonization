@@ -2,7 +2,7 @@ import type { State } from '@col/engine';
 import { buildingDefence, findLoyalist, hasLoyalist, rebelOrder, scorePlayer, util } from '@col/engine';
 import { holdChance } from './war.ts';
 
-export interface Change { strength?: number; ref?: number; gold?: number; /** Defence of one more colony. */ colony?: number }
+export interface Change { strength?: number; ref?: number; gold?: number; /** Defence of one more colony. */ colony?: number; /** Building defence added to every colony. */ defence?: number }
 export interface Forecast {
   points: number; qualifies: number;
   /** How far the easiest colony is from being safe, 0 to 1. Building a defence pays off only at the end. */
@@ -49,13 +49,13 @@ export function outlook(s: State, collections: string[][], p: number, loyalist: 
   }
   const per = set.score.patriotColony + util.mods(s, p, 'pointsPerPatriotColony').reduce((k, m) => k + m.value, 0);
   const foe = loyalist === null ? 0 : power(loyalist) * 0.6;
-  const build = buildingDefence(s, p).reduce((k, b) => k + b.value, 0);
+  const build = buildingDefence(s, p).reduce((k, b) => k + b.value, 0) + (o.defence ?? 0);
   const base = mine.map((c) => set.war.baseDefence + s.def.terrain[s.map.terrain[c.cell]!].defence + build);
   if (o.colony !== undefined) base.push(set.war.baseDefence + build + o.colony);
   if (!base.length) return { points: 0, qualifies: 0, progress: 0 };
   const civ = (collections[p] ?? []).filter((c) => c !== '?' && !util.isMilitary(s, c)).length;
   const allies = s.settlements.filter((z) => z.alive && z.ally === p).length * set.war.allyCubes;
-  // Only the strength a player has now: counting on more to come made bots wait for an army they never raised (2.5 ⚔️ at the war, on average, against about 7 cubes a colony).
+  // Only the strength a player has now: counting on more to come made bots wait for an army they never raised (2.5 🗡️ at the war, on average, against about 7 cubes a colony).
   const free = power(p) + allies + util.mods(s, p, 'freeMilitia').reduce((k, m) => k + m.value, 0) + (o.strength ?? 0) + 1;
   const paid = Math.floor(gold / set.war.mercenaryGold) + Math.min(civ, pl.bells) * 0.6;
   let points = 0, qualifies = 0;

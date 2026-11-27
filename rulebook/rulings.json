@@ -8,8 +8,8 @@
     "ru": "Корсара предлагают только первому игроку и только если он есть в колоде агентов или общем сбросе. Игрок с наибольшим запасом серебра на складе платит за каждый его кубик либо добавляет 🟥 и получает 🔔; серебро остаётся у него в любом случае. Кто не может заплатить полностью, добавляет 🟥."
   },
   "event.seven_years_war": {
-    "en": "Every agent with ⚔️ leaves the pier, not only soldiers. Refill the pier from the agent deck first, then put the removed agents in the common discard. Agents are removed one at a time from the top of your deck, unseen, and paid for at once; never from your hand, and never below <rv p=\"settings.collection.min\"></rv> agents in your agent pool.",
-    "ru": "С причала уходят все агенты с ⚔️, а не только солдаты. Сначала пополните причал из колоды агентов, затем положите убранных в общий сброс. Агентов убирают по одному с верха своей колоды, не глядя, и оплачивают сразу; никогда — с руки и никогда, если в пуле осталось <rv p=\"settings.collection.min\"></rv> агента."
+    "en": "Every agent with 🗡️ leaves the pier, not only soldiers. Refill the pier from the agent deck first, then put the removed agents in the common discard. Agents are removed one at a time from the top of your deck, unseen, and paid for at once; never from your hand, and never below <rv p=\"settings.collection.min\"></rv> agents in your agent pool.",
+    "ru": "С причала уходят все агенты с 🗡️, а не только солдаты. Сначала пополните причал из колоды агентов, затем положите убранных в общий сброс. Агентов убирают по одному с верха своей колоды, не глядя, и оплачивают сразу; никогда — с руки и никогда, если в пуле осталось <rv p=\"settings.collection.min\"></rv> агента."
   },
   "event.the_great_awakening": {
     "en": "A church owner also has a chapel and gains both amounts. Everyone chooses in secret how many ✝️ to give; then all are given at once. Crosses beyond the last full group, and beyond the most 🟥 the card can remove, are lost.",
@@ -28,8 +28,8 @@
     "ru": "Это не выбор: корабль с грузом теряет весь груз; корабль с пустым трюмом получает 1 повреждение и уходит в Европу или, если у вас есть «Верфь», к вашей колонии. Корабли в открытом море считаются вне Европы; пешка на борту — не груз. Игрок без колоний считается игроком с наименьшим их числом."
   },
   "event.pontiacs_rebellion": {
-    "en": "Settlements raid in number order, and several may raid the same colony. Hostility is counted as the colony’s owner sees it, so Pocahontas helps. A fort in any of your colonies protects them all. Discarding resources needs 2 of them in the warehouse; otherwise you lose a building that none of your other buildings needs.",
-    "ru": "Поселения совершают набеги по порядку номеров, и несколько могут напасть на одну колонию. Враждебность считается для владельца колонии, так что Покахонтас помогает. «Форт» в любой вашей колонии защищает все. Сбросить ресурсы можно, только если на складе их не меньше двух; иначе вы теряете постройку, которую не требует ни одна другая ваша постройка."
+    "en": "Settlements raid in number order, and several may raid the same colony. Hostility is counted as the colony’s owner sees it, so Pocahontas helps. A stockade in any of your colonies protects them all. Discarding resources needs 2 of them in the warehouse; otherwise you lose a building that none of your other buildings needs.",
+    "ru": "Поселения совершают набеги по порядку номеров, и несколько могут напасть на одну колонию. Враждебность считается для владельца колонии, так что Покахонтас помогает. «Частокол» в любой вашей колонии защищает все. Сбросить ресурсы можно, только если на складе их не меньше двух; иначе вы теряете постройку, которую не требует ни одна другая ваша постройка."
   },
   "event.broken_treaties": {
     "en": "Alliances end, but hostility stays as it is. The raids then follow as in Pontiac’s Rebellion.",
@@ -60,8 +60,8 @@
     "ru": "Обвинитель может выбрать и себя. Обвинённый сам выбирает, какого агента с 🎓 убрать, из любой части своего пула агентов. Игрок, в чьём пуле осталось <rv p=\"settings.collection.min\"></rv> агента, ничего не теряет и ничего не получает."
   },
   "event.mutiny": {
-    "en": "Every agent with ⚔️ in your agent pool, hand, deck and discard, is decided one by one: pay for it or remove it. Down to <rv p=\"settings.collection.min\"></rv> agents, you must pay if you can; if you can do neither, nothing happens.",
-    "ru": "Каждый агент с ⚔️ в вашем пуле агентов — на руке, в колоде и в сбросе — решается по одному: заплатите за него или уберите его. Если в пуле осталось <rv p=\"settings.collection.min\"></rv>, нужно платить, если можете; если нельзя ни то ни другое, ничего не происходит."
+    "en": "Every agent with 🗡️ in your agent pool, hand, deck and discard, is decided one by one: pay for it or remove it. Down to <rv p=\"settings.collection.min\"></rv> agents, you must pay if you can; if you can do neither, nothing happens.",
+    "ru": "Каждый агент с 🗡️ в вашем пуле агентов — на руке, в колоде и в сбросе — решается по одному: заплатите за него или уберите его. Если в пуле осталось <rv p=\"settings.collection.min\"></rv>, нужно платить, если можете; если нельзя ни то ни другое, ничего не происходит."
   },
   "event.sacred_forest": {
     "en": "Buildings count only if nobody has any timber. The chosen player pays 1 🟧 or 5 🟡, or lets the hostility of every tribe rise. The raids then follow as in Pontiac’s Rebellion.",
@@ -172,8 +172,8 @@
     "ru": "По-прежнему нужен агент с 🎓, и союз по-прежнему распадается при враждебности <rv p=\"settings.natives.allianceBreak\"></rv>."
   },
   "father.squanto": {
-    "en": "Every production that already gives fish, with any agent: the sea, a fish bonus, or work through the docks. He never makes fish where there is none.",
-    "ru": "Каждая добыча, которая уже даёт рыбу, любым агентом: море, бонус рыбы или работа через доки. Там, где рыбы нет, он её не создаёт."
+    "en": "Every production that already gives food, with any agent: the sea, a food bonus, or work through the docks. He never makes food where there is none.",
+    "ru": "Каждая добыча, которая уже даёт еду, любым агентом: море, бонус еды или работа через доки. Там, где еды нет, он её не создаёт."
   },
   "father.john_rolfe": {
     "en": "Every 🌿, fur from a trapper or a cossack too.",
@@ -204,8 +204,8 @@
     "ru": "Проповедь никогда не повышает враждебность. Вместе с Лас Касасом проповедь бесплатна."
   },
   "father.michiel_de_ruyter": {
-    "en": "Any agent with ⚔️ may bombard from your undamaged ship, counting its better ⚔️. A pawn still needs a cannoneer to bombard a ship.",
-    "ru": "Любой агент с ⚔️ может бомбардировать с вашего неповреждённого корабля, считая лучшее из своих ⚔️. Пешке для бомбардировки корабля по-прежнему нужен канонир."
+    "en": "Any agent with 🗡️ may bombard from your undamaged ship, counting its better 🗡️. A pawn still needs a cannoneer to bombard a ship.",
+    "ru": "Любой агент с 🗡️ может бомбардировать с вашего неповреждённого корабля, считая лучшее из своих 🗡️. Пешке для бомбардировки корабля по-прежнему нужен канонир."
   },
   "father.robert_de_la_salle": {
     "en": "Once, when you take him: a stockade, or a fort if you already have the stockade. You need a free building space and a card left in the supply. You may decline.",
@@ -220,8 +220,8 @@
     "ru": "Только когда агент производит колокола в ратуше или газете."
   },
   "father.george_washington": {
-    "en": "Only as a patriot with an attacked colony. Militia is still limited to one for each of your agents without ⚔️.",
-    "ru": "Только для патриота с атакованной колонией. Ополчение по-прежнему не больше одного на каждого вашего агента без ⚔️."
+    "en": "Only as a patriot with an attacked colony. Militia is still limited to one for each of your agents without 🗡️.",
+    "ru": "Только для патриота с атакованной колонией. Ополчение по-прежнему не больше одного на каждого вашего агента без 🗡️."
   },
   "father.paul_revere": {
     "en": "Only as a patriot with an attacked colony. Free, and not limited by your agents.",
@@ -260,7 +260,7 @@
     "ru": "Добавляет +1 к любой добыче, но работает только на клетках и в доках; школа может его переобучить. В бою даёт 1."
   },
   "agent.fisherman": {
-    "en": "Any production that gives fish: the sea, a fish bonus, or the docks.",
+    "en": "Any production that gives food: the sea, a food bonus, or the docks.",
     "ru": "Любая добыча, которая даёт рыбу: море, бонус рыбы или доки."
   },
   "agent.builder": {
@@ -280,8 +280,8 @@
     "ru": "Отдельное действие, откуда угодно, если у вас есть колония; корабль не нужен. Цена не бывает ниже 0."
   },
   "agent.cannoneer": {
-    "en": "Bombards from your ship at the land, or from your pawn at a ship next to it. It has no pawn ⚔️, so it cannot lead an ordinary attack on land.",
-    "ru": "Бомбардирует с вашего корабля сушу или с вашей пешки корабль рядом с ней. У него нет ⚔️ пешки, поэтому он не может вести обычную атаку на суше."
+    "en": "Bombards from your ship at the land, or from your pawn at a ship next to it. It has no pawn 🗡️, so it cannot lead an ordinary attack on land.",
+    "ru": "Бомбардирует с вашего корабля сушу или с вашей пешки корабль рядом с ней. У него нет 🗡️ пешки, поэтому он не может вести обычную атаку на суше."
   },
   "agent.captain": {
     "en": "Can lead an attack with either token.",
@@ -348,12 +348,12 @@
     "ru": "Работают либо в церкви, либо в часовне, не в обеих. Кресты не превышают предела."
   },
   "building.stockade": {
-    "en": "For every colony of yours, in every attack and in the war.",
-    "ru": "Для каждой вашей колонии, при любой атаке и на войне."
+    "en": "For every colony of yours, in every attack and in the war. A stockade in any of your colonies stops native raids on all of them, and it stays when a fort replaces it.",
+    "ru": "Для каждой вашей колонии, при любой атаке и на войне. Частокол в любой вашей колонии защищает от набегов индейцев все ваши колонии и остаётся, когда его заменяет форт."
   },
   "building.fort": {
-    "en": "Replaces the stockade: +2, not +3. A fort protects all your colonies from native raids.",
-    "ru": "Заменяет частокол: +2, а не +3. Форт защищает от набегов индейцев все ваши колонии."
+    "en": "Adds to the stockade: +3 together. With Kościuszko, his bonus counts once: +2 for the fort.",
+    "ru": "Складывается с частоколом: вместе +3. С Костюшко его бонус считается один раз: +2 за форт."
   },
   "building.school": {
     "en": "You choose where the new agent comes from: the agent deck (shuffle it after), the common discard or the pier; it goes to your discard. The agent you played leaves your pool. Never a unique or a native profession.",
@@ -364,20 +364,20 @@
     "ru": "Агенты без 📖 сюда не попадают; сначала переобучите их в школе. Школа по-прежнему переобучает в профессии 📖."
   },
   "building.custom_house": {
-    "en": "No ship is needed, and the sale counts on the demand track. A trader lacks the education to work here; the Dutch negotiant adds his bonus.",
-    "ru": "Корабль не нужен, продажа заполняет трек спроса. Торговцу не хватает образования для работы здесь; голландский негоциант добавляет свой бонус."
+    "en": "No ship is needed. Both units are of the one resource you choose, each sold at the price of the moment, and each counts on the demand track. A trader can work here and adds his bonus to each unit, as does the Dutch negotiant.",
+    "ru": "Корабль не нужен. Обе единицы — одного выбранного ресурса, каждая продаётся по цене на этот момент и заполняет трек спроса. Торговец может здесь работать и добавляет бонус к каждой единице, как и голландский негоциант."
   },
   "building.shipyard": {
-    "en": "It also lets a damaged ship go next to your colony instead of to Europe. Without it, a repair in Europe removes only 1 damage.",
-    "ru": "Ещё она позволяет повреждённому кораблю уйти к вашей колонии вместо Европы. Без неё ремонт в Европе убирает только 1 повреждение."
+    "en": "A damaged ship of yours may return next to your colony instead of to Europe, fully repaired. Working the shipyard also repairs the ship fully while it lies next to your colony. Without a shipyard, a repair in Europe removes only 1 damage.",
+    "ru": "Ваш повреждённый корабль может вернуться к вашей колонии вместо Европы, полностью починенным. Работа на верфи тоже полностью чинит корабль, стоящий у вашей колонии. Без верфи ремонт в Европе убирает только 1 повреждение."
   },
   "ruin.natives_ambush": {
-    "en": "The agent played for this move counts; otherwise discard one with ⚔️ from your hand. A scout who flees stays on the cell, its move over.",
-    "ru": "Подходит агент, разыгранный для этого движения; иначе сбросьте с руки агента с ⚔️. Скаут, выбравший бегство, остаётся на клетке, и его ход заканчивается."
+    "en": "The agent played for this move counts; otherwise discard one with 🗡️ from your hand. A scout who flees stays on the cell, its move over.",
+    "ru": "Подходит агент, разыгранный для этого движения; иначе сбросьте с руки агента с 🗡️. Скаут, выбравший бегство, остаётся на клетке, и его ход заканчивается."
   },
   "ruin.predators_lair": {
-    "en": "The agent played for this move counts; otherwise discard one with ⚔️ from your hand. A scout who flees stays on the cell, its move over.",
-    "ru": "Подходит агент, разыгранный для этого движения; иначе сбросьте с руки агента с ⚔️. Скаут, выбравший бегство, остаётся на клетке, и его ход заканчивается."
+    "en": "The agent played for this move counts; otherwise discard one with 🗡️ from your hand. A scout who flees stays on the cell, its move over.",
+    "ru": "Подходит агент, разыгранный для этого движения; иначе сбросьте с руки агента с 🗡️. Скаут, выбравший бегство, остаётся на клетке, и его ход заканчивается."
   },
   "ruin.survivor": {
     "en": "Escorting sends the pawn to Europe even if a scout moved it. Abandoning: the same pawn resolves the next ruin card at once.",

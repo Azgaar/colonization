@@ -126,7 +126,7 @@ describe('explanations', () => {
   it('says why an action is not available', () => {
     const s = game(1);
     const why = Object.fromEntries(actionsFor(s, 0, 'colonist').map((a) => [a.action, a.why]));
-    expect(why).toMatchObject({ produce: 'needs a colony', found: 'infantry must be on land', attack: 'needs an agent with ⚔️', trade: 'the hold is empty', moveShip: null });
+    expect(why).toMatchObject({ produce: 'needs a colony', found: 'infantry must be on land', attack: 'needs an agent with 🗡️', trade: 'the hold is empty', moveShip: null });
     colony(s, 0, at(5, 5));
     P(s).ship = at(3, 3);
     expect(actionsFor(s, 0, 'colonist').find((a) => a.action === 'hire')!.why).toBe('the ship must be in Europe');

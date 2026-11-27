@@ -37,7 +37,7 @@ const FX: Record<string, { sheet: string; field: (f: string) => string[] | null 
   wrecks: { sheet: 'Wreck events', field: (f) => (f === 'do' ? [] : null) },
   tactics: { sheet: 'King Tactics', field: (f) => (f === 'effect' ? [] : null) },
 };
-const EDU = ['🚫', '📖', '🎓'];
+const EDU = ['👒', '📖', '🎓'];
 const str = (v: unknown) => String(v ?? '').trim();
 function setIn(root: Record<string, unknown>, keys: string[], value: unknown) {
   let o = root;

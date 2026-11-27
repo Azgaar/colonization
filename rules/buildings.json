@@ -80,7 +80,7 @@
       "copies": 5,
       "nickname": "chapel",
       "name": "часовня",
-      "effect": "→ 1 ✝️",
+      "effect": "→ 2 ✝️",
       "education": "📖",
       "price": "2 🪵",
       "image": "chapel.png",
@@ -88,22 +88,22 @@
         "work": {
           "kind": "produce",
           "icon": "crosses",
-          "amount": 1
+          "amount": 2
         }
       },
-      "$checked": "c2d80fd280"
+      "$checked": "cef719f736"
     },
     {
       "copies": 5,
       "nickname": "stockade",
       "name": "частокол",
-      "effect": "+1 ⚔️ колонии",
+      "effect": "+1 🗡️ колонии, без набегов",
       "price": "2 🪵",
       "image": "stockade.png",
       "$fx": {
         "defence": 1
       },
-      "$checked": "9e275af21c"
+      "$checked": "99438eed69"
     },
     {
       "copies": 5,
@@ -124,24 +124,24 @@
       "copies": 1,
       "nickname": "custom house",
       "name": "таможня",
-      "effect": "→ продажа 1 ресурса",
-      "education": "🎓",
+      "effect": "→ продажа до 2 единиц ресурса",
+      "education": "📖",
       "requires": "склад",
-      "price": "4 🪵",
+      "price": "3 🪵",
       "image": "custom house.png",
       "$fx": {
         "work": {
           "kind": "sell",
-          "amount": 1
+          "amount": 2
         }
       },
-      "$checked": "9521f8b4a9"
+      "$checked": "a72e89d9a6"
     },
     {
       "copies": 1,
       "nickname": "shipyard",
       "name": "верфь",
-      "effect": "→ полный 🛠️ корабля",
+      "effect": "→ полный 🛠️ корабля; повреждённый корабль возвращается к колонии починенным",
       "education": "📖",
       "requires": "доки",
       "price": "2 🪵",
@@ -151,7 +151,7 @@
           "kind": "repair"
         }
       },
-      "$checked": "80a6d456e1"
+      "$checked": "125a1dad7f"
     },
     {
       "copies": 1,
@@ -179,7 +179,7 @@
       "copies": 1,
       "nickname": "newspaper",
       "name": "газета",
-      "effect": "→ 3 🔔",
+      "effect": "→ 2 🔔",
       "education": "🎓",
       "requires": "ратуша",
       "price": "4 🪵",
@@ -188,16 +188,16 @@
         "work": {
           "kind": "produce",
           "icon": "bells",
-          "amount": 3
+          "amount": 2
         }
       },
-      "$checked": "b3860b995a"
+      "$checked": "a8d979e55c"
     },
     {
       "copies": 1,
       "nickname": "church",
       "name": "церковь",
-      "effect": "🎓: → 3 ✝️",
+      "effect": "🎓: → 4 ✝️",
       "education": "🎓",
       "requires": "часовня",
       "price": "4 🪵",
@@ -206,23 +206,23 @@
         "work": {
           "kind": "produce",
           "icon": "crosses",
-          "amount": 3
+          "amount": 4
         }
       },
-      "$checked": "b75df6e362"
+      "$checked": "e0d5fff2f9"
     },
     {
       "copies": 1,
       "nickname": "fort",
       "name": "форт",
-      "effect": "+2 ⚔️ колонии",
+      "effect": "+2 🗡️ колонии",
       "requires": "частокол",
-      "price": "5 🪵",
+      "price": "3 🪵",
       "image": "fort.png",
       "$fx": {
         "defence": 2
       },
-      "$checked": "00d3a51716"
+      "$checked": "73ed6cf126"
     },
     {
       "copies": 1,

@@ -4,9 +4,9 @@ import { icon } from '../icons.ts';
 
 /** Each source of points: its sign, or a Father's name for the points a Father gives. */
 const SOURCE: Record<string, { icon?: string; name: Text }> = {
-  colonies: { icon: 'house', name: msg('score.colonies') }, bells: { icon: 'bells', name: msg('score.bells') }, agents: { icon: 'people', name: msg('score.agents') },
-  gold: { icon: 'gold', name: msg('score.gold') }, buildings: { icon: 'house', name: msg('score.buildings') }, fathers: { icon: 'father', name: msg('score.fathers') },
-  alliances: { icon: 'people', name: msg('score.alliances') },
+  colonies: { icon: 'colony', name: msg('score.colonies') }, bells: { icon: 'bells', name: msg('score.bells') }, agents: { icon: 'population', name: msg('score.agents') },
+  gold: { icon: 'gold', name: msg('score.gold') }, buildings: { icon: 'colony', name: msg('score.buildings') }, fathers: { icon: 'fathers', name: msg('score.fathers') },
+  alliances: { icon: 'population', name: msg('score.alliances') },
 };
 type Parts = { label: string; value: number }[];
 export const named = (l: string) => (SOURCE[l] ? pick(SOURCE[l].name) : D.fathers[l] ? pick(D.fathers[l]) : l);

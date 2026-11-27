@@ -113,7 +113,7 @@ const RUINS = [
 /* ---- infantry by nation ---- */
 const STEEL = '#c3cad0', BRASS = '#c9a25a', INK = '#22262b';
 /* The King's colours and his crown (the same crown as the Royal Army everywhere in the game). */
-const RED = '#b0242a', ROYAL = '#23366e', CROWN = SHAPES.ref!;
+const RED = '#b0242a', ROYAL = '#23366e', CROWN = SHAPES.king!;
 const tricorne = (trim: string, cockade = '') => `<path d="M21 16.500q11-11 22 0-11-3.500-22 0Z" fill="${INK}"/><path d="M21.600 16.200q10.400-3.300 20.800 0" stroke="${trim}" stroke-width="1" fill="none"/>${cockade ? `<circle cx="32" cy="12.600" r="1.600" fill="${cockade}"/>` : ''}`;
 const morion = `<path d="M21 13.500q11 5 22 0-2 3.500-11 3.500t-11-3.500Z" fill="#aeb6bc"/><path d="M26 15q0-7 6-7t6 7Z" fill="${STEEL}"/><path d="M28 9.500q4-5 8 0" stroke="#8d969c" stroke-width="2" fill="none"/>`;
 /** The colour of the crossbelts of each nation. */

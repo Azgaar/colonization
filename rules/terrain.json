@@ -25,7 +25,7 @@
       "indian tribes": 0,
       "village cells": 0,
       "$fx": [
-        "fish"
+        "food"
       ],
       "$checked": "328b0d3dfa"
     },
@@ -35,7 +35,7 @@
       "color": "#228B22",
       "production": "🟫",
       "bonus resource": "10%: 🪵, 5%: 🌿",
-      "defence bonus": "+1 ⚔️",
+      "defence bonus": "+1 🗡️",
       "movement cost": "2 💨",
       "cells": 78,
       "indian tribes": 4,
@@ -66,7 +66,7 @@
       "color": "#A9A9A9",
       "production": "⬜",
       "bonus resource": "10%: 🪙",
-      "defence bonus": "+2 ⚔️",
+      "defence bonus": "+2 🗡️",
       "movement cost": "все 💨",
       "cells": 50,
       "indian tribes": 3,

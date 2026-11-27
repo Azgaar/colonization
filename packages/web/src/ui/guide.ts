@@ -33,7 +33,7 @@ function sections(): Section[] {
       msg('guide.played_agent'),
     ] },
     { id: 'move', title: msg('guide.moving_exploring'), items: [
-      msg('guide.one_action', { ship: ic('ship'), infantry: ic('infantry'), points: s.move.points }),
+      msg('guide.one_action', { ship: ic('ship'), pawn: ic('pawn'), points: s.move.points }),
       msg('guide.moving_clouds', { explore: s.move.explore }),
       msg('guide.infantry_rides'),
       msg('guide.hold_places', { size: s.hold.size, cargo: s.move.cargo }),
@@ -41,7 +41,7 @@ function sections(): Section[] {
     ] },
     { id: 'colony', title: msg('guide.colonies'), items: [
       msg('guide.infantry_founds', { edge: s.colony.onEdge ? '' : t('guide.not_edge'), value: s.colony.foundCost.value, v: ic(s.colony.foundCost.resource) }),
-      msg('guide.produce', { forest: t(fur ? 'guide.forest_fur' : 'guide.forest', { timber: ic('timber') }), food: ic('food'), silver: ic('silver'), fish: ic('fish') }),
+      msg('guide.produce', { forest: t(fur ? 'guide.forest_fur' : 'guide.forest', { timber: ic('timber') }), food: ic('food'), silver: ic('silver') }),
       msg('guide.build_timber', { max: s.buildings.max }),
       msg('guide.warehouse_resources', { base: s.warehouse.base }),
       msg('guide.supply_1'),
@@ -54,7 +54,7 @@ function sections(): Section[] {
       msg('guide.repair_remove'),
     ] },
     { id: 'natives', title: msg('guide.natives'), items: [
-      msg('guide.villages_appear', { anger: ic('anger'), maxHostility: s.natives.maxHostility }),
+      msg('guide.villages_appear', { anger: ic('hostility'), maxHostility: s.natives.maxHostility }),
       msg('guide.next_village'),
       msg('guide.events_activate'),
     ] },
@@ -82,8 +82,8 @@ function sections(): Section[] {
     ] },
     { id: 'icons', title: msg('guide.icons'), items: [
       msg('guide.food_timber', { food: ic('food'), timber: ic('timber'), crops: ic('crops'), goods: ic('goods'), silver: ic('silver') }),
-      msg('guide.gold_bells', { gold: ic('gold'), bells: ic('bells'), crosses: ic('crosses'), ref: ic('ref'), vp: ic('vp') }),
-      msg('guide.ship_infantry', { ship: ic('ship'), infantry: ic('infantry'), anger: ic('anger') }),
+      msg('guide.gold_bells', { gold: ic('gold'), bells: ic('bells'), crosses: ic('crosses'), king: ic('king'), vp: ic('vp') }),
+      msg('guide.ship_infantry', { ship: ic('ship'), pawn: ic('pawn'), anger: ic('hostility') }),
     ] },
   ];
 }

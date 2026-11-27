@@ -90,8 +90,8 @@ const TAX: [string, GameSpec['changes']][] = [
   ['taxes a third', S({ 'tax.track': [0, 0, 1, 2, 3, 3, 5, 5, 6, 8] })],
 ];
 const WAR: [string, GameSpec['changes']][] = [
-  ['a cube is 1 ⚔️', S({ 'war.refStrength': 1 })],
-  ['a cube is 1 ⚔️, refusal adds 1', S({ 'war.refStrength': 1, 'tax.refuseRef': 1 })],
+  ['a cube is 1 🗡️', S({ 'war.refStrength': 1 })],
+  ['a cube is 1 🗡️, refusal adds 1', S({ 'war.refStrength': 1, 'tax.refuseRef': 1 })],
   ['mercenary 3 gold', S({ 'war.mercenaryGold': 3 })],
   ['dice cap 5', S({ 'war.diceCap': 5 })],
   ['ally gives 5', S({ 'war.allyCubes': 5 })],
@@ -108,7 +108,7 @@ const ECON: [string, GameSpec['changes']][] = [
 ];
 const READ: [string, GameSpec['changes']][] = [
   ['raids from hostility 3', S({ 'activation.raidMinHostility': 3 })], ['no settlement gifts', S({ 'activation.gift': 0 })], ['damage leaves the ship where it is', S({ 'damage.sendsToEurope': false })],
-  ['fort adds to stockade', S({ 'fort.replacesStockade': false })], ['one Father per action', S({ 'propaganda.maxFathers': 1 })], ['cargo costs per unit', S({ 'cargo.costPer': 'unit' })],
+  ['one Father per action', S({ 'propaganda.maxFathers': 1 })], ['cargo costs per unit', S({ 'cargo.costPer': 'unit' })],
   ['combat dice capped at 10', S({ 'combat.diceCap': 10 })], ['explore diagonally', S({ 'explore.diagonal': true })], ['own tokens do not block cells', S({ 'production.emptyMeans': 'noForeignToken' })],
   ['REF strength without tactic', S({ 'war.refStrengthIncludesTactic': false })], ['no open-sea ring', S({ 'ring.openSea': 0 })], ['forest gives timber only', { 'terrain.forest.yields': ['timber'] }],
 ];
@@ -120,7 +120,7 @@ for (const bots of [[tuned], mixed]) {
 }
 await compare('read', 'Unclear rules read differently', 4, 600, READ, mixed);
 for (const n of [2, 3]) await compare(`tax${n}`, 'Taxes', n, 600, TAX, mixed);
-await compare('solo', 'Solo', 1, 600, [...TAX.slice(0, 3), ['refusal adds 2', S({ 'tax.refuseRefSolo': 2 })], ['a cube is 1 ⚔️', S({ 'war.refStrength': 1 })]], [patriot]);
+await compare('solo', 'Solo', 1, 600, [...TAX.slice(0, 3), ['refusal adds 2', S({ 'tax.refuseRefSolo': 2 })], ['a cube is 1 🗡️', S({ 'war.refStrength': 1 })]], [patriot]);
 
 // --- 3. Combined proposal -----------------------------------------------------------------
 if (want('seek')) {
@@ -130,5 +130,5 @@ if (want('seek')) {
     const rs = await runAll(table(def, { prefix: 'seek', games: N(320), players: 4, bots: mixed, changes: S({ 'war.refStrength': cube, 'tax.refuseRef': ref, 'tax.refuseBells': bells, 'war.baseDefence': bd }) }));
     rows.push([String(cube), String(ref), String(bells), String(bd), ...['loyalist wins', 'patriot colonies that survive', 'rounds played', 'attack per colony', 'defence per colony', 'taxes refused although affordable'].map((k) => { const v = values(rs, k); return /wins|survive|refused/.test(k) ? `${pct(mean(v))} ±${pct(ci(v))}` : mean(v).toFixed(1); })]);
   }
-  section('Search over four settings (4 players, mixed bots)', mdTable(['cube ⚔️', 'refusal cubes', 'refusal bells', 'base defence', 'loyalist wins', 'survive', 'rounds', 'attack', 'defence', 'refused though able'], rows));
+  section('Search over four settings (4 players, mixed bots)', mdTable(['cube 🗡️', 'refusal cubes', 'refusal bells', 'base defence', 'loyalist wins', 'survive', 'rounds', 'attack', 'defence', 'refused though able'], rows));
 }

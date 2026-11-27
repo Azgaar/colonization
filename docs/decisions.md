@@ -15,6 +15,13 @@ Questions and candidates awaiting the designer. Candidates are the overrides of 
 | O-5 | Dead cards: school (before DD-75), slave, smuggler | May be the bots, not the cards |
 | O-6 | Town hall, stockade, work action, alliances look dominated | Recheck after the war changes |
 | O-7 | Bots move one token per action | Lab numbers understate DD-73 |
+| O-8 | Candidate `chapel-2-church-4`: chapel 2 ✝️, church 4 | ✝️ gained 0.17 → 1.2 a player; chapel built 9% → 18% (round 6), its owners still 2.6 below the mean; recruits 0.01 → 0.1, preaching 0.15 → 0.5 a game |
+| O-9 | Candidate `crosses-every-round`: chapel and church are not worked but give their ✝️ at every round's end | Chapel built 72% (round 4.4), ✝️ 7.1 a player, preaching 2.2 and recruits 0.4 a game, mean score 20.9 → 19.8. With 2/4 (package `crosses-every-round-2-4`): chapel 89%, 14 ✝️ a player but 9 left unspent. One more marker step a round |
+| O-10 | Candidates `goods-6`, `goods-7`: goods start at 6 or 7 on a price track to 10 | Goods made 0.44 → 1.16 a game at 7; blacksmith shop 26% → 29%, factory 0 → 3%. Component change: a longer market track |
+| O-11 | Candidates `gift-fixed-1/2/3`: a gift lowers hostility by 1, 2 or 3, no dice (today 1 + a die in 3 for each of 3 dice: 2 on average) | Gifts about 0.55 a game whatever the value: bots give when a token is next to a village. At 3, alliances 0.33 → 0.41 a game; raids 4.2 → 4.0 |
+| O-12 | Candidate `upgrade-in-place`: an upgrade takes the slot of the building under it | Fort built 6% → 15%, university 13% → 15%; buildings at the end 4.8 → 4.9; mean score 20.6 → 20.8 |
+| O-13 | Candidate `raids-at-5`: raids only at hostility 5 | Measured before the stockade change (DD-77): raids 7.6 → 3.8 |
+| O-14 | Candidate `shipyard-repairs`: a damaged ship may return to its owner's colony fully repaired | Shipyard owners 1.9 → 0.3 below the mean (win rate ×0.5 → ×0.8), built 22% → 23%. The risk is small: 0.55 damages a player a game, nearly all from events (2.0 a game) and wrecks (0.2); ships attack ships 0.01 times a game, and half the players are never damaged |
 
 ## Where the board stands
 
@@ -116,6 +123,23 @@ Questions and candidates awaiting the designer. Candidates are the overrides of 
 | DD-74 | Applied: landing or boarding costs the target cell, like any move |
 | DD-75 | Applied: a school swaps the agent for a profession it teaches; school 2 🟫, university 4 🟫 |
 | DD-76 | Applied: one icon and cube colour per resource: food 🟦 blue (🐟), timber 🟫 brown (🪵), crops 🟩 green (🌿: cash crops and fur), goods 🟧 orange (📦), silver ⬜ light grey (🪙 ingot). 🦫 fur is folded into 🌿, so John Rolfe also adds to fur. Earlier rows keep the old signs (🟨 food, 🟦 goods, 🍂 leaf) |
+| DD-77 | Applied `stockade-stops-raids`: Rulebook, raids: a player with a stockade (not only a fort) is never raided. Stockade card: +1 ⚔️ колонии, no raids |
+| DD-78 | Applied `gift-any-resource`: Gift: pay 1 resource of any kind (not only goods) |
+| DD-79 | Applied `custom-house-open`: Custom house card: price 3 🪵, worker 📖 (not 🎓), sells up to 2 of one resource |
+| DD-80 | Applied `newspaper-2`: Newspaper card: → 2 🔔 |
+| DD-81 | Dropped `workshop-2-goods`: Blacksmith shop built by 18% and barely worked: 1 🌾 for 1 goods loses value; factory never built |
+| DD-82 | Dropped `recruit-half-round`: Crosses are almost never spent: about 0.03 recruits a game, since a recruit costs the round number in ✝️ and a chapel makes 1 a use |
+| DD-83 | Applied `fort-3`: Fort card: price 3 🪵 |
+| DD-84 | Fort +3 as an upgrade over the stockade (+3 in its place, not +4). Improvements are upgrades (factory, newspaper, church, fort: laid over their building; a passive effect counts once, the upgrade's; the building stays workable by agents without the upgrade's education) or extensions (custom house, shipyard, university: a new effect beside it). `BuildingDef.upgrade` replaces `fort.replacesStockade` |
+| DD-85 | Applied `chapel-2-church-4`: Chapel card: → 2 ✝️. Church card: 🎓: → 4 ✝️ |
+| DD-86 | Applied `gift-fixed-3`: Gift: give 1 resource from your warehouse; the tribe's hostility drops by 3 (no dice) |
+| DD-87 | Applied `shipyard-repairs`: Shipyard card: a damaged ship of yours may return to your colony instead of Europe, fully repaired |
+| DD-88 | Dropped `gift-fixed-1`: A gift rolls 3 dice for a drop of 1–4 hostility; a fixed result is quicker at the table and easy to plan |
+| DD-89 | Dropped `gift-fixed-2`: A gift rolls 3 dice for a drop of 1–4 hostility; a fixed result is quicker at the table and easy to plan |
+| DD-90 | Dropped `goods-6`: Blacksmith shop built by 16% and barely worked, factory never: 1 🌿 (price 3) for 1 📦 (price 5) is worth little; a higher goods price and a longer track give goods a reason |
+| DD-91 | Dropped `goods-7`: Blacksmith shop built by 16% and barely worked, factory never: 1 🌿 (price 3) for 1 📦 (price 5) is worth little; a higher goods price and a longer track give goods a reason |
+| DD-92 | Dropped `upgrade-in-place`: An upgrade (factory, newspaper, church, fort) stops the effect of the building under it, yet both take a slot of the 6 |
+| DD-93 | No upgrade logic (DD-84 withdrawn): an improvement is a second building beside its basic one, with its own slot and 1 🏅 like any building; defences add up. Fort +2 (+3 with the stockade). A Father's bonus for a building (Kościuszko) counts once, the best |
 
 Questions Q1–Q21 are answered in DD-11 to DD-67.
 

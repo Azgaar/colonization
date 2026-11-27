@@ -5,7 +5,6 @@ import { version } from "../../../../package.json";
 /** The recordings the game plays and whom to credit (sound/music.json, from their Wikimedia Commons pages). */
 import MUSIC from "../../sound/music.json";
 import { $, D, lang, pick, t } from "../data.ts";
-import { icon } from "../icons.ts";
 import { Board } from "../map/board.ts";
 import { paint } from "../paint.ts";
 import { Dev, Sim } from "../sim.ts";
@@ -35,7 +34,7 @@ const PAGES: Record<Exclude<TitlePage, "main" | "new" | "bench">, () => string> 
   load: () => `<h2>${t('title.load_game')}</h2>
 <h3>${t('title.saved_browser')}</h3>${savedCard()}
 <h3>${t('title.file')}</h3><p>${t('title.game_saved')}</p>
-<button class="wide" data-open-file>${icon("book", 18)} ${t('title.open_saved')}</button>`,
+<button class="wide" data-open-file>${t('title.open_saved')}</button>`,
   options: () => `<h2>${t('title.options')}</h2>${settings(false)}`,
   about: () => `<h2>${t('title.about')}</h2>
 <p class="lead">${t('title.colonization_board')}</p>

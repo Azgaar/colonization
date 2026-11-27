@@ -1,5 +1,5 @@
 /* What every place means for the agent in hand: the options there, or why there are none. All options come from the rules engine. */
-import type { BuildingWork, Mod } from '@col/data';
+import type { BuildingWork, Mod, Resource } from '@col/data';
 import { map } from '@col/engine';
 import { ACT, art, D, me, P, pick, why as reason, RES, t } from './data.ts';
 import { icon } from './icons.ts';
@@ -25,7 +25,7 @@ const mods = <K extends Mod['mod']>(l: Mod[], kind: K) => l.filter((m): m is Ext
 const allMods = (card: string) => [...D.agents[card].mods, ...P.fathers.flatMap((f) => Sim.s.def.fathers[f].mods)];
 /** What working in a building uses up, if anything. */
 const uses = (w: BuildingWork | undefined) => (w?.kind === 'produce' ? w.consumes : undefined);
-/** The pictogram of a gathered icon: its own name. Fish keeps its own sign (food from water). */
+/** The pictogram of a gathered icon: its own name. */
 const ico = (i: string) => i;
 const homes = () => D.colonies.filter((c) => c.owner === me);
 const inEurope = () => D.zone[P.ship] === 'europe';
@@ -63,7 +63,7 @@ function work(card: string): Spaces {
     const w = D.buildings[b].work, k = w?.kind, need = uses(w), act = k ? ({ produce: 'work', ocean: 'docks', sell: 'customs', repair: 'shipyard', teach: 'teach' } as Record<string, string>)[k] : undefined;
     let o: Opt[] = k === 'produce' ? has('work').filter((q) => q.building === b) : k === 'ocean' ? has('docks').map((o) => ({ ...o, n: D.docks[card]?.find((y) => y.cell === o.cell)?.n ?? 1 })).sort((a, b) => b.n - a.n).slice(0, 1) : k === 'teach' ? has('teach').filter((q) => q.building === b) : act ? has(act) : [];
     if (k === 'ocean' && !has('docks').length) o = [];
-    out[`lot:${b}`] = o.length ? { options: o } : { why: !w ? t('places.works_itself') : only && k !== 'produce' && k !== 'ocean' && k !== 'teach' ? gathers : D.buildings[b].edu > D.agents[card].edu ? t('places.needs_education') : need && P.wh[need.res] < need.amount ? t('places.needs_crops') : why(act ?? '', t('why')), passive: !w, need: !w || (only && k !== 'produce' && k !== 'ocean') ? null : D.buildings[b].edu > D.agents[card].edu ? [['', D.buildings[b].edu === 2 ? 'cap' : 'book']] : need && P.wh[need.res] < need.amount ? [[need.amount - P.wh[need.res], need.res]] : null };
+    out[`lot:${b}`] = o.length ? { options: o } : { why: !w ? t('places.works_itself') : only && k !== 'produce' && k !== 'ocean' && k !== 'teach' ? gathers : D.buildings[b].edu > D.agents[card].edu ? t('places.needs_education') : need && P.wh[need.res] < need.amount ? t('places.needs_crops') : why(act ?? '', t('why')), passive: !w, need: !w || (only && k !== 'produce' && k !== 'ocean') ? null : D.buildings[b].edu > D.agents[card].edu ? [['', D.buildings[b].edu === 2 ? 'eduHigher' : 'eduBasic']] : need && P.wh[need.res] < need.amount ? [[need.amount - P.wh[need.res], need.res]] : null };
   }
   // Buildings that could stand.
   for (const [b, def] of Object.entries(D.buildings)) if (!P.buildings.includes(b)) {
@@ -89,7 +89,10 @@ function work(card: string): Spaces {
     for (const o of has('produce')) by.set(o.cell, [...(by.get(o.cell) ?? []), { ...o, n: n(o) }]);
     for (const [c, l] of by) { l.sort((a, b) => b.n - a.n); cell(c, { options: l, gather: l }); }
   }
-  for (const a of ['gift', 'preach', 'alliance']) for (const o of has(a)) { const x = D.settlements[o.settlement - 1]; cell(x.cell, { village: x, options: [o] }); }
+  // A gift of any resource (a rules option) gives the one held most of: one gift per village.
+  const held = (o: Opt) => (o.r ? P.wh[o.r as Resource] : 0);
+  const most = (l: Opt[]) => l.filter((o) => l.find((b) => b.settlement === o.settlement && held(b) === Math.max(...l.filter((c) => c.settlement === o.settlement).map(held))) === o);
+  for (const a of ['gift', 'preach', 'alliance']) for (const o of a === 'gift' ? most(has(a)) : has(a)) { const x = D.settlements[o.settlement - 1]; cell(x.cell, { village: x, options: [o] }); }
   for (const o of has('attack')) cell(o.cell, { attack: true, options: [o] });
   if (has('found').length && typeof P.inf === 'number') cell(P.inf, { found: true, options: has('found') });
   out.found = has('found').length && typeof P.inf === 'number' ? { options: has('found'), cell: P.inf } : { why: only ? gathers : why('found', t('why')) };
@@ -107,7 +110,7 @@ const gain = (n: number) => `<span class="gain" title="${t('vp')}">·&nbsp;${n}$
 const plus = (n: number, i: string, s = 18) => `${n > 0 ? '+' : '−'}${Math.abs(n)} ${icon(i, s)}`;
 function effect(o: Opt): string[] {
   if (o.a === 'produce') return [plus(o.n, ico(o.icon))];
-  if (o.a === 'docks') return [plus(o.n, 'fish')];
+  if (o.a === 'docks') return [plus(o.n, 'food')];
   if (o.a === 'teach') return [o.from === 'pier' ? t('places.from_pier') : o.from === 'deck' ? t('places.from_deck') : t('places.from_discard')];
   if (o.a === 'work') { const w = D.buildings[o.building].work; if (w?.kind !== 'produce') return []; const n = D.works[o.card]?.[o.building]; return [...(w.consumes ? [plus(-w.consumes.amount, w.consumes.res)] : []), plus(typeof n === 'number' ? n : w.amount, ico(w.icon))]; }
   if (o.a === 'build') return [plus(-(D.build[o.card]?.[o.building] ?? 0), 'timber'), plus(D.settings.score.building, 'vp')];
@@ -118,7 +121,7 @@ function effect(o: Opt): string[] {
   if (o.a === 'smuggle') return [plus(-1, o.r), `+ ${icon('gold', 18)}`];
   if (o.a === 'supply') return [plus(-1, 'food'), t('places.draw_1')];
   if (o.a === 'exchange') return [t('places.draw_1')];
-  if (o.a === 'gift') return [plus(-1, 'goods'), `${icon('anger', 17)} −1–4`];
+  if (o.a === 'gift') { const n = D.settings.natives; return [plus(-1, o.r ?? 'goods'), `${icon('hostility', 17)} −${n.giftBase}${n.giftDice ? `–${n.giftBase + n.giftDice}` : ''}`]; }
   if (o.a === 'preach') return [t('places.native_agent')];
   if (o.a === 'recruit') return [plus(-o.n, 'crosses')];
   if (o.a === 'found') return [...(homes().length ? [plus(-5, 'food')] : []), plus(D.settings.score.patriotColony, 'vp')];

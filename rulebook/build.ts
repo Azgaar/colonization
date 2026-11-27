@@ -23,7 +23,7 @@ const S = R.settings;
 const D = describe(R);
 const PRINTED = texts as Record<string, string>, EN = en as Record<string, string>;
 const ART = '../../packages/web/art';
-const EDU = ['🚫', '📖', '🎓'];
+const EDU = ['👒', '📖', '🎓'];
 const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 const name = (x: { en: string; ru: string }, l: Lang) => esc(cap(l === 'ru' ? x.ru : x.en));
@@ -34,17 +34,17 @@ const sum = <T>(o: Record<string, T>, f: (x: T) => number) => Object.values(o).r
 
 /* ---- the game's icons in place of the emoji ---- */
 const EXTRA: Record<string, string> = {
-  skull: '<path d="M12 2.5c-5 0-8.5 3.4-8.5 8 0 2.6 1.2 4.6 3 5.8V20c0 .8.7 1.5 1.5 1.5h8c.8 0 1.5-.7 1.5-1.5v-3.7c1.8-1.2 3-3.2 3-5.8 0-4.6-3.5-8-8.5-8Z" fill="#e9e3d6" stroke="#2a2a2a" stroke-width=".8"/><circle cx="8.6" cy="11.2" r="2.2" fill="#2a2a2a"/><circle cx="15.4" cy="11.2" r="2.2" fill="#2a2a2a"/><path d="M12 13.6l-1.3 2.4h2.6Z" fill="#2a2a2a"/><path d="M9.5 18.2v3M12 18.2v3M14.5 18.2v3" stroke="#2a2a2a" stroke-width="1"/>',
-  cube: '<path d="M4 7.5 12 3.5l8 4v9l-8 4-8-4Z" fill="#2b2b2b"/><path d="M4 7.5 12 11.5l8-4M12 11.5v9" stroke="#777" stroke-width="1.1" fill="none"/>',
-  hut: '<path d="M12 2.5 2.5 21h19Z" fill="#b98152"/><path d="M12 2.5 9.4 7.6M12 2.5l2.6 5.1" stroke="#6e4527" stroke-width="1.6" stroke-linecap="round"/><path d="M12 12.5 9.2 21h5.6Z" fill="#5a3820"/>',
-  tools: '<path d="M14.5 3.2a5 5 0 0 0-5.9 6.6L3 15.4a2 2 0 0 0 2.8 2.8l5.6-5.6a5 5 0 0 0 6.6-5.9l-3 3-2.5-.7-.7-2.5Z" fill="currentColor"/>',
+  danger: '<path d="M12 2.5c-5 0-8.5 3.4-8.5 8 0 2.6 1.2 4.6 3 5.8V20c0 .8.7 1.5 1.5 1.5h8c.8 0 1.5-.7 1.5-1.5v-3.7c1.8-1.2 3-3.2 3-5.8 0-4.6-3.5-8-8.5-8Z" fill="#e9e3d6" stroke="#2a2a2a" stroke-width=".8"/><circle cx="8.6" cy="11.2" r="2.2" fill="#2a2a2a"/><circle cx="15.4" cy="11.2" r="2.2" fill="#2a2a2a"/><path d="M12 13.6l-1.3 2.4h2.6Z" fill="#2a2a2a"/><path d="M9.5 18.2v3M12 18.2v3M14.5 18.2v3" stroke="#2a2a2a" stroke-width="1"/>',
+  marker: '<path d="M4 7.5 12 3.5l8 4v9l-8 4-8-4Z" fill="#2b2b2b"/><path d="M4 7.5 12 11.5l8-4M12 11.5v9" stroke="#777" stroke-width="1.1" fill="none"/>',
+  natives: '<path d="M12 2.5 2.5 21h19Z" fill="#b98152"/><path d="M12 2.5 9.4 7.6M12 2.5l2.6 5.1" stroke="#6e4527" stroke-width="1.6" stroke-linecap="round"/><path d="M12 12.5 9.2 21h5.6Z" fill="#5a3820"/>',
+  repair: '<path d="M14.5 3.2a5 5 0 0 0-5.9 6.6L3 15.4a2 2 0 0 0 2.8 2.8l5.6-5.6a5 5 0 0 0 6.6-5.9l-3 3-2.5-.7-.7-2.5Z" fill="currentColor"/>',
 };
 const SHAPE = (k: string) => SHAPES[k] ?? EXTRA[k] ?? '';
 const EMOJI: [string, string][] = Object.entries({
-  '🟡': 'gold', '🔔': 'bells', '✝️': 'crosses', '✝': 'crosses', '🟥': 'ref', '🟦': 'food', '🟫': 'timber', '🟩': 'crops', '🟧': 'goods', '⬜': 'silver',
-  '🐟': 'fish', '🪵': 'timber', '🌿': 'crops', '📦': 'goods', '🪙': 'silver', '⚔️': 'sword', '⚔': 'sword', '💢': 'anger', '📖': 'book', '🎓': 'cap', '🚫': 'bar',
-  '👨🏻‍🌾': 'bar', '💨': 'move', '🎲': 'die', '⛵': 'ship', '💂': 'infantry', '👥': 'people', '🏘️': 'house', '🏛️': 'father', '💀': 'skull', '⬛': 'cube', '🛖': 'hut',
-  '🛠️': 'tools', '🛠': 'tools', '🏅': 'vp',
+  '🟡': 'gold', '🔔': 'bells', '✝️': 'crosses', '✝': 'crosses', '🟥': 'king', '🟦': 'food', '🟫': 'timber', '🟩': 'crops', '🟧': 'goods', '⬜': 'silver',
+  '🐟': 'food', '🪵': 'timber', '🌿': 'crops', '📦': 'goods', '🪙': 'silver', '🗡️': 'power', '🗡': 'power', '💢': 'hostility', '📖': 'eduBasic', '🎓': 'eduHigher', '👒': 'eduNone',
+  '💨': 'move', '🎲': 'die', '⛵': 'ship', '♟️': 'pawn', '👥': 'population', '💀': 'danger', '⬛': 'marker', '🛖': 'natives',
+  '🛠️': 'repair', '🛠': 'repair', '🏅': 'vp',
 }).sort((a, b) => b[0].length - a[0].length);
 const EMOJI_RE = new RegExp(EMOJI.map(([e]) => e.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|'), 'gu');
 const EMOJI_KEY = new Map(EMOJI);
@@ -144,7 +144,7 @@ const TABLES: Record<string, (l: Lang) => string> = {
     const from: Record<string, [string, string]> = { food: ['Ocean', 'Океан'], timber: ['Forest', 'Лес'], crops: ['Grassland; fur in forest and tundra', 'Луг; мех в лесу и тундре'], goods: ['Crops, in a workshop', 'Из сырья в мастерской'], silver: ['Mountains', 'Горы'] };
     return `<table class="res"><thead><tr><th>${L(l, 'Resource', 'Ресурс')}</th><th>${L(l, 'Cube', 'Кубик')}</th><th>${L(l, 'From', 'Откуда')}</th><th class="num">${L(l, 'Start price', 'Начальная цена')}</th></tr></thead><tbody>${Object.values(R.resources).map((r) => `<tr><td class="nw">${RES[r.id]} <b>${name(r, l)}</b></td><td class="nw">${cube(r.id, l)}</td><td>${L(l, ...(from[r.id] ?? ['', '']))}</td><td class="num">${r.price} 🟡</td></tr>`).join('')}</tbody></table>`;
   },
-  terrain: (l) => { const give: Record<string, string> = { fish: '🟦', timber: '🟫', crops: '🟩', silver: '⬜' }; return `<table class="terrain"><thead><tr><th>${L(l, 'Terrain', 'Местность')}</th><th>${L(l, 'Gives', 'Даёт')}</th><th>${L(l, 'To enter', 'Вход')}</th><th>${L(l, 'Defence', 'Защита')}</th></tr></thead><tbody>${Object.values(R.terrain).map((t) => `<tr><td><b>${name(t, l)}</b></td><td>${t.yields.map((y) => give[y] ?? y).join(' ') || '—'}</td><td>${t.move === 'all' ? L(l, 'all 💨 left, at least 1', 'все оставшиеся 💨, не меньше 1') : `${t.move} 💨`}</td><td>${t.defence ? `+${t.defence} ⚔️` : '—'}</td></tr>`).join('')}</tbody></table>`; },
+  terrain: (l) => { const give: Record<string, string> = { food: '🟦', timber: '🟫', crops: '🟩', silver: '⬜' }; return `<table class="terrain"><thead><tr><th>${L(l, 'Terrain', 'Местность')}</th><th>${L(l, 'Gives', 'Даёт')}</th><th>${L(l, 'To enter', 'Вход')}</th><th>${L(l, 'Defence', 'Защита')}</th></tr></thead><tbody>${Object.values(R.terrain).map((t) => `<tr><td><b>${name(t, l)}</b></td><td>${t.yields.map((y) => give[y] ?? y).join(' ') || '—'}</td><td>${t.move === 'all' ? L(l, 'all 💨 left, at least 1', 'все оставшиеся 💨, не меньше 1') : `${t.move} 💨`}</td><td>${t.defence ? `+${t.defence} 🗡️` : '—'}</td></tr>`).join('')}</tbody></table>`; },
   components: (l) => { const li = (n: string | number, e: string, r: string) => `<li><b>${n}</b> ${L(l, e, r)}</li>`; return `<ul class="components">${[
     li(R.tiles.length, 'map tiles of 3 × 3 cells', 'фрагментов карты по 3 × 3 клетки'),
     li(VALUES['agents.common']!(), `common agent cards, ${VALUES['agents.types']!()} professions`, `карт общих агентов, ${VALUES['agents.types']!()} профессий`),
@@ -157,7 +157,7 @@ const TABLES: Record<string, (l: Lang) => string> = {
     li(count(R.wrecks), 'wreck cards', 'карт кораблекрушений'),
     li(count(R.tactics), 'King’s tactic cards', 'карт тактики Короля'),
     li(sum(R.tribes, (t) => t.copies), `tribe cards (${count(R.tribes)} tribes) with settlement markers`, `карт племён (${count(R.tribes)} племён) с маркерами поселений`),
-    li(count(R.nations), 'nation boards, each with a ⛵ ship, a 💂 pawn and colony markers in its colour', 'планшетов наций, у каждой ⛵ корабль, 💂 пешка и маркеры колоний своего цвета'),
+    li(count(R.nations), 'nation boards, each with a ⛵ ship, a ♟️ pawn and colony markers in its colour', 'планшетов наций, у каждой ⛵ корабль, ♟️ пешка и маркеры колоний своего цвета'),
     `<li>${L(l, 'The Europe board: the round, tax and price tracks, the pier, the salon and the barracks', 'Планшет Европы: треки тура, налога и цен, причал, салон и казармы')}</li>`,
     `<li>${L(l, `Resource cubes in five colours: ${cube('food', l, false)}blue food, ${cube('timber', l, false)}brown timber, ${cube('crops', l, false)}green crops, ${cube('goods', l, false)}orange goods, ${cube('silver', l, false)}light grey silver; red cubes 🟥 for the Royal Army; black cubes ⬛ for population, fighters and markers`, `Кубики ресурсов пяти цветов: ${cube('food', l, false)}синие — еда, ${cube('timber', l, false)}коричневые — древесина, ${cube('crops', l, false)}зелёные — сырьё, ${cube('goods', l, false)}оранжевые — товары, ${cube('silver', l, false)}светло-серые — серебро; красные кубики 🟥 для королевской армии; чёрные кубики ⬛ для населения, бойцов и отметок`)}</li>`,
     `<li>${L(l, 'Gold 🟡, bell 🔔 and cross ✝️ tokens; six dice 🎲', 'Жетоны золота 🟡, колоколов 🔔 и крестов ✝️; шесть кубиков 🎲')}</li>`,
@@ -187,10 +187,10 @@ const TABLES: Record<string, (l: Lang) => string> = {
   symbols: (l) => { const rows: [string, string, string][] = [
     ['🟡', 'gold', 'золото'], ['🔔', 'bells', 'колокола'], ['✝️', 'crosses', 'кресты'], ['🟥', 'the Royal Army', 'королевская армия'],
     ['🟦', 'food: fish, a blue cube', 'еда: рыба, синий кубик'], ['🟫', 'timber: logs, a brown cube', 'древесина: брёвна, коричневый кубик'], ['🟩', 'crops: cash crops or fur, a green cube', 'сырьё: плантационные культуры или мех, зелёный кубик'], ['🟧', 'goods: a crate, an orange cube', 'товары: ящик, оранжевый кубик'], ['⬜', 'silver: an ingot, a light grey cube', 'серебро: слиток, светло-серый кубик'],
-    ['⚔️', 'fighting strength', 'боевая сила'], ['💨', 'movement points', 'очки передвижения'], ['⛵', 'ship', 'корабль'], ['💂', 'pawn', 'пешка'],
+    ['🗡️', 'fighting strength', 'боевая сила'], ['💨', 'movement points', 'очки передвижения'], ['⛵', 'ship', 'корабль'], ['♟️', 'pawn', 'пешка'],
     ['🛖', 'native settlement', 'поселение индейцев'], ['👥', 'population', 'население'], ['💢', 'hostility', 'враждебность'], ['⬛', 'black cube', 'чёрный кубик'],
     ['💀', 'danger, a scout ignores it', 'опасность, скаут её игнорирует'], ['🎲', 'die', 'кубик'], ['🏅', 'victory points', 'победные очки'],
-    ['🚫', 'no education', 'без образования'], ['📖', 'basic education', 'базовое образование'], ['🎓', 'higher education', 'высшее образование'],
+    ['👒', 'no education', 'без образования'], ['📖', 'basic education', 'базовое образование'], ['🎓', 'higher education', 'высшее образование'],
   ]; return `<dl class="symbols">${rows.map(([i, e, r]) => `<div><dt>${i}</dt><dd>${L(l, e, r)}</dd></div>`).join('')}</dl>`; },
 };
 function poiCards(o: GameDef['ruins'], kind: 'ruin' | 'wreck', l: Lang): string {

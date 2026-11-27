@@ -28,7 +28,7 @@ function land(home: Snapshot['colonies'][number], ys: Snapshot['land']) {
 /** A colony's defence and where it comes from: the colony itself, its terrain, defensive buildings. */
 function defence(h: { defence: number; parts: { label: string; value: number }[] }) {
   const name = (l: string) => (l === 'colony' ? t('part.colony') : D.names.terrain[l] ? pick(D.names.terrain[l]).toLowerCase() : D.buildings[l] ? pick(D.buildings[l]).toLowerCase() : l);
-  return `${t('defence')} ${icon('sword', 14)} <b>${h.defence}</b> = ${h.parts.map((x) => `${name(x.label)} ${x.value}`).join(' + ')}`;
+  return `${t('defence')} ${icon('power', 14)} <b>${h.defence}</b> = ${h.parts.map((x) => `${name(x.label)} ${x.value}`).join(' + ')}`;
 }
 /** A building, built or not. One not built is a project: dim, with its cost and what it still needs. */
 function building(b: string, sp: Spaces) {

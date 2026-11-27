@@ -52,7 +52,7 @@ export function cellYield(s: State, p: number, card: string, cell: number, icon:
   return { cell, icon, ...sum(parts) };
 }
 
-const CELL_ICONS: Icon[] = ['fish', 'timber', 'crops', 'silver'];
+const CELL_ICONS: Icon[] = ['food', 'timber', 'crops', 'silver'];
 /** Every production a card can make on cells. */
 export function cellYields(s: State, p: number, card: string): Yield[] {
   const out: Yield[] = [];
@@ -70,7 +70,7 @@ export function docksYields(s: State, p: number, card: string): Yield[] {
     const w = building(s, id).work;
     if (w?.kind !== 'ocean' || agent(s, card).edu < building(s, id).edu) continue;
     for (const cell of workableCells(s, p)) if (s.map.terrain[cell] === 'ocean') {
-      const y = cellYield(s, p, card, cell, 'fish', w.add);
+      const y = cellYield(s, p, card, cell, 'food', w.add);
       if (y) out.push(y);
     }
   }

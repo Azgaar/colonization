@@ -18,8 +18,8 @@ const name = (p: Pair | { en: string; ru: string } | undefined, id: string) => e
 const agent = (id: string) => name(D.agents[id], id);
 const tribe = (n: number) => { const x = D.settlements[n - 1]; return x ? name(D.names.tribes[x.tribe], x.tribe) : ''; };
 const signs = (o: Opt) => Places.effect(o).join(' ');
-/** An amount gathered, with its sign and its name: "+3 🐟 food". Fish is food. */
-const got = (n: number, i: string) => { const r = Places.ico(i) === 'fish' ? 'food' : Places.ico(i); return `${Places.plus(n, Places.ico(i))} ${name(D.names.resources[r], r).toLowerCase()}`; };
+/** An amount gathered, with its sign and its name: "+3 [food] food". */
+const got = (n: number, i: string) => { const r = Places.ico(i); return `${Places.plus(n, Places.ico(i))} ${name(D.names.resources[r], r).toLowerCase()}`; };
 
 /** Where a move heads, by the bot's goal: `{at}` is the cell. */
 const GOALS: Record<string, Pair> = table('goal');
@@ -46,7 +46,7 @@ function describe(a: Advice): string {
         const n = D.yields[card]?.find((y) => y.cell === c.cell && y.icon === c.icon)?.n ?? 1;
         return `${t('advisor.gather')} ${got(n, c.icon)} ${t('advisor.at')} ${where(c.cell)}`;
       }
-      case 'docks': return `${t('advisor.fish_docks')} ${got(D.docks[card]?.find((y) => y.cell === c.cell)?.n ?? 1, 'fish')}`;
+      case 'docks': return `${t('advisor.fish_docks')} ${got(D.docks[card]?.find((y) => y.cell === c.cell)?.n ?? 1, 'food')}`;
       case 'work': return `${t('advisor.work')} ${name(D.buildings[c.building], c.building).toLowerCase()} ${signs(c)}`;
       case 'build': return `${t('advisor.build')} ${name(D.buildings[c.building], c.building).toLowerCase()} ${signs(c)}`;
       case 'found': return `${t('advisor.found_colony')} ${typeof P.inf === 'number' ? where(P.inf) : ''} ${signs(c)}`;

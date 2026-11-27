@@ -40,12 +40,12 @@ const pill = (x: number, y: number, text: string) => { const w = text.length * 8
 function warPlate(c: Colony, x: number, y: number) {
   const sieges = D.war?.sieges ?? [], q = sieges.find((z) => z.cell === c.cell); if (!q) return null;
   const i = sieges.indexOf(q), shown = S.war >= 0, done = shown && i <= S.war && q.fell !== undefined, w = 102;
-  return `<g transform="translate(${x + 32 - w / 2} ${y + 54})" data-war="${i}" style="cursor:pointer">${i === S.war ? `<rect x="-4" y="-4" width="${w + 8}" height="30" rx="15" fill="#fff08a"/>` : ''}<rect width="${w}" height="22" rx="11" fill="#0f3436f2"/>${roundel(-6, -3, q.owner, 28)}<text x="38" y="16" font-size="15" font-weight="800" fill="#93e09c" text-anchor="middle">${q.defence.total}</text><svg x="47" y="4" width="14" height="14" viewBox="0 0 24 24" color="#f7f1e1" opacity=".7">${SHAPES.sword}</svg><text x="70" y="16" font-size="15" font-weight="800" fill="#ff8f78" text-anchor="middle">${q.attack.total}</text>${done ? (q.fell ? '<path d="M88 7l8 8m0-8l-8 8" stroke="#ff8f78" stroke-width="3" stroke-linecap="round"/>' : '<path d="M87 11l4 4 7-8" stroke="#8fe09a" stroke-width="3" fill="none" stroke-linecap="round"/>') : ''}</g>`;
+  return `<g transform="translate(${x + 32 - w / 2} ${y + 54})" data-war="${i}" style="cursor:pointer">${i === S.war ? `<rect x="-4" y="-4" width="${w + 8}" height="30" rx="15" fill="#fff08a"/>` : ''}<rect width="${w}" height="22" rx="11" fill="#0f3436f2"/>${roundel(-6, -3, q.owner, 28)}<text x="38" y="16" font-size="15" font-weight="800" fill="#93e09c" text-anchor="middle">${q.defence.total}</text><svg x="47" y="4" width="14" height="14" viewBox="0 0 24 24" color="#f7f1e1" opacity=".7">${SHAPES.power}</svg><text x="70" y="16" font-size="15" font-weight="800" fill="#ff8f78" text-anchor="middle">${q.attack.total}</text>${done ? (q.fell ? '<path d="M88 7l8 8m0-8l-8 8" stroke="#ff8f78" stroke-width="3" stroke-linecap="round"/>' : '<path d="M87 11l4 4 7-8" stroke="#8fe09a" stroke-width="3" fill="none" stroke-linecap="round"/>') : ''}</g>`;
 }
 /** A settlement: how many live there and how alarmed they are. */
 function count(v: Village, x: number, y: number) {
   const hot = v.hostility >= 4, w = 66, ic = (n: string, cx: number) => `<svg x="${cx}" y="2" width="14" height="14" viewBox="0 0 24 24" color="#f7f1e1">${SHAPES[n]}</svg>`, num = (n: number, cx: number, c = '#f7f1e1') => `<text x="${cx}" y="14" font-size="14.500" font-weight="800" fill="${c}">${n}</text>`;
-  return `<g transform="translate(${x - w / 2} ${y - 1})"><rect width="${w}" height="18" rx="9" fill="#0f3436e6"/>${ic('people', 7)}${num(v.pop, 23)}${ic('anger', 36)}${num(v.hostility, 53, hot ? '#ff8f78' : '#f7f1e1')}</g>`;
+  return `<g transform="translate(${x - w / 2} ${y - 1})"><rect width="${w}" height="18" rx="9" fill="#0f3436e6"/>${ic('population', 7)}${num(v.pop, 23)}${ic('hostility', 36)}${num(v.hostility, 53, hot ? '#ff8f78' : '#f7f1e1')}</g>`;
 }
 /** A ship under the pointer: what is in its hold, and the infantry if it is aboard. */
 function cargoPlate(i: number, x: number, y: number) {
@@ -63,7 +63,7 @@ function wide(s: string, px: number) {
 /** A colony under the pointer: its name and how well it holds. */
 function colonyPlate(c: Colony, x: number, y: number) {
   const mine = c.owner === me, name = colonyName(c), nw = Math.ceil(wide(name, 13.5)), d = 28 + nw + 8, w = d + 30;
-  return `<g transform="translate(${x - w / 2} ${y})"><rect width="${w}" height="20" rx="10" fill="${mine ? D.players[me].color : '#0f3436e6'}" ${mine ? 'stroke="#fff" stroke-width="2"' : ''}/>${roundel(-4, -3, c.owner, 26)}<text x="28" y="15" font-size="13.500" font-weight="800" fill="#f7f1e1">${name}</text><text x="${d}" y="15" font-size="14.500" font-weight="800" fill="#f7f1e1">${c.defence}</text><svg x="${d + 10}" y="4" width="12" height="12" viewBox="0 0 24 24" color="#f7f1e1">${SHAPES.sword}</svg></g>`;
+  return `<g transform="translate(${x - w / 2} ${y})"><rect width="${w}" height="20" rx="10" fill="${mine ? D.players[me].color : '#0f3436e6'}" ${mine ? 'stroke="#fff" stroke-width="2"' : ''}/>${roundel(-4, -3, c.owner, 26)}<text x="28" y="15" font-size="13.500" font-weight="800" fill="#f7f1e1">${name}</text><text x="${d}" y="15" font-size="14.500" font-weight="800" fill="#f7f1e1">${c.defence}</text><svg x="${d + 10}" y="4" width="12" height="12" viewBox="0 0 24 24" color="#f7f1e1">${SHAPES.power}</svg></g>`;
 }
 /** Something that stands on the map: where (map units), how high in the stack, whether it takes the pointer, and its picture. */
 interface Thing { id: string; x: number; y: number; z: number; hit: boolean; html: string }
@@ -87,7 +87,7 @@ const GLYPH: Record<string, string> = {
   wreck: '<path d="M8 18 14.500 3.500" stroke="currentColor" stroke-width="2.200" stroke-linecap="round"/><path d="M13.500 6.500l6.500 3-2.200 4-1.800-1.600-1.800 2.600Z" fill="currentColor"/><path d="M2 20.500q2.500-2.500 5 0t5 0 5 0 5 0" stroke="currentColor" stroke-width="1.800" fill="none" stroke-linecap="round"/>',
 };
 /** The pictogram of the good each bonus resource gives, as in the warehouse. */
-const BONUS: Record<string, string> = { fish: 'fish', crops: 'crops', timber: 'timber', silver: 'silver' };
+const BONUS: Record<string, string> = { food: 'food', crops: 'crops', timber: 'timber', silver: 'silver' };
 /** What stands on the map, each as one sign in the middle of its cell. Squares are places: a colony in its nation's colour, a smaller settlement in the natives' brown. Discs are units in their nation's colour.
  * All of these have a white rim, but a settlement alarmed enough to attack (hostility 4 or more) has a red one. Ruins and wrecks are dark grey hexagons. A bonus resource is the bare pictogram of its good, thinly outlined, in the bottom right corner of its cell. */
 function overview(sp: Spaces, at: Put, near: (c: number) => boolean) {
@@ -103,7 +103,7 @@ function overview(sp: Spaces, at: Put, near: (c: number) => boolean) {
   }
   for (const c of D.colonies) {
     const s = sp[`cell:${c.cell}`], war = warPlate(c, 0, 0);
-    put(`c${c.cell}`, c.cell, 32, 32, (x, y) => (s?.attack ? halo(x + 32, y + 32, 22) : '') + square(x, y, 44, D.players[c.owner]!.color, SHAPES.house!) + (warPlate(c, x, y + 4) ?? '') + (s?.attack ? pill(x + 32, y + 2, pick(ACT.attack)) : ''), 0, !!D.war);
+    put(`c${c.cell}`, c.cell, 32, 32, (x, y) => (s?.attack ? halo(x + 32, y + 32, 22) : '') + square(x, y, 44, D.players[c.owner]!.color, SHAPES.colony!) + (warPlate(c, x, y + 4) ?? '') + (s?.attack ? pill(x + 32, y + 2, pick(ACT.attack)) : ''), 0, !!D.war);
     if (near(c.cell) && !war) put(`h${c.cell}`, c.cell, 32, 32, (x, y) => colonyPlate(c, x + 32, y + 54), 3000);
   }
   const ships = new Map<number, number>();
@@ -115,7 +115,7 @@ function overview(sp: Spaces, at: Put, near: (c: number) => boolean) {
       if (near(p.ship) && !hit) put(`hs${i}`, p.ship, 32, 32, (x, y) => cargoPlate(i, x + 32, y + 50), 3000);
     }
     // Infantry in a colony sits on the corner of its square.
-    if (typeof p.inf === 'number') { const c = colonyAt(p.inf), s = sp[`cell:${p.inf}`], hit = s?.attack && !mine && !c, a = c ? 10 : 32, b = c ? 54 : 32; put(`i${i}`, p.inf, 32, 32, (x, y) => (hit ? halo(x + a, y + b, 12) : '') + dot(x + a, y + b, 12, p.color, SHAPES.infantry!) + (hit ? pill(x + 32, y + 60, pick(ACT.attack)) : ''), 6); }
+    if (typeof p.inf === 'number') { const c = colonyAt(p.inf), s = sp[`cell:${p.inf}`], hit = s?.attack && !mine && !c, a = c ? 10 : 32, b = c ? 54 : 32; put(`i${i}`, p.inf, 32, 32, (x, y) => (hit ? halo(x + a, y + b, 12) : '') + dot(x + a, y + b, 12, p.color, SHAPES.pawn!) + (hit ? pill(x + 32, y + 60, pick(ACT.attack)) : ''), 6); }
   });
 }
 /* ---- The Royal Army: when the war begins it lands colony by colony, a ship off the coast and one soldier at a time on the land around ---- */

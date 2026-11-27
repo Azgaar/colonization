@@ -17,7 +17,7 @@
       "nickname": "Criminal",
       "name": "Преступник",
       "comment": "Только действие производство",
-      "education": "🚫",
+      "education": "👒",
       "price": "0 🟡",
       "image": "Criminal.jpeg,50,100,100",
       "$fx": [
@@ -33,7 +33,7 @@
       "name": "Раб",
       "effect": "производство: +1",
       "comment": "Только действие производство",
-      "education": "🚫",
+      "education": "👒",
       "price": "3 🟡",
       "image": "Slave.png,50,100,100",
       "$fx": [
@@ -69,7 +69,7 @@
         {
           "mod": "production",
           "icons": [
-            "fish"
+            "food"
           ],
           "add": 1
         }
@@ -281,7 +281,7 @@
       "nickname": "Smuggler",
       "name": "Контрабандист",
       "effect": "контрабанда: продажа 1 ресурса прямо со склада по цене рынка -1 🟡",
-      "education": "🚫",
+      "education": "👒",
       "price": "4 🟡",
       "image": "Smuggler.jpeg,50,100,100",
       "$fx": [
@@ -296,8 +296,8 @@
       "copies": 1,
       "nickname": "Corsair",
       "name": "Корсар",
-      "effect": "атака и защита корабля: +2 ⚔️",
-      "education": "🚫",
+      "effect": "атака и защита корабля: +2 🗡️",
+      "education": "👒",
       "price": "5 🟡",
       "image": "Corsair.jpeg,100,95,97",
       "$fx": [
@@ -307,13 +307,13 @@
           "add": 2
         }
       ],
-      "$checked": "8398439680"
+      "$checked": "e17c440140"
     },
     {
       "copies": 2,
       "nickname": "Cannoneer",
       "name": "Канонир",
-      "effect": "атака и защита корабля: +1 ⚔️",
+      "effect": "атака и защита корабля: +1 🗡️",
       "comment": "Может обстреливать",
       "education": "📖",
       "price": "5 🟡",
@@ -328,13 +328,13 @@
           "mod": "bombard"
         }
       ],
-      "$checked": "d3362bf733"
+      "$checked": "f707edb1d4"
     },
     {
       "copies": 6,
       "nickname": "Soldier",
       "name": "Солдат",
-      "effect": "атака и защита пешки: +2 ⚔️",
+      "effect": "атака и защита пешки: +2 🗡️",
       "education": "📖",
       "price": "6 🟡",
       "image": "Soldier.jpeg,50,80,100",
@@ -345,13 +345,13 @@
           "add": 2
         }
       ],
-      "$checked": "a4d7d47d07"
+      "$checked": "94927797fb"
     },
     {
       "copies": 4,
       "nickname": "Dragoon",
       "name": "Драгун",
-      "effect": "атака и защита пешки: +3 ⚔️",
+      "effect": "атака и защита пешки: +3 🗡️",
       "education": "🎓",
       "price": "8 🟡",
       "image": "Dragoon.png,30,50,97",
@@ -362,13 +362,13 @@
           "add": 3
         }
       ],
-      "$checked": "f1abd52cdd"
+      "$checked": "ea6d20de00"
     },
     {
       "copies": 4,
       "nickname": "Captain",
       "name": "Капитан",
-      "effect": "атака и защита: +3 ⚔️",
+      "effect": "атака и защита: +3 🗡️",
       "education": "🎓",
       "price": "10 🟡",
       "image": "Captain.jpeg,50,65,100",
@@ -384,7 +384,7 @@
           "add": 3
         }
       ],
-      "$checked": "cdfc408310"
+      "$checked": "8f58e0c162"
     },
     {
       "copies": 4,

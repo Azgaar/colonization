@@ -13,7 +13,7 @@ import { tokenStops } from './moves.ts';
 type Kind = 'infantry' | 'ship' | 'best';
 const terrainOf = (s: State, c: number) => s.def.terrain[s.map.terrain[c]!];
 
-/** ⚔️ of one card for a token type, where it stands and whom it fights. */
+/** 🗡️ of one card for a token type, where it stands and whom it fights. */
 export function cardStrength(s: State, card: string, kind: Kind, vsNative: boolean, cell: number): number {
   const by = { infantry: 0, ship: 0 };
   for (const m of agent(s, card).mods) {
@@ -28,10 +28,12 @@ export const canBombard = (s: State, p: number, card: string, token: 'ship' | 'i
 /** Defence of a player's colonies from buildings and Fathers. */
 export function buildingDefence(s: State, p: number): Part[] {
   const pl = s.players[p];
-  let list = pl.buildings.filter((b) => building(s, b).defence);
-  if (s.def.settings.fort.replacesStockade) list = list.filter((b) => !list.some((x) => building(s, x).requires === b));
+  // Defences add up: a stockade and the fort beside it count both (DD-93).
+  const list = pl.buildings.filter((b) => building(s, b).defence);
   const parts = list.map((b) => ({ label: b, value: building(s, b).defence! }));
-  for (const m of mods(s, p, 'colonyDefence')) if (list.includes(m.building)) parts.push({ label: `fathers:${m.building}`, value: m.add });
+  // A Father's bonus for a building (Kościuszko: stockade or fort) counts once, the best one the player has.
+  const bonus = mods(s, p, 'colonyDefence').filter((m) => list.includes(m.building)).sort((a, b) => b.add - a.add)[0];
+  if (bonus) parts.push({ label: `fathers:${bonus.building}`, value: bonus.add });
   return parts;
 }
 
@@ -242,7 +244,11 @@ task('refuge', (s, t) => {
 });
 decision('refuge', {
   options: (s, d) => [{ c: 'europe' }, ...colonyWater(s, d.player).map((cell) => ({ c: 'cell', cell }))],
-  resolve(s, d, c) { if (c.c === 'europe') shipToEurope(s, d.player); else s.players[d.player].ship = c.cell; },
+  resolve(s, d, c) {
+    if (c.c === 'europe') return shipToEurope(s, d.player);
+    s.players[d.player].ship = c.cell;
+    if (s.def.settings.damage.shipyardRepairs) { s.players[d.player].damage = 0; log(s, { e: 'repaired', p: d.player }); }
+  },
 });
 export function shipToEurope(s: State, p: number) {
   const pl = s.players[p];

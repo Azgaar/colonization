@@ -25,7 +25,7 @@ const sum = (r: GameRecord, f: (p: number) => number) => r.scores.reduce((n, _, 
 const got = (r: GameRecord, p: number, ...icons: string[]) => icons.reduce((n, i) => n + (r.produced?.[p]?.[i] ?? 0), 0);
 /** What each game says, per player where it is a per-player count. */
 const METRICS: [string, (r: GameRecord) => number][] = [
-  ['food produced per player', (r) => sum(r, (p) => got(r, p, 'fish')) / r.n],
+  ['food produced per player', (r) => sum(r, (p) => got(r, p, 'food')) / r.n],
   ['crops produced per player', (r) => sum(r, (p) => got(r, p, 'crops')) / r.n],
   ['timber produced per player', (r) => sum(r, (p) => got(r, p, 'timber')) / r.n],
   ['colonies founded per player', (r) => sum(r, (p) => r.foundRounds[p]!.length) / r.n],

@@ -2,7 +2,7 @@
 export interface Weights {
   bell: number; gold: number; cross: number; timber: number; food: number; crops: number;
   /** Value of holding one more colony, after the risk of losing it. */
-  /** Multipliers on what the war forecast says about colonies, ⚔️ and REF cubes. */
+  /** Multipliers on what the war forecast says about colonies, 🗡️ and REF cubes. */
   colony: number; strength: number; ref: number;
   firstColony: number;
   explore: number; poi: number; trade: number; building: number; father: number; hire: number;

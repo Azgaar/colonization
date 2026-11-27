@@ -311,7 +311,7 @@ task('raid', (s, t) => {
   if (!col || combinedHostility(s, col.owner, x.tribe) < s.def.settings.activation.raidMinHostility) return;
   const pl = s.players[col.owner];
   log(s, { e: 'raid', settlement: x.n, p: col.owner });
-  if (pl.buildings.includes('fort')) return;
+  if (pl.buildings.includes(s.def.settings.raid.stoppedBy)) return;
   if (total(pl.wh) || pl.buildings.length) ask(s, { kind: 'raid', player: col.owner });
 });
 decision('raid', {

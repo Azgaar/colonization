@@ -7,7 +7,7 @@ import type { GameDef, Mod } from '../packages/data/src/index.ts';
 
 type Any = Record<string, any>; // the effect nodes, read loosely: every kind is handled by name below
 export const RES: Record<string, string> = { food: '🟦', timber: '🟫', crops: '🟩', goods: '🟧', silver: '⬜', gold: '🟡', bells: '🔔', crosses: '✝️' };
-const ICON: Record<string, string> = { fish: '🐟', timber: '🪵', crops: '🌿', goods: '📦', silver: '🪙', crosses: '✝️', bells: '🔔' };
+const ICON: Record<string, string> = { food: '🐟', timber: '🪵', crops: '🌿', goods: '📦', silver: '🪙', crosses: '✝️', bells: '🔔' };
 const sign = (x: number) => (x > 0 ? `+${x}` : `−${-x}`);
 const list = (xs: string[], and = 'and') => (xs.length < 2 ? xs.join('') : `${xs.slice(0, -1).join(', ')} ${and} ${xs.at(-1)}`);
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
@@ -34,7 +34,7 @@ export function describe(R: GameDef) {
         case 'cost': out.push(m.of === 'build' ? `Buildings cost ${sign(m.add)} 🟫` : `Hiring costs ${sign(m.add)} 🟡`); break;
         case 'sellPrice': out.push(`Trade: ${sign(m.add)} 🟡 for each resource sold`); break;
         case 'smuggle': out.push(`Smuggles: sells 1 resource from the warehouse at the market price ${sign(m.add)} 🟡, off the demand track`); break;
-        case 'combat': out.push(`${m.token === 'ship' ? '⛵' : '💂'} ${sign(m.add)} ⚔️${m.vs === 'native' ? ' against natives' : ''}${where}`); break;
+        case 'combat': out.push(`${m.token === 'ship' ? '⛵' : '♟️'} ${sign(m.add)} 🗡️${m.vs === 'native' ? ' against natives' : ''}${where}`); break;
         case 'bombard': out.push('Bombards'); break;
         default: out.push(String(m.mod));
       }
@@ -46,11 +46,11 @@ export function describe(R: GameDef) {
   function work(b: GameDef['buildings'][string]): string {
     const w = b.work as Any | undefined;
     if (b.storage) return `Warehouse holds ${S.warehouse.base + b.storage} resources instead of ${S.warehouse.base}`;
-    if (b.defence) return `${sign(b.defence)} ⚔️ to every colony’s defence${b.id === 'fort' ? '; replaces the stockade; stops native raids' : ''}`;
+    if (b.defence) return `${sign(b.defence)} 🗡️ to every colony’s defence${b.id === S.raid.stoppedBy ? '; stops native raids' : ''}`;
     if (w?.kind === 'ocean') return `Work an ocean cell: ${sign(w.add)} 🐟`;
     if (w?.kind === 'produce') return `${w.consumes ? `${w.consumes.amount} ${RES[w.consumes.res]} → ` : '→ '}${w.amount} ${ICON[w.icon] ?? RES[w.icon] ?? w.icon}`;
     if (w?.kind === 'teach') return `Retrain the agent played here, ${b.edu ? 'one with 📖 or more' : 'any agent'}, into any ${w.maxEdu === 2 ? '🎓' : '📖'} profession`;
-    if (w?.kind === 'sell') return `Sell ${w.amount} resource from the warehouse at the market price`;
+    if (w?.kind === 'sell') return w.amount > 1 ? `Sell up to ${w.amount} of one resource from the warehouse at the market price` : 'Sell 1 resource from the warehouse at the market price';
     if (w?.kind === 'repair') return 'Repair the ship fully while it lies next to your colony';
     return '';
   }
@@ -88,7 +88,7 @@ export function describe(R: GameDef) {
   /** What an option costs; `paid` says it as what happens ("−2 🔔") when the cost is all the option does. */
   function cost(c: Any = {}, needs?: string, paid = false): string {
     const out: string[] = [], m = paid ? '−' : '';
-    if (c.agent) out.push(c.agent === 'scout' ? 'needs a scout' : 'needs an agent with ⚔️');
+    if (c.agent) out.push(c.agent === 'scout' ? 'needs a scout' : 'needs an agent with 🗡️');
     for (const q of ['gold', 'bells'] as const) if (c[q]) out.push(`${m}${c[q]} ${RES[q]}`);
     if (c.cards) out.push(`discard ${plural(c.cards, 'card')} from your hand`);
     if (c.anyFood) out.push(`${m}${c.anyFood} 🟦 from the hold or the warehouse`);
@@ -113,7 +113,7 @@ export function describe(R: GameDef) {
 
   /* ---- events ---- */
   const resList = (rs: string[]) => (rs.length === Object.keys(R.resources).length ? 'all resources' : list(rs.map((r) => RES[r]!)));
-  const raid = `raids the nearest colony. Unless that colony has a fort, its owner discards ${S.raid.resources} resources or loses 1 building`;
+  const raid = `raids the nearest colony. Unless its owner has a ${R.buildings[S.raid.stoppedBy]?.en.toLowerCase() ?? S.raid.stoppedBy}, its owner discards ${S.raid.resources} resources or loses 1 building`;
   function eventStep(n: Any): string {
     switch (n.n) {
       case 'gainIfStock': return `Every player with ${RES[n.res]} in their warehouse gains ${n.bells} 🔔.`;
@@ -121,7 +121,7 @@ export function describe(R: GameDef) {
       case 'activate': return `The natives stir: settlement ${n.settlement}.`;
       case 'firstMayTake': return `The first player may ${n.gold ? `pay ${n.gold} 🟡 to put` : 'put'} ${a(agent(n.agent))} into their discard${n.gold ? '' : ' for free'}.`;
       case 'mostPays': return `The player with the most ${RES[n.res]} pays ${n.goldPerUnit ? `${n.goldPerUnit} 🟡 for each one` : `${n.gold} 🟡`}, or adds ${n.ref} 🟥${n.bells ? ` and gains ${n.bells} 🔔` : ''}.`;
-      case 'refreshPier': return n.which === 'military' ? 'Replace every agent with ⚔️ on the pier.' : 'Discard the pier and deal it anew.';
+      case 'refreshPier': return n.which === 'military' ? 'Replace every agent with 🗡️ on the pier.' : 'Discard the pier and deal it anew.';
       case 'sellAgents': return `Each player may remove up to ${n.max} agents from the top of their deck and gains ${n.gold} 🟡 for each${n.refEach ? `; add ${n.refEach} 🟥 for each` : ''}.`;
       case 'gainPerBuilding': { const e = Object.entries(n.buildings as Record<string, number>), w = RES[n.what]; return n.once ? `Every player with ${list(e.map(([b]) => a(building(b))), 'or')} gains ${e[0]![1]} ${w}.` : `Every player gains ${list(e.map(([b, v]) => `${v} ${w} for ${a(building(b))}`))}.`; }
       case 'jointCrosses': return `Each player secretly discards any number of ✝️. For every ${n.per} ✝️ discarded by all players together, remove 1 🟥, at most ${n.max}.`;
@@ -137,7 +137,7 @@ export function describe(R: GameDef) {
       case 'refreshSalon': return 'Replace the Founding Fathers in the salon with new ones.';
       case 'cheapBuild': return `In turn order, players may build ${list((n.options as string[]).map((b) => a(building(b))), 'or')} at once for ${n.timber} 🟫.`;
       case 'witchTrial': return `The player with the most ✝️ picks any player, who removes one of their 🎓 agents, or gains ${n.crosses} ✝️ if they have none.`;
-      case 'payOrRemove': return `Each player pays ${n.gold} 🟡 for each ${n.which === 'military' ? 'agent with ⚔️' : agent(n.which)} they own, or removes it. Add ${n.refEach} 🟥 for each one removed.`;
+      case 'payOrRemove': return `Each player pays ${n.gold} 🟡 for each ${n.which === 'military' ? 'agent with 🗡️' : agent(n.which)} they own, or removes it. Add ${n.refEach} 🟥 for each one removed.`;
       case 'sacredForest': return `The player with the most 🟫 (if nobody has any, the most buildings) pays the natives ${n.goods} 🟧 or ${n.gold} 🟡, or the 💢 of every settlement rises by ${n.hostility}.`;
       case 'priceReset': return `The prices of ${resList(n.res)} return to their start.`;
       case 'hostilityAll': return `The 💢 of every settlement ${n.add < 0 ? 'falls' : 'rises'} by ${Math.abs(n.add)}.`;
@@ -156,8 +156,8 @@ export function describe(R: GameDef) {
   function tactic(t: GameDef['tactics'][string]): string {
     const e = t.effect as Any;
     switch (e.t) {
-      case 'perCubes': return `Attack ${sign(e.add)} ⚔️ for every ${e.per} 🟥 at the colony.`;
-      case 'perOcean': return `Attack ${sign(e.add)} ⚔️ for every ${e.per} ocean cells around the colony.`;
+      case 'perCubes': return `Attack ${sign(e.add)} 🗡️ for every ${e.per} 🟥 at the colony.`;
+      case 'perOcean': return `Attack ${sign(e.add)} 🗡️ for every ${e.per} ocean cells around the colony.`;
       case 'noTerrain': return 'Patriots do not add their terrain to the defence.';
       case 'cubes': return `Add ${e.add} 🟥 before they are dealt.`;
       case 'successFrom': return `Every ${list(e.faces.map(String))} on the dice is a success.`;
