@@ -1,6 +1,6 @@
 # Data specification
 
-How `Colonization.xlsx` becomes game data. The workbook stays the designer's editing tool; the importer only reads it.
+How the rules become game data. Since 2026-11-27 the rules live in `rules/` (one file per sheet of the old `Colonization.xlsx`, every cell as printed, plus each card's effect `$fx`, English name `$en` and text check `$checked`, and `settings.json`); `pnpm rules:build` compiles them with the importer described below, reading the same columns, and `pnpm rules:sheet publish` writes them back to the Google Sheet that Dextrous prints from. The spreadsheet is no longer edited by hand.
 
 ## 1. Sheets
 
@@ -104,5 +104,5 @@ Checked on the 15:13 version. The earlier tile 20 and tile 31 problems are fixed
 - Use raw art in `assets/`. The `components/` exports are outdated and are not used **[A]**, with two exceptions read for information only: the tax track and the play mat.
 - Pipeline: resize and convert to WebP, keep several sizes, produce a manifest of entity → image, report gaps. Done by `packages/web/tools/art.py`, which ends with a report of missing and unused images per kind (FR-D-5).
 - Reuse directly: terrain textures, portraits, buildings, Fathers, tribes, nation panels, emblems, card backs.
-- New art needed: map tokens for ship, infantry, colony and settlement; resource and interface icons (emoji are used now and render differently by platform); terrain transitions and coastlines; fog; war screen.
+- New art needed: map tokens for ship, pawn, colony and settlement; resource and interface icons (emoji are used now and render differently by platform); terrain transitions and coastlines; fog; war screen.
 - Some file names contain Cyrillic letters (`сaravel.png`); the pipeline normalises names.

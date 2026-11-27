@@ -1,0 +1,246 @@
+{
+  "sheet": "Buildings",
+  "header": [
+    "copies",
+    "nickname",
+    "name",
+    "effect",
+    "education",
+    "requires",
+    "price",
+    "image"
+  ],
+  "rows": [
+    {
+      "copies": 5,
+      "nickname": "warehouse",
+      "name": "склад",
+      "effect": "+6 единиц хранения",
+      "price": "1 🪵",
+      "image": "warehouse.png",
+      "$fx": {
+        "storage": 6
+      },
+      "$checked": "48e448ee9c"
+    },
+    {
+      "copies": 5,
+      "nickname": "docks",
+      "name": "доки",
+      "effect": "→ 2 🐟",
+      "price": "1 🪵",
+      "image": "docks.png,50,50,100",
+      "$fx": {
+        "work": {
+          "kind": "ocean",
+          "add": 1
+        }
+      },
+      "$checked": "d6cc1f1a22"
+    },
+    {
+      "copies": 5,
+      "nickname": "blacksmith shop",
+      "name": "мастерская",
+      "effect": "1 🍂→ 1 📦",
+      "education": "📖",
+      "price": "2 🪵",
+      "image": "blacksmiths shop.png",
+      "$fx": {
+        "work": {
+          "kind": "produce",
+          "icon": "goods",
+          "amount": 1,
+          "consumes": {
+            "res": "crops",
+            "amount": 1
+          }
+        }
+      },
+      "$checked": "43e5c20d50"
+    },
+    {
+      "copies": 5,
+      "nickname": "town hall",
+      "name": "ратуша",
+      "effect": "→ 1 🔔",
+      "education": "📖",
+      "price": "2 🪵",
+      "image": "town hall.png,50,60,100",
+      "$fx": {
+        "work": {
+          "kind": "produce",
+          "icon": "bells",
+          "amount": 1
+        }
+      },
+      "$checked": "cf8d1cbda6"
+    },
+    {
+      "copies": 5,
+      "nickname": "chapel",
+      "name": "часовня",
+      "effect": "→ 1 ✝️",
+      "education": "📖",
+      "price": "2 🪵",
+      "image": "chapel.png",
+      "$fx": {
+        "work": {
+          "kind": "produce",
+          "icon": "crosses",
+          "amount": 1
+        }
+      },
+      "$checked": "c2d80fd280"
+    },
+    {
+      "copies": 5,
+      "nickname": "stockade",
+      "name": "частокол",
+      "effect": "+1 ⚔️ колонии",
+      "price": "2 🪵",
+      "image": "stockade.png",
+      "$fx": {
+        "defence": 1
+      },
+      "$checked": "9e275af21c"
+    },
+    {
+      "copies": 5,
+      "nickname": "school",
+      "name": "школа",
+      "effect": "👨🏻‍🌾 → 📖",
+      "education": "📖",
+      "price": "3 🪵",
+      "image": "school.jpeg,50,70,100",
+      "$fx": {
+        "work": {
+          "kind": "teach",
+          "maxEdu": 1
+        }
+      },
+      "$checked": "280dbd4f8b"
+    },
+    {
+      "copies": 1,
+      "nickname": "custom house",
+      "name": "таможня",
+      "effect": "→ продажа 1 ресурса",
+      "education": "🎓",
+      "requires": "склад",
+      "price": "4 🪵",
+      "image": "custom house.png",
+      "$fx": {
+        "work": {
+          "kind": "sell",
+          "amount": 1
+        }
+      },
+      "$checked": "9521f8b4a9"
+    },
+    {
+      "copies": 1,
+      "nickname": "shipyard",
+      "name": "верфь",
+      "effect": "→ полный 🛠️ корабля",
+      "education": "📖",
+      "requires": "доки",
+      "price": "2 🪵",
+      "image": "shipyard.png",
+      "$fx": {
+        "work": {
+          "kind": "repair"
+        }
+      },
+      "$checked": "80a6d456e1"
+    },
+    {
+      "copies": 1,
+      "nickname": "factory",
+      "name": "фабрика",
+      "effect": "1 🍂→ 2 📦",
+      "education": "📖",
+      "requires": "мастерская",
+      "price": "4 🪵",
+      "image": "factory.jpeg",
+      "$fx": {
+        "work": {
+          "kind": "produce",
+          "icon": "goods",
+          "amount": 2,
+          "consumes": {
+            "res": "crops",
+            "amount": 1
+          }
+        }
+      },
+      "$checked": "e06a6743f0"
+    },
+    {
+      "copies": 1,
+      "nickname": "newspaper",
+      "name": "газета",
+      "effect": "→ 3 🔔",
+      "education": "🎓",
+      "requires": "ратуша",
+      "price": "4 🪵",
+      "image": "newspaper.png",
+      "$fx": {
+        "work": {
+          "kind": "produce",
+          "icon": "bells",
+          "amount": 3
+        }
+      },
+      "$checked": "b3860b995a"
+    },
+    {
+      "copies": 1,
+      "nickname": "church",
+      "name": "церковь",
+      "effect": "🎓: → 3 ✝️",
+      "education": "🎓",
+      "requires": "часовня",
+      "price": "4 🪵",
+      "image": "church.png,50,80,100",
+      "$fx": {
+        "work": {
+          "kind": "produce",
+          "icon": "crosses",
+          "amount": 3
+        }
+      },
+      "$checked": "b75df6e362"
+    },
+    {
+      "copies": 1,
+      "nickname": "fort",
+      "name": "форт",
+      "effect": "+2 ⚔️ колонии",
+      "requires": "частокол",
+      "price": "5 🪵",
+      "image": "fort.png",
+      "$fx": {
+        "defence": 2
+      },
+      "$checked": "00d3a51716"
+    },
+    {
+      "copies": 1,
+      "nickname": "university",
+      "name": "университет",
+      "effect": "👨🏻‍🌾 → 🎓 (кроме уникальных)",
+      "education": "🎓",
+      "requires": "школа",
+      "price": "6 🪵",
+      "image": "university.jpeg,50,60,100",
+      "$fx": {
+        "work": {
+          "kind": "teach",
+          "maxEdu": 2
+        }
+      },
+      "$checked": "aca9dada90"
+    }
+  ]
+}

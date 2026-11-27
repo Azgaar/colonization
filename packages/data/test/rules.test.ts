@@ -1,10 +1,8 @@
-import { readFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
-import readWorkbook from 'read-excel-file/node';
 import { describe, expect, it } from 'vitest';
-import { importWorkbook, type RawSheet } from '../src/import.ts';
+import { compileMaster, machine, readMaster, todo } from '../src/master.ts';
+import { applyToMaster } from '../src/rulesfs.ts';
 import {
-  addDecision, changeList, compileRuleset, conversionReport, dropOverride, editable, flattenRuleset, gameData, loadRuleset, promoteOverride, rulesets, sourceMap, sourceOf,
+  addDecision, changeList, compileRuleset, conversionReport, dropOverride, editable, flattenRuleset, gameData, loadRuleset, rulesets, sourceMap, sourceOf,
   toCsv, validateChange, type Override, type Ruleset,
 } from '../src/index.ts';
 
@@ -35,22 +33,24 @@ describe('adding and removing cards', () => {
     expect(() => compile({ remove: ['events.stamp_act'], conversion: 'interface' }, false)).toThrow(/interface only/);
     expect(compile({ remove: ['events.stamp_act'], conversion: 'direct', table: 'Take Stamp Act out of the event deck' }, false).events.stamp_act).toBeUndefined();
   });
-  it('pc is board plus its own changes', () => { expect(flattenRuleset(rulesets.pc, rulesets).overrides).toEqual([...rulesets.board.overrides, ...rulesets.pc.overrides]); });
+  it('a ruleset gets its base’s changes in front; the old pc is board', () => {
+    const base = rs([{ id: 'b0' }], true, 'base'), mine = { ...rs([{ id: 'm0' }], true, 'mine'), base: 'base' };
+    expect(flattenRuleset(mine, { ...rulesets, base }).overrides.map((o) => o.id)).toEqual(['b0', 'm0']);
+    expect(flattenRuleset({ ...mine, base: 'pc' }, rulesets).overrides.map((o) => o.id)).toEqual(['m0']);
+  });
 });
 
 describe('sources and change lists', () => {
-  it('maps values to workbook cells, and the stored map is up to date', async () => {
+  it('maps values to sheet cells, and the stored map is up to date', () => {
     expect(sourceOf('agents.priest.price')).toEqual({ sheet: 'Agents', row: 14, column: 'H', header: 'price' });
     expect(sourceOf('fathers.francis_drake.mods.0.add').header).toBe('effect');
-    expect(sourceOf('settings.tax.track')).toEqual({ sheet: 'packages/data/src/settings.ts', row: null, column: null, header: 'tax.track' });
-    const sheets = (await readWorkbook(fileURLToPath(new URL('../../../Colonization.xlsx', import.meta.url)))) as unknown as RawSheet[];
-    const reviewed = JSON.parse(readFileSync(fileURLToPath(new URL('../src/reviewed-texts.json', import.meta.url)), 'utf8'));
-    expect(importWorkbook(sheets, reviewed).sources).toEqual(sourceMap);
+    expect(sourceOf('settings.tax.track')).toEqual({ sheet: 'rules/settings.json', row: null, column: null, header: 'tax.track' });
+    expect(compileMaster().sources).toEqual(sourceMap);
   });
   const pc = rs([
     { id: 'cheap_priest', conversion: 'direct', table: 'The priest costs 5 gold', set: { 'agents.priest.price': 5 } },
     { id: 'new_father', conversion: 'component', table: 'A second Minuit', components: ['1 Father card'], copy: { 'fathers.minuit_2': 'fathers.peter_minuit' }, set: { 'fathers.minuit_2.bells': 3 } },
-  ], false, 'pc');
+  ], false, 'mine');
   it('lists each change with the cell to edit', () => {
     const rows = changeList(gameData, pc);
     expect(rows[0]).toEqual({ override: 'cheap_priest', path: 'agents.priest.price', sheet: 'Agents', row: 14, column: 'H', header: 'price', from: 6, to: 5, conversion: 'direct', table: 'The priest costs 5 gold' });
@@ -60,21 +60,28 @@ describe('sources and change lists', () => {
   });
   it('reports what differs from board', () => {
     const report = conversionReport(gameData, rs([], false, 'board'), { ...pc, base: 'board' });
-    expect(report).toContain('2 change(s) in pc: direct 1, component 1.');
+    expect(report).toContain('2 change(s) in mine: direct 1, component 1.');
     expect(report).toContain('| agents.priest.price | Agents, H14 (price) | 6 | 5 |');
     expect(report).toContain('Components needed: 1 Father card.');
   });
 });
 
-describe('promote and drop', () => {
-  const board = rs([], false, 'board');
-  const pc = rs([{ id: 'a', conversion: 'direct', table: 'A', set: {} }, { id: 'b', conversion: 'notConvertible', set: {} }, { id: 'c', conversion: 'direct', set: {} }], false, 'pc');
-  it('moves a convertible change to board and refuses the others', () => {
-    const r = promoteOverride(board, pc, 'a');
-    expect([r.board.overrides.map((o) => o.id), r.pc.overrides.map((o) => o.id)]).toEqual([['a'], ['b', 'c']]);
-    expect(() => promoteOverride(board, pc, 'b')).toThrow(/not convertible/);
-    expect(() => promoteOverride(board, pc, 'c')).toThrow(/table wording/);
-    expect(dropOverride(pc, 'b').pc.overrides.map((o) => o.id)).toEqual(['a', 'c']);
+describe('apply and drop', () => {
+  it('writes a change into the master: settings, printed values with their units, effects with a todo for the printed text', () => {
+    const m = readMaster();
+    const left = applyToMaster(m, { id: 'x', why: '', conversion: 'direct', table: 'Priest 5, tax track, Drake +3', set: { 'settings.tax.refuseRef': 2, 'agents.priest.price': 5, 'fathers.francis_drake.mods.0.add': 3 } });
+    expect(m.settings.tax.refuseRef).toBe(2);
+    expect(m.sheets.find((s) => s.sheet === 'Agents')!.rows.find((r) => r.nickname === 'Priest')!.price).toBe('5 🟡');
+    expect(left).toEqual(['fathers.francis_drake']);
+    expect(todo(m).map((t) => t.card)).toEqual(['father.francis_drake']);
+    const d = compileMaster(m).data!;
+    expect([d.agents.priest.price, (d.fathers.francis_drake.mods[0] as { add: number }).add, d.settings.tax.refuseRef]).toEqual([5, 3, 2]);
+    expect(machine(m).checked('father.francis_drake', 'x')).toBe(false);
+    expect(() => applyToMaster(m, { id: 'y', why: '', conversion: 'component', table: 'A second Minuit', components: ['1 Father card'], copy: { 'fathers.minuit_2': 'fathers.peter_minuit' } })).toThrow(/by hand/);
+  });
+  it('drops a change from its ruleset', () => {
+    const r = rs([{ id: 'a', conversion: 'direct', table: 'A', set: {} }, { id: 'b', set: {} }], true, 'proposed');
+    expect(dropOverride(r, 'b').ruleset.overrides.map((o) => o.id)).toEqual(['a']);
   });
   it('appends a dated decision', () => {
     const log = '# D\n\n## Decided by the designer (2026-11-25)\n\n| # | Decision |\n|---|---|\n| DD-1 | x |\n| DD-2 | y |\n\n## Open\n\ntext\n';

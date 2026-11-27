@@ -70,7 +70,7 @@ decision('tax', {
   resolve(s, d, c) {
     const set = s.def.settings.tax;
     log(s, { e: 'tax', p: d.player, pay: c.c === 'pay', rate: taxRate(s) });
-    if (c.c === 'pay') return addGold(s, d.player, -taxRate(s), 'tax');
+    if (c.c === 'pay') { addGold(s, d.player, -taxRate(s), 'tax'); return addBells(s, d.player, set.payBells, 'tax'); }
     addRef(s, s.players.length === 1 ? set.refuseRefSolo : set.refuseRef, 'tax');
     addBells(s, d.player, set.refuseBells, 'tax');
   },
@@ -402,7 +402,8 @@ export function gainFather(s: State, p: number, f: string) {
 task('recruit', (s, t) => {
   // As an action (recruitAction), the crosses spent are the cards looked at, and Roger Williams takes 2 of them; otherwise one look, or his 3.
   const look = t.n ?? mods(s, t.p, 'recruitLook').reduce((n, m) => Math.max(n, m.value), 1);
-  const take = t.n ? mods(s, t.p, 'recruitTake').reduce((n, m) => Math.max(n, m.value), 1) : 1;
+  // A second pick carries what is left to take (t.take); Roger Williams' 2 is counted only when the recruiting starts.
+  const take = t.take ?? (t.n ? mods(s, t.p, 'recruitTake').reduce((n, m) => Math.max(n, m.value), 1) : 1);
   const cards: string[] = t.cards ?? [];
   if (!t.cards) while (cards.length < look) { const c = drawAgent(s); if (!c) break; cards.push(c); }
   if (cards.length) ask(s, { kind: 'recruit', player: t.p, cards, take, action: !!t.n });

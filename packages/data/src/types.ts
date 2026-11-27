@@ -141,7 +141,7 @@ export interface Settings {
   players: { min: number; max: number };
   hand: { size: number };
   rounds: { max: number; firstYear: number; yearStep: number };
-  tax: { track: number[]; refuseRef: number; refuseRefSolo: number; refuseBells: number };
+  tax: { track: number[]; refuseRef: number; refuseRefSolo: number; refuseBells: number; payBells: number };
   map: { size: number };
   ring: { openSea: number; europe: number };
   move: { points: number; explore: number; cargo: number; embark: number };
@@ -224,7 +224,7 @@ export interface Override {
 /** `base` names a ruleset whose overrides come first: `pc` is `board` plus its own changes. */
 /** `packages`: named sets of this ruleset's overrides (by id) meant to be tried together, as in `proposed`. */
 export interface Ruleset { id: string; title: string; base?: string; sandbox?: boolean; overrides: Override[]; packages?: Record<string, string[]> }
-/** Where a value can be edited: a workbook cell, or a key in packages/data/src/settings.ts. `row` is null for a new row. */
+/** Where a value is printed: a cell of a sheet in rules/ (as published to the Google Sheet), or a key in rules/settings.json. `row` is null for a new row. */
 export interface Source { sheet: string; row: number | null; column: string | null; header: string }
 export interface GameDef extends GameData { rulesetId: string; rulesetHash: string }
 /** Path → [sheet, row, column letter, header] of the cell it was read from. Deeper paths fall back to the nearest recorded parent. */

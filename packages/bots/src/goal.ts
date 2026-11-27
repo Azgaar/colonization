@@ -376,7 +376,7 @@ function scoreSmall(x: Situation, c: Choice): number {
       const set = s.def.settings.tax, rate = taxRate(s);
       const cubes = s.players.length === 1 ? set.refuseRefSolo : set.refuseRef;
       // Gold spent is mercenaries not hired; cubes come down on all patriots.
-      if (c.c === 'pay') return -rate * 0.1 - Math.max(0, warPoints(x) - warPoints(x, { gold: -rate })) * w.strength - (x.last ? 0 : rate * Math.max(0, x.gold - 0.1));
+      if (c.c === 'pay') return set.payBells * x.bell - rate * 0.1 - Math.max(0, warPoints(x) - warPoints(x, { gold: -rate })) * w.strength - (x.last ? 0 : rate * Math.max(0, x.gold - 0.1));
       return set.refuseBells * x.bell - cubes * x.ref;
     }
     case 'nodeChoice': {

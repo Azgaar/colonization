@@ -1,6 +1,6 @@
 {
  "schema": 1,
- "sourceHash": "fbfc7f4c59af896f",
+ "sourceHash": "50a0cb016d4fc90a",
  "resources": {
   "food": {
    "id": "food",
@@ -49,8 +49,7 @@
    "ru": "лес",
    "en": "Forest",
    "yields": [
-    "timber",
-    "fur"
+    "timber"
    ],
    "defence": 1,
    "move": 2
@@ -60,7 +59,6 @@
    "ru": "луг",
    "en": "Grassland",
    "yields": [
-    "corn",
     "leaf"
    ],
    "defence": 0,
@@ -176,7 +174,7 @@
     {
      "mod": "production",
      "icons": [
-      "corn"
+      "leaf"
      ],
      "add": 1
     }
@@ -1389,7 +1387,7 @@
     {
      "mod": "production",
      "icons": [
-      "leaf"
+      "fish"
      ],
      "add": 1
     }
@@ -1546,7 +1544,7 @@
   },
   "docks": {
    "id": "docks",
-   "ru": "причал",
+   "ru": "доки",
    "en": "Docks",
    "copies": 5,
    "edu": 0,
@@ -1962,7 +1960,7 @@
     {
      "mod": "production",
      "icons": [
-      "corn"
+      "fish"
      ],
      "add": 1
     }
@@ -2059,8 +2057,8 @@
    "bells": 2,
    "mods": [
     {
-     "mod": "recruitLook",
-     "value": 3
+     "mod": "recruitTake",
+     "value": 2
     }
    ],
    "onGain": []
@@ -2088,7 +2086,7 @@
    "id": "michiel_de_ruyter",
    "ru": "Михил де Рёйтер",
    "en": "Michiel de Ruyter",
-   "flavor": "1607–1676. Aдмирал, одержавший ряд крупных побед",
+   "flavor": "1607–1676. Адмирал, одержавший ряд крупных побед",
    "category": "military",
    "bells": 2,
    "mods": [
@@ -2272,7 +2270,7 @@
    "id": "benedict_arnold",
    "ru": "Бенедикт Арнольд",
    "en": "Benedict Arnold",
-   "flavor": "1741–1801. Генерал Континетальной армии, предавший патриотов",
+   "flavor": "1741–1801. Генерал Континентальной армии, предавший патриотов",
    "category": "military",
    "bells": 2,
    "mods": [
@@ -2352,7 +2350,7 @@
    "id": "seven_years_war",
    "ru": "Семилетняя война",
    "en": "Seven Years War",
-   "flavor": "Старый Свет полыхает в огне войны. Корона требуют рекрутов из колоний, а оружейники взвинчивают цены на мушкеты и пушки.",
+   "flavor": "Старый Свет полыхает в огне войны. Корона требует рекрутов из колоний, а оружейники взвинчивают цены на мушкеты и пушки.",
    "do": [
     {
      "n": "price",
@@ -2407,7 +2405,7 @@
    "id": "smallpox_epidemic",
    "ru": "Эпидемия оспы",
    "en": "Smallpox Epidemic",
-   "flavor": "Cмерть пришла на кораблях из Европы. Она не щадит ни колонистов, ни, в особенности, коренных жителей этих земель.",
+   "flavor": "Смерть пришла на кораблях из Европы. Она не щадит ни колонистов, ни, в особенности, коренных жителей этих земель.",
    "do": [
     {
      "n": "price",
@@ -4419,7 +4417,7 @@
    "id": "surviving_crew",
    "ru": "Выживший экипаж",
    "en": "Surviving Crew",
-   "flavor": "Изголодавшие матросы на шлюпке готовы поклясться вам в верности, если вы их спасёте.",
+   "flavor": "Изголодавшиеся матросы на шлюпке готовы поклясться вам в верности, если вы их спасёте.",
    "do": [
     {
      "n": "choice",
@@ -4527,7 +4525,7 @@
    "id": "slave_ship",
    "ru": "Судно работорговцев",
    "en": "Slave Ship",
-   "flavor": "На трюме севшего на мель судна найдены пленные индейцы.",
+   "flavor": "В трюме севшего на мель судна найдены пленные индейцы.",
    "do": [
     {
      "n": "choice",
@@ -4663,7 +4661,7 @@
    "id": "calm_seas",
    "ru": "Штиль",
    "en": "Calm Seas",
-   "flavor": "Корабль попал в зону полного безветрия",
+   "flavor": "Корабль попал в зону полного безветрия.",
    "do": [
     {
      "n": "endMove"
@@ -7780,9 +7778,10 @@
     20,
     25
    ],
-   "refuseRef": 2,
+   "refuseRef": 1,
    "refuseRefSolo": 3,
-   "refuseBells": 1
+   "refuseBells": 0,
+   "payBells": 1
   },
   "map": {
    "size": 4
@@ -7819,7 +7818,7 @@
     "resource": "food",
     "value": 5
    },
-   "onEdge": false
+   "onEdge": true
   },
   "buildings": {
    "max": 6
@@ -7843,7 +7842,7 @@
   "crosses": {
    "max": 15,
    "recruitPerRound": 1,
-   "recruitAction": false
+   "recruitAction": true
   },
   "collection": {
    "min": 4
@@ -7890,7 +7889,7 @@
   },
   "war": {
    "bells": 15,
-   "refStrength": 2,
+   "refStrength": 1,
    "hostileCubes": 1,
    "hostileFrom": 4,
    "allyCubes": 3,
@@ -7899,7 +7898,7 @@
    "refStrengthIncludesTactic": true,
    "tokenBonus": 1,
    "baseDefence": 1,
-   "loyalistFrom": 2
+   "loyalistFrom": 3
   },
   "score": {
    "patriotColony": 6,

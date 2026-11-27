@@ -1120,6 +1120,7 @@ describe('settings without a rule of their own', () => {
       s.war = { loyalist: null, tactic: 'ships_of_the_line', pool: 2, order: [0], sieges: [], spent: {} };
       return siegeStrength(s, { owner: 0, cell: at(5, 5), cubes: 2, loyalist: [], militia: 0, army: [], support: 0, betrayed: 0 }).ref;
     };
-    expect([ref(), ref(defWith({ 'settings.war.refStrengthIncludesTactic': false }))]).toEqual([6, 4]);
+    // 2 cubes at strength 1 (DD-49): 2 without the tactic, 6 with Ships of the Line's bonus.
+    expect([ref(), ref(defWith({ 'settings.war.refStrengthIncludesTactic': false }))]).toEqual([6, 2]);
   });
 });

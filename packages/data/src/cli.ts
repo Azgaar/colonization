@@ -1,29 +1,21 @@
-/** Import Colonization.xlsx. `--review` accepts the current card texts as matching effects.ts. */
-import { existsSync, readFileSync, writeFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
-import readWorkbook from 'read-excel-file/node';
-import { formatIssue, importWorkbook, type RawSheet } from './import.ts';
+/**
+ * Build the game data from the master rules (`rules/`, see master.ts): generated/gamedata.json, sources.json (where each value is printed in
+ * the sheet) and texts.json (the printed card texts). `--review` first accepts every printed text as checked against its effect (`$fx`).
+ * Usage: pnpm rules:build, pnpm rules:review
+ */
+import { formatIssue } from './import.ts';
+import { compileMaster, readMaster, review, writeGenerated, writeMaster } from './master.ts';
 
-const at = (p: string) => fileURLToPath(new URL(p, import.meta.url));
-const workbook = at('../../../Colonization.xlsx');
-const reviewedPath = at('./reviewed-texts.json');
-const outPath = at('../generated/gamedata.json');
-const sourcesPath = at('../generated/sources.json');
-
-const sheets = (await readWorkbook(workbook)) as unknown as RawSheet[];
-let reviewed: Record<string, string> = existsSync(reviewedPath) ? JSON.parse(readFileSync(reviewedPath, 'utf8')) : {};
+const master = readMaster();
 if (process.argv.includes('--review')) {
-  const { texts } = importWorkbook(sheets, reviewed);
-  for (const [k, v] of Object.entries(texts)) if (reviewed[k] !== v) console.log(`reviewed ${k}: ${v}`);
-  reviewed = Object.fromEntries(Object.entries(texts).sort(([a], [b]) => (a < b ? -1 : 1)));
-  writeFileSync(reviewedPath, JSON.stringify(reviewed, null, 1) + '\n');
+  const changed = review(master);
+  for (const c of changed) console.log(`checked ${c}`);
+  if (changed.length) writeMaster(master);
 }
-const { data, issues, sources } = importWorkbook(sheets, reviewed);
+const { data, issues, sources, texts } = compileMaster(master);
 for (const i of issues) console.log(formatIssue(i));
-if (!data) { console.error('Import failed. Nothing was written.'); process.exit(1); }
-writeFileSync(outPath, JSON.stringify(data, null, 1) + '\n');
-// One path per line keeps workbook edits readable in a diff.
-writeFileSync(sourcesPath, '{\n' + Object.entries(sources).map(([k, v]) => ` ${JSON.stringify(k)}: ${JSON.stringify(v)}`).join(',\n') + '\n}\n');
+if (!data) { console.error('The rules do not compile. Nothing was written.'); process.exit(1); }
+writeGenerated({ data, issues, sources, texts });
 const n = (o: object) => Object.keys(o).length;
-console.log(`Imported ${n(data.agents)} agents, ${n(data.nations)} nations, ${n(data.buildings)} buildings, ${n(data.fathers)} Fathers, ${n(data.events)} events, ` +
+console.log(`Built ${n(data.agents)} agents, ${n(data.nations)} nations, ${n(data.buildings)} buildings, ${n(data.fathers)} Fathers, ${n(data.events)} events, ` +
   `${n(data.ruins)} ruins, ${n(data.wrecks)} wrecks, ${n(data.tactics)} tactics, ${n(data.tribes)} tribes, ${data.tiles.length} tiles.`);

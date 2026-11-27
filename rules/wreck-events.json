@@ -1,0 +1,1151 @@
+{
+  "sheet": "Wreck events",
+  "header": [
+    "copies",
+    "nickname",
+    "name",
+    "flavor",
+    "effect 1",
+    "image",
+    "type"
+  ],
+  "rows": [
+    {
+      "copies": 1,
+      "nickname": "Shipwreck",
+      "name": "Кораблекрушение",
+      "flavor": "Всё, что удалось найти – пустые бочки из-под рома.",
+      "effect 1": "➥ Забрать: положите +1 🟫 в трюм, фишка заканчивает ход\n➥ Отплыть: +1 💨",
+      "image": "wreck-back.png",
+      "type": "🌀",
+      "$fx": [
+        {
+          "n": "choice",
+          "id": "shipwreck",
+          "options": [
+            {
+              "id": "take",
+              "en": "Take",
+              "ru": "Забрать",
+              "do": [
+                {
+                  "n": "gain",
+                  "hold": {
+                    "timber": 1
+                  }
+                },
+                {
+                  "n": "endMove"
+                }
+              ]
+            },
+            {
+              "id": "leave",
+              "en": "Sail on",
+              "ru": "Отплыть",
+              "do": [
+                {
+                  "n": "moves",
+                  "add": 1
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "$checked": "799503be76"
+    },
+    {
+      "copies": 1,
+      "nickname": "Sunken Galleon",
+      "name": "Затонувший галеон",
+      "flavor": "Огромный корабль напоролся на рифы. Его трюмы ломятся от богатств Нового Света.",
+      "effect 1": "➥ Обыскать верхнюю палубу: +8 🟡, фишка заканчивает ход\n➥ Нырнуть в затопленный трюм: фишка заканчивает ход\n  🎲 1-2: Обвал мачты: 1 повреждение 💀\n  🎲 3-4: Найдены сундуки: +15 🟡\n  🎲 5-6: Главная казна: +25 🟡\n➥ Проплыть мимо: +1 💨",
+      "image": "wreck-back.png",
+      "type": "🌟",
+      "$fx": [
+        {
+          "n": "choice",
+          "id": "sunken_galleon",
+          "options": [
+            {
+              "id": "deck",
+              "en": "Search the upper deck",
+              "ru": "Обыскать верхнюю палубу",
+              "do": [
+                {
+                  "n": "gain",
+                  "gold": 8
+                },
+                {
+                  "n": "endMove"
+                }
+              ]
+            },
+            {
+              "id": "dive",
+              "en": "Dive into the hold",
+              "ru": "Нырнуть в затопленный трюм",
+              "do": [
+                {
+                  "n": "endMove"
+                },
+                {
+                  "n": "roll",
+                  "table": [
+                    {
+                      "max": 2,
+                      "do": [
+                        {
+                          "n": "damage",
+                          "amount": 1,
+                          "skull": true
+                        }
+                      ]
+                    },
+                    {
+                      "max": 4,
+                      "do": [
+                        {
+                          "n": "gain",
+                          "gold": 15
+                        }
+                      ]
+                    },
+                    {
+                      "max": 6,
+                      "do": [
+                        {
+                          "n": "gain",
+                          "gold": 25
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "leave",
+              "en": "Sail past",
+              "ru": "Проплыть мимо",
+              "do": [
+                {
+                  "n": "moves",
+                  "add": 1
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "$checked": "ffa0dfce42"
+    },
+    {
+      "copies": 1,
+      "nickname": "Man Overboard",
+      "name": "Человек за бортом!",
+      "flavor": "В воде обнаружен выживший после кораблекрушения.",
+      "effect 1": "➥ Спасти: +2 ✝️, положите самого левого агента с причала Европы в свой сброс, фишка заканчивает ход\n➥ Бросить: -2 ✝️, +1 💨",
+      "image": "wreck-back.png",
+      "type": "⭐",
+      "$fx": [
+        {
+          "n": "choice",
+          "id": "man_overboard",
+          "options": [
+            {
+              "id": "save",
+              "en": "Save",
+              "ru": "Спасти",
+              "do": [
+                {
+                  "n": "gain",
+                  "crosses": 2
+                },
+                {
+                  "n": "pierLeftmost"
+                },
+                {
+                  "n": "endMove"
+                }
+              ]
+            },
+            {
+              "id": "abandon",
+              "en": "Abandon",
+              "ru": "Бросить",
+              "do": [
+                {
+                  "n": "lose",
+                  "crosses": 2
+                },
+                {
+                  "n": "moves",
+                  "add": 1
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "$checked": "7face04359"
+    },
+    {
+      "copies": 1,
+      "nickname": "Floating Cargo",
+      "name": "Плавающий груз",
+      "flavor": "В воде качаются запечатанные бочки и тюки с ценными товарами.",
+      "effect 1": "➥ Выловить бочки: положите +2 🟦 в трюм, фишка заканчивает ход\n➥ Выловить тюки: положите +4 🟩 в трюм, фишка заканчивает ход\n➥ Оставить в воде: +1 💨",
+      "image": "wreck-back.png",
+      "type": "⭐",
+      "$fx": [
+        {
+          "n": "choice",
+          "id": "floating_cargo",
+          "options": [
+            {
+              "id": "barrels",
+              "en": "Haul in barrels",
+              "ru": "Выловить бочки",
+              "do": [
+                {
+                  "n": "gain",
+                  "hold": {
+                    "goods": 2
+                  }
+                },
+                {
+                  "n": "endMove"
+                }
+              ]
+            },
+            {
+              "id": "bales",
+              "en": "Haul in bales",
+              "ru": "Выловить тюки",
+              "do": [
+                {
+                  "n": "gain",
+                  "hold": {
+                    "crops": 4
+                  }
+                },
+                {
+                  "n": "endMove"
+                }
+              ]
+            },
+            {
+              "id": "leave",
+              "en": "Leave it",
+              "ru": "Оставить в воде",
+              "do": [
+                {
+                  "n": "moves",
+                  "add": 1
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "$checked": "ba8c16851d"
+    },
+    {
+      "copies": 1,
+      "nickname": "Plague Ship",
+      "name": "Чумной корабль",
+      "flavor": "Над судном вьется жёлтый флаг. Команда мертва от лихорадки, но сейф капитана открыт.",
+      "effect 1": "➥ Рискнуть и подняться на борт: фишка заканчивает ход\n  🎲 1: Заражение команды: 2 повреждения 💀\n  🎲 2-3: Часть команды заболела: 1 повреждение 💀\n  🎲 4-6: Золото не заразно: +10 🟡\n➥ Бежать от греха подальше: +1 💨",
+      "image": "wreck-back.png",
+      "type": "⭐",
+      "$fx": [
+        {
+          "n": "choice",
+          "id": "plague_ship",
+          "options": [
+            {
+              "id": "board",
+              "en": "Board",
+              "ru": "Подняться на борт",
+              "do": [
+                {
+                  "n": "endMove"
+                },
+                {
+                  "n": "roll",
+                  "table": [
+                    {
+                      "max": 1,
+                      "do": [
+                        {
+                          "n": "damage",
+                          "amount": 2,
+                          "skull": true
+                        }
+                      ]
+                    },
+                    {
+                      "max": 3,
+                      "do": [
+                        {
+                          "n": "damage",
+                          "amount": 1,
+                          "skull": true
+                        }
+                      ]
+                    },
+                    {
+                      "max": 6,
+                      "do": [
+                        {
+                          "n": "gain",
+                          "gold": 10
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "leave",
+              "en": "Flee",
+              "ru": "Бежать",
+              "do": [
+                {
+                  "n": "moves",
+                  "add": 1
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "$checked": "1632661292"
+    },
+    {
+      "copies": 1,
+      "nickname": "Drifting Frigate",
+      "name": "Дрейфующий фрегат",
+      "flavor": "Военный корабль без экипажа. Пушки целы, пороховой погреб полон.",
+      "effect 1": "➥ Вывезти орудия: +2 🔔 (сбросьте 1 карту с руки), переместите фишку на клетку, соседнюю с любой вашей колонией\n➥ Взять на буксир: +10 🟡 (сбросьте 1 карту с руки), переместите фишку в Европу\n➥ Проплыть мимо: +1 💨",
+      "image": "wreck-back.png",
+      "type": "🌟",
+      "$fx": [
+        {
+          "n": "choice",
+          "id": "drifting_frigate",
+          "options": [
+            {
+              "id": "guns",
+              "en": "Take the guns",
+              "ru": "Вывезти орудия",
+              "do": [
+                {
+                  "n": "gain",
+                  "bells": 2
+                },
+                {
+                  "n": "toColonyWater"
+                }
+              ],
+              "cost": {
+                "cards": 1
+              },
+              "needs": "sea-colony"
+            },
+            {
+              "id": "tow",
+              "en": "Tow",
+              "ru": "Взять на буксир",
+              "do": [
+                {
+                  "n": "gain",
+                  "gold": 10
+                },
+                {
+                  "n": "toEurope"
+                }
+              ],
+              "cost": {
+                "cards": 1
+              }
+            },
+            {
+              "id": "leave",
+              "en": "Sail past",
+              "ru": "Проплыть мимо",
+              "do": [
+                {
+                  "n": "moves",
+                  "add": 1
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "$checked": "0392837df0"
+    },
+    {
+      "copies": 1,
+      "nickname": "Pirate Ambush",
+      "name": "Пиратская засада",
+      "flavor": "Обломки были приманкой! Из-за мыса выходит бриг с поднятым Весёлым Роджером.",
+      "effect 1": "➥ Дать залп (требуется агент с ⚔️): +1 🔔, фишка заканчивает ход\n➥ Откупиться: сбросьте весь груз (не менее 2 ресурсов) из трюма ИЛИ заплатите 5 🟡\n➥ Уходить на всех парусах: сбросьте 2 карты агентов с руки, +1 💨\n➥ Вывесить белый флаг: сбросьте весь груз, 2 повреждения 💀",
+      "image": "wreck-back.png",
+      "type": "💀",
+      "$fx": [
+        {
+          "n": "choice",
+          "id": "pirate_ambush",
+          "options": [
+            {
+              "id": "fire",
+              "en": "Fire a broadside",
+              "ru": "Дать залп",
+              "do": [
+                {
+                  "n": "gain",
+                  "bells": 1
+                },
+                {
+                  "n": "endMove"
+                }
+              ],
+              "cost": {
+                "agent": "military"
+              }
+            },
+            {
+              "id": "cargo",
+              "en": "Give up the cargo",
+              "ru": "Отдать груз",
+              "do": [],
+              "cost": {
+                "wholeHold": 2
+              }
+            },
+            {
+              "id": "ransom",
+              "en": "Pay ransom",
+              "ru": "Откупиться золотом",
+              "do": [],
+              "cost": {
+                "gold": 5
+              }
+            },
+            {
+              "id": "flee",
+              "en": "Full sail",
+              "ru": "Уходить на всех парусах",
+              "do": [
+                {
+                  "n": "moves",
+                  "add": 1
+                }
+              ],
+              "cost": {
+                "cards": 2
+              }
+            },
+            {
+              "id": "surrender",
+              "en": "White flag",
+              "ru": "Вывесить белый флаг",
+              "do": [
+                {
+                  "n": "dropHold"
+                },
+                {
+                  "n": "damage",
+                  "amount": 2,
+                  "skull": true
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "$checked": "532228bead"
+    },
+    {
+      "copies": 1,
+      "nickname": "Sea Charts",
+      "name": "Морские карты",
+      "flavor": "В каюте мёртвого капитана вы нашли точные карты течений и отмелей.",
+      "effect 1": "➥ Изучить течения: +5 💨\n➥ Копировать карты: откройте фрагменты карты, соседние по сторонам, фишка заканчивает ход",
+      "image": "wreck-back.png",
+      "type": "⭐",
+      "$fx": [
+        {
+          "n": "choice",
+          "id": "sea_charts",
+          "options": [
+            {
+              "id": "currents",
+              "en": "Study currents",
+              "ru": "Изучить течения",
+              "do": [
+                {
+                  "n": "moves",
+                  "add": 5
+                }
+              ]
+            },
+            {
+              "id": "copy",
+              "en": "Copy the charts",
+              "ru": "Копировать карты",
+              "do": [
+                {
+                  "n": "revealAdjacent"
+                },
+                {
+                  "n": "endMove"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "$checked": "a076cd2344"
+    },
+    {
+      "copies": 1,
+      "nickname": "Smugglers Cache",
+      "name": "Тайник контрабандистов",
+      "flavor": "В прибрежных пещерах рядом с местом крушения спрятаны ценности.",
+      "effect 1": "➥ Забрать серебро: положите +2 ⬜ в трюм, фишка заканчивает ход\n➥ Сдать тайник властям: уберите 1 🟥",
+      "image": "wreck-back.png",
+      "type": "⭐",
+      "$fx": [
+        {
+          "n": "choice",
+          "id": "smugglers_cache",
+          "options": [
+            {
+              "id": "take",
+              "en": "Take the silver",
+              "ru": "Забрать серебро",
+              "do": [
+                {
+                  "n": "gain",
+                  "hold": {
+                    "silver": 2
+                  }
+                },
+                {
+                  "n": "endMove"
+                }
+              ]
+            },
+            {
+              "id": "report",
+              "en": "Report it",
+              "ru": "Сдать тайник властям",
+              "do": [
+                {
+                  "n": "ref",
+                  "add": -1
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "$checked": "83fb40d5d5"
+    },
+    {
+      "copies": 1,
+      "nickname": "Surviving Crew",
+      "name": "Выживший экипаж",
+      "flavor": "Изголодавшиеся матросы на шлюпке готовы поклясться вам в верности, если вы их спасёте.",
+      "effect 1": "➥ Накормить (сбросьте 1 🟨 из трюма или со склада): +2 ✝️, положите самого левого агента с причала Европы в свой сброс\n➥ Пройти мимо: -2 ✝️, +1 💨",
+      "image": "wreck-back.png",
+      "type": "⭐",
+      "$fx": [
+        {
+          "n": "choice",
+          "id": "surviving_crew",
+          "options": [
+            {
+              "id": "feed",
+              "en": "Feed them",
+              "ru": "Накормить",
+              "do": [
+                {
+                  "n": "gain",
+                  "crosses": 2
+                },
+                {
+                  "n": "pierLeftmost"
+                }
+              ],
+              "cost": {
+                "anyFood": 1
+              }
+            },
+            {
+              "id": "abandon",
+              "en": "Pass by",
+              "ru": "Пройти мимо",
+              "do": [
+                {
+                  "n": "lose",
+                  "crosses": 2
+                },
+                {
+                  "n": "moves",
+                  "add": 1
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "$checked": "5d01f2b0f7"
+    },
+    {
+      "copies": 1,
+      "nickname": "Treacherous Reefs",
+      "name": "Коварные рифы",
+      "flavor": "Пытаясь подойти к обломкам, ваше судно скрежещет днищем о подводные камни.",
+      "effect 1": "➥ Осторожно маневрировать (сбросьте 1 карту с руки): +1 💨\n➥ Идти напролом: фишка заканчивает ход\n  🎲 1-3: Пробоина: 1 повреждение 💀\n  🎲 4-6: Вышли к обломкам: +5 🟡",
+      "image": "wreck-back.png",
+      "type": "💀",
+      "$fx": [
+        {
+          "n": "choice",
+          "id": "treacherous_reefs",
+          "options": [
+            {
+              "id": "careful",
+              "en": "Manoeuvre carefully",
+              "ru": "Осторожно маневрировать",
+              "do": [
+                {
+                  "n": "moves",
+                  "add": 1
+                }
+              ],
+              "cost": {
+                "cards": 1
+              }
+            },
+            {
+              "id": "straight",
+              "en": "Go straight through",
+              "ru": "Идти напролом",
+              "do": [
+                {
+                  "n": "endMove"
+                },
+                {
+                  "n": "roll",
+                  "table": [
+                    {
+                      "max": 3,
+                      "do": [
+                        {
+                          "n": "damage",
+                          "amount": 1,
+                          "skull": true
+                        }
+                      ]
+                    },
+                    {
+                      "max": 6,
+                      "do": [
+                        {
+                          "n": "gain",
+                          "gold": 5
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "$checked": "b975b66a7b"
+    },
+    {
+      "copies": 1,
+      "nickname": "Slave Ship",
+      "name": "Судно работорговцев",
+      "flavor": "В трюме севшего на мель судна найдены пленные индейцы.",
+      "effect 1": "➥ Освободить: +3 ✝️, -1 💢 в ближайшем 🛖\n➥ Заковать в цепи: добавьте агента <i>раб</i> в свой сброс, -2 ✝️, +1 💢 в ближайшем 🛖, фишка заканчивает ход\n➥ Бросить их на произвол судьбы: -3 ✝️, +1 💨",
+      "image": "wreck-back.png",
+      "type": "⭐",
+      "$fx": [
+        {
+          "n": "choice",
+          "id": "slave_ship",
+          "options": [
+            {
+              "id": "free",
+              "en": "Free them",
+              "ru": "Освободить",
+              "do": [
+                {
+                  "n": "gain",
+                  "crosses": 3
+                },
+                {
+                  "n": "hostilityNearest",
+                  "add": -1
+                }
+              ]
+            },
+            {
+              "id": "chain",
+              "en": "Chain them",
+              "ru": "Заковать в цепи",
+              "do": [
+                {
+                  "n": "takeAgent",
+                  "agent": "slave",
+                  "amount": 1
+                },
+                {
+                  "n": "lose",
+                  "crosses": 2
+                },
+                {
+                  "n": "hostilityNearest",
+                  "add": 1
+                },
+                {
+                  "n": "endMove"
+                }
+              ]
+            },
+            {
+              "id": "abandon",
+              "en": "Abandon",
+              "ru": "Бросить",
+              "do": [
+                {
+                  "n": "lose",
+                  "crosses": 3
+                },
+                {
+                  "n": "moves",
+                  "add": 1
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "$checked": "0aaad69908"
+    },
+    {
+      "copies": 1,
+      "nickname": "Gutted Hull",
+      "name": "Выпотрошенный остов",
+      "flavor": "Кто-то побывал здесь до вас. Остались лишь голые доски и пустые бочки.",
+      "effect 1": "➥ Снять обшивку: положите +1 🟫 в трюм, фишка заканчивает ход\n➥ Тщательно обыскать: фишка заканчивает ход\n  🎲 1-4: Ничего ценного\n  🎲 5-6: Спрятанный кошель: +5 🟡\n➥ Пройти мимо: +1 💨",
+      "image": "wreck-back.png",
+      "type": "🌀",
+      "$fx": [
+        {
+          "n": "choice",
+          "id": "gutted_hull",
+          "options": [
+            {
+              "id": "strip",
+              "en": "Strip the planking",
+              "ru": "Снять обшивку",
+              "do": [
+                {
+                  "n": "gain",
+                  "hold": {
+                    "timber": 1
+                  }
+                },
+                {
+                  "n": "endMove"
+                }
+              ]
+            },
+            {
+              "id": "search",
+              "en": "Search thoroughly",
+              "ru": "Тщательно обыскать",
+              "do": [
+                {
+                  "n": "endMove"
+                },
+                {
+                  "n": "roll",
+                  "table": [
+                    {
+                      "max": 4,
+                      "do": []
+                    },
+                    {
+                      "max": 6,
+                      "do": [
+                        {
+                          "n": "gain",
+                          "gold": 5
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "leave",
+              "en": "Pass by",
+              "ru": "Пройти мимо",
+              "do": [
+                {
+                  "n": "moves",
+                  "add": 1
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "$checked": "f7e9eef8a9"
+    },
+    {
+      "copies": 1,
+      "nickname": "Calm Seas",
+      "name": "Штиль",
+      "flavor": "Корабль попал в зону полного безветрия.",
+      "effect 1": "Фишка заканчивает ход",
+      "image": "wreck-back.png",
+      "type": "🌀",
+      "$fx": [
+        {
+          "n": "endMove"
+        }
+      ],
+      "$checked": "5d9b54f1bb"
+    },
+    {
+      "copies": 1,
+      "nickname": "Capricious Official",
+      "name": "Капризный чиновник",
+      "flavor": "Высокопоставленный пассажир требует больше места под его каюту.",
+      "effect 1": "➥ Освободить место (требуется не пустой трюм): сбросьте 1 ресурс из трюма\n➥ Отдать ему каюту капитана: -2 🔔\n➥ Игнорировать Его Капризнейшество: добавьте 1 🟥",
+      "image": "wreck-back.png",
+      "type": "🌀",
+      "$fx": [
+        {
+          "n": "choice",
+          "id": "capricious_official",
+          "options": [
+            {
+              "id": "space",
+              "en": "Make room",
+              "ru": "Освободить место",
+              "do": [],
+              "cost": {
+                "holdResource": 1
+              }
+            },
+            {
+              "id": "cabin",
+              "en": "Give up the captain's cabin",
+              "ru": "Отдать каюту капитана",
+              "do": [],
+              "cost": {
+                "bells": 2
+              }
+            },
+            {
+              "id": "ignore",
+              "en": "Ignore",
+              "ru": "Игнорировать",
+              "do": [
+                {
+                  "n": "ref",
+                  "add": 1
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "$checked": "4ad9895f03"
+    },
+    {
+      "copies": 1,
+      "nickname": "Lost Relic",
+      "name": "Потерянная реликвия",
+      "flavor": "Из записей капитана стало известно о перевозимой христианской реликвии, затонувшей вместе с кораблём.",
+      "effect 1": "➥ Нырять: фишка заканчивает ход\n  🎲 1-2: Пустая трата сил\n  🎲 3-4: Артефакт повреждён: +5 🟡, +1 ✝️\n  🎲 5-6: Реликвия в идеальном состоянии: +15 🟡, +2 ✝️\n➥ Не стоит того: -3 ✝️, +1 💨",
+      "image": "wreck-back.png",
+      "type": "⭐",
+      "$fx": [
+        {
+          "n": "choice",
+          "id": "lost_relic",
+          "options": [
+            {
+              "id": "dive",
+              "en": "Dive",
+              "ru": "Нырять",
+              "do": [
+                {
+                  "n": "endMove"
+                },
+                {
+                  "n": "roll",
+                  "table": [
+                    {
+                      "max": 2,
+                      "do": []
+                    },
+                    {
+                      "max": 4,
+                      "do": [
+                        {
+                          "n": "gain",
+                          "gold": 5
+                        },
+                        {
+                          "n": "gain",
+                          "crosses": 1
+                        }
+                      ]
+                    },
+                    {
+                      "max": 6,
+                      "do": [
+                        {
+                          "n": "gain",
+                          "gold": 15
+                        },
+                        {
+                          "n": "gain",
+                          "crosses": 2
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "abandon",
+              "en": "Not worth it",
+              "ru": "Не стоит того",
+              "do": [
+                {
+                  "n": "lose",
+                  "crosses": 3
+                },
+                {
+                  "n": "moves",
+                  "add": 1
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "$checked": "9009c8cb4f"
+    },
+    {
+      "copies": 1,
+      "nickname": "Message in a Bottle 1",
+      "name": "Послание в бутылке",
+      "flavor": "Трогательное письмо какого-то капитана своей возлюбленной.",
+      "effect 1": "➥ Доставить письмо: переместите фишку в Европу\n➥ Выбросить назад в море",
+      "image": "wreck-back.png",
+      "type": "🌀",
+      "$fx": [
+        {
+          "n": "choice",
+          "id": "message_in_a_bottle_1",
+          "options": [
+            {
+              "id": "deliver",
+              "en": "Deliver the letter",
+              "ru": "Доставить письмо",
+              "do": [
+                {
+                  "n": "toEurope"
+                }
+              ]
+            },
+            {
+              "id": "discard",
+              "en": "Throw it back",
+              "ru": "Выбросить назад в море",
+              "do": []
+            }
+          ]
+        }
+      ],
+      "$checked": "075e6ceaa4"
+    },
+    {
+      "copies": 1,
+      "nickname": "Message in a Bottle 2",
+      "name": "Послание в бутылке",
+      "flavor": "Моряк в ярости клеймит тиранию короля и призывает к бунту.",
+      "effect 1": "➥ Распространить:  +2 🔔, добавьте 1 🟥\n➥ Уничтожить: -2 🔔, уберите 1 🟥",
+      "image": "wreck-back.png",
+      "type": "⭐",
+      "$fx": [
+        {
+          "n": "choice",
+          "id": "message_in_a_bottle_2",
+          "options": [
+            {
+              "id": "spread",
+              "en": "Spread",
+              "ru": "Распространить",
+              "do": [
+                {
+                  "n": "gain",
+                  "bells": 2
+                },
+                {
+                  "n": "ref",
+                  "add": 1
+                }
+              ]
+            },
+            {
+              "id": "destroy",
+              "en": "Destroy",
+              "ru": "Уничтожить",
+              "do": [
+                {
+                  "n": "ref",
+                  "add": -1
+                }
+              ],
+              "cost": {
+                "bells": 2
+              }
+            }
+          ]
+        }
+      ],
+      "$checked": "5eeb6a1ab9"
+    },
+    {
+      "copies": 1,
+      "nickname": "Message in a Bottle 3",
+      "name": "Послание в бутылке",
+      "flavor": "Письмо содержит глубокие мысли о смысле жизни, свободе и долге.",
+      "effect 1": "➥ Распространить:  +1 🔔, добавьте 1 🟥\n➥ Уничтожить: -1 🔔",
+      "image": "wreck-back.png",
+      "type": "⭐",
+      "$fx": [
+        {
+          "n": "choice",
+          "id": "message_in_a_bottle_3",
+          "options": [
+            {
+              "id": "spread",
+              "en": "Spread",
+              "ru": "Распространить",
+              "do": [
+                {
+                  "n": "gain",
+                  "bells": 1
+                },
+                {
+                  "n": "ref",
+                  "add": 1
+                }
+              ]
+            },
+            {
+              "id": "destroy",
+              "en": "Destroy",
+              "ru": "Уничтожить",
+              "do": [],
+              "cost": {
+                "bells": 1
+              }
+            }
+          ]
+        }
+      ],
+      "$checked": "05c0ed2624"
+    },
+    {
+      "copies": 1,
+      "nickname": "Rich Reefs",
+      "name": "Богатство рифов",
+      "flavor": "Обломки указали на рифы, богатые жемчугом.",
+      "effect 1": "➥ Нырять: фишка заканчивает ход\n  🎲1-2: Слишком глубоко!\n  🎲3-4: Скудный улов: +8 🟡\n  🎲5-6: Вот это улов!: +20 🟡\n➥ Не задерживаемся: +1 💨",
+      "image": "wreck-back.png",
+      "type": "🌟",
+      "$fx": [
+        {
+          "n": "choice",
+          "id": "rich_reefs",
+          "options": [
+            {
+              "id": "dive",
+              "en": "Dive",
+              "ru": "Нырять",
+              "do": [
+                {
+                  "n": "endMove"
+                },
+                {
+                  "n": "roll",
+                  "table": [
+                    {
+                      "max": 2,
+                      "do": []
+                    },
+                    {
+                      "max": 4,
+                      "do": [
+                        {
+                          "n": "gain",
+                          "gold": 8
+                        }
+                      ]
+                    },
+                    {
+                      "max": 6,
+                      "do": [
+                        {
+                          "n": "gain",
+                          "gold": 20
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "leave",
+              "en": "No delay",
+              "ru": "Не задерживаемся",
+              "do": [
+                {
+                  "n": "moves",
+                  "add": 1
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "$checked": "a7a1c9b7ca"
+    }
+  ]
+}

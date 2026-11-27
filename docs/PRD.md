@@ -4,7 +4,7 @@
 | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
 | Status              | Draft 4, designer answers included                                                                                                    |
 | Date                | 2026-11-25                                                                                                                            |
-| Sources             | `Колонизация.docx`, `Colonization.xlsx` (both as of 2026-11-25 14:12), `assets/`                                                      |
+| Sources             | `Колонизация.docx`, `rules/` (the master of the rules, from `Colonization.xlsx` as of 2026-11-25 14:12), `assets/`                    |
 | Companion documents | [rules-spec.md](rules-spec.md) · [data-spec.md](data-spec.md) · [ai-and-testlab.md](ai-and-testlab.md) · [decisions.md](decisions.md) |
 
 This PRD says what is being built, why, and in what order. The companion documents hold the detail. Where two documents conflict, `rules-spec.md` wins on game rules and this one wins on scope.
@@ -66,18 +66,18 @@ Full reasoning is in [decisions.md](decisions.md).
 
 ## 5. Board and PC rules
 
-Two rulesets share one engine:
+One master holds the rules: `rules/` (decided 2026-11-27). It is the board game's spreadsheet as data, with each card's effect, and settings. The game data is compiled from it, the Google Sheet that Dextrous prints from is published from it, and the rulebook takes its values from it. In the game it is the ruleset `board`.
 
-| Ruleset | Content                                        | Role                                                                  |
-| ------- | ---------------------------------------------- | --------------------------------------------------------------------- |
-| `board` | The paper rules as they would be printed today | Reference for balance and printing. Changes only by explicit decision |
-| `pc`    | `board` plus named changes. Empty at the start | Where ideas are tried and played                                      |
+| Ruleset | Content | Role |
+| --- | --- | --- |
+| `board` | The rules (`rules/`) with nothing on top | Reference for play, balance and printing. Changes only by explicit decision |
+| `proposed`, `alternatives`, the designer's own | Changes on top of `board` | Where ideas are tried and played (sandboxes) |
 
-A change that works in `pc` is either **promoted** to `board`, and then carried into the document and spreadsheet, or **dropped**. The two are not meant to drift apart for good.
+A change that works is either **applied**, written into `rules/` and logged in `docs/decisions.md`, or **dropped**. A change to a card's effect leaves a note (`$todo`) until its printed text is updated.
 
 Each change carries a conversion label:
 
-| Label           | Meaning                                                             | Allowed in `pc`                |
+| Label           | Meaning                                                             | Allowed in the rules           |
 | --------------- | ------------------------------------------------------------------- | ------------------------------ |
 | Interface       | No rule changes: automation, previews, undo, fog drawing, animation | Yes                            |
 | Direct          | Changes a number or text already printed                            | Yes                            |
@@ -144,8 +144,8 @@ Priority: **M** must (v1), **S** should (v1 if cheap), **C** could (later). Mile
 | FR-R-6 | Changing a ruleset mid-game is allowed only in sandbox mode                                                            | S   | M4        |
 
 | FR-R-7 | Every override carries a conversion label and its table wording; unlabelled or non-convertible overrides run only in sandbox mode | M | M1 |
-| FR-R-8 | Conversion report: what differs between `pc` and `board`, with label, components needed and sources to edit | M | M4 |
-| FR-R-9 | Promote or drop a change, recorded in the decision log | S | M4 |
+| FR-R-8 | Conversion report: what a ruleset changes against the rules, with label, components needed and where each value is printed | M | M4 |
+| FR-R-9 | Apply a change to the rules or drop it, recorded in the decision log | S | M4 |
 
 ### 7.4 AI players
 
@@ -257,7 +257,7 @@ Numbers are targets to be confirmed by measurement in M1–M2.
 ## 10. Architecture
 
 ```
- Colonization.xlsx ──► data import ──► game data ─┐
+ rules/ (master) ──► rules:build ──► game data ─┐
                                                   ├─► RULES ENGINE ◄── ruleset overrides
                                                   │     state + choice → state + events
                        ┌──────────────────────────┼───────────────────────┐
@@ -306,7 +306,7 @@ M4 status (2026-11-26): built.
 
 - Search AI: information-set Monte Carlo search over the goal bot's candidates, sampling hidden cards and tiles from the seat's view; difficulty levels easy, normal, hard, expert (FR-A-5, FR-A-6); the advisor plays a whole suggested action (FR-A-8).
 - Exit criterion met for the search bot: at 60 samples per decision it beats the tuned bot in 62% of 200 two-player games (95% interval 55–68%, score +1.75 ±0.89) and wins 37% of 200 four-player games against three tuned bots (30–43%, parity 25%). `pnpm strength:search`.
-- Tweak panel (Design bench → Rules): own rulesets on `pc`, every value with default, validation and reset, conversion label and table wording per change (FR-R-4); overrides can add a card as a copy or remove one (FR-R-3); export of the cells to edit by sheet, row and column and the conversion report (FR-R-5, FR-R-8); `pnpm rules promote | drop` with an entry in `decisions.md` (FR-R-9).
+- Tweak panel (Design bench → Rules): own rulesets on `board` (the rules), every value with default, validation and reset, conversion label and table wording per change (FR-R-4); overrides can add a card as a copy or remove one (FR-R-3); export of the cells to edit by sheet, row and column and the conversion report (FR-R-5, FR-R-8); `pnpm rules promote | drop` with an entry in `decisions.md` (FR-R-9).
 - Lab without the command line (Design bench → Lab, FR-T-8): compare rulesets on paired seeds, sweeps (FR-T-5, also `pnpm sweep`), problem detectors (FR-T-7, also `pnpm detect`).
 - Hot-seat (FR-U-16); in dev mode, the Dev menu (FR-U-19, rules changed mid-game FR-R-6) and forecasts (FR-U-15).
 - Open: the second exit criterion, a tweak-test-export cycle by the designer unaided, needs the designer.
@@ -315,7 +315,7 @@ M5 status (2026-11-26): scope agreed with the designer: the tutorial and the rul
 - Built (FR-U-20): the tutorial is part of every new game until the player turns it off in Options or ends it (no separate tutorial game); a coach gives one step at a time, points at what to use and moves on when the game shows the step done; Rules on the title screen; the rules reference in both languages (F1, or Rules in the game menu), with the numbers of the rules being played.
 - Rule changes proposed from lab evidence (2026-11-26): [proposals.md](proposals.md), candidates in `rulesets/proposed.json`, decisions Q19 and Q20 in [decisions.md](decisions.md); nothing promoted until the designer chooses.
 - Sound (FR-U-21): effects for what happens in the game, music by the game's stage (title, exploring, colonies, tension, war) with crossfades, Music, Effects and Sound on/off in both Options screens. Effects from Kenney's CC0 packs; music from real baroque recordings under free licences (Wikimedia Commons), credited on the About page; see [audio.md](audio.md).
-- Promotion to `board` from dev mode (FR-R-9): Design bench → Export → Toward the board game adds a change to `pc`, promotes it to `board` or drops it, through the local server (`pnpm web`), as `pnpm rules add | promote | drop` does on the command line; each decision is logged in decisions.md.
+- Applying changes from dev mode (FR-R-9): Design bench → Export → Into the rules writes a change into `rules/` or drops it, through the local server (`pnpm web`), as `pnpm rules apply | drop` does on the command line; each decision is logged in decisions.md, and printed texts still to update are listed.
 - Not planned yet: the desktop package.
 
 ## 12. Testing
@@ -352,4 +352,4 @@ Good tests here check observable behaviour: given a state and a choice, these op
 3. A newcomer finishes a game against AI using only in-game help.
 4. No known mismatch between `board` and the rules document and spreadsheet.
 5. A printing list with component counts exists.
-6. Every difference between `pc` and `board` is convertible and has a recorded status.
+6. Every change applied to the rules is convertible and has a recorded status.

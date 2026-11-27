@@ -32,7 +32,7 @@
 | DD-26 | Loyalist win rate with 4 players should be about 15%. Other balance targets are accepted, except the round 5 leader (Q14) |
 | DD-27 | Numbers missing from the workbook stay in a separate settings file; no new sheet |
 | DD-28 | Criminals and slaves count as support in battle |
-| DD-29 | One action moves both ship and infantry only through embarking or disembarking |
+| DD-29 | One action moves both ship and pawn only through embarking or disembarking |
 | DD-30 | Solo is won by keeping a colony |
 | DD-31 | Working in docks includes the cell's fish bonus (+1), and a fisherman adds +1 more |
 | DD-32 | Balance is not needed now; first check that the systems work in general |
@@ -82,6 +82,9 @@
 | DD-66 | Rule change "indian-fish" (direct) promoted from pc to board: Indian: +1 🐟, not +1 🍂. / Индеец: +1 🐟 вместо +1 🍂. Why: With the farmer on crops, the converted Indian turns to the sea, so food has a helper of its own. To carry into the sources: agents.indian.mods.0.icons → ["fish"] (Sp Agents, E47 (effect)) |
 | DD-67 | Corn is gone from the game: food comes from fish only, so no tile carries a corn bonus (the importer drops all 14 printed ones, the 3 of DD-47 among them, until the workbook is edited), and food is drawn as a fish. One product per terrain (Q21: DD-63 to DD-66) |
 | DD-68 | Card names: the farmer is the Planter (Земледелец), and the Danish planter the Cane Planter (Плантатор), so that the common crops worker and the Danish expert never share a name. Ids, art and effects stay; the importer applies the names until the workbook carries them |
+| DD-69 | One master for the rules: `rules/`, one file per sheet of the spreadsheet (every cell as printed, each card's effect, English name and text check) plus `settings.json`, with `board`'s 11 changes and the import-time patches baked in. The game data is compiled from it, the Google Sheet that Dextrous prints from is published from it (values only), and the rulebook takes its values from it. `rulesets/board.json`, `pc.json`, `effects.ts`, `settings.ts` and `Colonization.xlsx` are gone; a change is tried in a sandbox ruleset and applied to `rules/` or dropped |
+| DD-70 | The Docks building is «Доки» in Russian, so that «Причал» names only the pier in Europe. Id, art and effect stay; the shipyard requires «Доки» |
+| DD-71 | Rule change "tax-pay-bell" (direct) applied to the rules: Paying the tax gives +1 🔔. / Уплата налога даёт +1 🔔. Why: Nobody pays the tax: refusing costs 1 shared cube and paying gives nothing, so from round 4 no one paid (4 players, mixed bots). A bell for paying makes the cheap early taxes worth paying; the late ones stay too dear, so it adds about 0.5 bells per player. Changed: settings.tax.payBells → 1. |
 
 ## Proposed in this PRD, awaiting confirmation
 
@@ -106,27 +109,22 @@ Answered: Q1 (DD-11), Q2 (DD-12), Q3 (DD-13), Q4 (DD-22), Q5 (DD-14), Q6 (DD-15)
 
 ## Source edits still to make
 
-Checked on the 15:13 versions. Done by the designer: activation rule, docks, ocean, Sepúlveda, terrain costs, spreadsheet wording of events.
+Checked on the 15:13 versions. Done by the designer: activation rule, docks, ocean, Sepúlveda, terrain costs, spreadsheet wording of events. Since DD-69 the spreadsheet is published from `rules/`, so every spreadsheet edit is made there; what is left is the document, which the new rulebook replaces.
 
 | Where | Edit | From |
 |---|---|---|
 | Document, Принципы | Describe the two rings | DD-12 |
 | Document, Салон | "1 Отца-Основателя" → up to 2 | DD-22 |
-| Spreadsheet, terrain | Forest gives timber only, not 🟩 | DD-56 |
 | Document, starting decks and stars | Follow the spreadsheet | DD-6 |
 | Document, Торговец | Education 🎓 in the document, 📖 in the spreadsheet | DD-6 |
 | Document, Поселенец | "Базовых построек" is not in the spreadsheet; every building is cheaper | DD-6 |
-| Spreadsheet, Tiles | Remove every 🌽: tiles 1 (cells 2, 4), 8 (3), 23 (5), 27 (8), 29 (2), 35 (6), 37 (7), 42 (9), 55 (8), 56 (5, 7), 61 (8), 62 (9) | DD-47, DD-67 |
-| Spreadsheet, Terrain D4; Agents D6; Fathers F16; Sp Agents E47 | Grassland 🍂 only; Planter (the farmer) +1 🍂; Squanto +1 🐟; Indian +1 🐟 | DD-63 to DD-66 |
 | Document | Food is 🐟 only; the rules and resource lists lose 🌽 | DD-67 |
-| Spreadsheet, Agents and Sp Agents | Фермер → Земледелец (English: Planter); the Danish Плантатор keeps its Russian name, English: Cane Planter | DD-68 |
 | Document, agents | Farmer → Planter (Земледелец); Danish Planter → Cane Planter | DD-68 |
 | Document, Эквиано | Slaves go under the deck in the document, are removed in the spreadsheet | DD-6 |
 | Document, war | Each Royal Army cube attacks with 1 ⚔️, not 2 | DD-49 |
 | Document, tax | Refusing the tax gives no bell | DD-50 |
 | Document, tax | Refusing the tax adds 1 cube to the Royal Army, not 2 (solo unchanged) | DD-52 |
 | Document, war | With 2 players there is no loyalist; the war plays without the loyalist's steps | DD-58 |
-| Document and spreadsheet | Call the King's army the Royal Army (Королевская армия) everywhere | DD-61 |
+| Document | Call the King's army the Royal Army (Королевская армия) everywhere | DD-61 |
 | Document, Кресты | Recruiting is an action: play an agent, spend ✝️ (at least the round number), look at that many agents, take one to the discard, the rest to the bottom | DD-60 |
-| Spreadsheet, Fathers F22 | Roger Williams: when recruiting, take up to 2 of the agents you look at | DD-60 |
 | Document, Колонии | Remove «на краю карты»: a colony may be founded on the edge of the map | DD-62 |

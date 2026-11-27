@@ -24,7 +24,7 @@ export function defFor(g: Pick<GameSpec, 'ruleset' | 'rules' | 'changes'>): Game
   if (!d) {
     const named = g.rules ?? rulesets[g.ruleset ?? 'board'];
     if (!named) throw new Error(`unknown ruleset "${g.ruleset}"`);
-    // The base's changes come first (pc builds on board); the experiment's on top.
+    // The base's changes come first (proposed builds on board, the rules); the experiment's on top.
     const base = flattenRuleset(named, rulesets);
     const r: Ruleset = g.changes ? { id: `${base.id}+`, title: '', sandbox: true, overrides: [...base.overrides, { id: 'change', why: 'experiment', set: g.changes }] } : base;
     defs.set(key, (d = compileRuleset(gameData, r)));

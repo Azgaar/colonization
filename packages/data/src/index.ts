@@ -7,7 +7,7 @@ export * from './types.ts';
 export { applyOverride, compileRuleset, flattenRuleset, hash, references, rulesets, RulesetError } from './ruleset.ts';
 export { editable, getPath, validateChange, COLLECTIONS, type Editable, type Collection } from './values.ts';
 export { sourceMap, sourceOf, where, SETTINGS_FILE } from './sources.ts';
-export { addDecision, changeList, conversionReport, decisionText, dropOverride, promoteOverride, promoteProblem, toCsv, toMarkdown, type ChangeRow } from './changes.ts';
+export { addDecision, changeList, conversionReport, decisionText, dropOverride, promoteProblem, toCsv, toMarkdown, type ChangeRow } from './changes.ts';
 export const gameData = generated as unknown as GameData;
 export const loadRuleset = (id = 'board') => {
   if (!rulesets[id]) throw new Error(`unknown ruleset "${id}"`);

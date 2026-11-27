@@ -1,27 +1,24 @@
-import { readFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
-import readWorkbook from 'read-excel-file/node';
-import { beforeAll, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { formatIssue, importWorkbook, toId, type RawSheet } from '../src/import.ts';
-import { compileRuleset, gameData, loadRuleset, rulesets, RulesetError } from '../src/index.ts';
+import { grid, machine, readMaster } from '../src/master.ts';
+import { compileRuleset, gameData, loadRuleset, RulesetError } from '../src/index.ts';
 
-const at = (p: string) => fileURLToPath(new URL(p, import.meta.url));
-const reviewed = JSON.parse(readFileSync(at('../src/reviewed-texts.json'), 'utf8'));
-let sheets: RawSheet[];
-beforeAll(async () => { sheets = (await readWorkbook(at('../../../Colonization.xlsx'))) as unknown as RawSheet[]; });
+/** The master rules as the sheets they are printed as, and their machine side. */
+const master = readMaster(), mx = machine(master);
+const sheets: RawSheet[] = master.sheets.map((s) => ({ sheet: s.sheet, data: grid(s) }));
 
-/** Import with one cell changed. */
+/** Compile with one cell changed. */
 function broken(sheet: string, row: number, column: string, value: unknown) {
   const copy = structuredClone(sheets);
   const sh = copy.find((s) => s.sheet === sheet)!;
-  sh.data[row - 1][sh.data[0].indexOf(column)] = value as string;
-  return importWorkbook(copy, reviewed);
+  sh.data[row - 1]![sh.data[0]!.indexOf(column)] = value as string;
+  return importWorkbook(copy, mx);
 }
 const errors = (r: ReturnType<typeof importWorkbook>) => r.issues.filter((i) => i.level === 'error').map(formatIssue);
 
 describe('import', () => {
-  it('reads the current workbook without errors, and the generated data is up to date', () => {
-    const r = importWorkbook(sheets, reviewed);
+  it('compiles the master rules without errors, and the generated data is up to date', () => {
+    const r = importWorkbook(sheets, mx);
     expect(errors(r)).toEqual([]);
     expect(r.data).toEqual(gameData);
   });
@@ -48,19 +45,19 @@ describe('import', () => {
     ['Agents', 5, 'copies', -1, /expected a number/],
     ['Agents', 5, 'education', '🧠', /unknown education/],
     ['Agents', 5, 'nickname', 'Slave', /duplicate id "slave"/],
-    ['Agents', 5, 'effect', 'производство: +2 🐟', /text of "fisherman" changed/],
+    ['Agents', 5, 'effect', 'производство: +2 🐟', /text of "fisherman".*was not checked/],
     ['Buildings', 9, 'requires', 'сарай', /unknown building "сарай"/],
     ['Europeans', 2, 'starting units', 'Траппер\nКороль', /no card "Король"/],
     ['Indians', 2, 'loot', '5 🍌', /unknown loot/],
     ['Fathers', 3, 'price', '3 🟡', /cannot read price/],
-    ['Events', 3, 'nickname', 'New Event', /no reviewed effect/],
+    ['Events', 3, 'nickname', 'New Event', /no effect defined for "new_event"/],
   ])('reports a bad cell in %s, row %i, %s', (sheet, row, col, value, message) => {
     const r = broken(sheet, row, col, value);
     expect(r.data).toBe(null);
     expect(errors(r).some((e) => message.test(e)), errors(r).join('\n')).toBe(true);
   });
   it('reports a missing sheet', () => {
-    expect(errors(importWorkbook(sheets.filter((s) => s.sheet !== 'Fathers'), reviewed))).toContain('ERROR: Fathers: sheet is missing');
+    expect(errors(importWorkbook(sheets.filter((s) => s.sheet !== 'Fathers'), mx))).toContain('ERROR: Fathers: sheet is missing');
   });
   it('warns when an effect needs more copies than exist', () => {
     const r = broken('Agents', 3, 'copies', 1);
@@ -70,7 +67,10 @@ describe('import', () => {
 
 describe('rulesets', () => {
   const rs = (o: object, sandbox = false) => ({ id: 't', title: '', sandbox, overrides: [{ id: 'x', why: '', set: {}, ...o }] }) as never;
-  it('pc without its own changes plays as board', () => { expect(compileRuleset(gameData, { ...rulesets.pc, overrides: [] }).rulesetHash).toBe(loadRuleset('board').rulesetHash); });
+  it('a ruleset on board without changes plays as board, also one made on the old pc', () => {
+    expect(compileRuleset(gameData, { id: 'mine', title: '', base: 'board', overrides: [] }).rulesetHash).toBe(loadRuleset('board').rulesetHash);
+    expect(compileRuleset(gameData, { id: 'old', title: '', base: 'pc', overrides: [] }).rulesetHash).toBe(loadRuleset('board').rulesetHash);
+  });
   it('overrides numbers, lists and card values', () => {
     const d = compileRuleset(gameData, rs({ set: { 'agents.priest.price': 5, 'settings.tax.track': [0, 0], 'fathers.francis_drake.mods.0.add': 3 } }, true));
     expect([d.agents.priest.price, d.settings.tax.track, (d.fathers.francis_drake.mods[0] as { add: number }).add]).toEqual([5, [0, 0], 3]);

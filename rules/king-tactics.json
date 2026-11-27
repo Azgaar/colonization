@@ -1,0 +1,114 @@
+{
+  "sheet": "King Tactics",
+  "header": [
+    "copies",
+    "nickname",
+    "name",
+    "effect",
+    "image"
+  ],
+  "rows": [
+    {
+      "copies": 1,
+      "nickname": "Line Infantry",
+      "name": "Линейная пехота",
+      "effect": "+1 ⚔️за каждые 3 🟥, осаждающие конкретную колонию.",
+      "$fx": {
+        "t": "perCubes",
+        "add": 1,
+        "per": 3
+      },
+      "$checked": "d1666c51c8"
+    },
+    {
+      "copies": 1,
+      "nickname": "Ships of the Line",
+      "name": "Линейные корабли",
+      "effect": "+1 ⚔️ за каждые 2 клетки океана вокруг конкретной колонии.",
+      "$fx": {
+        "t": "perOcean",
+        "add": 1,
+        "per": 2
+      },
+      "$checked": "73641e56ce"
+    },
+    {
+      "copies": 1,
+      "nickname": "Native Scouts",
+      "name": "Индейские скауты",
+      "effect": "Патриоты не добавляют бонус местности.",
+      "$fx": {
+        "t": "noTerrain"
+      },
+      "$checked": "bed3abfbc9"
+    },
+    {
+      "copies": 1,
+      "nickname": "Hessian Mercenaries",
+      "name": "Гессенские наёмники",
+      "effect": "Добавьте 4 🟥 перед распределением.",
+      "$fx": {
+        "t": "cubes",
+        "add": 4
+      },
+      "$checked": "006ab0abad"
+    },
+    {
+      "copies": 1,
+      "nickname": "Surprise Assault",
+      "name": "Внезапный штурм",
+      "effect": "При бросании кубиков успехом считается 4, 5 и 6.",
+      "$fx": {
+        "t": "successFrom",
+        "faces": [
+          4,
+          5,
+          6
+        ]
+      },
+      "$checked": "51dc873ca0"
+    },
+    {
+      "copies": 1,
+      "nickname": "Siege Artillery",
+      "name": "Осадная артиллерия",
+      "effect": "При расчёте защиты патриоты не добавляют бонус от частокола и форта.",
+      "$fx": {
+        "t": "noBuildings"
+      },
+      "$checked": "a59697f27a"
+    },
+    {
+      "copies": 1,
+      "nickname": "Loyalist Militia",
+      "name": "Ополчение лоялистов",
+      "effect": "Лоялист получает 1 ⬛ для распределения за каждую единицу ✝️.",
+      "$fx": {
+        "t": "militiaPerCross",
+        "value": 1
+      },
+      "$checked": "875a341bde"
+    },
+    {
+      "copies": 1,
+      "nickname": "Extended Supply Lines",
+      "name": "Растянутые коммуникации",
+      "effect": "Для победы атакующим требуется выбросить не менее двух успехов.",
+      "$fx": {
+        "t": "minSuccesses",
+        "value": 2
+      },
+      "$checked": "d5d4c05227"
+    },
+    {
+      "copies": 1,
+      "nickname": "Gentleman’s War",
+      "name": "Джентльменская война",
+      "effect": "Нет эффекта.",
+      "$fx": {
+        "t": "none"
+      },
+      "$checked": "2f31319656"
+    }
+  ]
+}

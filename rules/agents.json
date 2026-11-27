@@ -1,0 +1,414 @@
+{
+  "sheet": "Agents",
+  "header": [
+    "copies",
+    "nickname",
+    "name",
+    "effect",
+    "comment",
+    "education",
+    "nation",
+    "price",
+    "image"
+  ],
+  "rows": [
+    {
+      "copies": 2,
+      "nickname": "Criminal",
+      "name": "Преступник",
+      "comment": "Только действие производство",
+      "education": "🚫",
+      "price": "0 🟡",
+      "image": "Criminal.jpeg,50,100,100",
+      "$fx": [
+        {
+          "mod": "onlyProduce"
+        }
+      ],
+      "$checked": "750786fd05"
+    },
+    {
+      "copies": 2,
+      "nickname": "Slave",
+      "name": "Раб",
+      "effect": "производство: +1",
+      "comment": "Только действие производство",
+      "education": "🚫",
+      "price": "3 🟡",
+      "image": "Slave.png,50,100,100",
+      "$fx": [
+        {
+          "mod": "onlyProduce"
+        },
+        {
+          "mod": "production",
+          "add": 1
+        }
+      ],
+      "$checked": "97ab2fcb65"
+    },
+    {
+      "copies": 2,
+      "nickname": "Colonist",
+      "name": "Колонист",
+      "education": "📖",
+      "price": "2 🟡",
+      "image": "Colonist.jpeg,50,70,100",
+      "$fx": [],
+      "$checked": "e3b0c44298"
+    },
+    {
+      "copies": 2,
+      "nickname": "Fisherman",
+      "name": "Рыбак",
+      "effect": "производство: +1 🐟",
+      "education": "📖",
+      "price": "3 🟡",
+      "image": "Fisherman.jpeg,50,90,100",
+      "$fx": [
+        {
+          "mod": "production",
+          "icons": [
+            "fish"
+          ],
+          "add": 1
+        }
+      ],
+      "$checked": "b3ba236b92"
+    },
+    {
+      "copies": 2,
+      "nickname": "Farmer",
+      "name": "Земледелец",
+      "effect": "производство: +1 🍂",
+      "education": "📖",
+      "price": "3 🟡",
+      "image": "Farmer.jpeg,50,90,100",
+      "$fx": [
+        {
+          "mod": "production",
+          "icons": [
+            "leaf"
+          ],
+          "add": 1
+        }
+      ],
+      "$en": "Planter",
+      "$checked": "c520cd899a"
+    },
+    {
+      "copies": 2,
+      "nickname": "Lumberjack",
+      "name": "Лесоруб",
+      "effect": "производство: +1 🪵",
+      "education": "📖",
+      "price": "3 🟡",
+      "image": "Lumberjack.jpeg,50,70,100",
+      "$fx": [
+        {
+          "mod": "production",
+          "icons": [
+            "timber"
+          ],
+          "add": 1
+        }
+      ],
+      "$checked": "d22c24fbdc"
+    },
+    {
+      "copies": 2,
+      "nickname": "Miner",
+      "name": "Рудокоп",
+      "effect": "производство: +1 🪙",
+      "education": "📖",
+      "price": "3 🟡",
+      "image": "Miner.jpeg,50,100,100",
+      "$fx": [
+        {
+          "mod": "production",
+          "icons": [
+            "silver"
+          ],
+          "add": 1
+        }
+      ],
+      "$checked": "ee7b5b2a5f"
+    },
+    {
+      "copies": 2,
+      "nickname": "Scout",
+      "name": "Скаут",
+      "effect": "передвижение пешки: +2 💨\nигнорирует эффект ловушек (💀)",
+      "education": "📖",
+      "price": "4 🟡",
+      "image": "Scout.png,50,100,100",
+      "$fx": [
+        {
+          "mod": "move",
+          "token": "infantry",
+          "add": 2
+        },
+        {
+          "mod": "ignoreSkull"
+        },
+        {
+          "mod": "negotiator"
+        }
+      ],
+      "$checked": "d8ef767d6e"
+    },
+    {
+      "copies": 2,
+      "nickname": "Sailor",
+      "name": "Матрос",
+      "effect": "передвижение корабля: +2 💨",
+      "education": "📖",
+      "price": "4 🟡",
+      "image": "Sailor.jpeg,50,80,110",
+      "$fx": [
+        {
+          "mod": "move",
+          "token": "ship",
+          "add": 2
+        }
+      ],
+      "$checked": "88b6e378fc"
+    },
+    {
+      "copies": 2,
+      "nickname": "Builder",
+      "name": "Строитель",
+      "effect": "строительство: цена -1 🪵",
+      "education": "📖",
+      "price": "4 🟡",
+      "image": "Builder.jpeg,50,100,100",
+      "$fx": [
+        {
+          "mod": "cost",
+          "of": "build",
+          "add": -1
+        }
+      ],
+      "$checked": "5578d81401"
+    },
+    {
+      "copies": 2,
+      "nickname": "Preacher",
+      "name": "Проповедник",
+      "effect": "производство: +1 ✝️",
+      "education": "📖",
+      "price": "4 🟡",
+      "image": "Preacher.jpeg,50,90,100",
+      "$fx": [
+        {
+          "mod": "production",
+          "icons": [
+            "crosses"
+          ],
+          "add": 1
+        }
+      ],
+      "$checked": "bfe0333ac4"
+    },
+    {
+      "copies": 1,
+      "nickname": "Recruiter",
+      "name": "Вербовщик",
+      "effect": "наём: цена -1 🟡",
+      "education": "📖",
+      "price": "4 🟡",
+      "image": "Recruiter.jpeg,50,100,100",
+      "$fx": [
+        {
+          "mod": "cost",
+          "of": "hire",
+          "add": -1
+        }
+      ],
+      "$checked": "c414357775"
+    },
+    {
+      "copies": 1,
+      "nickname": "Priest",
+      "name": "Священник",
+      "effect": "производство: +2 ✝️",
+      "education": "🎓",
+      "price": "6 🟡",
+      "image": "Priest.jpeg,50,60,100",
+      "$fx": [
+        {
+          "mod": "production",
+          "icons": [
+            "crosses"
+          ],
+          "add": 2
+        }
+      ],
+      "$checked": "4eae3ab68e"
+    },
+    {
+      "copies": 2,
+      "nickname": "Craftsman",
+      "name": "Мастер",
+      "effect": "производство: +1 📦",
+      "education": "📖",
+      "price": "5 🟡",
+      "image": "Craftsman.jpeg,50,100,100",
+      "$fx": [
+        {
+          "mod": "production",
+          "icons": [
+            "goods"
+          ],
+          "add": 1
+        }
+      ],
+      "$checked": "e77fbcb555"
+    },
+    {
+      "copies": 1,
+      "nickname": "Trader",
+      "name": "Торговец",
+      "effect": "торговля: цена +1 🟡",
+      "education": "📖",
+      "price": "6 🟡",
+      "image": "Trader.jpeg,50,80,100",
+      "$fx": [
+        {
+          "mod": "sellPrice",
+          "add": 1
+        }
+      ],
+      "$checked": "c182fb3926"
+    },
+    {
+      "copies": 1,
+      "nickname": "Smuggler",
+      "name": "Контрабандист",
+      "effect": "контрабанда: продажа 1 ресурса прямо со склада по цене рынка -1 🟡",
+      "education": "🚫",
+      "price": "4 🟡",
+      "image": "Smuggler.jpeg,50,100,100",
+      "$fx": [
+        {
+          "mod": "smuggle",
+          "add": -1
+        }
+      ],
+      "$checked": "2408531d47"
+    },
+    {
+      "copies": 1,
+      "nickname": "Corsair",
+      "name": "Корсар",
+      "effect": "атака и защита корабля: +2 ⚔️",
+      "education": "🚫",
+      "price": "5 🟡",
+      "image": "Corsair.jpeg,100,95,97",
+      "$fx": [
+        {
+          "mod": "combat",
+          "token": "ship",
+          "add": 2
+        }
+      ],
+      "$checked": "8398439680"
+    },
+    {
+      "copies": 2,
+      "nickname": "Cannoneer",
+      "name": "Канонир",
+      "effect": "атака и защита корабля: +1 ⚔️",
+      "comment": "Может обстреливать",
+      "education": "📖",
+      "price": "5 🟡",
+      "image": "Cannoneer.jpeg,100,95,110",
+      "$fx": [
+        {
+          "mod": "combat",
+          "token": "ship",
+          "add": 1
+        },
+        {
+          "mod": "bombard"
+        }
+      ],
+      "$checked": "d3362bf733"
+    },
+    {
+      "copies": 6,
+      "nickname": "Soldier",
+      "name": "Солдат",
+      "effect": "атака и защита пешки: +2 ⚔️",
+      "education": "📖",
+      "price": "6 🟡",
+      "image": "Soldier.jpeg,50,80,100",
+      "$fx": [
+        {
+          "mod": "combat",
+          "token": "infantry",
+          "add": 2
+        }
+      ],
+      "$checked": "a4d7d47d07"
+    },
+    {
+      "copies": 4,
+      "nickname": "Dragoon",
+      "name": "Драгун",
+      "effect": "атака и защита пешки: +3 ⚔️",
+      "education": "🎓",
+      "price": "8 🟡",
+      "image": "Dragoon.png,30,50,97",
+      "$fx": [
+        {
+          "mod": "combat",
+          "token": "infantry",
+          "add": 3
+        }
+      ],
+      "$checked": "f1abd52cdd"
+    },
+    {
+      "copies": 4,
+      "nickname": "Captain",
+      "name": "Капитан",
+      "effect": "атака и защита: +3 ⚔️",
+      "education": "🎓",
+      "price": "10 🟡",
+      "image": "Captain.jpeg,50,65,100",
+      "$fx": [
+        {
+          "mod": "combat",
+          "token": "infantry",
+          "add": 3
+        },
+        {
+          "mod": "combat",
+          "token": "ship",
+          "add": 3
+        }
+      ],
+      "$checked": "cdfc408310"
+    },
+    {
+      "copies": 4,
+      "nickname": "Politician",
+      "name": "Политик",
+      "effect": "производство: +1 🔔",
+      "education": "🎓",
+      "price": "10 🟡",
+      "image": "Politician.jpeg,50,95,100",
+      "$fx": [
+        {
+          "mod": "production",
+          "icons": [
+            "bells"
+          ],
+          "add": 1
+        }
+      ],
+      "$checked": "1e3bfd2a86"
+    }
+  ]
+}

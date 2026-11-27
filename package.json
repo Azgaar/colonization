@@ -7,8 +7,10 @@
     "node": ">=24"
   },
   "scripts": {
-    "data:import": "node packages/data/src/cli.ts",
-    "data:review": "node packages/data/src/cli.ts --review",
+    "rules:build": "node packages/data/src/cli.ts",
+    "rules:review": "node packages/data/src/cli.ts --review",
+    "rules:sheet": "node packages/data/src/sheet.ts",
+    "rulebook": "node rulebook/build.ts",
     "rules": "node packages/data/src/rules.ts",
     "test": "vitest run",
     "typecheck": "tsc --noEmit && tsc --noEmit -p packages/web && pnpm lab:typecheck",
@@ -26,7 +28,7 @@
     "strength:search": "node packages/lab/src/search-strength.ts",
     "proposals": "node packages/lab/src/proposals.ts",
     "lab:typecheck": "tsc --noEmit -p packages/lab/tsconfig.browser.json",
-    "check": "pnpm data:import && pnpm typecheck && pnpm test",
+    "check": "pnpm rules:build && pnpm typecheck && pnpm test",
     "release:patch": "npm version patch --no-git-tag-version",
     "release:minor": "npm version minor --no-git-tag-version",
     "release:major": "npm version major --no-git-tag-version"

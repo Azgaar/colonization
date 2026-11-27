@@ -12,7 +12,7 @@ const code = () => fs.readdirSync(src, { recursive: true }).filter((f) => f.ends
 describe('locales', () => {
   it('every language has every English key, with the same placeholders', () => {
     // Card texts in Russian are the printed ones, from the workbook (texts.ts); every other language has them here.
-    const printed = (l: string, k: string) => l === 'ru' && /^(father|event)\./.test(k);
+    const printed = (l: string, k: string) => l === 'ru' && /^(father|event|flavor)\./.test(k);
     for (const [l, words] of Object.entries(LOCALES)) for (const [k, s] of Object.entries(LOCALES.en)) {
       if (printed(l, k)) continue;
       expect(words[k], `${l}: ${k}`).toBeTypeOf('string');

@@ -1,0 +1,159 @@
+{
+  "sheet": "Indians",
+  "header": [
+    "copies",
+    "nickname",
+    "name",
+    "terrain",
+    "region",
+    "initial alert",
+    "initial population",
+    "loot",
+    "image"
+  ],
+  "rows": [
+    {
+      "copies": 2,
+      "nickname": "Inca",
+      "name": "Инки",
+      "terrain": "mountains.png",
+      "region": "Анды",
+      "initial alert": "3 💢",
+      "initial population": "4 🏹",
+      "loot": "25 🟡",
+      "image": "inca.png,50,100,100"
+    },
+    {
+      "copies": 2,
+      "nickname": "Aztec",
+      "name": "Ацтеки",
+      "terrain": "grassland.png",
+      "region": "Долина Мехико",
+      "initial alert": "5 💢",
+      "initial population": "5 🏹",
+      "loot": "20 🟡",
+      "image": "aztec.png,50,100,100"
+    },
+    {
+      "copies": 2,
+      "nickname": "Arawak",
+      "name": "Араваки",
+      "terrain": "forest.png",
+      "region": "Бассейн Ориноко",
+      "initial alert": "2 💢",
+      "initial population": "2 🏹",
+      "loot": "4 🟡",
+      "image": "arawak.png"
+    },
+    {
+      "copies": 2,
+      "nickname": "Caribs",
+      "name": "Карибы",
+      "terrain": "forest.png",
+      "region": "Карибские острова",
+      "initial alert": "4 💢",
+      "initial population": "1 🏹",
+      "loot": "4 🟡",
+      "image": "caribs.png,50,100,160"
+    },
+    {
+      "copies": 2,
+      "nickname": "Cherokee",
+      "name": "Чероки",
+      "terrain": "mountains.png",
+      "region": "Аппалачи",
+      "initial alert": "3 💢",
+      "initial population": "3 🏹",
+      "loot": "5 🦫",
+      "image": "cherokee.png"
+    },
+    {
+      "copies": 2,
+      "nickname": "Iroquois",
+      "name": "Ирокезы",
+      "terrain": "forest.png",
+      "region": "Великие озёра",
+      "initial alert": "4 💢",
+      "initial population": "3 🏹",
+      "loot": "6 🦫",
+      "image": "iroquois.png"
+    },
+    {
+      "copies": 2,
+      "nickname": "Sioux",
+      "name": "Сиу",
+      "terrain": "grassland.png",
+      "region": "Великие равнины",
+      "initial alert": "3 💢",
+      "initial population": "2 🏹",
+      "loot": "3 🦫",
+      "image": "sioux.png,50,100,100"
+    },
+    {
+      "copies": 2,
+      "nickname": "Apache",
+      "name": "Апачи",
+      "terrain": "desert.png",
+      "region": "Скалистые горы",
+      "initial alert": "4 💢",
+      "initial population": "2 🏹",
+      "loot": "8 🟡",
+      "image": "apache.png"
+    },
+    {
+      "copies": 2,
+      "nickname": "Tupi",
+      "name": "Тупи",
+      "terrain": "forest.png",
+      "region": "Амазония",
+      "initial alert": "2 💢",
+      "initial population": "2 🏹",
+      "loot": "4 🟡",
+      "image": "tupi.png,50,50,100"
+    },
+    {
+      "copies": 2,
+      "nickname": "Mapuche",
+      "name": "Арауканы",
+      "terrain": "mountains.png",
+      "region": "Южные Анды",
+      "initial alert": "5 💢",
+      "initial population": "2 🏹",
+      "loot": "3 🪙",
+      "image": "mapuche.png,50,50,100"
+    },
+    {
+      "copies": 2,
+      "nickname": "Comanche",
+      "name": "Команчи",
+      "terrain": "grassland.png",
+      "region": "Великие равнины",
+      "initial alert": "4 💢",
+      "initial population": "2 🏹",
+      "loot": "8 🟡",
+      "image": "comanche.png,50,50,100"
+    },
+    {
+      "copies": 2,
+      "nickname": "Inuit",
+      "name": "Инуиты",
+      "terrain": "tundra.png",
+      "region": "Арктика",
+      "initial alert": "2 💢",
+      "initial population": "1 🏹",
+      "loot": "2 🦫",
+      "image": "inuit.png,50,50,100"
+    },
+    {
+      "copies": 2,
+      "nickname": "Pueblo",
+      "name": "Пуэбло",
+      "terrain": "desert.png",
+      "region": "Новая Мексика",
+      "initial alert": "3 💢",
+      "initial population": "3 🏹",
+      "loot": "10 🟡",
+      "image": "pueblo.png,50,50,100"
+    }
+  ]
+}

@@ -3,7 +3,7 @@ import type { Source, SourceMap } from './types.ts';
 import generated from '../generated/sources.json' with { type: 'json' };
 
 export const sourceMap = generated as unknown as SourceMap;
-export const SETTINGS_FILE = 'packages/data/src/settings.ts';
+export const SETTINGS_FILE = 'rules/settings.json';
 
 /**
  * The cell to edit for `path`, from its nearest recorded parent: `fathers.x.mods.0.add` is the effect cell of that Father.
@@ -18,7 +18,7 @@ export function sourceOf(path: string, copies: Record<string, string> = {}, map:
   return { sheet: '', row: null, column: null, header: '' };
 }
 
-/** "Agents, H14 (price)" or "packages/data/src/settings.ts: tax.track". */
+/** "Agents, H14 (price)" or "rules/settings.json: tax.track". */
 export function where(s: Source): string {
   if (s.sheet === SETTINGS_FILE) return `${s.sheet}: ${s.header}`;
   if (!s.sheet) return 'unknown';

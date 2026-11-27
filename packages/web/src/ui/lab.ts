@@ -10,7 +10,7 @@ import { esc, md } from './md.ts';
 
 type Mode = 'compare' | 'sweep' | 'detect';
 /** The lab's form, its progress and its last report. `b` is the ruleset under test, `a` what it is compared with. */
-export const lab = { mode: 'compare' as Mode, a: 'board', b: 'pc', games: 200, players: 4, bots: 'mixed', path: 'settings.tax.refuseRef', values: '1,2,3', done: 0, total: 0, report: '', error: '', stop: null as AbortController | null };
+export const lab = { mode: 'compare' as Mode, a: 'board', b: 'proposed', games: 200, players: 4, bots: 'mixed', path: 'settings.tax.refuseRef', values: '1,2,3', done: 0, total: 0, report: '', error: '', stop: null as AbortController | null };
 const BOTS: Record<string, Msg> = { mixed: msg('lab.eight_characters'), balanced: msg('lab.balanced_bots'), search: msg('lab.one_search') };
 /** The bots of a batch; seats rotate through the list, so a list as long as the table puts one search bot in every game. */
 const botsOf = (k: string, players: number): BotSpec[] =>

@@ -71,7 +71,7 @@ export function read(v: View, w: Weights): Situation {
   x.ref = loyal > 0.4 ? -0.3 : Math.max(1.2 * Math.max(0.2, mineShare), (here - warPoints(x, { ref: 4 })) / 4) * w.ref;
   x.gold = Math.max(0.1, last ? 0.1 + x.strength * 0.15 : w.gold, (x.strength / s.def.settings.war.mercenaryGold) * 1.2);
   // Gold that will pay a tax saves the cubes of a refusal.
-  const tax = s.def.settings.tax, refuse = (s.players.length === 1 ? tax.refuseRefSolo : tax.refuseRef) * x.ref - tax.refuseBells * bell;
+  const tax = s.def.settings.tax, refuse = (s.players.length === 1 ? tax.refuseRefSolo : tax.refuseRef) * x.ref + (tax.payBells - tax.refuseBells) * bell;
   for (let r = s.round, sum = 0; r <= Math.min(set.rounds.max, s.round + left - 1); r++) {
     const rate = tax.track[r - 1];
     sum += rate;

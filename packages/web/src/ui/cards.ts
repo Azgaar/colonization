@@ -1,6 +1,6 @@
 /* Events, ruins and wrecks: what their cards say, in words and signs. */
 import type { Cost, Node, PoiCardDef } from '@col/data';
-import { D, me, pick, t } from '../data.ts';
+import { D, lang, me, pick, t } from '../data.ts';
 import { icon } from '../icons.ts';
 import { Sim, type Entry } from '../sim.ts';
 import { Texts } from '../texts.ts';
@@ -46,5 +46,6 @@ export const table = (list: Node[] | undefined) => { const q = rollOf(list); if 
 export const costs = (k: Cost = {}) => [...GBC.filter((q) => k[q]).map((q) => plus(-(k[q] ?? 0), q)), k.cards ? `−${k.cards} ${t('cards.from_hand', { n: k.cards })}` : '', k.anyFood ? plus(-k.anyFood, 'food') : '', k.anyResource ? t('cards.good', { anyResource: k.anyResource }) : '', k.holdResource ? t('cards.good_hold', { holdResource: k.holdResource }) : '', k.wholeHold ? t('cards.whole_cargo', { wholeHold: k.wholeHold }) : '', k.agent ? `${k.agent === 'scout' ? t('cards.needs_scout') : `${t('cards.needs_agent')} ${icon('sword', 15)}`}` : ''].filter(Boolean).join(', ');
 export const poiCard = (e: Entry, body: string, buttons = '') => bigCard(e.deck, e.card, pick(D.names[e.deck === 'ruin' ? 'ruins' : 'wrecks'][e.card]), t(e.deck), `${flav(e.deck, e.card)}${body}`, buttons);
 export const sinceEvent = (): Entry[] => { const l = Sim.s.log, i = l.findLastIndex((x) => x.e === 'event'); return i < 0 ? [] : l.slice(i + 1); };
-const flav = (k: keyof typeof D.flavor, id: string) => (D.flavor[k][id] ? `<p class="flav">${D.flavor[k][id]}</p>` : '');
+/** A card's story line: printed in Russian on the card (the rules), English from the locale. */
+const flav = (k: keyof typeof D.flavor, id: string) => { const s = lang() === 'ru' ? D.flavor[k][id] : D.flavor[k][id] && t(`flavor.${k}.${id}`); return s ? `<p class="flav">${s}</p>` : ''; };
 export const eventCard = (id: string, more: string, buttons: string) => bigCard('event', id, pick(D.names.events[id]), '', `${flav('event', id)}<p>${Texts.event(id, 19)}</p>${more}`, buttons);

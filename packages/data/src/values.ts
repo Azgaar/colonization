@@ -25,7 +25,7 @@ export interface Editable {
   options?: readonly string[];
 }
 
-/** Effect blocks: only their numbers and switches are offered, the structure stays as reviewed in effects.ts;
+/** Effect blocks: only their numbers and switches are offered, the structure stays as checked in the rules ($fx);
  * the one exception is which resources a talent works on (`icons`), the symbol printed on the card. */
 const EFFECT = new Set(['mods', 'onGain', 'do', 'work', 'effect']);
 const SKIP = new Set(['id', 'ru', 'en', 'flavor', 'color', 'base', 'kind', 'nation', 'unique', 'improvement', 'category']);

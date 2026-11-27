@@ -4,13 +4,25 @@ import type {
   TacticDef, TerrainDef, TerrainId, TileDef, TribeDef,
 } from './types.ts';
 import { ICON_RESOURCE, RESOURCES } from './types.ts';
-import * as fx from './effects.ts';
-import { SETTINGS } from './settings.ts';
+import type { Settings, Mod, Node as EffectNode } from './types.ts';
 
 export type CellValue = string | number | boolean | Date | null | undefined;
 export interface RawSheet { sheet: string; data: CellValue[][] }
 export interface Issue { level: 'error' | 'warning'; sheet: string; row?: number; column?: string; message: string }
 export interface ImportResult { data: GameData | null; issues: Issue[]; texts: Record<string, string>; sources: SourceMap }
+/** The machine side of the rules, which the sheet's texts only describe: card effects by id (agents by base), terrain yields, settings,
+ * English names where they differ from the nickname, and whether each printed text was checked against its effect. */
+export interface Machine {
+  agents: Record<string, Mod[]>; buildings: Record<string, Pick<BuildingDef, 'work' | 'storage' | 'defence'>>; fathers: Record<string, Pick<FatherDef, 'mods' | 'onGain'>>;
+  events: Record<string, EffectNode[]>; ruins: Record<string, EffectNode[]>; wrecks: Record<string, EffectNode[]>; tactics: Record<string, TacticDef['effect']>;
+  yields: Record<string, Icon[]>; settings: Settings; names: Record<string, string>;
+  /** Whether the effect of `key` ("agent.farmer") was checked against this printed text. */
+  checked: (key: string, text: string) => boolean;
+}
+/** An agent's base: a nation's copy (Planter_Danish) shares the common or unique agent's id; natives are their own base. */
+export const agentBase = (nick: string) => (NATIVE_IDS.has(toId(nick)) ? toId(nick) : toId(nick.replace(/_[^_]+$/, '')));
+/** A card's printed text as checked against its effect: its non-empty parts joined. */
+export const printedText = (...parts: string[]) => parts.map((p) => String(p ?? '').trim()).filter(Boolean).join(' / ');
 
 export const toId = (s: string) => s.toLowerCase().replace(/[’'`]/g, '').replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
 const title = (s: string) => { const t = s.replace(/_/g, ' ').trim(); return t.charAt(0).toUpperCase() + t.slice(1); };
@@ -24,7 +36,7 @@ interface Row { row: number; get(col: string): string; num(col: string): number;
 /** 0 → A, 26 → AA. */
 export const columnLetter = (i: number): string => (i >= 26 ? columnLetter(Math.floor(i / 26) - 1) : '') + String.fromCharCode(65 + (i % 26));
 
-export function importWorkbook(sheets: RawSheet[], reviewed: Record<string, string>): ImportResult {
+export function importWorkbook(sheets: RawSheet[], mx: Machine): ImportResult {
   const issues: Issue[] = [];
   const texts: Record<string, string> = {};
   const sources: SourceMap = {};
@@ -68,10 +80,9 @@ export function importWorkbook(sheets: RawSheet[], reviewed: Record<string, stri
   /** Remember the printed text and check that its structured effect was reviewed against it. */
   function review(kind: string, id: string, sheet: string, row: number, ...parts: string[]) {
     const key = `${kind}.${id}`;
-    const text = parts.map((p) => p.trim()).filter(Boolean).join(' / ');
+    const text = printedText(...parts);
     texts[key] = text;
-    if (reviewed[key] === undefined) err(sheet, row, 'effect', `"${id}" has no reviewed effect. Check packages/data/src/effects.ts, then run "pnpm data:review"`);
-    else if (reviewed[key] !== text) err(sheet, row, 'effect', `text of "${id}" changed since its effect was reviewed. Was: "${reviewed[key]}". Now: "${text}"`);
+    if (!mx.checked(key, text)) err(sheet, row, 'effect', `the text of "${id}" ("${text}") was not checked against its effect ($fx). Check the effect, then run "pnpm rules:review"`);
   }
   function effect<T>(map: Record<string, T>, id: string, sheet: string, row: number): T | undefined {
     if (!(id in map)) { err(sheet, row, 'nickname', `no effect defined for "${id}"`); return undefined; }
@@ -104,7 +115,7 @@ export function importWorkbook(sheets: RawSheet[], reviewed: Record<string, stri
     if (move !== 'all' && !(move > 0)) err('Terrain', r.row, 'movement cost', `cannot read movement cost "${mv}"`);
     const defence = r.get('defence bonus') === '' ? 0 : Number.parseInt(r.get('defence bonus'), 10);
     review('terrain', id, 'Terrain', r.row, r.get('production'));
-    terrain[id] = { id, ru: r.get('name'), en: title(id), yields: fx.TERRAIN_YIELDS[id], defence, move };
+    terrain[id] = { id, ru: r.get('name'), en: title(id), yields: mx.yields[id] ?? [], defence, move };
     mark(`terrain.${id}`, terrain[id], r, { ru: 'name', en: 'nickname', yields: 'production', defence: 'defence bonus', move: 'movement cost' });
   }
   for (const t of TERRAINS) if (!terrain[t]) err('Terrain', undefined, undefined, `terrain "${t}" is missing`);
@@ -121,7 +132,7 @@ export function importWorkbook(sheets: RawSheet[], reviewed: Record<string, stri
     review('agent', id, 'Agents', r.row, r.get('effect'), r.get('comment'));
     add(agents, {
       id, base: id, ru: r.get('name'), en: title(r.get('nickname')), kind: 'common', unique: false, copies: r.num('copies'),
-      edu: education(r, 'Agents', 0), price: readPrice(r, 'Agents'), mods: effect(fx.AGENTS, id, 'Agents', r.row) ?? [],
+      edu: education(r, 'Agents', 0), price: readPrice(r, 'Agents'), mods: effect(mx.agents, id, 'Agents', r.row) ?? [],
     }, 'Agents', r.row);
     mark(`agents.${id}`, agents[id], r, { ru: 'name', en: 'nickname', copies: 'copies', edu: 'education', price: 'price', mods: 'effect' });
   }
@@ -129,25 +140,20 @@ export function importWorkbook(sheets: RawSheet[], reviewed: Record<string, stri
     const nick = r.get('nickname');
     const nation = toId(r.get('nation'));
     const native = NATIVE_IDS.has(toId(nick));
-    const base = native ? toId(nick) : toId(nick.replace(/_[^_]+$/, ''));
+    const base = agentBase(nick);
     const common = agents[base]?.kind === 'common';
     if (!common) review('agent', base, 'Sp Agents', r.row, r.get('effect'), r.get('comment'));
     const edu = education(r, 'Sp Agents', 0);
     if (common && agents[base].edu !== edu) err('Sp Agents', r.row, 'education', `"${nick}" differs from the common agent`);
     add(agents, {
       id: toId(nick), base, ru: r.get('name'), en: title(base), kind: native ? 'native' : 'nation', unique: !common && !native,
-      ...(native ? {} : { nation }), copies: r.num('e'), edu, price: null, mods: effect(fx.AGENTS, base, 'Sp Agents', r.row) ?? [],
+      ...(native ? {} : { nation }), copies: r.num('e'), edu, price: null, mods: effect(mx.agents, base, 'Sp Agents', r.row) ?? [],
     }, 'Sp Agents', r.row);
     mark(`agents.${toId(nick)}`, agents[toId(nick)], r, { ru: 'name', en: 'nickname', nation: 'nation', copies: 'e', edu: 'education', mods: 'effect' });
   }
 
-  // DD-68: the designer's names, until the workbook carries them. The ids stay (art, effects and bots use them).
-  const RENAMED: Record<string, { en: string; ru?: string }> = { farmer: { en: 'Planter', ru: 'Земледелец' }, planter: { en: 'Cane Planter' } };
-  for (const a of Object.values(agents)) {
-    const n = RENAMED[a.base]; if (!n) continue;
-    a.en = n.en;
-    if (n.ru && a.ru !== n.ru) { warn('Agents', `${a.id}: "${a.ru}" in the workbook is "${n.ru}" in the game (DD-68)`); a.ru = n.ru; }
-  }
+  // English names that differ from the nickname (DD-68): the ids stay, as art, effects and bots use them.
+  for (const a of Object.values(agents)) if (mx.names[a.base]) a.en = mx.names[a.base];
 
   // Nations
   const nations: Record<string, NationDef> = {};
@@ -180,7 +186,7 @@ export function importWorkbook(sheets: RawSheet[], reviewed: Record<string, stri
     if (needs && !reqRow) err('Buildings', r.row, 'requires', `unknown building "${needs}"`);
     add(buildings, {
       id, ru: r.get('name'), en: title(r.get('nickname')), copies: r.num('copies'), edu: education(r, 'Buildings', 0), timber: Number(m?.[1] ?? 0),
-      improvement: !!needs, ...(reqRow ? { requires: toId(reqRow.get('nickname')) } : {}), ...effect(fx.BUILDINGS, id, 'Buildings', r.row),
+      improvement: !!needs, ...(reqRow ? { requires: toId(reqRow.get('nickname')) } : {}), ...effect(mx.buildings, id, 'Buildings', r.row),
     }, 'Buildings', r.row);
     mark(`buildings.${id}`, buildings[id], r, {
       ru: 'name', en: 'nickname', copies: 'copies', edu: 'education', timber: 'price', requires: 'requires', improvement: 'requires', work: 'effect', storage: 'effect', defence: 'effect',
@@ -194,7 +200,7 @@ export function importWorkbook(sheets: RawSheet[], reviewed: Record<string, stri
     review('father', id, 'Fathers', r.row, r.get('effect'));
     const m = /^(\d+)\s*🔔$/u.exec(r.get('price'));
     if (!m) err('Fathers', r.row, 'price', `cannot read price "${r.get('price')}"`);
-    add(fathers, { id, ru: r.get('name'), en: r.get('nickname'), flavor: r.get('description') || undefined, category: r.get('type'), bells: Number(m?.[1] ?? 0), mods: [], onGain: [], ...effect(fx.FATHERS, id, 'Fathers', r.row) }, 'Fathers', r.row);
+    add(fathers, { id, ru: r.get('name'), en: r.get('nickname'), flavor: r.get('description') || undefined, category: r.get('type'), bells: Number(m?.[1] ?? 0), mods: [], onGain: [], ...effect(mx.fathers, id, 'Fathers', r.row) }, 'Fathers', r.row);
     mark(`fathers.${id}`, fathers[id], r, { ru: 'name', en: 'nickname', flavor: 'description', category: 'type', bells: 'price', mods: 'effect', onGain: 'effect' });
   }
 
@@ -203,7 +209,7 @@ export function importWorkbook(sheets: RawSheet[], reviewed: Record<string, stri
   for (const r of table('Events')) {
     const id = toId(r.get('nickname'));
     review('event', id, 'Events', r.row, r.get('effect 1'), r.get('effect 2'), r.get('effect 3'), r.get('effect 4'));
-    add(events, { id, ru: r.get('name'), en: r.get('nickname'), flavor: r.get('flavor') || undefined, do: effect(fx.EVENTS, id, 'Events', r.row) ?? [] }, 'Events', r.row);
+    add(events, { id, ru: r.get('name'), en: r.get('nickname'), flavor: r.get('flavor') || undefined, do: effect(mx.events, id, 'Events', r.row) ?? [] }, 'Events', r.row);
     mark(`events.${id}`, events[id], r, { ru: 'name', en: 'nickname', flavor: 'flavor', do: 'effect 1' });
   }
   const poiCards = (sheet: string, kind: string, map: Record<string, Node[]>) => {
@@ -216,13 +222,13 @@ export function importWorkbook(sheets: RawSheet[], reviewed: Record<string, stri
     }
     return out;
   };
-  const ruins = poiCards('Burial events', 'ruin', fx.RUINS);
-  const wrecks = poiCards('Wreck events', 'wreck', fx.WRECKS);
+  const ruins = poiCards('Burial events', 'ruin', mx.ruins);
+  const wrecks = poiCards('Wreck events', 'wreck', mx.wrecks);
   const tactics: Record<string, TacticDef> = {};
   for (const r of table('King Tactics')) {
     const id = toId(r.get('nickname'));
     review('tactic', id, 'King Tactics', r.row, r.get('effect'));
-    add(tactics, { id, ru: r.get('name'), en: r.get('nickname'), effect: effect(fx.TACTICS, id, 'King Tactics', r.row) ?? { t: 'none' } }, 'King Tactics', r.row);
+    add(tactics, { id, ru: r.get('name'), en: r.get('nickname'), effect: effect(mx.tactics, id, 'King Tactics', r.row) ?? { t: 'none' } }, 'King Tactics', r.row);
     mark(`tactics.${id}`, tactics[id], r, { ru: 'name', en: 'nickname', effect: 'effect' });
   }
 
@@ -262,8 +268,6 @@ export function importWorkbook(sheets: RawSheet[], reviewed: Record<string, stri
       const b = r.get(`resource ${i}`);
       if (b) {
         if (!ICONS[b]) err('Tiles', r.row, `resource ${i}`, `"${b}" is not a resource icon`);
-        // DD-47, DD-67: corn is gone from the game (food comes from fish), so a corn bonus is dropped until the workbook loses it.
-        else if (ICONS[b] === 'corn') warn('Tiles', `tile ${id} cell ${i}: corn bonus is dropped (DD-67)`, r.row);
         else c.bonus = ICONS[b];
       }
       cells.push(c);
@@ -273,7 +277,7 @@ export function importWorkbook(sheets: RawSheet[], reviewed: Record<string, stri
     sources[`tiles.${tiles.length}`] = r.at('nickname');
     tiles.push({ id, cells });
   }
-  if (tiles.length < SETTINGS.map.size ** 2) err('Tiles', undefined, undefined, `need at least ${SETTINGS.map.size ** 2} tiles`);
+  if (tiles.length < mx.settings.map.size ** 2) err('Tiles', undefined, undefined, `need at least ${mx.settings.map.size ** 2} tiles`);
 
   // Warnings: things that are legal but probably not intended.
   for (const [id, f] of Object.entries(fathers)) for (const n of f.onGain) {
@@ -285,14 +289,12 @@ export function importWorkbook(sheets: RawSheet[], reviewed: Record<string, stri
     const villages = tiles.flatMap((x) => x.cells).filter((c) => c.terrain === t && c.poi === 'village').length;
     if (villages && !Object.values(tribes).some((x) => x.terrain === t)) warn('Tiles', `villages on ${t} but no tribe lives there`);
   }
-  const used = new Set(Object.keys(texts));
-  for (const k of Object.keys(reviewed)) if (!used.has(k)) warn('effects', `reviewed effect "${k}" is no longer in the workbook`);
 
   const sourceHash = createHash('sha256').update(JSON.stringify(sheets.map((s) => [s.sheet, s.data]))).digest('hex').slice(0, 16);
   const failed = issues.some((i) => i.level === 'error');
   return {
     issues, texts, sources,
-    data: failed ? null : { schema: 1, sourceHash, resources, terrain, agents, nations, buildings, fathers, events, ruins, wrecks, tactics, tribes, tiles, settings: SETTINGS },
+    data: failed ? null : { schema: 1, sourceHash, resources, terrain, agents, nations, buildings, fathers, events, ruins, wrecks, tactics, tribes, tiles, settings: mx.settings },
   };
 }
 

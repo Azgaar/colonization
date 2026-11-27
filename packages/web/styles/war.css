@@ -87,10 +87,39 @@ body.war .hand,body.war .door,body.war #heaps,body.war .side,body.war .kingbox {
 @media (max-width:900px) { .ebox { grid-template-columns:1fr } .epic { max-height:28vh } }
 /* While the war is fought, the peace-time row below the map (hand, piles, doors, warehouse, pier) has nothing to do. */
 body.atwar .hand,body.atwar .door,body.atwar #heaps,body.atwar .side { display:none }
-/* The war card: three tiles, the Royal Army, the King's tactic, the loyalist. */
+/* The war card: the sides, the loyalist and the patriots. */
 .rc .wcard { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:6px 0 4px;text-align:center }
+.rc .wcard.two { grid-template-columns:repeat(2,minmax(0,1fr)) }
+.rc .wct .wpic .em+.em { margin-left:-7px }
 .rc .wct { display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 6px;border-radius:12px;background:#1c2a2a12 }
 .rc .wpic { display:flex;align-items:center;justify-content:center;height:36px }
 .rc .wct b { font:800 16px/1.1 var(--sc) }
 .rc .wct small { font-size:13px;line-height:1.25;opacity:.8 }
 .rc .wct .wmen { max-width:110px;justify-content:center }
+/* The King's tactic, drawn: a face-down deck on the table, its top card lifts off, turns over and shows what the King will do. */
+.rc.tdraw { width:min(400px,94vw) }
+.tstage { --w:150px;--h:214px;flex:none;position:relative;height:250px;border-radius:8px;overflow:hidden;perspective:1000px;background:radial-gradient(90% 90% at 50% 40%,#5a2a1e,#2a110c);box-shadow:0 0 0 1.500px var(--a),inset 0 0 40px #000a }
+.tdeck { position:absolute;left:calc(50% - 159px);top:62px;width:100px;height:143px }
+.tdeck i { position:absolute;inset:0;transform:translate(calc(var(--i,0) * -2px),calc(var(--i,0) * 2.5px)) }
+.tdeck i:nth-child(2) { --i:1 } .tdeck i:nth-child(3) { --i:2 } .tdeck i:nth-child(4) { --i:3 } .tdeck i:nth-child(5) { --i:4 }
+.tback { display:grid;place-items:center;border-radius:9px;background:#7c2419;background-image:repeating-linear-gradient(45deg,#0000 0 6px,#ffffff10 6px 7px),repeating-linear-gradient(-45deg,#0000 0 6px,#ffffff10 6px 7px);box-shadow:inset 0 0 0 4px #7c2419,inset 0 0 0 5.500px #edb443,0 2px 6px #0008 }
+.tcard { position:absolute;left:calc(50% - 1px);top:18px;width:var(--w);height:var(--h);transform-style:preserve-3d;animation:tdraw 1.5s .35s cubic-bezier(.35,.1,.25,1) both }
+.tcard>* { position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden }
+.tcard>.tback { transform:rotateY(180deg) }
+.tcard>.tback svg { width:44px;height:44px }
+.tfront { display:flex;flex-direction:column;align-items:center;gap:6px;padding:18px 12px 12px;border-radius:12px;text-align:center;background:#f8f0dc;background-image:radial-gradient(130% 80% at 50% 0,#fffaf0 0,#f8f0dc 55%,#efe2c3 100%);box-shadow:inset 0 0 0 4px #7c2419,inset 0 0 0 5.500px #edb443,0 10px 30px #000c;animation:tglow 1.2s 1.75s ease-out both }
+.tcrown { display:grid;place-items:center;width:46px;height:46px;border-radius:50%;background:#7c2419;box-shadow:0 0 0 2px #edb443 }
+.tfront b { font:800 19px/1.08 var(--sc);color:#7c2419;text-wrap:balance }
+.tfront .rule { display:block;width:90px;height:7px;background:linear-gradient(90deg,#0000,#7c2419 25%,#0000 46%,#0000 54%,#7c2419 75%,#0000) 50%/100% 1.200px no-repeat,radial-gradient(circle,#7c2419 2.400px,#0000 2.900px) 50%/7px 7px no-repeat;opacity:.8 }
+.tfront p { margin:0;font-size:15px;line-height:1.28;color:#2b241b;text-wrap:balance }
+/* From the top of the deck (100×143 at its place) to the table, turning face up on the way. */
+@keyframes tdraw {
+  0% { transform:translate(-183px,8px) scale(.667) rotateY(180deg) }
+  30% { transform:translate(-140px,-22px) scale(.78) rotateY(180deg) rotateZ(-4deg) }
+  100% { transform:none }
+}
+@keyframes tglow { from { box-shadow:inset 0 0 0 4px #7c2419,inset 0 0 0 5.500px #edb443,0 0 0 4px #edb443,0 0 40px 10px #edb443aa } }
+.rc .tarmy { display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:4px 8px;font:700 16.500px var(--sc) }
+.rc .tarmy b { font:800 24px/1 var(--sc);color:var(--a) }
+.rc .tarmy .wmen { justify-content:center }
+@media (prefers-reduced-motion:reduce) { .tcard,.tfront { animation:none } }

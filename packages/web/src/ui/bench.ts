@@ -63,7 +63,7 @@ const settle = (r: Ruleset): Ruleset => ({
 
 /* ---- the page ---- */
 export function bench(): string {
-  if (!B.rs || !all()[B.rs]) B.rs = Object.keys(custom())[0] ?? "pc";
+  if (!B.rs || !all()[B.rs]) B.rs = Object.keys(custom())[0] ?? "proposed";
   return `<div class="bench">
 <header><button class="pback" data-t-page="main">← ${t('back')}</button><h2>${t('bench.design_bench')}</h2>
 <nav class="tabs">${(["rules", "lab", "export"] as Tab[]).map(t => `<button class="${B.tab === t ? "on" : ""}" data-b-tab="${t}">${pick({ rules: say('newgame.rules'), lab: say('bench.lab'), export: say('bench.export') }[t] as Text)}</button>`).join("")}</nav></header>
@@ -181,85 +181,53 @@ function exportTab() {
     .map(id => `<option${id === B.rs ? " selected" : ""}>${esc(id)}</option>`)
     .join("")}</select></label>
 <button data-b-dl="csv">${t('bench.cells_edit')}</button><button data-b-dl="md">${t('bench.cells_edit2')}</button><button data-b-dl="report">${t('bench.conversion_report')}</button><button data-b-dl="json">${t('bench.ruleset_file')}</button></div>
-<p class="note">${t('bench.make_change')} <code>pnpm rules promote &lt;id&gt;</code> ${t('bench.drop_decision')}</p>
+<p class="note">${t('bench.make_change')} <code>pnpm rules apply &lt;ruleset&gt; &lt;id&gt;</code> ${t('bench.drop_decision')}</p>
 ${Dev.on ? `<section class="b-board" id="b-board">${toBoard()}</section>` : ""}
 <div class="md">${md(report)}</div><h4>${t('bench.cells_edit3')}</h4><div class="md">${md(toMarkdown(rows))}</div></div>`;
 }
 
 /* ---- toward the board game (dev mode, FR-R-9): the local server writes rulesets/*.json and docs/decisions.md, as `pnpm rules` does ---- */
-const S: {
-  rs: Record<string, Ruleset> | null;
-  down: boolean;
-  busy: boolean;
-  msg: string;
-  rows: string;
-  fresh: boolean;
-} = { rs: null, down: false, busy: false, msg: "", rows: "", fresh: false };
+/** What the local server says: the rulesets on disk and the printed texts that still have to follow an applied change. */
+type Todo = { card: string; text: string; table: string };
+const S: { rs: Record<string, Ruleset> | null; todo: Todo[]; down: boolean; busy: boolean; msg: string; rows: string; fresh: boolean } =
+  { rs: null, todo: [], down: false, busy: false, msg: "", rows: "", fresh: false };
 async function readServer() {
   try {
     const r = await fetch("/api/rules");
     if (!r.ok) throw new Error();
-    S.rs = (await r.json()) as Record<string, Ruleset>;
-    S.down = false;
+    const x = (await r.json()) as { rulesets: Record<string, Ruleset>; todo: Todo[] };
+    S.rs = x.rulesets; S.todo = x.todo; S.down = false;
   } catch {
     S.down = true;
   }
   const el = document.getElementById("b-board");
   if (el) el.innerHTML = toBoard();
 }
+/** Dev mode: apply the chosen ruleset's changes to the rules or drop them, and the printed texts still to update. */
 function toBoard(): string {
   const h = `<h4>${t('bench.toward_board')}</h4>`;
-  if (S.down)
-    return `${h}<p class="note">${t('bench.rules_files')} <code>pnpm web</code> ${t('bench.use')} <code>pnpm rules</code>.</p>`;
-  if (!S.rs) {
-    void readServer();
-    return `${h}<p class="note">${t('bench.reading_rules')}</p>`;
-  }
-  const pc = S.rs.pc.overrides,
-    board = S.rs.board.overrides,
-    off = S.busy ? " disabled" : "";
+  if (S.down) return `${h}<p class="note">${t('bench.rules_files')} <code>pnpm web</code> ${t('bench.use')} <code>pnpm rules</code>.</p>`;
+  if (!S.rs) { void readServer(); return `${h}<p class="note">${t('bench.reading_rules')}</p>`; }
+  const off = S.busy ? " disabled" : "", onDisk = !!S.rs[B.rs] && B.rs !== "board";
   const line = (o: Override, acts: string) => {
     const why = promoteProblem(o);
     return `<div class="b-ch"><div class="b-ch-h"><b>${esc(o.id)}</b><span>${esc(o.table || o.why || Object.keys(o.set ?? {}).join(", "))}</span>${acts}</div>${why ? `<small class="b-warn">${t('bench.not_ready')}: ${esc(why)}</small>` : ""}</div>`;
   };
-  const pcRows = pc.length
-    ? pc
-        .map(o =>
-          line(
-            o,
-            `<button data-b-promote="${esc(o.id)}"${promoteProblem(o) ? " disabled" : off}>${t('bench.promote_board')}</button><button data-b-drop="${esc(o.id)}"${off}>${t('bench.drop')}</button>`
-          )
-        )
-        .join("")
-    : `<p class="note">${t('bench.pc_plays')}</p>`;
-  const from = B.rs !== "pc" && B.rs !== "board" ? all()[B.rs] : undefined;
-  const add = from
-    ? `<h5>${t('bench.changes', { id: from.id })}</h5>${from.overrides.length ? from.overrides.map(o => line(o, pc.some(x => x.id === o.id) ? `<small>${t('bench.pc')}</small>` : board.some(x => x.id === o.id) ? `<small>${t('bench.board2')}</small>` : `<button data-b-add="${esc(o.id)}"${promoteProblem(o) ? " disabled" : off}>${t('bench.add_pc')}</button>`)).join("") : `<p class="note">${t('bench.no_changes')}</p>`}`
+  const from = B.rs !== "board" ? (onDisk ? S.rs[B.rs] : all()[B.rs]) : undefined;
+  const changes = from
+    ? `<h5>${t('bench.changes', { id: from.id })}</h5>${from.overrides.length ? from.overrides.map((o) => line(o, `<button data-b-apply="${esc(o.id)}"${promoteProblem(o) ? " disabled" : off}>${t('bench.promote_board')}</button>${onDisk ? `<button data-b-drop="${esc(o.id)}"${off}>${t('bench.drop')}</button>` : ""}`)).join("") : `<p class="note">${t('bench.no_changes')}</p>`}`
     : "";
-  return `${h}<p class="note">${t('bench.change_goes')}</p>
-<h5>${t('bench.waiting_pc')}</h5>${pcRows}${add}
+  const todo = `<h5>${t('bench.waiting_pc')}</h5>${S.todo.length ? S.todo.map((x) => `<div class="b-ch"><div class="b-ch-h"><b>${esc(x.card)}</b><span>${t('bench.pc')}: ${esc(x.text)}</span></div><small>${t('bench.board2')}: ${esc(x.table)}</small></div>`).join("") : `<p class="note">${t('bench.pc_plays')}</p>`}`;
+  return `${h}<p class="note">${t('bench.change_goes')}</p>${changes}${todo}
 ${S.msg ? `<p class="b-msg">${esc(S.msg)}${S.fresh ? ` <button data-b-reload>${t('bench.reload_game')}</button>` : ""}</p>` : ""}${S.rows ? `<div class="md">${md(S.rows)}</div>` : ""}`;
 }
-async function step(kind: "add" | "promote" | "drop", x: { id?: string; override?: Override }) {
-  S.busy = true;
-  S.msg = t('bench.writing_files');
-  S.rows = "";
-  const el = () => document.getElementById("b-board");
-  el()!.innerHTML = toBoard();
+async function step(kind: "apply" | "drop", x: { id?: string; ruleset?: string; from?: string; override?: Override }) {
+  S.busy = true; S.msg = t('bench.writing_files'); S.rows = "";
+  document.getElementById("b-board")!.innerHTML = toBoard();
   try {
-    const r = await fetch(`/api/rules/${kind}`, {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify(x)
-      }),
-      out = (await r.json()) as {
-        message?: string;
-        error?: string;
-        rows?: Parameters<typeof toMarkdown>[0];
-      };
-    S.msg =
-      out.error ??
-      `${out.message} ${t('bench.reload_play')}`;
+    const r = await fetch(`/api/rules/${kind}`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(x) }),
+      out = (await r.json()) as { message?: string; error?: string; rows?: Parameters<typeof toMarkdown>[0] };
+    S.msg = out.error ?? `${out.message} ${t('bench.reload_play')}`;
     S.fresh = !out.error;
     if (out.rows?.length) S.rows = toMarkdown(out.rows);
   } catch {
@@ -337,7 +305,7 @@ document.addEventListener("click", e => {
       .replace(/^-|-$/g, "");
     if (!name) return msg(t('bench.give_name'));
     if (all()[name]) return msg(t('bench.name_taken'));
-    save({ id: name, title: name, base: "pc", overrides: [] });
+    save({ id: name, title: name, base: "board", overrides: [] });
     B.rs = name;
     redraw();
   } else if ((x = q("[data-b-reset]"))) {
@@ -361,21 +329,12 @@ document.addEventListener("click", e => {
     redraw();
   } else if (q("[data-b-play]")) {
     void import("./newgame.ts").then(m => m.openNewGame(B.rs));
-  } else if ((x = q("[data-b-promote]"))) {
-    const id = x.dataset.bPromote!;
-    if (
-      confirm(
-        t('bench.make_part', { id })
-      )
-    )
-      void step("promote", { id });
+  } else if ((x = q("[data-b-apply]"))) {
+    const id = x.dataset.bApply!, o = (S.rs?.[B.rs] ?? all()[B.rs])?.overrides.find((v) => v.id === id);
+    if (o && confirm(t('bench.make_part', { id }))) void step("apply", { override: o, from: B.rs });
   } else if ((x = q("[data-b-drop]"))) {
     const id = x.dataset.bDrop!;
-    if (confirm(t('bench.drop_pc', { id })))
-      void step("drop", { id });
-  } else if ((x = q("[data-b-add]"))) {
-    const o = all()[B.rs]?.overrides.find(v => v.id === x!.dataset.bAdd);
-    if (o) void step("add", { override: o });
+    if (confirm(t('bench.drop_pc', { id, ruleset: B.rs }))) void step("drop", { ruleset: B.rs, id });
   } else if (q("[data-b-reload]")) location.reload();
   else if ((x = q("[data-b-dl]"))) {
     const r = all()[B.rs],

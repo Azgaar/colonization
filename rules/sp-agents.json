@@ -1,0 +1,639 @@
+{
+  "sheet": "Sp Agents",
+  "header": [
+    "e",
+    "nickname",
+    "nation",
+    "name",
+    "effect",
+    "comment",
+    "education",
+    "emblem",
+    "emblem back",
+    "price",
+    "image"
+  ],
+  "rows": [
+    {
+      "e": 1,
+      "nickname": "Trapper_French",
+      "nation": "French",
+      "name": "Траппер",
+      "effect": "производство: +1 🦫 в лесу",
+      "education": "🎓",
+      "emblem": "French.svg",
+      "emblem back": "French.svg",
+      "image": "Trapper.jpeg,50,90,100",
+      "$fx": [
+        {
+          "mod": "production",
+          "icons": [
+            "fur"
+          ],
+          "add": 1,
+          "terrain": "forest",
+          "enables": true
+        }
+      ],
+      "$checked": "b18b60301e"
+    },
+    {
+      "e": 1,
+      "nickname": "Colonist_French",
+      "nation": "French",
+      "name": "Колонист",
+      "education": "📖",
+      "emblem": "French.svg",
+      "emblem back": "French.svg",
+      "image": "Colonist.jpeg,50,70,100"
+    },
+    {
+      "e": 1,
+      "nickname": "Preacher_French",
+      "nation": "French",
+      "name": "Проповедник",
+      "effect": "производство: +1 ✝️",
+      "education": "📖",
+      "emblem": "French.svg",
+      "emblem back": "French.svg",
+      "image": "Preacher.jpeg,50,90,100"
+    },
+    {
+      "e": 1,
+      "nickname": "Sailor_French",
+      "nation": "French",
+      "name": "Матрос",
+      "effect": "передвижение корабля: +2 💨",
+      "education": "📖",
+      "emblem": "French.svg",
+      "emblem back": "French.svg",
+      "image": "Sailor.jpeg,50,80,110"
+    },
+    {
+      "e": 1,
+      "nickname": "Soldier_French",
+      "nation": "French",
+      "name": "Солдат",
+      "effect": "атака и защита пешки: +2 ⚔️",
+      "education": "📖",
+      "emblem": "French.svg",
+      "emblem back": "French.svg",
+      "image": "Soldier.jpeg,50,80,100"
+    },
+    {
+      "e": 1,
+      "nickname": "Negotiant_Dutch",
+      "nation": "Dutch",
+      "name": "Негоциант",
+      "effect": "торговля: цена +1 🟡",
+      "education": "🎓",
+      "emblem": "Dutch.svg",
+      "emblem back": "Dutch.svg",
+      "image": "Negotiant.jpeg,50,70,100",
+      "$fx": [
+        {
+          "mod": "sellPrice",
+          "add": 1
+        }
+      ],
+      "$checked": "c182fb3926"
+    },
+    {
+      "e": 1,
+      "nickname": "Colonist_Dutch",
+      "nation": "Dutch",
+      "name": "Колонист",
+      "education": "📖",
+      "emblem": "Dutch.svg",
+      "emblem back": "Dutch.svg",
+      "image": "Colonist.jpeg,50,70,100"
+    },
+    {
+      "e": 1,
+      "nickname": "Preacher_Dutch",
+      "nation": "Dutch",
+      "name": "Проповедник",
+      "effect": "производство: +1 ✝️",
+      "education": "📖",
+      "emblem": "Dutch.svg",
+      "emblem back": "Dutch.svg",
+      "image": "Preacher.jpeg,50,90,100"
+    },
+    {
+      "e": 1,
+      "nickname": "Sailor_Dutch",
+      "nation": "Dutch",
+      "name": "Матрос",
+      "effect": "передвижение корабля: +2 💨",
+      "education": "📖",
+      "emblem": "Dutch.svg",
+      "emblem back": "Dutch.svg",
+      "image": "Sailor.jpeg,50,80,110"
+    },
+    {
+      "e": 1,
+      "nickname": "Soldier_Dutch",
+      "nation": "Dutch",
+      "name": "Солдат",
+      "effect": "атака и защита пешки: +2 ⚔️",
+      "education": "📖",
+      "emblem": "Dutch.svg",
+      "emblem back": "Dutch.svg",
+      "image": "Soldier.jpeg,50,80,100"
+    },
+    {
+      "e": 1,
+      "nickname": "Puritan_English",
+      "nation": "English",
+      "name": "Пуританин",
+      "effect": "производство: +2 ✝️",
+      "education": "🎓",
+      "emblem": "English.svg",
+      "emblem back": "English.svg",
+      "image": "Puritan.jpeg,50,60,100",
+      "$fx": [
+        {
+          "mod": "production",
+          "icons": [
+            "crosses"
+          ],
+          "add": 2
+        }
+      ],
+      "$checked": "4eae3ab68e"
+    },
+    {
+      "e": 1,
+      "nickname": "Slave_English",
+      "nation": "English",
+      "name": "Раб",
+      "effect": "производство: +1",
+      "comment": "Только действие производство",
+      "education": "🚫",
+      "emblem": "English.svg",
+      "emblem back": "English.svg",
+      "image": "Slave.png,50,100,100"
+    },
+    {
+      "e": 1,
+      "nickname": "Colonist_English",
+      "nation": "English",
+      "name": "Колонист",
+      "education": "📖",
+      "emblem": "English.svg",
+      "emblem back": "English.svg",
+      "image": "Colonist.jpeg,50,70,100"
+    },
+    {
+      "e": 1,
+      "nickname": "Sailor_English",
+      "nation": "English",
+      "name": "Матрос",
+      "effect": "передвижение корабля: +2 💨",
+      "education": "📖",
+      "emblem": "English.svg",
+      "emblem back": "English.svg",
+      "image": "Sailor.jpeg,50,80,110"
+    },
+    {
+      "e": 1,
+      "nickname": "Soldier_English",
+      "nation": "English",
+      "name": "Солдат",
+      "effect": "атака и защита пешки: +2 ⚔️",
+      "education": "📖",
+      "emblem": "English.svg",
+      "emblem back": "English.svg",
+      "image": "Soldier.jpeg,50,80,100"
+    },
+    {
+      "e": 1,
+      "nickname": "Navigator_Portuguese",
+      "nation": "Portuguese",
+      "name": "Навигатор",
+      "effect": "передвижение корабля: +4 💨",
+      "education": "🎓",
+      "emblem": "Portuguese.svg",
+      "emblem back": "Portuguese.svg",
+      "image": "Navigator.jpeg,50,50,100",
+      "$fx": [
+        {
+          "mod": "move",
+          "token": "ship",
+          "add": 4
+        }
+      ],
+      "$checked": "008d1eb49a"
+    },
+    {
+      "e": 1,
+      "nickname": "Slave_Portuguese",
+      "nation": "Portuguese",
+      "name": "Раб",
+      "effect": "производство: +1",
+      "comment": "Только действие производство",
+      "education": "🚫",
+      "emblem": "Portuguese.svg",
+      "emblem back": "Portuguese.svg",
+      "image": "Slave.png,50,100,100"
+    },
+    {
+      "e": 1,
+      "nickname": "Colonist_Portuguese",
+      "nation": "Portuguese",
+      "name": "Колонист",
+      "education": "📖",
+      "emblem": "Portuguese.svg",
+      "emblem back": "Portuguese.svg",
+      "image": "Colonist.jpeg,50,70,100"
+    },
+    {
+      "e": 1,
+      "nickname": "Preacher_Portuguese",
+      "nation": "Portuguese",
+      "name": "Проповедник",
+      "effect": "производство: +1 ✝️",
+      "education": "📖",
+      "emblem": "Portuguese.svg",
+      "emblem back": "Portuguese.svg",
+      "image": "Preacher.jpeg,50,90,100"
+    },
+    {
+      "e": 1,
+      "nickname": "Soldier_Portuguese",
+      "nation": "Portuguese",
+      "name": "Солдат",
+      "effect": "атака и защита пешки: +2 ⚔️",
+      "education": "📖",
+      "emblem": "Portuguese.svg",
+      "emblem back": "Portuguese.svg",
+      "image": "Soldier.jpeg,50,80,100"
+    },
+    {
+      "e": 1,
+      "nickname": "Conquistador_Spanish",
+      "nation": "Spanish",
+      "name": "Конкистадор",
+      "effect": "атака и защита пешки: +2 ⚔️ и ещё +2 ⚔️ против индейцев",
+      "education": "🎓",
+      "emblem": "Spanish.svg",
+      "emblem back": "Spanish.svg",
+      "image": "Conquistador.jpeg,50,80,97",
+      "$fx": [
+        {
+          "mod": "combat",
+          "token": "infantry",
+          "add": 2
+        },
+        {
+          "mod": "combat",
+          "token": "infantry",
+          "add": 2,
+          "vs": "native"
+        }
+      ],
+      "$checked": "f1ff652cea"
+    },
+    {
+      "e": 1,
+      "nickname": "Colonist_Spanish",
+      "nation": "Spanish",
+      "name": "Колонист",
+      "education": "📖",
+      "emblem": "Spanish.svg",
+      "emblem back": "Spanish.svg",
+      "image": "Colonist.jpeg,50,70,100"
+    },
+    {
+      "e": 1,
+      "nickname": "Sailor_Spanish",
+      "nation": "Spanish",
+      "name": "Матрос",
+      "effect": "передвижение корабля: +2 💨",
+      "education": "📖",
+      "emblem": "Spanish.svg",
+      "emblem back": "Spanish.svg",
+      "image": "Sailor.jpeg,50,80,110"
+    },
+    {
+      "e": 1,
+      "nickname": "Preacher_Spanish",
+      "nation": "Spanish",
+      "name": "Проповедник",
+      "effect": "производство: +1 ✝️",
+      "education": "📖",
+      "emblem": "Spanish.svg",
+      "emblem back": "Spanish.svg",
+      "image": "Preacher.jpeg,50,90,100"
+    },
+    {
+      "e": 1,
+      "nickname": "Slave_Spanish",
+      "nation": "Spanish",
+      "name": "Раб",
+      "effect": "производство: +1",
+      "comment": "Только действие производство",
+      "education": "🚫",
+      "emblem": "Spanish.svg",
+      "emblem back": "Spanish.svg",
+      "image": "Slave.png,50,100,100"
+    },
+    {
+      "e": 1,
+      "nickname": "Settler_Swedish",
+      "nation": "Swedish",
+      "name": "Поселенец",
+      "effect": "строительство: цена -1 🪵",
+      "education": "🎓",
+      "emblem": "Swedish.svg",
+      "emblem back": "Swedish.svg",
+      "image": "Settler.jpeg,50,55,100",
+      "$fx": [
+        {
+          "mod": "cost",
+          "of": "build",
+          "add": -1
+        }
+      ],
+      "$checked": "5578d81401"
+    },
+    {
+      "e": 1,
+      "nickname": "Soldier_Swedish",
+      "nation": "Swedish",
+      "name": "Солдат",
+      "effect": "атака и защита пешки: +2 ⚔️",
+      "education": "📖",
+      "emblem": "Swedish.svg",
+      "emblem back": "Swedish.svg",
+      "image": "Soldier.jpeg,50,80,100"
+    },
+    {
+      "e": 1,
+      "nickname": "Colonist_Swedish",
+      "nation": "Swedish",
+      "name": "Колонист",
+      "education": "📖",
+      "emblem": "Swedish.svg",
+      "emblem back": "Swedish.svg",
+      "image": "Colonist.jpeg,50,70,100"
+    },
+    {
+      "e": 1,
+      "nickname": "Preacher_Swedish",
+      "nation": "Swedish",
+      "name": "Проповедник",
+      "effect": "производство: +1 ✝️",
+      "education": "📖",
+      "emblem": "Swedish.svg",
+      "emblem back": "Swedish.svg",
+      "image": "Preacher.jpeg,50,90,100"
+    },
+    {
+      "e": 1,
+      "nickname": "Planter_Danish",
+      "nation": "Danish",
+      "name": "Плантатор",
+      "effect": "производство: +1 🍂 на острове из 3 и менее клеток",
+      "education": "🎓",
+      "emblem": "Danish.svg",
+      "emblem back": "Danish.svg",
+      "image": "Planter.jpeg,50,100,100",
+      "$fx": [
+        {
+          "mod": "production",
+          "icons": [
+            "leaf"
+          ],
+          "add": 1,
+          "island": 3,
+          "enables": true
+        }
+      ],
+      "$en": "Cane Planter",
+      "$checked": "a13fa269c3"
+    },
+    {
+      "e": 1,
+      "nickname": "Sailor_Danish",
+      "nation": "Danish",
+      "name": "Матрос",
+      "effect": "передвижение корабля: +2 💨",
+      "education": "📖",
+      "emblem": "Danish.svg",
+      "emblem back": "Danish.svg",
+      "image": "Sailor.jpeg,50,80,110"
+    },
+    {
+      "e": 1,
+      "nickname": "Preacher_Danish",
+      "nation": "Danish",
+      "name": "Проповедник",
+      "effect": "производство: +1 ✝️",
+      "education": "📖",
+      "emblem": "Danish.svg",
+      "emblem back": "Danish.svg",
+      "image": "Preacher.jpeg,50,90,100"
+    },
+    {
+      "e": 1,
+      "nickname": "Slave_Danish",
+      "nation": "Danish",
+      "name": "Раб",
+      "effect": "производство: +1",
+      "comment": "Только действие производство",
+      "education": "🚫",
+      "emblem": "Danish.svg",
+      "emblem back": "Danish.svg",
+      "image": "Slave.png,50,100,100"
+    },
+    {
+      "e": 1,
+      "nickname": "Cossack_Russian",
+      "nation": "Russian",
+      "name": "Казак",
+      "effect": "атака и защита пешки: +2 ⚔️\nпроизводство: +2 🦫 в тундре",
+      "education": "🎓",
+      "emblem": "Russian.svg",
+      "emblem back": "Russian.svg",
+      "image": "Cossack.jpeg,50,70,97",
+      "$fx": [
+        {
+          "mod": "combat",
+          "token": "infantry",
+          "add": 2
+        },
+        {
+          "mod": "production",
+          "icons": [
+            "fur"
+          ],
+          "add": 2,
+          "terrain": "tundra",
+          "enables": true
+        }
+      ],
+      "$checked": "b1a35dc4f9"
+    },
+    {
+      "e": 1,
+      "nickname": "Colonist_Russian",
+      "nation": "Russian",
+      "name": "Колонист",
+      "education": "📖",
+      "emblem": "Russian.svg",
+      "emblem back": "Russian.svg",
+      "image": "Colonist.jpeg,50,70,100"
+    },
+    {
+      "e": 1,
+      "nickname": "Sailor_Russian",
+      "nation": "Russian",
+      "name": "Матрос",
+      "effect": "передвижение корабля: +2 💨",
+      "education": "📖",
+      "emblem": "Russian.svg",
+      "emblem back": "Russian.svg",
+      "image": "Sailor.jpeg,50,80,110"
+    },
+    {
+      "e": 1,
+      "nickname": "Preacher_Russian",
+      "nation": "Russian",
+      "name": "Проповедник",
+      "effect": "производство: +1 ✝️",
+      "education": "📖",
+      "emblem": "Russian.svg",
+      "emblem back": "Russian.svg",
+      "image": "Preacher.jpeg,50,90,100"
+    },
+    {
+      "e": 1,
+      "nickname": "Adventurer_Curonian",
+      "nation": "Curonian",
+      "name": "Авантюрист",
+      "effect": "наём: цена -2 🟡",
+      "education": "🎓",
+      "emblem": "Curonian.svg",
+      "emblem back": "Curonian.svg",
+      "image": "Adventurer.jpeg,50,70,100",
+      "$fx": [
+        {
+          "mod": "cost",
+          "of": "hire",
+          "add": -2
+        }
+      ],
+      "$checked": "11495b1548"
+    },
+    {
+      "e": 1,
+      "nickname": "Soldier_Curonian",
+      "nation": "Curonian",
+      "name": "Солдат",
+      "effect": "атака и защита пешки: +2 ⚔️",
+      "education": "📖",
+      "emblem": "Curonian.svg",
+      "emblem back": "Curonian.svg",
+      "image": "Soldier.jpeg,50,80,100"
+    },
+    {
+      "e": 1,
+      "nickname": "Preacher_Curonian",
+      "nation": "Curonian",
+      "name": "Проповедник",
+      "effect": "производство: +1 ✝️",
+      "education": "📖",
+      "emblem": "Curonian.svg",
+      "emblem back": "Curonian.svg",
+      "image": "Preacher.jpeg,50,90,100"
+    },
+    {
+      "e": 1,
+      "nickname": "Sailor_Curonian",
+      "nation": "Curonian",
+      "name": "Матрос",
+      "effect": "передвижение корабля: +2 💨",
+      "education": "📖",
+      "emblem": "Curonian.svg",
+      "emblem back": "Curonian.svg",
+      "image": "Sailor.jpeg,50,80,110"
+    },
+    {
+      "e": 1,
+      "nickname": "Highlander_Scottish",
+      "nation": "Scottish",
+      "name": "Горец",
+      "effect": "атака и защита пешки: +1⚔️ и ещё +2 ⚔️ в горах",
+      "education": "🎓",
+      "emblem": "Scottish.svg",
+      "emblem back": "Scottish.svg",
+      "image": "Highlander.jpeg,50,100,97",
+      "$fx": [
+        {
+          "mod": "combat",
+          "token": "infantry",
+          "add": 1
+        },
+        {
+          "mod": "combat",
+          "token": "infantry",
+          "add": 2,
+          "terrain": "mountains"
+        }
+      ],
+      "$checked": "7e667d5be7"
+    },
+    {
+      "e": 1,
+      "nickname": "Colonist_Scottish",
+      "nation": "Scottish",
+      "name": "Колонист",
+      "education": "📖",
+      "emblem": "Scottish.svg",
+      "emblem back": "Scottish.svg",
+      "image": "Colonist.jpeg,50,70,100"
+    },
+    {
+      "e": 1,
+      "nickname": "Sailor_Scottish",
+      "nation": "Scottish",
+      "name": "Матрос",
+      "effect": "передвижение корабля: +2 💨",
+      "education": "📖",
+      "emblem": "Scottish.svg",
+      "emblem back": "Scottish.svg",
+      "image": "Sailor.jpeg,50,80,110"
+    },
+    {
+      "e": 1,
+      "nickname": "Preacher_Scottish",
+      "nation": "Scottish",
+      "name": "Проповедник",
+      "effect": "производство: +1 ✝️",
+      "education": "📖",
+      "emblem": "Scottish.svg",
+      "emblem back": "Scottish.svg",
+      "image": "Preacher.jpeg,50,90,100"
+    },
+    {
+      "e": 8,
+      "nickname": "Indian",
+      "name": "Индеец",
+      "effect": "производство: +1 🐟",
+      "education": "🚫",
+      "price": "🚫",
+      "image": "Indian.jpeg,50,70,100",
+      "$fx": [
+        {
+          "mod": "production",
+          "icons": [
+            "fish"
+          ],
+          "add": 1
+        }
+      ],
+      "$checked": "b3ba236b92"
+    }
+  ]
+}

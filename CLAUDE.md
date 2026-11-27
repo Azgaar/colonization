@@ -1,7 +1,7 @@
 # Notes for AI agents
 
 - The board game is the goal: every rule change must stay convertible to the table, with its conversion label and table wording.
-- Rule changes are proposals only; nothing reaches `board` unless the designer promotes it.
+- Rule changes are proposals only; nothing reaches `rules/` unless the designer applies it.
 - Balance later: don't start long tuning or lab runs unless asked.
 - `packages/web` is strict TypeScript: make the small change asked for, keep tests minimal, don't redesign around it.
 - Other sessions edit this repo at the same time: never revert or overwrite changes you didn't make.

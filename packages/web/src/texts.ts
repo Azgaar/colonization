@@ -1,5 +1,5 @@
-/* Card texts. Russian comes from the spreadsheet, English is written here. */
-import texts from '../../data/src/reviewed-texts.json' with { type: 'json' };
+/* Card texts. Russian is printed in the rules (rules/, compiled to texts.json), English is written here. */
+import texts from '../../data/generated/texts.json' with { type: 'json' };
 import { D, lang, pick, t, table } from './data.ts';
 import type { Pair } from './view.ts';
 import { eduIcon, icon } from './icons.ts';

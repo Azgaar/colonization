@@ -1,11 +1,13 @@
 /** Serve the interface from this package. Usage: node packages/web/tools/serve.ts [port] (after `pnpm web:build`).
- * For dev mode it also takes rule changes toward the board game (FR-R-9): POST /api/rules/add | promote | drop, from this computer only.
- * Each writes the ruleset files and docs/decisions.md as `pnpm rules` does, then rebuilds the game so the page sees the new rules. */
+ * For dev mode it also takes rule changes (FR-R-9), from this computer only: GET /api/rules (the rulesets and the printed texts to update),
+ * POST /api/rules/apply {override, from?} and /api/rules/drop {ruleset, id}. Each writes rules/, the rulesets and docs/decisions.md as
+ * `pnpm rules` does, then rebuilds the game so the page sees the new rules. */
 import { createServer, type IncomingMessage } from 'node:http';
 import { readFile } from 'node:fs/promises';
 import { execFile } from 'node:child_process';
 import { extname, join, normalize } from 'node:path';
-import { addToPc, allRulesets, drop, promote } from '../../data/src/rulesfs.ts';
+import { allRulesets, apply, drop, RULESET_IDS } from '../../data/src/rulesfs.ts';
+import { readMaster, todo } from '../../data/src/master.ts';
 import type { Override } from '../../data/src/types.ts';
 
 const root = join(import.meta.dirname, '..'), repo = join(root, '..', '..'), port = Number(process.argv[2] ?? process.env.PORT ?? 8765);
@@ -20,10 +22,11 @@ createServer(async (req, res) => {
     const send = (code: number, x: unknown) => res.writeHead(code, { 'content-type': 'application/json' }).end(JSON.stringify(x));
     if (!local(req)) return send(403, { error: 'only from this computer' });
     try {
-      if (req.method === 'GET') return send(200, allRulesets());
-      const x = JSON.parse((await body(req)) || '{}') as { id?: string; override?: Override }, step = url.pathname.slice('/api/rules/'.length);
-      const done = step === 'add' && x.override ? { message: addToPc(x.override) } : step === 'promote' && x.id ? promote(x.id) : step === 'drop' && x.id ? { message: drop(x.id) } : null;
-      if (!done) return send(400, { error: 'expected add {override}, promote {id} or drop {id}' });
+      if (req.method === 'GET') return send(200, { rulesets: allRulesets(), todo: todo(readMaster()) });
+      const x = JSON.parse((await body(req)) || '{}') as { id?: string; ruleset?: string; from?: string; override?: Override }, step = url.pathname.slice('/api/rules/'.length);
+      const file = (r?: string) => (r && RULESET_IDS.includes(r) ? r : undefined);
+      const done = step === 'apply' && x.override ? apply(x.override, file(x.from)) : step === 'drop' && x.id && file(x.ruleset) ? { message: drop(x.ruleset!, x.id) } : null;
+      if (!done) return send(400, { error: 'expected apply {override, from?} or drop {ruleset, id}' });
       await build();
       return send(200, done);
     } catch (e) { return send(400, { error: (e as Error).message }); }

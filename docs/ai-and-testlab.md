@@ -64,7 +64,7 @@ Bots receive only their own view. A test runs each decision twice with different
 | A/B | What does this change do? Same seeds and seats on both sides |
 | Sweep | How does the outcome vary over a range? |
 | Sensitivity | Which unclear rules (settings) actually matter? |
-| Conversion | Does a `pc` change improve the game enough to promote to `board`? |
+| Conversion | Does a proposed change improve the game enough to apply it to the rules? |
 | Round robin | Which personality beats which? |
 | Exploit hunt | What does a bot tuned only for X achieve? |
 | Component | What is the peak use of each component? |

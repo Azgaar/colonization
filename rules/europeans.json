@@ -1,0 +1,137 @@
+{
+  "sheet": "Europeans",
+  "header": [
+    "copies",
+    "nickname",
+    "name",
+    "starting units",
+    "difficulty",
+    "default color",
+    "image",
+    "emblem",
+    "emblem back",
+    "ribbon style"
+  ],
+  "rows": [
+    {
+      "copies": 1,
+      "nickname": "French",
+      "name": "Новая Франция",
+      "starting units": "Траппер\nКолонист\nПроповедник\nМатрос\nСолдат",
+      "difficulty": "★ ★",
+      "default color": "#233e8b",
+      "image": "colony_French.png,50,50,100",
+      "emblem": "French.svg",
+      "emblem back": "French.svg",
+      "ribbon style": "{background:#233e8b}"
+    },
+    {
+      "copies": 1,
+      "nickname": "Dutch",
+      "name": "Новые Нидерланды",
+      "starting units": "Негоциант\nКолонист\nПроповедник\nМатрос\nСолдат",
+      "difficulty": "★",
+      "default color": "#cc5805",
+      "image": "colony_Dutch.png,0,0,105",
+      "emblem": "Dutch.svg",
+      "emblem back": "Dutch.svg",
+      "ribbon style": "{background:#cc5805}"
+    },
+    {
+      "copies": 1,
+      "nickname": "English",
+      "name": "Новая Англия",
+      "starting units": "Пуританин\nРаб\nКолонист\nМатрос\nСолдат",
+      "difficulty": "★",
+      "default color": "#9b1212",
+      "image": "colony_English.png,50,50,100",
+      "emblem": "English.svg",
+      "emblem back": "English.svg",
+      "ribbon style": "{background:#9b1212}"
+    },
+    {
+      "copies": 1,
+      "nickname": "Portuguese",
+      "name": "Новая Португалия",
+      "starting units": "Навигатор\nРаб\nКолонист\nПроповедник\nСолдат",
+      "difficulty": "★",
+      "default color": "#306312",
+      "image": "colony_Portuguese.png,50,50,100",
+      "emblem": "Portuguese.svg",
+      "emblem back": "Portuguese.svg",
+      "ribbon style": "{background:#306312}"
+    },
+    {
+      "copies": 1,
+      "nickname": "Spanish",
+      "name": "Новая Испания",
+      "starting units": "Конкистадор\nРаб\nКолонист\nПроповедник\nМатрос",
+      "difficulty": "★",
+      "default color": "#623b72",
+      "image": "colony_Spanish.png,50,15,105",
+      "emblem": "Spanish.svg",
+      "emblem back": "Spanish.svg",
+      "ribbon style": "{background:#623b72}"
+    },
+    {
+      "copies": 1,
+      "nickname": "Swedish",
+      "name": "Новая Швеция",
+      "starting units": "Поселенец\nКолонист\nПроповедник\nСолдат",
+      "difficulty": "★ ★ ★",
+      "default color": "#233e8b",
+      "image": "colony_Swedish.png,50,50,100",
+      "emblem": "Swedish.svg",
+      "emblem back": "Swedish.svg",
+      "ribbon style": "{background:#233e8b}"
+    },
+    {
+      "copies": 1,
+      "nickname": "Danish",
+      "name": "Новая Дания",
+      "starting units": "Плантатор\nРаб\nМатрос\nПроповедник",
+      "difficulty": "★ ★",
+      "default color": "#cc5805",
+      "image": "colony_Danish.png,50,50,100",
+      "emblem": "Danish.svg",
+      "emblem back": "Danish.svg",
+      "ribbon style": "{background:#cc5805}"
+    },
+    {
+      "copies": 1,
+      "nickname": "Russian",
+      "name": "Русская Америка",
+      "starting units": "Казак\nКолонист\nПроповедник\nМатрос",
+      "difficulty": "★ ★ ★ ★",
+      "default color": "#9b1212",
+      "image": "colony_Russian.png,50,50,100",
+      "emblem": "Russian.svg",
+      "emblem back": "Russian.svg",
+      "ribbon style": "{background:#9b1212}"
+    },
+    {
+      "copies": 1,
+      "nickname": "Curonian",
+      "name": "Новая Курляндия",
+      "starting units": "Авантюрист\nПроповедник\nМатрос\nСолдат",
+      "difficulty": "★ ★ ★ ★",
+      "default color": "#306312",
+      "image": "colony_Curonian.png,50,50,100",
+      "emblem": "Curonian.svg",
+      "emblem back": "Curonian.svg",
+      "ribbon style": "{background:#306312}"
+    },
+    {
+      "copies": 1,
+      "nickname": "Scottish",
+      "name": "Новая Шотландия",
+      "starting units": "Горец\nКолонист\nПроповедник\nМатрос",
+      "difficulty": "★ ★ ★ ★ ★",
+      "default color": "#623b72",
+      "image": "colony_Scottish.png,50,50,100",
+      "emblem": "Scottish.svg",
+      "emblem back": "Scottish.svg",
+      "ribbon style": "{background:#623b72}"
+    }
+  ]
+}

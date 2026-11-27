@@ -1,0 +1,107 @@
+{
+  "sheet": "Terrain",
+  "header": [
+    "nickname",
+    "name",
+    "color",
+    "production",
+    "bonus resource",
+    "defence bonus",
+    "movement cost",
+    "cells",
+    "indian tribes",
+    "village cells",
+    "poi cells"
+  ],
+  "rows": [
+    {
+      "nickname": "ocean",
+      "name": "океан",
+      "color": "#0066CC",
+      "production": "🟨",
+      "bonus resource": "8%: 🐟",
+      "movement cost": "1 💨",
+      "cells": 398,
+      "indian tribes": 0,
+      "village cells": 0,
+      "$fx": [
+        "fish"
+      ],
+      "$checked": "beeb44b6f7"
+    },
+    {
+      "nickname": "forest",
+      "name": "лес",
+      "color": "#228B22",
+      "production": "🟫",
+      "bonus resource": "10%: 🪵, 5%: 🦫",
+      "defence bonus": "+1 ⚔️",
+      "movement cost": "2 💨",
+      "cells": 78,
+      "indian tribes": 4,
+      "village cells": 16,
+      "$fx": [
+        "timber"
+      ],
+      "$checked": "9df3ba7dfe"
+    },
+    {
+      "nickname": "grassland",
+      "name": "луг",
+      "color": "#A8DF00",
+      "production": "🟩",
+      "bonus resource": "8%: 🍂",
+      "movement cost": "1 💨",
+      "cells": 100,
+      "indian tribes": 3,
+      "village cells": 17,
+      "$fx": [
+        "leaf"
+      ],
+      "$checked": "c170f83adc"
+    },
+    {
+      "nickname": "mountains",
+      "name": "горы",
+      "color": "#A9A9A9",
+      "production": "⬜",
+      "bonus resource": "10%: 🪙",
+      "defence bonus": "+2 ⚔️",
+      "movement cost": "все 💨",
+      "cells": 50,
+      "indian tribes": 3,
+      "village cells": 12,
+      "$fx": [
+        "silver"
+      ],
+      "$checked": "f0b90951dc"
+    },
+    {
+      "nickname": "desert",
+      "name": "пустыня",
+      "color": "#EDC9AF",
+      "bonus resource": "5%: 🪙",
+      "movement cost": "2 💨",
+      "cells": 20,
+      "indian tribes": 2,
+      "village cells": 5,
+      "$fx": [],
+      "$checked": "e3b0c44298"
+    },
+    {
+      "nickname": "tundra",
+      "name": "тундра",
+      "color": "#B3CBB9",
+      "bonus resource": "8%: 🦫",
+      "movement cost": "2 💨",
+      "cells": 20,
+      "indian tribes": 1,
+      "village cells": 3,
+      "$fx": [],
+      "$checked": "e3b0c44298"
+    },
+    {
+      "cells": 666
+    }
+  ]
+}

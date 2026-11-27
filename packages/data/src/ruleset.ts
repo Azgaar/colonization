@@ -1,13 +1,15 @@
 import type { GameData, GameDef, Override, Ruleset } from './types.ts';
 import { COLLECTIONS, validateChange } from './values.ts';
-import board from '../../../rulesets/board.json' with { type: 'json' };
-import pc from '../../../rulesets/pc.json' with { type: 'json' };
 import alternatives from '../../../rulesets/alternatives.json' with { type: 'json' };
 import proposed from '../../../rulesets/proposed.json' with { type: 'json' };
 
 export class RulesetError extends Error {}
 
-export const rulesets: Record<string, Ruleset> = { board: board as unknown as Ruleset, pc: pc as unknown as Ruleset, alternatives: alternatives as unknown as Ruleset, proposed: proposed as unknown as Ruleset };
+/** The rules themselves: the master (`rules/`), compiled to the game data, with nothing on top. Saves, replays and lab records name it `board`. */
+const board: Ruleset = { id: 'board', title: 'The rules (rules/)', overrides: [] };
+export const rulesets: Record<string, Ruleset> = { board, alternatives: alternatives as unknown as Ruleset, proposed: proposed as unknown as Ruleset };
+/** Rulesets made before the master built on `pc`, which played as `board`. */
+const LEGACY: Record<string, string> = { pc: 'board' };
 
 /** Apply a ruleset's overrides, after those of its base, to imported data. The result is frozen and shared by all games that use it. */
 export function compileRuleset(data: GameData, rules: Ruleset, all: Record<string, Ruleset> = rulesets): GameDef {
@@ -21,10 +23,10 @@ export function compileRuleset(data: GameData, rules: Ruleset, all: Record<strin
   return deepFreeze(def);
 }
 
-/** A ruleset with the overrides of its `base` in front, so `pc` keeps every change promoted to `board`. */
+/** A ruleset with the overrides of its `base` in front. */
 export function flattenRuleset(r: Ruleset, all: Record<string, Ruleset>, seen: string[] = []): Ruleset {
   if (!r.base) return r;
-  const base = all[r.base];
+  const base = all[r.base] ?? all[LEGACY[r.base] ?? ''];
   if (!base || seen.includes(r.base)) throw new RulesetError(`ruleset "${r.id}": cannot use "${r.base}" as its base`);
   return { ...r, base: undefined, overrides: [...flattenRuleset(base, all, [...seen, r.id]).overrides, ...r.overrides] };
 }

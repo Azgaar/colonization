@@ -25,7 +25,7 @@ What the game plays, and the file it looks for in `sound/fx/`:
 | `dice.ogg` | Dice are rolled: combat, gifts, ruins, the war | Casino Audio (dice) |
 | `coins.ogg` | Gold earned or paid: trade, tax, hire | Casino Audio (chips) |
 | `sail.ogg` | The ship moves (once per move) | water splash; Impact or RPG |
-| `march.ogg` | Infantry moves (once per move) | RPG Audio (footsteps) |
+| `march.ogg` | The pawn moves (once per move) | RPG Audio (footsteps) |
 | `reveal.ogg` | A part of the map is explored | Interface Sounds (soft whoosh) |
 | `found.ogg` | A colony is founded | Impact Sounds (wood, hammer) |
 | `build.ogg` | A building is built | Impact Sounds (wood) |

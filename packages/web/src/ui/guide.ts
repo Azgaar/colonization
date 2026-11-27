@@ -23,7 +23,7 @@ function sections(): Section[] {
       msg('guide.draw_up', { size: s.hand.size }),
       msg('guide.turn_player'),
       msg('guide.top_event'),
-      msg('guide.tax', { track: tax.join(', '), gold: ic('gold'), n: s.tax.refuseRef, solo: s.tax.refuseRefSolo, bells: s.tax.refuseBells ? t('guide.tax_bells', { n: s.tax.refuseBells, bells: ic('bells') }) : '' }),
+      msg('guide.tax', { track: tax.join(', '), gold: ic('gold'), pay: s.tax.payBells ? t('guide.tax_pay', { n: s.tax.payBells, bells: ic('bells') }) : '', n: s.tax.refuseRef, solo: s.tax.refuseRefSolo, bells: s.tax.refuseBells ? t('guide.tax_bells', { n: s.tax.refuseBells, bells: ic('bells') }) : '' }),
       msg('guide.recruit_play', { crosses: ic('crosses') }),
     ] },
     { id: 'agents', title: msg('top.agents'), items: [

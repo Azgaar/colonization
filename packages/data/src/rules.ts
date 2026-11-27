@@ -1,11 +1,13 @@
-/** Rulesets from the command line (FR-R-9): list, export, report, add to pc, promote, drop. Run with "pnpm rules <command>". */
+/** The rules from the command line (FR-R-9): list the rulesets, export or report a ruleset's changes, apply or drop a change, list the printed texts to update. Run with "pnpm rules <command>". */
 import type { Override } from './types.ts';
 import { flattenRuleset, RulesetError } from './ruleset.ts';
 import { changeList, conversionReport, toCsv, toMarkdown } from './changes.ts';
 import { gameData } from './index.ts';
-import { addToPc, allRulesets as all, drop, promote } from './rulesfs.ts';
+import { readMaster, todo } from './master.ts';
+import { allRulesets as all, apply, drop } from './rulesfs.ts';
 
-const [cmd, arg] = process.argv.slice(2);
+const [cmd, arg, id] = process.argv.slice(2);
+const ruleset = (name: string) => { const r = all()[name]; if (!r) throw new RulesetError(`unknown ruleset "${name}"`); return r; };
 try {
   if (cmd === 'list') {
     for (const r of Object.values(all())) {
@@ -13,26 +15,24 @@ try {
       for (const o of r.overrides) console.log(`  ${o.id} [${o.conversion ?? 'unlabelled'}] ${o.table || o.why}`);
     }
   } else if (cmd === 'export' && arg) {
-    const rs = all();
-    if (!rs[arg]) throw new RulesetError(`unknown ruleset "${arg}"`);
-    const rows = changeList(gameData, flattenRuleset(rs[arg], rs));
+    const rows = changeList(gameData, flattenRuleset(ruleset(arg), all()));
     process.stdout.write(process.argv.includes('--csv') ? toCsv(rows) : toMarkdown(rows));
-  } else if (cmd === 'report') {
-    const rs = all();
-    process.stdout.write(conversionReport(gameData, rs.board, rs.pc));
-  } else if (cmd === 'add' && arg && process.argv[4]) {
-    // From another ruleset (proposed, or one exported from the design bench) into pc.
-    const from = all()[arg], o = from?.overrides.find((x: Override) => x.id === process.argv[4]);
-    if (!o) throw new RulesetError(`no override "${process.argv[4]}" in ${arg}`);
-    console.log(addToPc(o));
-  } else if (cmd === 'promote' && arg) {
-    const { message, rows } = promote(arg);
-    console.log(`${message} Carry it into the workbook:`);
+  } else if (cmd === 'report' && arg) {
+    process.stdout.write(conversionReport(gameData, all().board!, { ...ruleset(arg), base: 'board' }));
+  } else if (cmd === 'apply' && arg && id) {
+    const o = ruleset(arg).overrides.find((x: Override) => x.id === id);
+    if (!o) throw new RulesetError(`no override "${id}" in ${arg}`);
+    const { message, rows } = apply(o, arg);
+    console.log(message);
     process.stdout.write(toMarkdown(rows));
-  } else if (cmd === 'drop' && arg) {
-    console.log(drop(arg));
+  } else if (cmd === 'drop' && arg && id) {
+    console.log(drop(arg, id));
+  } else if (cmd === 'todo') {
+    const list = todo(readMaster());
+    if (!list.length) console.log('Every printed text matches its effect.');
+    for (const t of list) console.log(`${t.card} (${t.sheet}, row ${t.row}): print as "${t.table}"; now "${t.text}"`);
   } else {
-    console.log('Usage: pnpm rules list | export <ruleset> [--csv] | report | add <ruleset> <override-id> | promote <override-id> | drop <override-id>');
+    console.log('Usage: pnpm rules list | export <ruleset> [--csv] | report <ruleset> | apply <ruleset> <override-id> | drop <ruleset> <override-id> | todo');
     process.exitCode = cmd ? 1 : 0;
   }
 } catch (e) {

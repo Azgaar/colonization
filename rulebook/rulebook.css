@@ -1,0 +1,176 @@
+/* The rulebook: printed pages first (A4 by default, two columns of text, chapters running on), read on screen as the same pages.
+   Set tight on purpose: the book should be as short as it can be without losing a rule. */
+@import url("https://fonts.googleapis.com/css2?family=Alegreya+SC:wght@500;700;800&family=Alegreya:ital,wght@0,400;0,500;0,700;1,400&family=Alegreya+Sans:wght@400;500;700;800&display=swap");
+:root {
+  --ink: #1f2a2a; --soft: #5d5440; --mute: #7a6c4e; --line: #ddd0b3; --paper: #fbf6ea; --teal: #0f3436; --teal2: #1d5556; --ochre: #c8902c; --scarlet: #b0242a;
+  --serif: "Alegreya", Georgia, serif; --sc: "Alegreya SC", Georgia, serif; --sans: "Alegreya Sans", "Gill Sans", sans-serif;
+}
+@page { size: A4; margin: 12mm 12mm 13mm; @bottom-center { content: counter(page); font: 500 8.5pt "Alegreya SC", Georgia, serif; color: #8a7b5c; } }
+@page cover { margin: 0; @bottom-center { content: none; } }
+* { box-sizing: border-box; }
+html { background: #d9cfb8; }
+body { margin: 0; color: var(--ink); font: 400 9.5pt/1.36 var(--serif); hyphens: auto; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+:lang(ru) body, body:lang(ru) { font-size: 9.3pt; }
+.book { max-width: 210mm; margin: 0 auto; background: var(--paper); }
+@media screen { .book { margin: 18px auto 40px; padding: 0 12mm 12mm; box-shadow: 0 10px 40px #0004; } .cover { margin: 0 -12mm; } }
+
+/* The game's icons, drawn in the text at the size of the letters. */
+.ic { display: inline-block; width: 1.22em; height: 1.22em; vertical-align: -.27em; color: var(--teal); }
+.ic + .ic { margin-left: .06em; }
+h4 .ic, th .ic { width: 1.1em; height: 1.1em; }
+.ic-die { color: #fffdf6; }
+.ic-die rect { stroke: var(--teal); stroke-width: 1.6; }
+
+/* The cover. */
+.cover { page: cover; position: relative; height: 297mm; overflow: hidden; color: #fff; background: var(--teal) center / cover no-repeat; display: flex; flex-direction: column; justify-content: flex-end; padding: 0 16mm 22mm; break-after: page; }
+.cover::before { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, #0f343600 30%, #0f3436e6 78%); }
+.cover > * { position: relative; }
+.cover h1 { font: 800 66pt/0.95 var(--sc); margin: 0; letter-spacing: .01em; text-shadow: 0 3px 18px #0008; }
+.cover .sub { font: italic 400 17pt/1.3 var(--serif); margin: 8mm 0 0; max-width: 150mm; }
+.cover .facts { display: flex; gap: 10mm; margin-top: 12mm; font: 700 12pt var(--sc); color: #f3dca5; }
+
+/* Headings: chapters run on, each under a slim picture band; sections stay with their text. */
+h2, h3, h4 { font-family: var(--sc); color: var(--teal); line-height: 1.12; break-after: avoid; }
+.chapter { margin-top: 7mm; }
+.chapter > header { margin: 0 0 3mm; break-inside: avoid; break-after: avoid; }
+.chapter > header + *, .chapter > header + h3 + * { break-before: avoid; }
+.chapter > header + .cols > :first-child, .chapter > header + .cols > :first-child + * { break-before: avoid; }
+.chapter > header img { display: block; width: 100%; height: 22mm; object-fit: cover; object-position: 50% 30%; border-radius: 2.5mm; }
+.chapter.ref > header img { height: 13mm; }
+.chapter > header h2 { font-size: 18pt; margin: 2.5mm 0 .8mm; }
+.chapter > header p { margin: 0; font: italic 400 9.8pt/1.3 var(--serif); color: var(--soft); max-width: 160mm; }
+h3 { font-size: 11.5pt; margin: 3.5mm 0 1mm; }
+h4 { font-size: 9.8pt; margin: 2.5mm 0 .6mm; }
+p { margin: 0 0 1.6mm; }
+.cols { columns: 2; column-gap: 6mm; column-fill: balance; }
+.cols > h3:first-child { margin-top: 0; }
+ul, ol { margin: 0 0 1.8mm; padding-left: 4.5mm; }
+li { margin-bottom: .6mm; }
+b, strong { font-weight: 700; }
+.rv { font-weight: 700; white-space: nowrap; }
+
+/* Boxes: an example, a rule to remember, a fine point, a step list. Never split across pages or columns. */
+.example, .remember, .detail, .steps > li, table, figure { break-inside: avoid; }
+.example { margin: 2mm 0; padding: 1.8mm 2.8mm; background: #e6efe9; border-left: 1mm solid var(--teal2); border-radius: 0 1.6mm 1.6mm 0; font-size: 8.9pt; line-height: 1.32; }
+.example::before { content: attr(data-title); display: block; font: 700 8.8pt var(--sc); color: var(--teal2); margin-bottom: .3mm; }
+.remember { margin: 2mm 0; padding: 1.8mm 2.8mm; background: #fbe9c6; border-radius: 1.6mm; font-size: 9pt; line-height: 1.32; }
+.remember::before { content: attr(data-title); display: block; font: 700 8.8pt var(--sc); color: #8a5a0c; margin-bottom: .3mm; }
+.detail { margin: 2mm 0; padding: 0 0 0 2.5mm; border-left: .5mm solid var(--line); font-size: 8.7pt; line-height: 1.32; color: var(--soft); }
+.detail::before { content: attr(data-title); display: block; font: 700 8.4pt var(--sc); color: var(--mute); }
+.detail ul { padding-left: 4mm; margin: 0; }
+.example p:last-child, .remember p:last-child, .detail p:last-child { margin: 0; }
+.steps { counter-reset: step; list-style: none; padding: 0; }
+.steps > li { counter-increment: step; position: relative; padding-left: 6.5mm; margin-bottom: 1.3mm; }
+.steps > li::before { content: counter(step); position: absolute; left: 0; top: .1mm; width: 4.6mm; height: 4.6mm; border-radius: 50%; background: var(--teal); color: #fff; font: 700 8pt/4.6mm var(--sc); text-align: center; }
+
+/* Tables of values: full width across both columns, or a column's width inside one. */
+table { width: 100%; border-collapse: collapse; margin: 1.5mm 0 3mm; font: 400 8.6pt/1.25 var(--sans); column-span: all; }
+th { text-align: left; font: 700 8pt var(--sc); color: var(--teal); border-bottom: .4mm solid var(--teal); padding: .7mm 1.2mm; }
+td { padding: .7mm 1.2mm; border-bottom: .2mm solid var(--line); vertical-align: middle; }
+.cols table.terrain, .cols table.res, .cols table.narrow { column-span: none; }
+tr { break-inside: avoid; }
+
+/* Card references: a picture, the name and what the card costs, its text and its ruling.
+   Cards flow down three columns like a newspaper, so a short card never leaves a hole beside a long one. */
+.cards { columns: 3; column-gap: 5mm; margin: 1mm 0 3mm; column-span: all; }
+.cards.two { columns: 2; column-gap: 6mm; }
+h3 + p { break-after: avoid; }
+.entry { display: grid; grid-template-columns: 9mm 1fr; gap: 2mm; align-items: start; padding: 1.2mm 0; border-bottom: .25mm solid var(--line); break-inside: avoid; font: 400 8.2pt/1.27 var(--sans); }
+.entry:has(> .art) { grid-template-columns: 13mm 1fr; }
+.nation.entry:has(> .art) { grid-template-columns: 16mm 1fr; }
+.entry.plain { grid-template-columns: 1fr; }
+.entry.imp { background: linear-gradient(90deg, #f3ead6, #f3ead600 70%); }
+.entry h4 { margin: 0 0 .4mm; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; column-gap: 1.5mm; font: 700 9.2pt/1.15 var(--sc); }
+.entry h4 small { font: 600 7.8pt/1.2 var(--sans); color: var(--mute); white-space: nowrap; }
+.entry p { margin: 0 0 .5mm; }
+.entry p > span:not(.rv) { display: block; }
+.entry p > span:not(.rv) + span:not(.rv) { margin-top: .4mm; }
+.entry .flav { font: italic 400 8pt/1.25 var(--serif); color: #6d6149; }
+.entry .req { color: var(--mute); font-size: 7.8pt; }
+.entry .ruling { margin: .6mm 0 0; font-size: 7.8pt; line-height: 1.27; color: #4a5654; }
+.opts { list-style: none; padding: 0; margin: .4mm 0 0; }
+.opts li { position: relative; padding-left: 3mm; margin-bottom: .4mm; }
+.opts li::before { content: "▸"; position: absolute; left: 0; color: var(--ochre); }
+.cost { color: var(--mute); }
+.rolls { display: block; }
+.rolls span { display: block; padding-left: .8mm; }
+.entry p.stats > span { display: inline; white-space: nowrap; margin: 0 2.5mm 0 0; }
+.face { width: 9mm; height: 9mm; border-radius: 50%; object-fit: cover; object-position: 50% 15%; border: .35mm solid #fff; box-shadow: 0 .3mm .8mm #0004; display: block; }
+.art { width: 13mm; height: 9.5mm; border-radius: 1.2mm; object-fit: cover; display: block; box-shadow: 0 .3mm .8mm #0003; }
+.nation .art { width: 16mm; height: 11mm; }
+.nation .own { display: grid; grid-template-columns: 6.5mm 1fr; gap: 1.6mm; margin-top: .6mm; }
+.nation .own .face { width: 6.5mm; height: 6.5mm; }
+.emblem { display: inline-grid; place-items: center; width: 5.2mm; height: 5.2mm; border-radius: 50%; background: var(--c); border: .3mm solid #fff; box-shadow: 0 .3mm .8mm #0004; vertical-align: -1.3mm; margin-right: .8mm; }
+.emblem img { width: 3.4mm; height: 3.4mm; }
+.stars { color: var(--ochre); letter-spacing: .2mm; }
+.stars i { color: #e2d6ba; font-style: normal; }
+
+/* The map at setup. */
+figure.map { margin: 0 auto 2mm; max-width: 40mm; }
+.map svg { display: block; width: 100%; }
+.map rect { stroke: var(--paper); stroke-width: .05; }
+.map .eu, .k.eu { fill: #e1cb98; background: #e1cb98; }
+.map .sea, .k.sea { fill: #8fbfd3; background: #8fbfd3; }
+.map .tile, .k.tile { fill: #1d5556; background: #1d5556; }
+.map .grid { stroke: var(--paper); stroke-width: .16; fill: none; }
+.map .north { fill: #f3dca5; }
+figcaption { display: flex; flex-wrap: wrap; gap: .6mm 3mm; justify-content: center; margin-top: 1.2mm; font: 400 7.8pt var(--sans); color: var(--soft); }
+.k { display: inline-block; width: 2.6mm; height: 2.6mm; border-radius: .5mm; margin-right: 1mm; vertical-align: -.3mm; }
+
+/* The front page (contents and components), the symbols, the glossary. */
+.front { break-after: page; }
+.front h2 { font-size: 18pt; margin: 0 0 2.5mm; }
+.front h2 + * { margin-bottom: 6mm; }
+.toc { columns: 3; column-gap: 6mm; list-style: none; padding: 0; margin: 0; font: 500 9.8pt/1.6 var(--serif); }
+.toc a { color: inherit; text-decoration: none; }
+.toc a:hover { color: var(--teal2); }
+.toc .toc-part { font: 700 8.6pt var(--sc); color: var(--ochre); margin-top: 1.5mm; break-after: avoid; }
+.toc .toc-part:first-child { margin-top: 0; }
+.components { columns: 2; column-gap: 6mm; list-style: none; padding: 0; column-span: all; }
+.components li { break-inside: avoid; }
+.symbols { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1mm 3mm; margin: 1.5mm 0 2mm; font: 400 8.4pt/1.2 var(--sans); column-span: all; }
+.symbols div { display: flex; gap: 1.6mm; align-items: center; }
+.symbols dt .ic { width: 4.6mm; height: 4.6mm; vertical-align: middle; }
+.symbols dd { margin: 0; }
+.cols:has(> .glossary) { columns: 3; column-gap: 5mm; }
+.glossary { margin: 0; font: 400 8.4pt/1.3 var(--sans); }
+.glossary dt { font-weight: 700; break-after: avoid; }
+.glossary dd { margin: 0 0 1.2mm; }
+
+/* On screen only: printing and page size. */
+.bar { position: sticky; top: 0; z-index: 9; display: flex; gap: 10px; align-items: center; justify-content: center; padding: 8px; background: var(--teal); color: #fff; font: 600 14px var(--sans); }
+.bar button, .bar select, .bar a { font: inherit; color: var(--teal); background: #f7f1e1; border: 0; border-radius: 8px; padding: 6px 14px; cursor: pointer; text-decoration: none; }
+.bar :focus-visible { outline: 2px solid var(--ochre); outline-offset: 2px; }
+@media print { .bar { display: none; } html, .book { background: #fff; } .book { max-width: none; } }
+
+/* ---- Ornaments (drawn in ornaments.ts, placed here; the variables come from dist/ornaments.css) ---- */
+body { counter-reset: chapter; }
+.chapter { counter-increment: chapter; }
+
+/* The cover: a frame of two rules inset from the edge, and a pale compass rose in the sky. */
+.cover::after { content: ""; position: absolute; inset: 9mm; border: .5mm solid #f3dca5aa; outline: .25mm solid #f3dca566; outline-offset: -2mm; pointer-events: none; }
+.cover .rose { position: absolute; top: 18mm; right: 18mm; width: 58mm; height: 58mm; background: var(--orn-compass-light) center / contain no-repeat; opacity: .55; }
+
+/* Chapter pictures: a fine inner frame and corner brackets. */
+.chapter > header { position: relative; --band: 22mm; }
+.chapter.ref > header { --band: 13mm; }
+.chapter > header:has(img)::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: var(--band); border-radius: 2.5mm; box-shadow: inset 0 0 0 1.3mm #0f343622, inset 0 0 0 1.7mm #fbf6eacc, inset 0 0 0 1.95mm #0f343633; background: var(--orn-c1) 2.2mm 2.2mm / 6mm no-repeat, var(--orn-c2) calc(100% - 2.2mm) 2.2mm / 6mm no-repeat, var(--orn-c3) calc(100% - 2.2mm) calc(100% - 2.2mm) / 6mm no-repeat, var(--orn-c4) 2.2mm calc(100% - 2.2mm) / 6mm no-repeat; }
+.chapter.ref > header:has(img)::before { background-size: 4mm; }
+
+/* The rule under a chapter title: a knot, then two fine lines to the edge. */
+.chapter > header h2 { padding-bottom: 2.6mm; margin-bottom: 1.2mm; background: var(--orn-knot) 3mm bottom / 12.5mm 2.5mm no-repeat, linear-gradient(var(--teal), var(--teal)) 0 calc(100% - 1.45mm) / 100% .28mm no-repeat, linear-gradient(var(--ochre), var(--ochre)) 0 calc(100% - .7mm) / 100% .18mm no-repeat; }
+
+/* A drop cap where a chapter opens with prose. */
+.chapter:not(.ref) > .cols > p:first-child::first-letter { float: left; font: 800 25pt/.82 var(--sc); color: var(--teal); padding: 1mm 1.3mm 0 0; }
+
+/* An anchor closes each chapter of the rules. */
+.chapter:not(.ref) > :last-child::after { content: ""; display: block; break-before: avoid; height: 4.5mm; margin: 2mm auto 0; max-width: 30mm; background: var(--orn-anchor) center / contain no-repeat; column-span: all; }
+
+/* Box emblems. */
+.example::before, .remember::before, .detail::before { padding-left: 4.6mm; background: left center / 3.6mm no-repeat; }
+.example::before { background-image: var(--orn-needle); }
+.remember::before { background-image: var(--orn-seal); }
+.detail::before { background-image: var(--orn-quill); }
+
+/* The reference starts a page of its own. */
+.chapter.new-page { break-before: page; margin-top: 0; }

@@ -1,6 +1,6 @@
 # Proposed rule changes
 
-2026-11-26. Proposals for the designer, from lab evidence. Nothing here is decided: a change reaches `board`, the rulebook and the spreadsheet only by the designer's choice (`pnpm rules promote <id>`, logged in [decisions.md](decisions.md)).
+2026-11-26. Proposals for the designer, from lab evidence. Nothing here is decided: a change reaches the rules (`rules/`), and with them the spreadsheet and the rulebook, only by the designer's choice (`pnpm rules apply`, logged in [decisions.md](decisions.md)).
 
 Every candidate is a **direct** change: printed numbers only, with the table wording ready. They are the overrides of [`rulesets/proposed.json`](../rulesets/proposed.json), a sandbox ruleset on top of `board`. The full tables come from `node packages/lab/src/proposals.ts 400` (about 7 minutes on 8 cores), which writes `out/proposals.md`.
 
@@ -10,6 +10,7 @@ Every candidate is a **direct** change: printed numbers only, with the table wor
 - **Accepted** (DD-60, the designer's own change): recruiting with crosses is an action; the crosses spent are the agents looked at; Roger Williams takes up to 2.
 - **Accepted** (DD-62, the designer's own change): a colony may be founded on the edge of the map. The edge rule dates from when the tiles touched Europe; the open-sea ring (DD-12) already keeps edge colonies apart from it.
 - **Accepted** (DD-63 to DD-67): one product per terrain. Grassland gives crops only, the farmer +1 🍂, Squanto and the Indian +1 🐟; corn is gone from the game, bonuses included, and food is drawn as a fish.
+- **Accepted** (DD-71, the designer's idea): paying the tax gives +1 🔔.
 - **Rejected** (DD-51): a base colony defence of 4. The designer's rule: a colony's strength is balanced by the King's cubes, not by raising the colony.
 
 ## Where the board stands
@@ -31,6 +32,26 @@ At 3 and 5 players with mixed bots: the loyalist wins 23% and 6%, colonies survi
 | `events-1-cube` | El Dorado Rumors: the Royal Army gains 1 cube per player, not 2. Mutiny, Boston Tea Party, Pirate Blockade, Black Market: 1 cube instead of 2 for each refusal, unit or seller. | five event-card numbers 2 → 1 |
 
 Russian wording is in `rulesets/proposed.json`. Tested before refusal 1 cube was adopted: it removes 6–8 cubes and moves the loyalist only 4–9 points, because events give about a quarter of the Royal Army (refusals gave 72 of about 105 cubes at 4 players). Kept for fine-tuning one player count, not as a fix.
+
+## A bell for paying the tax (2026-11-27, accepted: DD-71)
+
+The designer's idea: nobody pays the tax, because refusing costs 1 🟥 in a pool shared by all patriots and paying gives nothing. A bell for paying makes the cheap early taxes worth it; the late ones stay too dear, as they should.
+
+| Id | Table wording | Setting |
+|---|---|---|
+| `tax-pay-bell` | Paying the tax gives +1 🔔. | `settings.tax.payBells` 0 → 1 (new setting; 0 plays as now) |
+
+Quick check, 300 games per cell, mixed bots, not paired (not a full lab run):
+
+| Taxes paid | Round 2 (1 🟡) | Round 3 (3 🟡) | Round 4 (6 🟡) | Round 5+ (10–25 🟡) |
+|---|---|---|---|---|
+| Board, 3–5 players | 13–15% | 0–5% | 0% | 0% |
+| With the bell | 25–27% | 18–19% | 3–4% | 0–1% |
+
+- **Bells from the tax: +0.5 per player** over a game, against about 7 from everything else. The refusal bell gave 5–9 and was removed for it (DD-50); this one cannot flood, because a player holds 2–4 🟡 when the tax comes until round 7.
+- **The war does not move**: rounds, endings by bells, loyalist wins and colonies kept all change within ±2 points at 3, 4 and 5 players.
+- **Round 2 is held back by gold, not by choice**: only about 28% of seats have the 1 🟡.
+Applied as DD-71, with the rulebook, T-5 in rules-spec and the in-game help updated.
 
 ## One product per terrain (2026-11-27, accepted: DD-63 to DD-67)
 
@@ -84,6 +105,6 @@ Bots play weaker than people ([system-check.md](system-check.md)): they build up
 
 ## To adopt a change
 
-1. `pnpm rules add proposed <id>`: copies it into `pc`.
-2. `pnpm rules promote <id>`: moves it to `board`, logs the decision, and prints the setting or card to edit.
-3. Carry the table wording into the rulebook.
+1. `pnpm rules apply proposed <id>` (or Design bench → Export → Into the rules, in dev mode): writes it into `rules/`, rebuilds the game data, logs the decision, and lists the printed texts to update (`pnpm rules todo`).
+2. Update those texts in `rules/`, then `pnpm rules:review`.
+3. `pnpm rules:sheet publish` so Dextrous prints it; the rulebook takes its values from `rules/`.

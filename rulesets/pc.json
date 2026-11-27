@@ -1,6 +1,0 @@
-{
-  "id": "pc",
-  "title": "PC, identical to the board game until a change is added",
-  "base": "board",
-  "overrides": []
-}

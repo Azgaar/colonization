@@ -1,4 +1,4 @@
-/** What a ruleset changes, in workbook terms, and moving changes between `pc` and `board`. No node: imports. */
+/** What a ruleset changes against the rules, where each value is printed, and the decision-log lines for applied and dropped changes. No node: imports. */
 import type { Conversion, GameData, Override, Ruleset } from './types.ts';
 import { applyOverride, checkOverride, RulesetError } from './ruleset.ts';
 import { sourceOf, where } from './sources.ts';
@@ -50,16 +50,16 @@ export function toMarkdown(rows: ChangeRow[]): string {
     ...rows.map((r) => `| ${[r.override, r.path, where(r), r.from, r.to, r.conversion, r.table].map(md).join(' | ')} |`)].join('\n') + '\n';
 }
 
-/** Why an override cannot go to `board`, or null. Board rules must be playable at the table and worded for it. */
+/** Why an override cannot be applied to the rules, or null. The rules must be playable at the table and worded for it. */
 export function promoteProblem(o: Override): string | null {
   if (!o.conversion || o.conversion === 'notConvertible') return 'it is not convertible to the board game';
-  if (o.conversion === 'interface') return 'it is interface only, so there is no board rule to promote';
+  if (o.conversion === 'interface') return 'it is interface only, so there is no rule to apply';
   if (!o.table?.trim()) return 'it has no table wording';
   try { checkOverride(o, { id: 'board', title: '', overrides: [] }); } catch (e) { return (e as Error).message; }
   return null;
 }
 
-/** Every difference between `pc` and `board`: what to print, which components to make, and which cells to edit. */
+/** Every change a ruleset makes to the rules (`board`): what to print, which components to make, and where each value is printed. */
 export function conversionReport(data: GameData, board: Ruleset, pc: Ruleset): string {
   const pcAll = pc.base === board.id ? [...board.overrides, ...pc.overrides] : pc.overrides;
   const same = (a: Override, b: Override) => JSON.stringify(a) === JSON.stringify(b);
@@ -76,7 +76,7 @@ export function conversionReport(data: GameData, board: Ruleset, pc: Ruleset): s
   for (const o of extra) {
     const problem = promoteProblem(o);
     out.push(`## ${o.id} (${o.conversion ?? 'unlabelled'})`, '', `- Why: ${o.why || '-'}`, `- Table wording: ${o.table || '-'}`,
-      `- Components: ${o.components?.length ? o.components.join('; ') : 'none'}`, `- Ready to promote: ${problem ? `no, ${problem}` : 'yes'}`, '');
+      `- Components: ${o.components?.length ? o.components.join('; ') : 'none'}`, `- Ready to apply: ${problem ? `no, ${problem}` : 'yes'}`, '');
     const own = rows.filter((r) => r.override === o.id);
     if (own.length) out.push('| Path | Edit | From | To |', '|---|---|---|---|', ...own.map((r) => `| ${[r.path, where(r), r.from, r.to].map(md).join(' | ')} |`), '');
   }
@@ -84,29 +84,20 @@ export function conversionReport(data: GameData, board: Ruleset, pc: Ruleset): s
   return out.join('\n');
 }
 
-/** Move an override from `pc` to the end of `board`. Throws if it is not ready for the table. */
-export function promoteOverride(board: Ruleset, pc: Ruleset, id: string): { board: Ruleset; pc: Ruleset; override: Override } {
-  const o = pc.overrides.find((x) => x.id === id);
-  if (!o) throw new RulesetError(`no override "${id}" in ${pc.id}`);
-  const problem = promoteProblem(o);
-  if (problem) throw new RulesetError(`cannot promote "${id}": ${problem}`);
-  if (board.overrides.some((x) => x.id === id)) throw new RulesetError(`${board.id} already has an override "${id}"`);
-  return { board: { ...board, overrides: [...board.overrides, o] }, pc: { ...pc, overrides: pc.overrides.filter((x) => x !== o) }, override: o };
+/** A ruleset without one of its overrides. */
+export function dropOverride(ruleset: Ruleset, id: string): { ruleset: Ruleset; override: Override } {
+  const o = ruleset.overrides.find((x) => x.id === id);
+  if (!o) throw new RulesetError(`no override "${id}" in ${ruleset.id}`);
+  return { ruleset: { ...ruleset, overrides: ruleset.overrides.filter((x) => x !== o) }, override: o };
 }
 
-export function dropOverride(pc: Ruleset, id: string): { pc: Ruleset; override: Override } {
-  const o = pc.overrides.find((x) => x.id === id);
-  if (!o) throw new RulesetError(`no override "${id}" in ${pc.id}`);
-  return { pc: { ...pc, overrides: pc.overrides.filter((x) => x !== o) }, override: o };
-}
-
-/** Decision-log line for a promoted or dropped change. */
-export function decisionText(action: 'promoted' | 'dropped', o: Override, rows: ChangeRow[]): string {
-  const edits = rows.filter((r) => r.override === o.id).map((r) => `${r.path} → ${text(r.to)} (${where(r)})`);
-  return action === 'promoted'
-    ? `Rule change "${o.id}" (${o.conversion}) promoted from pc to board: ${o.table!.trim().replace(/\.?$/, '.')}${o.components?.length ? ` Components: ${o.components.join('; ')}.` : ''} ` +
-      `Why: ${(o.why || '-').replace(/\.?$/, '.')} To carry into the sources: ${edits.join('; ') || 'nothing'}`
-    : `Rule change "${o.id}" (${o.conversion ?? 'unlabelled'}) dropped from pc. Why it was tried: ${o.why || '-'}`;
+/** Decision-log line for an applied or dropped change; `todo` lists the cards whose printed text has to follow. */
+export function decisionText(action: 'applied' | 'dropped', o: Override, rows: ChangeRow[], todo: string[] = []): string {
+  const edits = rows.filter((r) => r.override === o.id).map((r) => `${r.path} → ${text(r.to)}`);
+  return action === 'applied'
+    ? `Rule change "${o.id}" (${o.conversion}) applied to the rules: ${o.table!.trim().replace(/\.?$/, '.')}${o.components?.length ? ` Components: ${o.components.join('; ')}.` : ''} ` +
+      `Why: ${(o.why || '-').replace(/\.?$/, '.')} Changed: ${edits.join('; ') || 'nothing'}.${todo.length ? ` Printed text to update: ${todo.join(', ')}.` : ''}`
+    : `Rule change "${o.id}" (${o.conversion ?? 'unlabelled'}) dropped. Why it was tried: ${o.why || '-'}`;
 }
 
 /** Append a row to the "Decided by the designer (date)" table, creating that section after the last such one. */

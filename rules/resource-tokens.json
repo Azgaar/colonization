@@ -1,0 +1,29 @@
+{
+  "sheet": "Resource tokens",
+  "header": [
+    "copies",
+    "nickname",
+    "icon",
+    "back style"
+  ],
+  "rows": [
+    {
+      "copies": 10,
+      "nickname": "crosses",
+      "icon": "✝️",
+      "back style": "{background: #a23ebd}"
+    },
+    {
+      "copies": 10,
+      "nickname": "bells",
+      "icon": "🔔",
+      "back style": "{background: #573824}"
+    },
+    {
+      "copies": 10,
+      "nickname": "gold",
+      "icon": "🟡",
+      "back style": "{background: #3d3d3d}"
+    }
+  ]
+}

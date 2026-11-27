@@ -1,0 +1,1120 @@
+{
+  "sheet": "Burial events",
+  "header": [
+    "copies",
+    "nickname",
+    "name",
+    "flavor",
+    "effect 1",
+    "image",
+    "type"
+  ],
+  "rows": [
+    {
+      "copies": 1,
+      "nickname": "Natives Ambush",
+      "name": "Засада дикарей",
+      "flavor": "Руины оказались приманкой. Из зарослей полетели отравленные стрелы.",
+      "effect 1": "Фишка заканчивает ход.\n➥ Дать отпор (требуется агент с ⚔️): +1 🔔\n➥ Сдаться: сбросьте 1 карту с руки, если есть\n➥ Бежать: перенесите фишку в Европу 💀",
+      "image": "burial-back.png",
+      "type": "💀",
+      "$fx": [
+        {
+          "n": "endMove"
+        },
+        {
+          "n": "choice",
+          "id": "natives_ambush",
+          "options": [
+            {
+              "id": "fight",
+              "en": "Fight back",
+              "ru": "Дать отпор",
+              "do": [
+                {
+                  "n": "gain",
+                  "bells": 1
+                }
+              ],
+              "cost": {
+                "agent": "military"
+              }
+            },
+            {
+              "id": "surrender",
+              "en": "Surrender",
+              "ru": "Сдаться",
+              "do": [
+                {
+                  "n": "discardCards",
+                  "amount": 1
+                }
+              ]
+            },
+            {
+              "id": "flee",
+              "en": "Flee",
+              "ru": "Бежать",
+              "do": [
+                {
+                  "n": "toEurope",
+                  "skull": true
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "$checked": "9c4e530115"
+    },
+    {
+      "copies": 1,
+      "nickname": "Predators Lair",
+      "name": "Логово хищников",
+      "flavor": "Вы разбудили стаю диких зверей, устроивших лежбище в древнем храме.",
+      "effect 1": "Фишка заканчивает ход.\n➥ Вступить в бой (требуется агент с ⚔️): + 5 🟡\n➥ Бежать: перенесите фишку в Европу 💀",
+      "image": "burial-back.png",
+      "type": "💀",
+      "$fx": [
+        {
+          "n": "endMove"
+        },
+        {
+          "n": "choice",
+          "id": "predators_lair",
+          "options": [
+            {
+              "id": "fight",
+              "en": "Fight",
+              "ru": "Вступить в бой",
+              "do": [
+                {
+                  "n": "gain",
+                  "gold": 5
+                }
+              ],
+              "cost": {
+                "agent": "military"
+              }
+            },
+            {
+              "id": "flee",
+              "en": "Flee",
+              "ru": "Бежать",
+              "do": [
+                {
+                  "n": "toEurope",
+                  "skull": true
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "$checked": "06b09aa49d"
+    },
+    {
+      "copies": 1,
+      "nickname": "Golden City",
+      "name": "Золотой город",
+      "flavor": "Хотя слухи об Эльдорадо оказались лишь пустыми легендами, вам удаётся найти немало золота в древнем заброшенном городе.",
+      "effect 1": "Фишка заканчивает ход.\n➥ Искать ценности\n  🎲 1-2: +10 🟡\n  🎲 3-4: +15 🟡\n  🎲 5-6: +20 🟡\n➥ Изучить: +2 🔔",
+      "image": "burial-back.png",
+      "type": "🌟",
+      "$fx": [
+        {
+          "n": "endMove"
+        },
+        {
+          "n": "choice",
+          "id": "golden_city",
+          "options": [
+            {
+              "id": "search",
+              "en": "Search for valuables",
+              "ru": "Искать ценности",
+              "do": [
+                {
+                  "n": "roll",
+                  "table": [
+                    {
+                      "max": 2,
+                      "do": [
+                        {
+                          "n": "gain",
+                          "gold": 10
+                        }
+                      ]
+                    },
+                    {
+                      "max": 4,
+                      "do": [
+                        {
+                          "n": "gain",
+                          "gold": 15
+                        }
+                      ]
+                    },
+                    {
+                      "max": 6,
+                      "do": [
+                        {
+                          "n": "gain",
+                          "gold": 20
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "study",
+              "en": "Study",
+              "ru": "Изучить",
+              "do": [
+                {
+                  "n": "gain",
+                  "bells": 2
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "$checked": "c0a24eed70"
+    },
+    {
+      "copies": 1,
+      "nickname": "Silver Mines",
+      "name": "Серебряные копи",
+      "flavor": "Древняя шахта, возможный источник драгоценной руды.",
+      "effect 1": "➥ Обыскать: фишка заканчивает ход\n  🎲 1-2: Шахта давно истощена: +1 ⬜\n  🎲 3-4: Осталось немало руды: +3 ⬜\n  🎲 5-6: Жила почти нетронута: +5 ⬜\n➥ Продолжить путь: +1 💨",
+      "image": "burial-back.png",
+      "type": "⭐",
+      "$fx": [
+        {
+          "n": "choice",
+          "id": "silver_mines",
+          "options": [
+            {
+              "id": "search",
+              "en": "Search",
+              "ru": "Обыскать",
+              "do": [
+                {
+                  "n": "endMove"
+                },
+                {
+                  "n": "roll",
+                  "table": [
+                    {
+                      "max": 2,
+                      "do": [
+                        {
+                          "n": "gain",
+                          "wh": {
+                            "silver": 1
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "max": 4,
+                      "do": [
+                        {
+                          "n": "gain",
+                          "wh": {
+                            "silver": 3
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "max": 6,
+                      "do": [
+                        {
+                          "n": "gain",
+                          "wh": {
+                            "silver": 5
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "leave",
+              "en": "Move on",
+              "ru": "Продолжить путь",
+              "do": [
+                {
+                  "n": "moves",
+                  "add": 1
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "$checked": "8d4b0d6c99"
+    },
+    {
+      "copies": 1,
+      "nickname": "Survivor",
+      "name": "Выживший",
+      "flavor": "Вы нашли человека из пропавшей экспедиции. Он знает эти земли как свои пять пальцев.",
+      "effect 1": "➥ Взять с собой: положите самого левого агента с причала Европы в свой сброс\n➥ Сопроводить:  +3 ✝️, перенесите фишку в Европу\n➥ Бросить: -2 ✝️, разыграйте ещё 1 карту руин",
+      "image": "burial-back.png",
+      "type": "⭐",
+      "$fx": [
+        {
+          "n": "choice",
+          "id": "survivor",
+          "options": [
+            {
+              "id": "take",
+              "en": "Take along",
+              "ru": "Взять с собой",
+              "do": [
+                {
+                  "n": "pierLeftmost"
+                }
+              ]
+            },
+            {
+              "id": "escort",
+              "en": "Escort home",
+              "ru": "Сопроводить",
+              "do": [
+                {
+                  "n": "gain",
+                  "crosses": 3
+                },
+                {
+                  "n": "toEurope"
+                }
+              ]
+            },
+            {
+              "id": "abandon",
+              "en": "Abandon",
+              "ru": "Бросить",
+              "do": [
+                {
+                  "n": "lose",
+                  "crosses": 2
+                },
+                {
+                  "n": "drawPoi"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "$checked": "5dab698fb3"
+    },
+    {
+      "copies": 1,
+      "nickname": "Abandoned Fort",
+      "name": "Заброшенный форт",
+      "flavor": "Здесь уже кто-то пытался жить. Остались добротные срубы и немного инструментов.",
+      "effect 1": "Получите 4 🟫. Вы можете немедленно бесплатно построить любую базовую постройку",
+      "image": "burial-back.png",
+      "type": "🌟",
+      "$fx": [
+        {
+          "n": "gain",
+          "wh": {
+            "timber": 4
+          }
+        },
+        {
+          "n": "freeBasicBuilding"
+        }
+      ],
+      "$checked": "ddbe3d6f8e"
+    },
+    {
+      "copies": 1,
+      "nickname": "Hidden Granaries",
+      "name": "Тайные амбары",
+      "flavor": "Скрытые в пещерах запасы маиса, оставленные прошлыми поколениями.",
+      "effect 1": "Получите 4 🟨",
+      "image": "burial-back.png",
+      "type": "🌟",
+      "$fx": [
+        {
+          "n": "gain",
+          "wh": {
+            "food": 4
+          }
+        }
+      ],
+      "$checked": "dde8da3088"
+    },
+    {
+      "copies": 1,
+      "nickname": "Smugglers Cave",
+      "name": "Пещера контрабандистов",
+      "flavor": "Кто-то спрятал здесь плоды своего нелегального труда.",
+      "effect 1": "Получите 2 🟩 и 2 🟦",
+      "image": "burial-back.png",
+      "type": "🌟",
+      "$fx": [
+        {
+          "n": "gain",
+          "wh": {
+            "crops": 2,
+            "goods": 2
+          }
+        }
+      ],
+      "$checked": "74cfe32320"
+    },
+    {
+      "copies": 1,
+      "nickname": "Mere Rumors",
+      "name": "Всего лишь слухи",
+      "flavor": "Слухи о богатом погребении оказались ложными.",
+      "effect 1": "Повезёт в следующий раз: +1 💨",
+      "image": "burial-back.png",
+      "type": "🌀",
+      "$fx": [
+        {
+          "n": "moves",
+          "add": 1
+        }
+      ],
+      "$checked": "cef20c8b19"
+    },
+    {
+      "copies": 1,
+      "nickname": "Native Burial",
+      "name": "Индейское погребение",
+      "flavor": "Погребение местных индейцев.",
+      "effect 1": "➥ Разграбить: фишка заканчивает ход\n  🎲 1-2: Ничего ценного\n  🎲 3-4: Украшения: +5 🟡, +1 💢 в ближайшем 🛖,\n  🎲 5-6: Могила вождя: +10 🟡,  +2 💢 в ближайшем 🛖\n➥ Проявить уважение: -1 💢 в ближайшем 🛖",
+      "image": "burial-back.png",
+      "type": "⭐",
+      "$fx": [
+        {
+          "n": "choice",
+          "id": "native_burial",
+          "options": [
+            {
+              "id": "loot",
+              "en": "Loot",
+              "ru": "Разграбить",
+              "do": [
+                {
+                  "n": "endMove"
+                },
+                {
+                  "n": "roll",
+                  "table": [
+                    {
+                      "max": 2,
+                      "do": []
+                    },
+                    {
+                      "max": 4,
+                      "do": [
+                        {
+                          "n": "gain",
+                          "gold": 5
+                        },
+                        {
+                          "n": "hostilityNearest",
+                          "add": 1
+                        }
+                      ]
+                    },
+                    {
+                      "max": 6,
+                      "do": [
+                        {
+                          "n": "gain",
+                          "gold": 10
+                        },
+                        {
+                          "n": "hostilityNearest",
+                          "add": 2
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "respect",
+              "en": "Show respect",
+              "ru": "Проявить уважение",
+              "do": [
+                {
+                  "n": "hostilityNearest",
+                  "add": -1
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "$checked": "ccdf7460fd"
+    },
+    {
+      "copies": 1,
+      "nickname": "Desecrated Burial",
+      "name": "Разорённое погребение",
+      "flavor": "Захоронение индейского воина уже кем-то вскрыто и разграблено.",
+      "effect 1": "➥ Забрать, что осталось: +5 🟡, +1 💢 в ближайшем 🛖\n➥ Перезахоронить: +3 ✝️, фишка заканчивает ход",
+      "image": "burial-back.png",
+      "type": "🌀",
+      "$fx": [
+        {
+          "n": "choice",
+          "id": "desecrated_burial",
+          "options": [
+            {
+              "id": "take",
+              "en": "Take what is left",
+              "ru": "Забрать, что осталось",
+              "do": [
+                {
+                  "n": "gain",
+                  "gold": 5
+                },
+                {
+                  "n": "hostilityNearest",
+                  "add": 1
+                }
+              ]
+            },
+            {
+              "id": "rebury",
+              "en": "Rebury",
+              "ru": "Перезахоронить",
+              "do": [
+                {
+                  "n": "gain",
+                  "crosses": 3
+                },
+                {
+                  "n": "endMove"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "$checked": "0d39c06223"
+    },
+    {
+      "copies": 1,
+      "nickname": "Sacred Totem Circle",
+      "name": "Священный круг тотемов",
+      "flavor": "Говорят, любой, кто потревожит их, навлечёт на себя гнев духов.",
+      "effect 1": "Фишка заканчивает ход\n➥ Разобрать тотемы: +2 💢 в ближайшем 🛖\n  🎲 1-2: Ничего ценного\n  🎲 3-4: Украшения из серебра: +3 ⬜\n  🎲 5-6: Золотые украшения: +20 🟡\n➥ Принести подношения: -1 любой ресурс, -2 💢 в ближайшем 🛖, -5 ✝️\n➥ Изучить: +2 🔔",
+      "image": "burial-back.png",
+      "type": "🌟",
+      "$fx": [
+        {
+          "n": "endMove"
+        },
+        {
+          "n": "choice",
+          "id": "sacred_totem_circle",
+          "options": [
+            {
+              "id": "dismantle",
+              "en": "Dismantle the totems",
+              "ru": "Разобрать тотемы",
+              "do": [
+                {
+                  "n": "hostilityNearest",
+                  "add": 2
+                },
+                {
+                  "n": "roll",
+                  "table": [
+                    {
+                      "max": 2,
+                      "do": []
+                    },
+                    {
+                      "max": 4,
+                      "do": [
+                        {
+                          "n": "gain",
+                          "wh": {
+                            "silver": 3
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "max": 6,
+                      "do": [
+                        {
+                          "n": "gain",
+                          "gold": 20
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "offer",
+              "en": "Make an offering",
+              "ru": "Принести подношения",
+              "do": [
+                {
+                  "n": "hostilityNearest",
+                  "add": -2
+                },
+                {
+                  "n": "lose",
+                  "crosses": 5
+                }
+              ],
+              "cost": {
+                "anyResource": 1
+              }
+            },
+            {
+              "id": "study",
+              "en": "Study",
+              "ru": "Изучить",
+              "do": [
+                {
+                  "n": "gain",
+                  "bells": 2
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "$checked": "f6700ea78f"
+    },
+    {
+      "copies": 1,
+      "nickname": "Guide",
+      "name": "Проводник",
+      "flavor": "К вам вышел индейский проводник. Он покажет тайную тропу к гробнице, но не за просто так.",
+      "effect 1": "➥ Заплатить: -2 🟡, посмотрите 2 верхние карты колоды руин, разыграйте одну, а вторую сбросьте\n➥ Пригрозить: -1 💢 в ближайшем 🛖, разыграйте ещё 1 карту руин\n➥ Отказаться от услуг: +1 💨",
+      "image": "burial-back.png",
+      "type": "🌟",
+      "$fx": [
+        {
+          "n": "choice",
+          "id": "guide",
+          "options": [
+            {
+              "id": "pay",
+              "en": "Pay",
+              "ru": "Заплатить",
+              "do": [
+                {
+                  "n": "guide",
+                  "look": 2
+                }
+              ],
+              "cost": {
+                "gold": 2
+              }
+            },
+            {
+              "id": "threaten",
+              "en": "Threaten",
+              "ru": "Пригрозить",
+              "do": [
+                {
+                  "n": "hostilityNearest",
+                  "add": -1
+                },
+                {
+                  "n": "drawPoi"
+                }
+              ]
+            },
+            {
+              "id": "leave",
+              "en": "Decline",
+              "ru": "Отказаться от услуг",
+              "do": [
+                {
+                  "n": "moves",
+                  "add": 1
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "$checked": "c565cdf08c"
+    },
+    {
+      "copies": 1,
+      "nickname": "Warrior Burial",
+      "name": "Воинское захоронение",
+      "flavor": "Среди костей обнаружены искусно сделанные воинские доспехи.",
+      "effect 1": "➥ Разграбить погребение: +6 🟡, -2 ✝️, +1 💢 в ближайшем 🛖\n➥ Пройти мимо: +1 💨",
+      "image": "burial-back.png",
+      "type": "⭐",
+      "$fx": [
+        {
+          "n": "choice",
+          "id": "warrior_burial",
+          "options": [
+            {
+              "id": "loot",
+              "en": "Loot",
+              "ru": "Разграбить погребение",
+              "do": [
+                {
+                  "n": "gain",
+                  "gold": 6
+                },
+                {
+                  "n": "lose",
+                  "crosses": 2
+                },
+                {
+                  "n": "hostilityNearest",
+                  "add": 1
+                }
+              ]
+            },
+            {
+              "id": "leave",
+              "en": "Pass by",
+              "ru": "Пройти мимо",
+              "do": [
+                {
+                  "n": "moves",
+                  "add": 1
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "$checked": "0dc250349e"
+    },
+    {
+      "copies": 1,
+      "nickname": "Bandeirante Tracks",
+      "name": "Следы бандейрантов",
+      "flavor": "Вы наткнулись на следы европейских искателей приключений, уже побывавших здесь.",
+      "effect 1": "➥ Изучить следы в поисках схрона (требуется агент <i>скаут</i>): +15 🟡\n➥ Прочесать округу: фишка заканчивает ход\n  🎲 1-3: След потерян\n  🎲 4: Засада бандейрантов: переместите фишку в Европу 💀\n  🎲 5-6: Найден схрон бандейрантов:  +15 🟡\n➥ Вздохнуть и уйти: +1 💨",
+      "image": "burial-back.png",
+      "type": "⭐",
+      "$fx": [
+        {
+          "n": "choice",
+          "id": "bandeirante_tracks",
+          "options": [
+            {
+              "id": "track",
+              "en": "Follow the tracks",
+              "ru": "Изучить следы",
+              "do": [
+                {
+                  "n": "gain",
+                  "gold": 15
+                }
+              ],
+              "cost": {
+                "agent": "scout"
+              }
+            },
+            {
+              "id": "comb",
+              "en": "Comb the area",
+              "ru": "Прочесать округу",
+              "do": [
+                {
+                  "n": "endMove"
+                },
+                {
+                  "n": "roll",
+                  "table": [
+                    {
+                      "max": 3,
+                      "do": []
+                    },
+                    {
+                      "max": 4,
+                      "do": [
+                        {
+                          "n": "toEurope",
+                          "skull": true
+                        }
+                      ]
+                    },
+                    {
+                      "max": 6,
+                      "do": [
+                        {
+                          "n": "gain",
+                          "gold": 15
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "leave",
+              "en": "Move on",
+              "ru": "Продолжить путь",
+              "do": [
+                {
+                  "n": "moves",
+                  "add": 1
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "$checked": "4b945ee68c"
+    },
+    {
+      "copies": 1,
+      "nickname": "Stone Wall",
+      "name": "Каменная стена",
+      "flavor": "Захоронение укрыто за каменной кладкой. Войти внутрь непросто.",
+      "effect 1": "➥ Разобрать кладку: фишка заканчивает ход\n    🎲 1: Обвал: переместите фишку в Европу 💀\n    🎲 2-4: Проход расчищен: +10 🟡\n    🎲 5-6: Найдена тайная ниша: +15 🟡\n➥ Развернуться и уйти: +1 💨",
+      "image": "burial-back.png",
+      "type": "⭐",
+      "$fx": [
+        {
+          "n": "choice",
+          "id": "stone_wall",
+          "options": [
+            {
+              "id": "dig",
+              "en": "Dismantle the wall",
+              "ru": "Разобрать кладку",
+              "do": [
+                {
+                  "n": "endMove"
+                },
+                {
+                  "n": "roll",
+                  "table": [
+                    {
+                      "max": 1,
+                      "do": [
+                        {
+                          "n": "toEurope",
+                          "skull": true
+                        }
+                      ]
+                    },
+                    {
+                      "max": 4,
+                      "do": [
+                        {
+                          "n": "gain",
+                          "gold": 10
+                        }
+                      ]
+                    },
+                    {
+                      "max": 6,
+                      "do": [
+                        {
+                          "n": "gain",
+                          "gold": 15
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "leave",
+              "en": "Turn back",
+              "ru": "Развернуться и уйти",
+              "do": [
+                {
+                  "n": "moves",
+                  "add": 1
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "$checked": "257d4297c6"
+    },
+    {
+      "copies": 1,
+      "nickname": "Protective Amulet",
+      "name": "Защитный амулет",
+      "flavor": "На входе висит золотой амулет с изображением какого-то пугающего божка.",
+      "effect 1": "➥ Изучить: +2 🔔, фишка заканчивает ход\n➥ Забрать: +1 💢 в ближайшем 🛖, +10 🟡\n➥ Оставить: +1 💨",
+      "image": "burial-back.png",
+      "type": "⭐",
+      "$fx": [
+        {
+          "n": "choice",
+          "id": "protective_amulet",
+          "options": [
+            {
+              "id": "study",
+              "en": "Study",
+              "ru": "Изучить",
+              "do": [
+                {
+                  "n": "gain",
+                  "bells": 2
+                },
+                {
+                  "n": "endMove"
+                }
+              ]
+            },
+            {
+              "id": "take",
+              "en": "Take",
+              "ru": "Забрать",
+              "do": [
+                {
+                  "n": "hostilityNearest",
+                  "add": 1
+                },
+                {
+                  "n": "gain",
+                  "gold": 10
+                }
+              ]
+            },
+            {
+              "id": "leave",
+              "en": "Leave it",
+              "ru": "Оставить",
+              "do": [
+                {
+                  "n": "moves",
+                  "add": 1
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "$checked": "02509d66d3"
+    },
+    {
+      "copies": 1,
+      "nickname": "Defiled Shrine",
+      "name": "Осквернённая святыня",
+      "flavor": "Захоронение давно разграблено, но возможно, что-то и уцелело.",
+      "effect 1": "➥ Обыскать: фишка заканчивает ход\n  🎲 1-2: Вас заметили местные индейцы: +1 💢 в ближайшем 🛖\n  🎲 3-4: Церемониальная ваза: +5 🟡\n  🎲 5-6: Спрятанные драгоценности: +10 🟡\n➥ Оставить в покое: +2 ✝️",
+      "image": "burial-back.png",
+      "type": "⭐",
+      "$fx": [
+        {
+          "n": "choice",
+          "id": "defiled_shrine",
+          "options": [
+            {
+              "id": "search",
+              "en": "Search",
+              "ru": "Обыскать",
+              "do": [
+                {
+                  "n": "endMove"
+                },
+                {
+                  "n": "roll",
+                  "table": [
+                    {
+                      "max": 2,
+                      "do": [
+                        {
+                          "n": "hostilityNearest",
+                          "add": 1
+                        }
+                      ]
+                    },
+                    {
+                      "max": 4,
+                      "do": [
+                        {
+                          "n": "gain",
+                          "gold": 5
+                        }
+                      ]
+                    },
+                    {
+                      "max": 6,
+                      "do": [
+                        {
+                          "n": "gain",
+                          "gold": 10
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "leave",
+              "en": "Leave in peace",
+              "ru": "Оставить в покое",
+              "do": [
+                {
+                  "n": "gain",
+                  "crosses": 2
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "$checked": "3457bbfb70"
+    },
+    {
+      "copies": 1,
+      "nickname": "Lost Tomb",
+      "name": "Затерянная усыпальница",
+      "flavor": "Легенды гласят, что здесь похоронен могущественный вождь.",
+      "effect 1": "➥ Попытаться вскрыть: +1 💢 в ближайшем 🛖\n  🎲 1: Удушливый газ: переместите фишку в Европу 💀\n  🎲 2-4: Несколько ценных украшений: + 5 🟡 \n  🎲 5–6: Огромный клад: +20 🟡\n➥ Сделать записи для истории и уйти: +2 🔔",
+      "image": "burial-back.png",
+      "type": "⭐",
+      "$fx": [
+        {
+          "n": "choice",
+          "id": "lost_tomb",
+          "options": [
+            {
+              "id": "open",
+              "en": "Try to open",
+              "ru": "Попытаться вскрыть",
+              "do": [
+                {
+                  "n": "hostilityNearest",
+                  "add": 1
+                },
+                {
+                  "n": "roll",
+                  "table": [
+                    {
+                      "max": 1,
+                      "do": [
+                        {
+                          "n": "toEurope",
+                          "skull": true
+                        }
+                      ]
+                    },
+                    {
+                      "max": 4,
+                      "do": [
+                        {
+                          "n": "gain",
+                          "gold": 5
+                        }
+                      ]
+                    },
+                    {
+                      "max": 6,
+                      "do": [
+                        {
+                          "n": "gain",
+                          "gold": 20
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "record",
+              "en": "Record and leave",
+              "ru": "Сделать записи и уйти",
+              "do": [
+                {
+                  "n": "gain",
+                  "bells": 2
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "$checked": "ab49277826"
+    },
+    {
+      "copies": 1,
+      "nickname": "Trail Marker",
+      "name": "Путеводный знак",
+      "flavor": "На одном из тотемов высечены знаки с указанием ориентиров.",
+      "effect 1": "➥ Изучить: откройте фрагменты карты, соседние по сторонам, фишка заканчивает ход\n➥ Уничтожить идол: +5 ✝️, +2 💢 в ближайшем 🛖\n➥ Пройти мимо: +1 💨",
+      "image": "burial-back.png",
+      "type": "⭐",
+      "$fx": [
+        {
+          "n": "choice",
+          "id": "trail_marker",
+          "options": [
+            {
+              "id": "study",
+              "en": "Study",
+              "ru": "Изучить",
+              "do": [
+                {
+                  "n": "revealAdjacent"
+                },
+                {
+                  "n": "endMove"
+                }
+              ]
+            },
+            {
+              "id": "destroy",
+              "en": "Destroy the idol",
+              "ru": "Уничтожить идол",
+              "do": [
+                {
+                  "n": "gain",
+                  "crosses": 5
+                },
+                {
+                  "n": "hostilityNearest",
+                  "add": 2
+                }
+              ]
+            },
+            {
+              "id": "leave",
+              "en": "Pass by",
+              "ru": "Пройти мимо",
+              "do": [
+                {
+                  "n": "moves",
+                  "add": 1
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "$checked": "4bdad2bcf0"
+    }
+  ]
+}

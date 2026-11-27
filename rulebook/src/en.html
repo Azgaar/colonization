@@ -1,0 +1,479 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Colonization: the rules</title>
+<link rel="stylesheet" href="../rulebook.css">
+<style id="page-size"></style>
+<script src="../rulebook.js" defer></script>
+</head>
+<body>
+<nav class="bar"><button data-print>Print</button><label>Page <select data-size><option value="A4">A4</option><option value="letter">Letter</option><option value="A5">A5</option></select></label><a href="ru.html">Русский</a></nav>
+<main class="book">
+
+<section class="cover" style="background-image:url(../../packages/web/art/europe.webp)">
+  <div class="rose"></div>
+  <h1>Colonization</h1>
+  <p class="sub">A board game of the New World, <rv p="year.first"></rv> to <rv p="year.last"></rv>. Explore, settle and trade, and choose where your loyalty lies.</p>
+  <p class="facts"><span><rv p="settings.players.min"></rv>–<rv p="settings.players.max"></rv> players</span><span><rv p="nations.count"></rv> nations</span><span><rv p="settings.rounds.max"></rv> rounds and a war</span></p>
+</section>
+
+<section class="front">
+  <h2>Contents</h2>
+  <ol class="toc"></ol>
+  <h2>Components</h2>
+  <rv-table of="components"></rv-table>
+</section>
+
+<!-- ============================== LEARN TO PLAY ============================== -->
+
+<section class="chapter" data-part="Learn to play" data-toc="short">
+  <header><img src="../../packages/web/art/event/sea_charts.webp" alt=""><h2>The game in brief</h2><p>You govern a European nation’s new colonies across the ocean. The Crown wants its taxes; your colonists want their freedom.</p></header>
+  <div class="cols">
+    <p>Over <rv p="settings.rounds.max"></rv> rounds, from <rv p="year.first"></rv> to <rv p="year.last"></rv>, you explore an unknown coast, found colonies, gather and sell resources, raise buildings, hire new people in Europe and win great men and women to your cause. Each round ends with an event and the King’s tax. Refuse the tax and the King’s army grows.</p>
+    <p>The game ends with the <b>War of Independence</b>. The governor who rang the fewest bells of liberty sides with the King as the <b>loyalist</b>. Everyone else is a <b>patriot</b> and must hold their colonies against the Royal Army and the loyalist’s troops.</p>
+    <div class="remember" data-title="How to win"><p>Keep at least one colony through the war and score the most victory points 🏅. A patriot scores well for every colony still held and every bell still unspent; the loyalist scores for every colony, including the ones taken in the war.</p></div>
+
+    <h3>Agents are your actions</h3>
+    <p>Everything you do, you do by playing an <b>agent</b> card from your hand: one card, one action. Any agent can take any of the standard actions, and most have a talent that makes one of them better. A fisherman catches more fish, a sailor sails further, a soldier fights harder. The same agents fight for you in battle and in the war.</p>
+    <p>Your agents form your own deck. You start with your nation’s <rv p="deck.min"></rv> or <rv p="deck.max"></rv>, and hire, recruit and train more as the game goes on. Each has an education: none 🚫, basic 📖 or higher 🎓. The better buildings need better educated workers.</p>
+
+    <h3>Two tokens on the map</h3>
+    <p>You have one <b>ship</b> ⛵ and one <b>pawn</b> 💂. The ship sails the ocean and carries your pawn and up to <rv p="settings.hold.size"></rv> resources in its hold. The pawn walks the land, explores, and founds your colonies. Tokens are never destroyed: a beaten token goes back to Europe.</p>
+
+    <h3>Resources</h3>
+    <p>Five kinds of resource, kept as cubes:</p>
+    <rv-table of="resources"></rv-table>
+    <p>Resources are kept in one <b>warehouse</b> that serves all your colonies, and sold in Europe for gold. Fur 🦫 is a kind of crops: it matters only for talents and bonuses.</p>
+    <p>Three more things are counted with tokens:</p>
+    <ul>
+      <li><b>Gold</b> 🟡 hires agents and pays the tax.</li>
+      <li><b>Bells</b> 🔔 measure the colonists’ wish for liberty. They win Founding Fathers, raise militia in the war and score points at the end.</li>
+      <li><b>Crosses</b> ✝️ recruit agents and convert natives. You may hold at most <rv p="settings.crosses.max"></rv>.</li>
+    </ul>
+    <p>Red cubes 🟥 are the <b>Royal Army</b>. They gather in the barracks on the Europe board through the game and march against the patriots in the war.</p>
+  </div>
+</section>
+
+<section class="chapter">
+  <header><img src="../../packages/web/art/event/calm_seas.webp" alt=""><h2>Setting up</h2><p>How to lay out the table for the first round.</p></header>
+  <div class="cols">
+    <rv-table of="map"></rv-table>
+    <ol class="steps">
+      <li><b>The map.</b> Shuffle the <rv p="tiles.total"></rv> map tiles face down. Lay <rv p="tiles.used"></rv> of them in a square, <rv p="settings.map.size"></rv> by <rv p="settings.map.size"></rv>, face down, all with their arrow pointing north. Around the square runs a ring of open sea, and around that a ring of Europe cells.</li>
+      <li><b>Europe.</b> Place the Europe board. Put the round marker on <rv p="year.first"></rv>, the tax marker on the first space, and a cube of each resource on its start price.</li>
+      <li><b>The agent deck.</b> Shuffle the common agents into one deck. Deal agents onto the <b>pier</b> until <rv p="settings.pier.slots"></rv> different agents show; a repeat goes on top of its own stack and you keep dealing.</li>
+      <li><b>Natives.</b> Put the <rv p="agents.native"></rv> native agents in a pile of their own. Shuffle the tribe cards.</li>
+      <li><b>The salon.</b> Shuffle the Founding Fathers and lay <rv p="settings.fathers.salon"></rv> of them face up.</li>
+      <li><b>Buildings.</b> Sort the building cards into stacks: <rv p="buildings.basicCopies"></rv> of each basic building and one of each improvement.</li>
+      <li><b>Decks.</b> Shuffle the events, the ruins, the wrecks and the King’s tactics into four face-down decks.</li>
+      <li><b>Players.</b> Each player chooses a nation and takes its board, ship, pawn, colony markers and starting agents, and shuffles the agents into their own deck. Everyone starts with no gold, bells, crosses or resources. For a first game, choose a nation with one ★: they are the easiest. Choose a first player at random; in turn order, each player puts their ship, with the pawn aboard, on a free Europe cell.</li>
+    </ol>
+  </div>
+</section>
+
+<section class="chapter">
+  <header><img src="../../packages/web/art/event/the_great_awakening.webp" alt=""><h2>A round</h2><p>Draw, then act in turn until everyone has passed. Then come the event and the tax.</p></header>
+  <div class="cols">
+    <h3>1. Draw</h3>
+    <p>Each player draws agents from their own deck until they hold <rv p="settings.hand.size"></rv>. When your deck runs out, shuffle your discard to make a new one, even in the middle of drawing.</p>
+
+    <h3>2. Actions</h3>
+    <p>Starting with the first player and going clockwise, each player in turn plays <b>one agent</b> and takes <b>one action</b> with it. The agent then goes to its owner’s discard. There are no free actions: everything you do costs a card.</p>
+    <p>Turns go round the table until everyone has <b>passed</b>. When you pass, the round is over for you: keep any of your remaining cards for the next round and discard the rest. A player with no cards must pass.</p>
+    <div class="remember" data-title="The warehouse limit"><p>At the end of each of your turns, and after every event, your warehouse may hold at most <rv p="settings.warehouse.base"></rv> resources, or <rv p="warehouse.full"></rv> with a warehouse building. Discard the excess, choosing which.</p></div>
+
+    <h3>3. Event</h3>
+    <p>When everyone has passed, turn over the top event card and resolve it from top to bottom (see <i>Chance and history</i>).</p>
+
+    <h3>4. Tax</h3>
+    <p>From round <rv p="tax.first"></rv>, the King demands a tax. It rises round by round along the track: <rv p="tax.track"></rv> 🟡. Each player either pays it and gains <rv p="settings.tax.payBells"></rv> 🔔, or <b>refuses</b>. A refusal adds <rv p="settings.tax.refuseRef"></rv> 🟥 to the barracks (<rv p="settings.tax.refuseRefSolo"></rv> 🟥 in a solo game). If you cannot pay, you must refuse.</p>
+    <div class="example" data-title="Example"><p>In round 4 the tax is <rv p="tax.round4"></rv> 🟡. Anna has 9 🟡, pays and gains <rv p="settings.tax.payBells"></rv> 🔔. Boris has 4 🟡, so he must refuse, and one more 🟥 joins the barracks. Today Boris only misses the bell, but every cube in the barracks will attack a patriot’s colony in the war.</p></div>
+
+    <h3>5. End of the round</h3>
+    <p>If any player has <rv p="settings.war.bells"></rv> 🔔 or more, or this was round <rv p="settings.rounds.max"></rv>, the War of Independence begins. Otherwise move the round marker on by <rv p="year.step"></rv> years, pass the first-player marker to the left, and start the next round.</p>
+
+    <h3>Playing a card</h3>
+    <p>Any agent can take any standard action and adds its talent where it applies. Two agents are exceptions: the <b>criminal</b> and the <b>slave</b> may only produce. They still count 1 in battle as support, and may be discarded to pay a card cost or to exchange.</p>
+    <div class="detail" data-title="Your collection"><p>Your hand, deck and discard together are your <b>collection</b>. Some cards make you remove agents from it; removal stops when <rv p="settings.collection.min"></rv> agents are left. A removed common agent goes to the <b>common discard</b>, a native agent back to the native pile, and a nation’s own agent out of the game. The common discard also takes the agents discarded from the pier, and is shuffled into a new agent deck when that deck runs out.</p></div>
+  </div>
+</section>
+
+<section class="chapter">
+  <header><img src="../../packages/web/art/event/drifting_frigate.webp" alt=""><h2>Moving and exploring</h2><p>Sail the coast, march inland, and turn the unknown map face up one tile at a time.</p></header>
+  <div class="cols">
+    <h3>Move</h3>
+    <p>Move <b>one</b> of your tokens, spending up to <rv p="settings.move.points"></rv> movement points 💨. A sailor, a scout and some Founding Fathers give more. Tokens move to any of the eight neighbouring cells, diagonals included. Entering a cell costs points by its terrain:</p>
+    <rv-table of="terrain"></rv-table>
+    <ul>
+      <li>The ship stays on water; the pawn stays on land unless it is aboard.</li>
+      <li>Only one token may stand on a cell, except your pawn aboard your ship.</li>
+      <li>Your pawn may enter your own colony. No token may enter a settlement or another player’s colony.</li>
+    </ul>
+
+    <h4>Explore</h4>
+    <p>For <rv p="settings.move.explore"></rv> 💨, turn a face-down tile next to your token face up, arrow north. From a tile, you may explore the tiles that share a side with it; from the sea or Europe, any tile touching your cell. On the new tile, put a black cube ⬛ on each ruin and wreck, and place settlements as described in <i>Natives</i>.</p>
+
+    <h4>Load and unload</h4>
+    <p>When your ship is on water next to one of your colonies, moving resources between its hold and your warehouse costs <rv p="settings.move.cargo"></rv> 💨 per trip, with any number of resources at once. The hold has <rv p="settings.hold.size"></rv> spaces: one for each resource, one for the pawn and one for each damage.</p>
+
+    <h4>Land and embark</h4>
+    <p>Moving the pawn between the ship and a neighbouring land cell costs <rv p="settings.move.embark"></rv> 💨, whatever that cell’s terrain. This is the only way one action moves both tokens: the points left over go on with whichever token keeps moving.</p>
+    <div class="example" data-title="Example"><p>Clara’s ship, with her pawn aboard, sails 3 cells along the coast: 3 💨. She spends 1 💨 to land the pawn on a grassland cell, and her last point to march it one more grassland cell inland.</p></div>
+
+    <h4>Ruins and wrecks</h4>
+    <p>When your pawn enters a ruin, or your ship enters a wreck, remove its black cube and resolve the top card of that deck at once. If the card ends your move, the points you have left are lost.</p>
+
+    <h3>Back to Europe</h3>
+    <p>A token sent to Europe leaves the map:</p>
+    <ul>
+      <li>A <b>ship</b> goes to the nearest free Europe cell, with its pawn and, unless the card says otherwise, its cargo. A ship that takes damage, from any cause, is sent to Europe, or next to one of your colonies if you have a shipyard. A damaged ship cannot move or attack until it is repaired.</li>
+      <li>A <b>pawn</b> waits in Europe until its ship picks it up, for 1 💨 from any Europe cell.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="chapter">
+  <header><img src="../../packages/web/art/event/industrial_boom.webp" alt=""><h2>Colonies</h2><p>Found up to <rv p="settings.colony.max"></rv> colonies, then put your agents to work on the land around them and in your buildings.</p></header>
+  <div class="cols">
+    <h3>Found a colony</h3>
+    <p>Your pawn founds a colony on the land cell it stands on: place one of your colony markers there. The first colony is free; each further one costs <rv p="settings.colony.foundCost.value"></rv> 🟨 from your warehouse. You may have <rv p="settings.colony.max"></rv> colonies. The cell must:</p>
+    <ul>
+      <li>not touch another colony or a settlement, diagonals included;</li>
+      <li>touch at least one ocean cell that connects to Europe through revealed water.</li>
+    </ul>
+    <p>The edge of the map is allowed. A settlement revealed later next to your colony is placed as usual: the distance rule only limits founding.</p>
+    <p>Colonies are never removed; only the war can take them. Your warehouse, buildings and Founding Fathers belong to you, not to one colony, and serve all your colonies.</p>
+
+    <h3>Produce</h3>
+    <p>Take <b>1 resource</b> from one cell: your colony’s own cell, or one of its eight neighbours that is empty (no colony, settlement or token on it). Each terrain gives one thing; desert and tundra give nothing. Then add:</p>
+    <ul>
+      <li>+1 for a bonus symbol printed on that cell, if it shows that resource;</li>
+      <li>+1 for the agent’s talent, if it matches;</li>
+      <li>the bonuses of your Founding Fathers.</li>
+    </ul>
+    <p>A bonus symbol on terrain that does not give its resource lets you take it there, 1 in all. A few agents, such as the trapper in the forest, can also produce where the land itself gives nothing.</p>
+    <p>Cells and buildings may be worked any number of times in a round.</p>
+
+    <h4>Work in a building</h4>
+    <p>Instead of a cell, the agent may work in one of your buildings, one building per action. The agent’s education must be at least the building’s. A workshop turns 1 🟩 into 1 🟦, a town hall makes 🔔, a chapel ✝️; the reference lists them all. Bonuses add to what a building makes, never to what it uses. An improvement works instead of its basic building, not on top of it: with a factory, you work the factory.</p>
+    <p>With <b>docks</b>, the agent works an ocean cell next to your colony through them for +1, so 2 🟨, before the cell’s bonus and the agent’s talent.</p>
+    <div class="example" data-title="Example"><p>Daniel has docks, and his colony touches an ocean cell with a fish bonus. He plays his fisherman there: 1 for the sea, +1 for the docks, +1 for the bonus and +1 for the fisherman, 4 🟨 in all.</p></div>
+
+    <h3>Build</h3>
+    <p>Pay the building’s cost in timber 🟫 from your warehouse and put its card by your nation board. You may own up to <rv p="settings.buildings.max"></rv> buildings, never two of a kind. An <b>improvement</b> needs its basic building, which stays and keeps its place. There is only one of each improvement, so only one player can build it. A building destroyed in an attack goes back to the supply.</p>
+
+    <h3>Supply</h3>
+    <p>Spend 1 🟨 from your warehouse to draw 1 card. It replaces the agent you played: a way to swap a weak card, not to gain one.</p>
+
+    <h3>Exchange</h3>
+    <p>Discard 2 cards, the played one included, and draw 1.</p>
+    <p>A few buildings do more than produce: the school and university teach, the custom house sells, the shipyard repairs. See <i>Buildings</i> in the reference.</p>
+  </div>
+</section>
+
+<section class="chapter">
+  <header><img src="../../packages/web/art/event/silver_fleet.webp" alt=""><h2>Europe</h2><p>The Old World buys your goods and sends you new people, and its salons are full of ideas.</p></header>
+  <div class="cols">
+    <p>These actions need your ship on a Europe cell. Tokens in Europe cannot be attacked.</p>
+    <h3>Trade</h3>
+    <p>Sell any resources from your hold at the current prices; the gold goes to you. Each cube you sell goes onto that resource’s <b>demand track</b>, which has one space per player. When the track fills, the price falls by 1 (never below 0) and the track keeps only the cubes beyond it. One sale can fill a track more than once. Everything you sell in one action sells at the price it had before.</p>
+    <div class="example" data-title="Example"><p>In a three-player game, silver sells at 5 🟡 and its track holds 1 cube. Eva sells 4 ⬜ and gets 20 🟡. Her second cube fills the track, the price falls to 4, and her last two cubes stay on the track.</p></div>
+
+    <h3>Hire</h3>
+    <p>Buy 1 or <rv p="settings.hire.max"></rv> different agents from the pier at their printed price. They go to your discard, and the pier refills at once. Instead of buying, you may discard the whole pier and deal it anew.</p>
+
+    <h3>Propaganda</h3>
+    <p>Win up to <rv p="settings.propaganda.maxFathers"></rv> Founding Fathers from the salon by paying their price in 🔔. You may have at most <rv p="settings.fathers.max"></rv>. The salon refills after the action.</p>
+
+    <h3>Repair</h3>
+    <p>Remove 1 damage from your ship. A shipyard repairs it fully, away from Europe: see <i>Buildings</i>.</p>
+
+    <h3>Recruit</h3>
+    <p>Recruiting needs no ship: any agent can do it from anywhere. Spend crosses ✝️, at least as many as the round number, and look at that many agents from the top of the agent deck. You may put one of them into your discard; the rest go under the deck in any order.</p>
+    <div class="example" data-title="Example"><p>In round 3 Fiona spends 4 ✝️ and looks at the top four agents: a colonist, two soldiers and a scout. She takes the scout and puts the other three under the deck.</p></div>
+  </div>
+</section>
+
+<section class="chapter">
+  <header><img src="../../packages/web/art/event/pirate_ambush.webp" alt=""><h2>Combat</h2><p>Battles are decided by the cards both sides commit, and a handful of dice.</p></header>
+  <div class="cols">
+    <h3>Attack</h3>
+    <p>Your token attacks a token, a colony or a settlement on a neighbouring cell. Play, face up, an agent with ⚔️ of the right kind: pawn ⚔️ for a battle on land, ship ⚔️ for a battle between ships. A captain has both.</p>
+    <ul>
+      <li>A ship cannot attack the land, except by bombardment.</li>
+      <li>A pawn attacking from its ship, or attacking a ship by the coast, fights at <rv p="settings.combat.landingPenalty"></rv> ⚔️.</li>
+      <li>A <b>bombardment</b> lets a ship attack the land, or a pawn attack a ship, without that penalty. A cannoneer bombards; with Michiel de Ruyter, so does any agent with ⚔️.</li>
+      <li>A pawn inside a colony cannot be attacked on its own: attack the colony.</li>
+    </ul>
+
+    <h3>Strength</h3>
+    <p>Both players secretly choose any number of cards from their hands to join the battle, and reveal them together. The defender may also add the top card of their deck, unseen. Each side then counts:</p>
+    <ul>
+      <li><b>1 for every card</b> it committed, the played card included;</li>
+      <li>the ⚔️ printed on those cards for this kind of battle;</li>
+      <li>its other bonuses; the defender also adds the terrain of its cell.</li>
+    </ul>
+    <p>All committed cards go to their owners’ discards.</p>
+
+    <h3>The dice</h3>
+    <p>If the attacker is not stronger, the attack fails and nothing more happens. Otherwise the attacker rolls one die 🎲 for each point of difference. Every <rv p="success"></rv> is a success, and every success does 1 damage. A victory with at least one success gives the winner +<rv p="settings.combat.victoryBells"></rv> 🔔.</p>
+    <div class="example" data-title="Example"><p>Eva attacks Fiona’s pawn in a forest with a soldier (1 for the card, +2 ⚔️) and adds a colonist from her hand: 4. Fiona adds one card, 1, and the forest gives her +1: 2. Eva rolls 2 dice and gets a 6: one success. Fiona’s pawn goes back to Europe, and Eva gains 1 🔔.</p></div>
+
+    <h3>What damage does</h3>
+    <ul>
+      <li><b>A pawn:</b> one success sends it to Europe.</li>
+      <li><b>A ship:</b> each success is 1 damage, taking a space in its hold, up to <rv p="settings.hold.maxDamage"></rv>. The ship goes to Europe, or next to its owner’s colony if they have a shipyard. A winning ship may take the loser’s cargo into its free hold space; the rest is lost, and so is any cargo that no longer fits the damaged hold. A pawn that beats a ship takes nothing.</li>
+      <li><b>A colony:</b> the defender adds +<rv p="settings.combat.colonyDefence"></rv>, the terrain, and a stockade (+1) or a fort (+2), which replaces the stockade. Each success takes 1 resource of the attacker’s choice into their warehouse, or destroys one of the cheapest buildings. A building that an improvement stands on cannot be destroyed while the improvement stands. Then the attacking pawn moves to its owner’s nearest colony, or to Europe if they have none; a bombarding ship stays where it is.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="chapter">
+  <header><img src="../../packages/web/art/event/sacred_totem_circle.webp" alt=""><h2>Natives</h2><p>The land is not empty. Its peoples can become friends, converts, or enemies.</p></header>
+  <div class="cols">
+    <h3>Settlements</h3>
+    <p>When you reveal a cell with a settlement symbol 🛖, and fewer than <rv p="settings.natives.maxSettlements"></rv> settlements have been placed in the game, draw the first tribe card that lives on that terrain and put its settlement marker there. The card shows the tribe’s population 👥 (black cubes) and its hostility 💢 (red cubes), from 0 to <rv p="settings.natives.maxHostility"></rv>. If no tribe fits, or the limit is reached, the cell is plain land.</p>
+    <p>Settlements are numbered in the order they appear, and events call them by these numbers. All the settlements of one tribe share one hostility.</p>
+
+    <h3>Dealing with a settlement</h3>
+    <p>These actions need your pawn or ship next to the settlement.</p>
+    <ul>
+      <li><b>Gift:</b> give 1 🟦 from your warehouse and roll <rv p="settings.natives.giftDice"></rv> dice. Hostility falls by 1, plus 1 for each success.</li>
+      <li><b>Preach:</b> spend ✝️ equal to the hostility. Take a native agent into your discard; hostility rises by 1 and population falls by 1. A settlement whose population reaches 0 is gone, with no loot.</li>
+      <li><b>Attack:</b> the settlement’s strength is its population plus its terrain; it never adds cards. If you win, you may take a native agent, you gain +1 🔔, and population falls by 1, however much damage you did. Taking the last of them gives you the tribe’s loot (gold, or resources straight into your warehouse) and removes the settlement. Any attack, won or lost, sets the hostility to <rv p="settings.natives.afterAttack"></rv>.</li>
+      <li><b>Alliance:</b> at hostility <rv p="settings.natives.allianceMax"></rv> or lower, an agent with 🎓 or a scout may ally with a settlement that has no ally yet. Put your marker on its card. In the war, each ally sends <rv p="settings.war.allyCubes"></rv> fighters ⬛ to your colonies’ defence. The alliance ends if the hostility reaches <rv p="settings.natives.allianceBreak"></rv>.</li>
+    </ul>
+    <p>Native agents come only from settlements, and only while the pile of <rv p="agents.native"></rv> lasts.</p>
+
+    <h3>When the natives stir</h3>
+    <p>Events activate settlements by number. The player whose colony is nearest to that settlement is affected:</p>
+    <ul>
+      <li>at hostility <rv p="settings.activation.giftMaxHostility"></rv> or lower, the natives bring <rv p="settings.activation.gift"></rv> 🟨 as a gift;</li>
+      <li>at <rv p="hostility.calm"></rv>, nothing happens;</li>
+      <li>at <rv p="hostility.raidFrom"></rv> or more, they <b>raid</b> that colony.</li>
+    </ul>
+    <p>In a raid, the colony’s owner discards <rv p="settings.raid.resources"></rv> resources or loses 1 building; with fewer resources and no building, all their resources are lost. A fort in any of your colonies stops raids on all of them. Distances are counted in steps, diagonal steps included; ties go to the player first in turn order. If that settlement, or any colony, does not exist, nothing happens.</p>
+  </div>
+</section>
+
+<section class="chapter">
+  <header><img src="../../packages/web/art/event/sunken_galleon.webp" alt=""><h2>Chance and history</h2><p>Events shake the whole table, ruins and wrecks reward the bold, and Founding Fathers stay with you to the end.</p></header>
+  <div class="cols">
+    <h3>Events</h3>
+    <p>One event is resolved each round, after everyone has passed. The deck holds <rv p="events.count"></rv> cards and is never reshuffled, so at most <rv p="settings.rounds.max"></rv> are seen in a game.</p>
+    <ul>
+      <li>Resolve the card from top to bottom; players act in turn order, starting with the first player. The natives stir last.</li>
+      <li>“The player with the most”: in a tie, the one closest clockwise from the first player, starting with the first player. If nobody has any, nothing happens.</li>
+      <li>Stock means your warehouse, not your ship’s hold.</li>
+      <li>Prices stay between 0 and <rv p="settings.market.maxPrice"></rv> 🟡, and price changes leave the demand tracks alone.</li>
+      <li>A “may” is offered to each player in turn order. A choice that all players make together is made in secret, at the same time.</li>
+      <li>Royal Army cubes “for each player” count every player.</li>
+      <li>Smugglers buy at the current market price, without agents’ bonuses.</li>
+    </ul>
+
+    <h3>Ruins and wrecks</h3>
+    <p>The ruins deck holds <rv p="ruins.count"></rv> cards and the wrecks deck <rv p="wrecks.count"></rv>. Resolve the card at once; most offer a choice.</p>
+    <ul>
+      <li>An option you cannot pay for, or whose need you cannot meet, is not open to you. If no option is open, nothing happens.</li>
+      <li>“Needs an agent with ⚔️” or “needs a scout”: the agent you played for this move, or one you discard from your hand.</li>
+      <li>A scout’s move ignores every effect marked 💀, at sea too.</li>
+      <li>“The nearest settlement” is counted in steps from your token, diagonal steps included; you break ties. With no settlement on the map, skip that part.</li>
+      <li>“The move ends”: the points left are lost, and a later 💨 on the card does nothing, but the rest of the card still happens.</li>
+      <li>Gains into the hold fill only its free space; the rest is lost.</li>
+      <li>Losses of ✝️ and 🔔 stop at 0, but an option that costs 🔔 needs you to have them.</li>
+      <li>Used cards go to a discard, shuffled into a new deck if the deck runs out.</li>
+    </ul>
+
+    <h3>Founding Fathers</h3>
+    <p>A Founding Father won by propaganda stays with you for the rest of the game. Each gives a lasting bonus, a gift on the spot, or a power for the war, and is worth 1 🏅 at the end. You may have at most <rv p="settings.fathers.max"></rv>; Thomas Jefferson raises the limit. All <rv p="fathers.count"></rv> are in the reference.</p>
+    <div class="detail" data-title="Production bonuses"><p>A Father who adds to a resource, such as Franklin, Hooker, Rolfe, Squanto or Whitney, adds to every production action that gives it, on a cell or in a building.</p></div>
+  </div>
+</section>
+
+<section class="chapter">
+  <header><img src="../../packages/web/art/event/seven_years_war.webp" alt=""><h2>The War of Independence</h2><p>The colonies rise. The King answers with every soldier he has gathered, and one governor stands with him.</p></header>
+  <div class="cols">
+    <h3>When it begins</h3>
+    <p>At the end of a round, after the tax, if any player has <rv p="settings.war.bells"></rv> 🔔 or more, or when round <rv p="settings.rounds.max"></rv> is over. The war is one phase, played in four steps.</p>
+
+    <h3>1. Sides</h3>
+    <p>The player with the fewest 🔔 becomes the <b>loyalist</b>; ties go to the one with fewer ✝️, then fewer 🟡. Everyone else is a <b>patriot</b>. There is no loyalist in a solo game, with fewer than <rv p="settings.war.loyalistFrom"></rv> players, or if every player has <rv p="settings.war.bells"></rv> 🔔 or more.</p>
+
+    <h3>2. The King’s army</h3>
+    <ol class="steps">
+      <li>Draw one King’s tactic. It changes this war as printed.</li>
+      <li>The Royal Army is every 🟥 in the barracks, plus <rv p="settings.war.hostileCubes"></rv> 🟥 for each settlement at hostility <rv p="settings.war.hostileFrom"></rv> or more, plus any the tactic adds.</li>
+      <li>Deal the cubes one at a time to the patriots’ colonies, starting with the patriot with the most 🔔 (ties: more ✝️, then more 🟡), each patriot’s colonies in the order they were founded. Go round again until no cubes are left. The loyalist’s colonies are never attacked.</li>
+      <li>The loyalist places any of their agents face down at patriot colonies. Everyone sees how many cards lie at each colony; only the loyalist knows what they are. Agents who cannot fight make a good bluff.</li>
+    </ol>
+
+    <h3>3. The patriots defend</h3>
+    <p>Each patriot chooses, in secret and at the same time as the others, how to defend:</p>
+    <ul>
+      <li><b>The army:</b> their agents with ⚔️, pawn or ship.</li>
+      <li><b>Militia:</b> 1 🔔 each, at most one for each of their agents without ⚔️. Each is a black cube ⬛ worth 1 ⚔️.</li>
+      <li><b>Mercenaries:</b> <rv p="settings.war.mercenaryGold"></rv> 🟡 each; a black cube ⬛ worth 1 ⚔️.</li>
+      <li><b>Allies:</b> <rv p="settings.war.allyCubes"></rv> black cubes ⬛ for each allied settlement.</li>
+    </ul>
+    <p>They then spread these cards and cubes among their attacked colonies. Everything is fixed before the first siege.</p>
+
+    <h3>4. The sieges</h3>
+    <p>Resolve the attacked colonies in the order the cubes were dealt. A colony with no 🟥 and no loyalist card is not attacked.</p>
+    <p><b>Attack:</b> <rv p="settings.war.refStrength"></rv> ⚔️ for each 🟥, plus the tactic, plus the ⚔️ of the loyalist’s cards there, plus the loyalist’s militia. Here a card adds only its ⚔️, not 1 for being played.</p>
+    <p><b>Defence:</b> <rv p="settings.war.baseDefence"></rv>, plus the terrain, plus your stockade or fort, plus <rv p="settings.war.tokenBonus"></rv> for each of your tokens on or next to the colony, plus the ⚔️ of your cards there, plus your black cubes.</p>
+    <p>If the attack is not stronger, the colony holds. Otherwise the loyalist rolls one die for each point of difference, at most <rv p="settings.war.diceCap"></rv>; with no loyalist, another player rolls. No success: against the odds, the colony holds. One success or more: the colony falls.</p>
+    <p>If a colony falls and the loyalist’s own strength there is at least the Royal Army’s, the loyalist takes it: replace the colony marker with one of theirs.</p>
+    <div class="example" data-title="Example"><p>Gregor’s colony faces 9 🟥, worth 9 ⚔️, and two loyalist cards worth 3 ⚔️: 12. Gregor defends with 1, +1 for the forest, +1 for his stockade, +1 for his ship next to the colony, his soldier’s 2 ⚔️ and 3 mercenaries: 9. The loyalist rolls 3 dice and gets 2, 4 and 5: one success, and the colony falls. The loyalist’s 3 ⚔️ are less than the army’s 9, so the colony is not theirs to take.</p></div>
+  </div>
+</section>
+
+<section class="chapter">
+  <header><img src="../../packages/web/art/event/treaty_of_paris.webp" alt=""><h2>The end of the game</h2><p>When the last siege is over, count the points.</p></header>
+  <table>
+    <thead><tr><th>Points for</th><th>Patriot</th><th>Loyalist</th></tr></thead>
+    <tbody>
+      <tr><td>Each colony you hold</td><td><rv p="settings.score.patriotColony"></rv> 🏅</td><td><rv p="settings.score.loyalistColony"></rv> 🏅, colonies taken in the war included</td></tr>
+      <tr><td>Each unspent 🔔</td><td><rv p="settings.score.perBell"></rv> 🏅</td><td>—</td></tr>
+      <tr><td>Every <rv p="settings.score.agentsPerPoint"></rv> agents in your collection</td><td colspan="2">1 🏅</td></tr>
+      <tr><td>Every <rv p="settings.score.goldPerPoint"></rv> 🟡</td><td colspan="2">1 🏅</td></tr>
+      <tr><td>Each building</td><td colspan="2"><rv p="settings.score.building"></rv> 🏅</td></tr>
+      <tr><td>Each Founding Father</td><td colspan="2"><rv p="settings.score.father"></rv> 🏅, plus the points some Fathers give</td></tr>
+    </tbody>
+  </table>
+  <div class="cols">
+    <h3>The winner</h3>
+    <p>Drop fractions. To win you must hold at least one colony and have the most points. Ties go to the player with more gold, then more agents; if still tied, the victory is shared. If nobody holds a colony, the Crown wins.</p>
+    <h3>Playing alone</h3>
+    <p>A solo game plays like any other, with no loyalist. Refusing the tax adds <rv p="settings.tax.refuseRefSolo"></rv> 🟥. In the sieges, roll the dice for the King yourself. You win if you hold at least one colony after the war; your score tells you how well you did.</p>
+  </div>
+</section>
+
+<!-- ============================== REFERENCE ============================== -->
+
+<section class="chapter ref" data-part="Reference" data-toc="short">
+  <header><img src="../../packages/web/art/role/rivalry.webp" alt=""><h2>Nations</h2><p>From the easiest, one ★, to the hardest. Each starts with its own small deck, and one agent in it belongs to that nation alone.</p></header>
+  <rv-table of="nations"></rv-table>
+</section>
+
+<section class="chapter ref" data-toc="short">
+  <header><img src="../../packages/web/art/role/companier.webp" alt=""><h2>Agents</h2><p>Price, number of cards, education and talent. The talent adds to the action it names; in everything else an agent is like any other.</p></header>
+  <h3>Common agents</h3>
+  <rv-table of="agents"></rv-table>
+  <h3>Nations’ own agents</h3>
+  <p>One in each nation’s starting deck. They cannot be hired, recruited or taught.</p>
+  <rv-table of="nationAgents"></rv-table>
+  <h3>Native agents</h3>
+  <p>Won from settlements, by preaching or in battle.</p>
+  <rv-table of="nativeAgents"></rv-table>
+</section>
+
+<section class="chapter ref" data-toc="short">
+  <header><img src="../../packages/web/art/event/stone_wall.webp" alt=""><h2>Buildings</h2><p>Cost in timber and the education the worker needs. Improvements, shaded, need their basic building; there is one of each.</p></header>
+  <rv-table of="buildings"></rv-table>
+</section>
+
+<section class="chapter ref" data-toc="short">
+  <header><img src="../../packages/web/art/role/patriot.webp" alt=""><h2>Founding Fathers</h2><p>Their price in bells, from the cheapest. Each is also worth 1 🏅 at the end of the game.</p></header>
+  <rv-table of="fathers"></rv-table>
+</section>
+
+<section class="chapter ref" data-toc="short">
+  <header><img src="../../packages/web/art/event/the_boston_tea_party.webp" alt=""><h2>Events</h2><p>One each round, resolved from top to bottom.</p></header>
+  <rv-table of="events"></rv-table>
+</section>
+
+<section class="chapter ref" data-toc="short">
+  <header><img src="../../packages/web/art/event/lost_tomb.webp" alt=""><h2>Ruins and wrecks</h2><p>What waits in the jungle and under the waves.</p></header>
+  <h3>Ruins</h3>
+  <rv-table of="ruins"></rv-table>
+  <h3>Wrecks</h3>
+  <rv-table of="wrecks"></rv-table>
+</section>
+
+<section class="chapter ref" data-toc="short">
+  <header><img src="../../packages/web/art/event/sacred_forest.webp" alt=""><h2>Tribes and tactics</h2><p>The peoples of the land, and the King’s plans for the war.</p></header>
+  <h3>Tribes</h3>
+  <p>Each tribe lives on one terrain. Population, starting hostility, and the loot its last settlement gives.</p>
+  <rv-table of="tribes"></rv-table>
+  <h3>King’s tactics</h3>
+  <p>One is drawn at the start of the war.</p>
+  <rv-table of="tactics"></rv-table>
+</section>
+
+<section class="chapter ref" data-toc="short">
+  <header><h2>Glossary</h2></header>
+  <div class="cols">
+    <dl class="glossary">
+      <dt>Agent</dt><dd>A card in your deck: one person, played for one action.</dd>
+      <dt>Alliance</dt><dd>A pact with a calm settlement. Allies send fighters to your defence in the war.</dd>
+      <dt>Barracks</dt><dd>The space on the Europe board where the Royal Army 🟥 gathers.</dd>
+      <dt>Bells 🔔</dt><dd>Liberty. They buy Founding Fathers and militia, decide the loyalist, start the war at <rv p="settings.war.bells"></rv>, and score for patriots.</dd>
+      <dt>Bombardment</dt><dd>A ship attacking the land, or a pawn attacking a ship, without the landing penalty.</dd>
+      <dt>Collection</dt><dd>Your hand, deck and discard together.</dd>
+      <dt>Colony</dt><dd>Your town on the map, founded by your pawn. You may have <rv p="settings.colony.max"></rv>.</dd>
+      <dt>Common discard</dt><dd>Agents that leave the pier or a collection. Shuffled into a new agent deck when that deck runs out.</dd>
+      <dt>Crosses ✝️</dt><dd>Faith. They recruit agents and convert natives. At most <rv p="settings.crosses.max"></rv>.</dd>
+      <dt>Damage</dt><dd>A wound to a ship, taking one space in its hold. A damaged ship cannot move or attack.</dd>
+      <dt>Demand track</dt><dd>One per resource, one space per player. When it fills, the price falls.</dd>
+      <dt>Education</dt><dd>None 🚫, basic 📖 or higher 🎓. A building needs a worker educated at least as well as itself.</dd>
+      <dt>Europe</dt><dd>The outer ring of cells. Trade, hire, propaganda and repair happen there.</dd>
+      <dt>Hold</dt><dd>Your ship’s <rv p="settings.hold.size"></rv> spaces: resources, the pawn and damage.</dd>
+      <dt>Hostility 💢</dt><dd>How angry a tribe is, from 0 to <rv p="settings.natives.maxHostility"></rv>.</dd>
+      <dt>Improvement</dt><dd>The stronger version of a basic building. One of each.</dd>
+      <dt>Loyalist</dt><dd>The player who sides with the King in the war.</dd>
+      <dt>Militia, mercenaries</dt><dd>Black cubes ⬛ a patriot buys with 🔔 or 🟡 to defend in the war.</dd>
+      <dt>Patriot</dt><dd>A player who fights for independence.</dd>
+      <dt>Pier</dt><dd>The row of agents for hire in Europe.</dd>
+      <dt>Royal Army 🟥</dt><dd>The King’s soldiers, one cube each. They grow with every refused tax and with some events.</dd>
+      <dt>Salon</dt><dd>The row of Founding Fathers in Europe.</dd>
+      <dt>Settlement 🛖</dt><dd>A native village. Its tribe card shows population 👥 and hostility 💢.</dd>
+      <dt>Tile</dt><dd>A 3 × 3 block of the map, revealed by exploring.</dd>
+      <dt>Warehouse</dt><dd>Where your resources are kept, shared by all your colonies: <rv p="settings.warehouse.base"></rv> spaces, <rv p="warehouse.full"></rv> with a warehouse building.</dd>
+    </dl>
+  </div>
+</section>
+
+<section class="chapter ref" data-toc="short">
+  <header><h2>Quick reference</h2></header>
+  <div class="cols">
+    <h3>A round</h3>
+    <ol class="steps">
+      <li>Draw up to <rv p="settings.hand.size"></rv>.</li>
+      <li>In turn: play one agent for one action, or pass.</li>
+      <li>Resolve the event.</li>
+      <li>Tax: pay and gain <rv p="settings.tax.payBells"></rv> 🔔, or refuse and add <rv p="settings.tax.refuseRef"></rv> 🟥.</li>
+      <li><rv p="settings.war.bells"></rv> 🔔, or round <rv p="settings.rounds.max"></rv>: the war. Otherwise, the next round.</li>
+    </ol>
+    <h3>Limits</h3>
+    <ul>
+      <li>Colonies <rv p="settings.colony.max"></rv>, buildings <rv p="settings.buildings.max"></rv>, Fathers <rv p="settings.fathers.max"></rv></li>
+      <li>Warehouse <rv p="settings.warehouse.base"></rv>, or <rv p="warehouse.full"></rv>; hold <rv p="settings.hold.size"></rv></li>
+      <li>Crosses <rv p="settings.crosses.max"></rv>; bells have no limit</li>
+      <li>Prices 0 to <rv p="settings.market.maxPrice"></rv> 🟡</li>
+    </ul>
+    <h3>Combat</h3>
+    <p>1 per card, plus ⚔️, plus bonuses. Roll a die for each point of difference; every <rv p="success"></rv> is a success.</p>
+    <h3>Actions</h3>
+    <table class="narrow">
+      <tbody>
+        <tr><td><b>Move</b></td><td><rv p="settings.move.points"></rv> 💨 for one token; explore for <rv p="settings.move.explore"></rv> 💨</td></tr>
+        <tr><td><b>Found</b></td><td>the first free, then <rv p="settings.colony.foundCost.value"></rv> 🟨</td></tr>
+        <tr><td><b>Produce</b></td><td>1 and bonuses, or work a building</td></tr>
+        <tr><td><b>Build</b></td><td>pay 🟫</td></tr>
+        <tr><td><b>Supply</b></td><td>1 🟨: draw 1</td></tr>
+        <tr><td><b>Exchange</b></td><td>discard 2: draw 1</td></tr>
+        <tr><td><b>Attack</b></td><td>an agent with ⚔️</td></tr>
+        <tr><td><b>Recruit</b></td><td>✝️, at least the round: look, keep 1</td></tr>
+        <tr><td><b>Gift, preach, ally</b></td><td>next to a settlement</td></tr>
+        <tr><td><b>In Europe</b></td><td>trade; hire <rv p="settings.hire.max"></rv>; propaganda <rv p="settings.propaganda.maxFathers"></rv>; repair 1</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <h3>Symbols</h3>
+  <rv-table of="symbols"></rv-table>
+</section>
+
+</main>
+</body>
+</html>

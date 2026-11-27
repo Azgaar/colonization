@@ -1,10 +1,10 @@
-# Rules specification: `board` ruleset
+# Rules specification: the rules (`rules/`, ruleset `board`)
 
 The rules as the engine must implement them. Each rule has an ID used in code, tests and reports.
 
 **Source marks**
 
-- no mark: stated in `Колонизация.docx` or `Colonization.xlsx`
+- no mark: stated in `Колонизация.docx` or the spreadsheet (now `rules/`, the master of the rules)
 - **[A]** answered by the designer on 2026-11-25 (listed in [decisions.md](decisions.md)). Answers override the document and the spreadsheet
 - **[D]** default chosen because the sources are silent or unclear. Each is a named setting, shown as `setting = value`. Those worth a designer's answer are listed as questions (Q) in [decisions.md](decisions.md#open-questions).
 
@@ -17,13 +17,13 @@ These are the rules of the board game. PC rules start identical and may change o
 | Term | Russian | Meaning |
 |---|---|---|
 | Agent | агент | Card played to take an action; also a fighter |
-| Ship, Infantry | корабль, пехота | Each player's two map tokens |
+| Ship, Pawn | корабль, пешка | Each player's two map tokens |
 | Cell / Fragment | клетка / фрагмент | One map square / a 3×3 block revealed together |
 | Settlement / Tribe | поселение / племя | A native village on the map / its people; one tribe may own several |
 | Hostility | враждебность 💢 | 0–5, shared by all settlements of a tribe |
 | Warehouse / Hold | склад / трюм | Player's stored goods / ship's cargo |
 | Pier | причал (Европа) | Row of agents for hire |
-| Docks | причал (постройка) | Colony building |
+| Docks | доки (постройка) | Colony building |
 | Salon | салон | Row of Founding Fathers |
 | REF | КЭК 🟥 | Royal Expeditionary Force cubes |
 | Bells, Crosses, Gold | 🔔, ✝️, 🟡 | Special resources |
@@ -32,13 +32,12 @@ These are the rules of the board game. PC rules start identical and may change o
 
 Resources: food 🟨 (🐟), timber 🟫 (🪵), crops 🟩 (🍂, 🦫), goods 🟦 (📦), silver ⬜ (🪙). Food is fish (corn is gone, DD-67); leaf and fur are both crops. The icon matters only for bonuses.
 
-Note: `причал` names both the pier in Europe and the Docks building. Code and English text use different words.
 
 ## S. Setup
 
 | ID | Rule |
 |---|---|
-| S-1 | 1–5 players. Each takes a nation, its starting deck (spreadsheet `starting units`), a ship and infantry aboard. **[D]** Gold, bells, crosses, hold cargo and warehouse start at 0 |
+| S-1 | 1–5 players. Each takes a nation, its starting deck (spreadsheet `starting units`), a ship and pawn aboard. **[D]** Gold, bells, crosses, hold cargo and warehouse start at 0 |
 | S-2 | Map is 16 random fragments out of 74, in 4×4, face down, fixed orientation (north up) |
 | S-3 | Around the 12×12 map: an inner ring of open sea, then an outer ring of Europe cells **[A]** (`ring.openSea = 1`, `ring.europe = 1`) |
 | S-4 | Nation agents and native agents are kept out of the common agent deck. Native agents form their own pile of 8 |
@@ -56,7 +55,7 @@ Note: `причал` names both the pier in Europe and the Docks building. Code 
 | T-2 | **Actions.** Clockwise, one card and one action per turn. Passing ends the round for that player, who keeps or discards **[D]** any subset of the remaining cards |
 | T-3 | A player with no cards must pass. Every action takes an agent, recruiting too (DD-60) |
 | T-4 | **Event.** When all have passed, resolve the top event (section V) |
-| T-5 | **Tax.** If the rate is above 0, each player pays in full, or refuses: +1 🟥 to the REF (DD-52; was +2) (solo: +3 🟥), and no 🔔 (DD-50; was +1 🔔). A player who cannot pay in full must refuse **[D]** |
+| T-5 | **Tax.** If the rate is above 0, each player pays and gains +1 🔔 (DD-71; was nothing), or refuses: +1 🟥 to the REF (DD-52; was +2) (solo: +3 🟥), and no 🔔 (DD-50; was +1 🔔). A player who cannot pay must refuse **[D]** |
 | T-6 | **End.** Check for war (W-1), advance the round and year (1620 + 20 per round), pass the first-player marker left |
 | T-7 | At the end of a player's turn, warehouse excess is discarded by choice. **[D]** The check also applies after events |
 | T-8 | There are no free actions: recruiting takes an agent (DD-60; was free, on one's own turn, any number of times) |
@@ -76,17 +75,17 @@ Note: `причал` names both the pier in Europe and the Docks building. Code 
 |---|---|
 | M-1 | 5 movement points for one token per action. Eight directions |
 | M-2 | Cost to enter: ocean, grassland 1; forest, desert, tundra 2; mountains need at least 1 and use all that remain |
-| M-3 | Ships stay on water. Infantry stays on land unless aboard. One token per cell, except infantry aboard a ship |
-| M-4 | **[D]** Infantry may enter an own colony. No token may enter a settlement or a foreign colony |
+| M-3 | Ships stay on water. The pawn stays on land unless aboard. One token per cell, except pawn aboard a ship |
+| M-4 | **[D]** The pawn may enter an own colony. No token may enter a settlement or a foreign colony |
 | M-5 | **Explore:** 1 point, reveals a closed fragment. From a fragment, the neighbours are those sharing a side **[D]** (`explore.diagonal`). From the rings, any fragment touching the token's cell **[D]** |
 | M-6 | On reveal: mark ruins and wrecks as unexplored; place settlements in reading order **[D]** per N-1 |
 | M-7 | **Load and unload:** 1 point per operation, any amount **[D]** `cargo.costPer = operation`. Goods move between hold and warehouse when the ship is on water next to an own colony |
-| M-8 | **Embark and disembark:** 1 point between adjacent ship and land. This is the only way one action can move both ship and infantry, using the remaining points **[A]**. **[D]** It can be part of either token's action. The point paid covers the first cell, whatever its terrain |
-| M-9 | Hold has 4 slots: 1 per resource, 1 for infantry, 1 per damage |
+| M-8 | **Embark and disembark:** 1 point between adjacent ship and land. This is the only way one action can move both ship and pawn, using the remaining points **[A]**. **[D]** It can be part of either token's action. The point paid covers the first cell, whatever its terrain |
+| M-9 | Hold has 4 slots: 1 per resource, 1 for the pawn, 1 per damage |
 | M-10 | A damaged ship cannot move or attack |
 | M-11 | Entering an unexplored ruin or wreck triggers it at once (section X). "Token ends its move" stops further movement in this action |
-| M-12 | Infantry sent to Europe waits off the map. **[D]** Its ship may board it from any Europe cell for 1 point |
-| M-13 | A ship sent to Europe goes to the nearest free Europe cell **[D]**, with its infantry and, unless stated, its cargo |
+| M-12 | A pawn sent to Europe waits off the map. **[D]** Its ship may board it from any Europe cell for 1 point |
+| M-13 | A ship sent to Europe goes to the nearest free Europe cell **[D]**, with its pawn and, unless stated, its cargo |
 | M-14 | **[A]** A ship that takes damage from any cause goes to Europe, or next to an own colony if its owner has a shipyard (`damage.sendsToEurope = true`, DD-54). Otherwise a ship damaged by a storm or wreck could never be repaired, since it cannot move |
 
 ## F. Colonies
@@ -94,7 +93,7 @@ Note: `причал` names both the pier in Europe and the Docks building. Code 
 | ID | Rule |
 |---|---|
 | F-1 | Up to 3 per player. First is free, others cost 5 food each from the warehouse |
-| F-2 | Founded by infantry on its own land cell, also on the outer edge of the 12×12 map **[A]** (DD-62: the document forbids the edge; `colony.onEdge`); not adjacent, diagonals included, to a colony or a settlement; at least one adjacent ocean cell that connects through revealed water to Europe |
+| F-2 | Founded by the pawn on its own land cell, also on the outer edge of the 12×12 map **[A]** (DD-62: the document forbids the edge; `colony.onEdge`); not adjacent, diagonals included, to a colony or a settlement; at least one adjacent ocean cell that connects through revealed water to Europe |
 | F-3 | Colonies are never removed. They can be occupied only in the war |
 | F-4 | Warehouse, buildings and Fathers belong to the player and serve all colonies **[A]** |
 | F-5 | Warehouse capacity is 6, or 12 with the warehouse building |
@@ -117,16 +116,16 @@ Require the player's ship on a Europe cell.
 
 | ID | Rule |
 |---|---|
-| C-1 | Attacks target an adjacent cell. Attacker must play an agent with the right ⚔️ type (infantry or ship; captain is both) |
+| C-1 | Attacks target an adjacent cell. Attacker must play an agent with the right ⚔️ type (pawn or ship; captain is both) |
 | C-2 | Both sides then secretly add any number of hand cards. The defender may add the unseen top card of their deck |
 | C-3 | Strength = number of cards, including the played one **[A]**, plus matching ⚔️ bonuses, plus terrain and other bonuses. Cards without ⚔️ count 1 |
-| C-4 | **[D]** Each side uses the ⚔️ of its own token: a ship's battle uses ship ⚔️, anything else infantry ⚔️. A bombarding side uses the higher of the two on each card. Terrain-bound bonuses (highlander) look at the fighter's own cell |
+| C-4 | **[D]** Each side uses the ⚔️ of its own token: a ship's battle uses ship ⚔️, anything else pawn ⚔️. A bombarding side uses the higher of the two on each card. Terrain-bound bonuses (highlander) look at the fighter's own cell |
 | C-5 | Attacker's strength not greater: the attack fails, no further effect. Otherwise roll dice equal to the difference; 5 and 6 are successes. One success = 1 damage. **[D]** `combat.diceCap = none` outside the war |
 | C-6 | **Land token:** 1+ damage sends the defender to Europe. Tokens are never destroyed |
-| C-7 | **Ship vs ship:** each damage fills one hold slot (maximum 4 **[D]**); the loser moves to Europe, or next to an own colony if its owner has a shipyard. Winner takes cargo up to free hold space; the rest is lost if the winner wishes. Cargo beyond the damaged hold's capacity is discarded. Infantry that beats a ship takes no cargo **[D]** |
-| C-8 | **Colony:** defender gets +1, terrain, stockade +1 or fort +2 (a fort replaces the stockade **[D]**). Each success: take 1 chosen resource to own warehouse, or destroy 1 of the cheapest buildings. Destroying a building an improvement depends on is not allowed while the improvement stands **[D]**. Infantry then moves to the attacker's nearest colony, or to Europe if none **[D]**; a bombarding ship stays **[D]**. Infantry inside a colony cannot be attacked separately **[D]** |
-| C-9 | **Landing attack** from a ship: -1. **Infantry against a ship:** -1 |
-| C-10 | **Bombardment** (cannoneer, or any ⚔️ agent with de Ruyter): ship attacks land, or infantry attacks a ship, without penalty |
+| C-7 | **Ship vs ship:** each damage fills one hold slot (maximum 4 **[D]**); the loser moves to Europe, or next to an own colony if its owner has a shipyard. Winner takes cargo up to free hold space; the rest is lost if the winner wishes. Cargo beyond the damaged hold's capacity is discarded. A pawn that beats a ship takes no cargo **[D]** |
+| C-8 | **Colony:** defender gets +1, terrain, stockade +1 or fort +2 (a fort replaces the stockade **[D]**). Each success: take 1 chosen resource to own warehouse, or destroy 1 of the cheapest buildings. Destroying a building an improvement depends on is not allowed while the improvement stands **[D]**. The pawn then moves to the attacker's nearest colony, or to Europe if none **[D]**; a bombarding ship stays **[D]**. Pawn inside a colony cannot be attacked separately **[D]** |
+| C-9 | **Landing attack** from a ship: -1. **Pawn against a ship:** -1 |
+| C-10 | **Bombardment** (cannoneer, or any ⚔️ agent with de Ruyter): ship attacks land, or a pawn attacks a ship, without penalty |
 | C-11 | Any victory (1+ success) gives +1 🔔 |
 | C-12 | **[D]** Combat is not allowed against tokens on Europe cells: `europe.safe = true` |
 | C-13 | All committed cards go to their owners' discards |
@@ -158,7 +157,7 @@ Require the player's ship on a Europe cell.
 | N-1 | Revealing a settlement cell draws the first tribe card matching its terrain, if fewer than 6 settlements have been placed. No match, or limit reached: the cell is plain terrain. **[D]** Destroyed settlements free no slot |
 | N-2 | Settlements take numbers 1–6 in order of appearance **[D]** on the order. Events refer to these numbers **[A]** |
 | N-3 | Hostility is shared by the tribe, limited to 0–5. A second settlement of a tribe joins at the current value **[D]** |
-| N-4 | Native actions need infantry or ship adjacent to the settlement |
+| N-4 | Native actions need pawn or ship adjacent to the settlement |
 | N-5 | **Gift:** 1 goods from the warehouse, roll 3 dice, hostility falls by 1 + successes |
 | N-6 | **Preach:** pay crosses equal to hostility; native agent to discard; hostility +1; population -1. **[D]** At population 0 the settlement disappears with no loot |
 | N-7 | **Attack:** settlement strength = population + terrain. Victory: optional native agent, +1 🔔, population -1 whatever the damage. Last one gives loot. Any attack, won or lost, sets hostility to 5 |
@@ -180,7 +179,7 @@ All 34 cards are implemented as printed in the spreadsheet. Clarifications:
 | B-2 | Sepúlveda gives 2 slaves **[A]**, or as many as the agent deck and common discard still hold **[D]** |
 | B-3 | Equiano: slaves are removed from the player's collection (spreadsheet) to the common discard **[D]**, and each is replaced by the top card of the agent deck. P-4 applies |
 | B-4 | Las Casas: preaching is free; attacks on natives are forbidden. Both last all game |
-| B-5 | Franklin, Hooker, Rolfe, Squanto, Whitney add to each production action that yields that resource. Rolfe counts only 🍂, Squanto only 🌽 |
+| B-5 | Franklin, Hooker, Rolfe, Squanto, Whitney add to each production action that yields that resource. Rolfe counts only 🍂, Squanto only 🐟 (DD-65) |
 | B-6 | Champlain: any revealed legal cell, within the limit of 3 |
 | B-7 | Jefferson: the cheapest Father in the salon, owner's choice among ties **[D]** |
 | B-8 | Kościuszko: +1 for a stockade or +2 for a fort, on top of the usual bonus |
@@ -207,7 +206,7 @@ All 34 cards are implemented as printed in the spreadsheet. Clarifications:
 
 | ID | Rule |
 |---|---|
-| X-1 | Infantry entering a ruin draws from the ruins deck; a ship entering a wreck draws from the wrecks deck. The marker is removed |
+| X-1 | A pawn entering a ruin draws from the ruins deck; a ship entering a wreck draws from the wrecks deck. The marker is removed |
 | X-2 | Used cards go to a discard, reshuffled if the deck runs out **[D]** |
 | X-3 | Options need their cost and requirement to be met. If no option is available, nothing happens **[D]** |
 | X-4 | "Requires an agent with ⚔️" or a scout: **[D]** the agent played for this move, or one discarded from hand |
@@ -225,7 +224,7 @@ All 34 cards are implemented as printed in the spreadsheet. Clarifications:
 | W-4 | REF pool = accumulated 🟥, plus 1 per settlement with hostility 4–5, plus tactic additions |
 | W-5 | Deal 🟥 one per patriot colony, in order of most 🔔 (then ✝️, 🟡), repeating until the pool is empty. **[D]** Within a player, colonies go in founding order |
 | W-6 | Loyalist places any of their agents face down at patriot colonies. Counts are public |
-| W-7 | Patriots then choose, secretly and at the same time **[D]**: army cards (any with ⚔️, infantry or ship value), militia (1 🔔 each, up to the number of their non-military cards), mercenaries (5 🟡 each), 3 cubes per allied settlement, and their placement |
+| W-7 | Patriots then choose, secretly and at the same time **[D]**: army cards (any with ⚔️, pawn or ship value), militia (1 🔔 each, up to the number of their non-military cards), mercenaries (5 🟡 each), 3 cubes per allied settlement, and their placement |
 | W-8 | Washington: 2 militia per bell, still limited by non-military cards **[D]**. Revere: 4 free militia, not limited **[D]** |
 | W-9 | Attack = 1 × 🟥 (DD-49; was 2 ×) + tactic + loyalist cards' ⚔️ + loyalist militia. Card count does not add strength here, unlike C-3 |
 | W-10 | Defence = 1 + terrain + buildings + 1 per own token on or next to the colony + cards' ⚔️ + support cubes |
