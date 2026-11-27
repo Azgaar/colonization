@@ -1,6 +1,7 @@
 /* The new game screen (FR-U-1): the player's nation, the rivals and their characters, the rules and the seed. */
+import { emblem } from '../emblem.ts';
 import type { Personality } from '@col/bots';
-import { art, D, L, pick } from '../data.ts';
+import { art, D, msg, pick, t, type Text } from '../data.ts';
 import { icon } from '../icons.ts';
 import { paint } from '../paint.ts';
 import { NATIONS, PERSONALITY_NAMES, RULESETS, Sim } from '../sim.ts';
@@ -9,28 +10,18 @@ import { traits } from '../texts.ts';
 import { startGame } from './setup.ts';
 import { coachFromStart } from './tutorial.ts';
 
-const CHARACTERS: Record<string, [string, string, string, string]> = {
-  balanced: ['Balanced', 'Сбалансированный', 'does a bit of everything', 'понемногу всё'],
-  trader: ['Trader', 'Торговец', 'sells goods in Europe', 'торгует с Европой'],
-  explorer: ['Explorer', 'Исследователь', 'ruins, wrecks and loot', 'руины, обломки, добыча'],
-  missionary: ['Missionary', 'Миссионер', 'crosses and the natives', 'кресты и индейцы'],
-  rebel: ['Rebel', 'Бунтарь', 'bells, refuses every tax', 'колокола, отказ от налогов'],
-  loyalist: ['Loyalist', 'Лоялист', 'sides with the King', 'на стороне короля'],
-  defender: ['Defender', 'Защитник', 'fortifies its colonies', 'укрепляет колонии'],
-  raider: ['Raider', 'Налётчик', 'attacks ships and colonies', 'нападает на корабли и колонии'],
-};
 /** Who plays a rival seat: a person at this screen (hot-seat), or a bot at a difficulty that changes how well it thinks, never what it gets (FR-A-6). */
-export const WHO: Record<string, [string, string]> = { person: ['Person', 'Человек'], easy: ['Easy', 'Лёгкий'], normal: ['Normal', 'Обычный'], hard: ['Hard', 'Сильный'], expert: ['Expert', 'Эксперт'] };
+export const WHO: Record<string, Text> = { person: msg('sandbox.person'), easy: msg('newgame.easy'), normal: msg('newgame.normal'), hard: msg('newgame.hard'), expert: msg('newgame.expert') };
 /** The form as it is filled in. The rules are board's unless the design bench opened the screen with others. */
 const form = { nation: 'french', n: 4, rivals: [] as { nation: string; bot: Personality; who: string }[], ruleset: 'board', seed: '' };
 
 /** A nation's emblem in its colour, for a nation that may not be in the game yet. */
-export const crest = (nation: string, size = 40) => `<span class="em" style="--c:${D.nations[nation]?.color ?? '#555'};width:${size}px;height:${size}px"><img src="${art.emblem(nation)}" alt=""></span>`;
+export const crest = (nation: string, size = 40) => emblem(nation, size);
 const name = (k: string) => pick(D.names.nations[k] ?? [k, k]);
 /** The nations from the easiest to the hardest. */
 const byStars = () => [...NATIONS].sort((a, b) => (D.nations[a]?.stars ?? 0) - (D.nations[b]?.stars ?? 0));
-const stars = (n: number) => `<span class="stars" title="${L('difficulty', 'сложность')} ${n}/5">${Array.from({ length: 5 }, (_, i) => `<i class="${i < n ? 'on' : ''}">★</i>`).join('')}</span>`;
-const hardness = (n: number) => pick(n <= 1 ? ['For a regular game', 'Для обычной игры'] : n === 2 ? ['A little harder', 'Чуть сложнее'] : n === 3 ? ['Hard', 'Сложно'] : ['For experienced governors', 'Для опытных губернаторов']);
+const stars = (n: number) => `<span class="stars" title="${t('newgame.difficulty')} ${n}/5">${Array.from({ length: 5 }, (_, i) => `<i class="${i < n ? 'on' : ''}">★</i>`).join('')}</span>`;
+const hardness = (n: number) => pick(n <= 1 ? msg('newgame.regular_game') : n === 2 ? msg('newgame.little_harder') : n === 3 ? msg('newgame.hard2') : msg('newgame.experienced_governors'));
 /** Keep the rivals to the number of players, each with a nation of its own. */
 function fit() {
   const used = new Set([form.nation]);
@@ -51,27 +42,27 @@ const heroHtml = () => {
   const k = form.nation, deck = D.nations[k]?.deck ?? [];
   const agents = deck.map((a) => `<div class="ag"><img src="${art.agent(a)}" alt=""><b>${pick(D.agents[a])}</b><small>${traits(a).join(' ') || '&nbsp;'}</small></div>`).join('');
   return `<div class="ph" style="background-image:url(${art.nation(k)})"></div><div class="hx">${crest(k, 84)}<div><h3>${name(k)}</h3><p>${stars(D.nations[k].stars)} <span>${hardness(D.nations[k].stars)}</span></p></div></div>
-<div class="deck"><h4>${L('Starting agents', 'Стартовые агенты')}${deck.length < 5 ? `<small>${L('Four agents: one action fewer each round', 'Четыре агента: на одно действие меньше в каждом туре')}</small>` : ''}</h4><div class="ags">${agents}</div></div>`;
+<div class="deck"><h4>${t('newgame.starting_agents')}${deck.length < 5 ? `<small>${t('newgame.four_agents')}</small>` : ''}</h4><div class="ags">${agents}</div></div>`;
 };
 const rivalsHtml = () => {
   const taken = new Set([form.nation, ...form.rivals.map((r) => r.nation)]);
-  const rows = form.rivals.map((r, i) => `<div class="rv">${crest(r.nation, 34)}<select data-ng-rival="${i}">${byStars().filter((n) => n === r.nation || !taken.has(n)).map((n) => `<option value="${n}"${n === r.nation ? ' selected' : ''}>${name(n)}</option>`).join('')}</select><select data-ng-who="${i}">${Object.entries(WHO).map(([k, n]) => `<option value="${k}"${k === r.who ? ' selected' : ''}>${pick(n)}</option>`).join('')}</select>${r.who === 'person' ? '<span></span>' : `<select data-ng-bot="${i}" title="${pick(CHARACTERS[r.bot] ? [CHARACTERS[r.bot][2], CHARACTERS[r.bot][3]] : ['', ''])}">${PERSONALITY_NAMES.map((p) => `<option value="${p}"${p === r.bot ? ' selected' : ''}>${pick(CHARACTERS[p] ? [CHARACTERS[p][0], CHARACTERS[p][1]] : [p, p])}</option>`).join('')}</select>`}</div>`).join('');
-  return `<h4>${L('Rivals', 'Соперники')}</h4>${rows || `<p class="note">${L('No rivals: only the King.', 'Соперников нет: только король.')}</p>`}`;
+  const rows = form.rivals.map((r, i) => `<div class="rv">${crest(r.nation, 34)}<select data-ng-rival="${i}">${byStars().filter((n) => n === r.nation || !taken.has(n)).map((n) => `<option value="${n}"${n === r.nation ? ' selected' : ''}>${name(n)}</option>`).join('')}</select><select data-ng-who="${i}">${Object.entries(WHO).map(([k, n]) => `<option value="${k}"${k === r.who ? ' selected' : ''}>${pick(n)}</option>`).join('')}</select>${r.who === 'person' ? '<span></span>' : `<select data-ng-bot="${i}" title="${t(`bot.${r.bot}_about`)}">${PERSONALITY_NAMES.map((p) => `<option value="${p}"${p === r.bot ? ' selected' : ''}>${t(`bot.${p}`)}</option>`).join('')}</select>`}</div>`).join('');
+  return `<h4>${t('newgame.rivals')}</h4>${rows || `<p class="note">${t('newgame.no_rivals')}</p>`}`;
 };
-const playersNote = () => (form.n === 1 ? L('Alone against the Crown: keep a colony through the war to win.', 'Один против Короны: чтобы победить, удержите колонию в войне.') : form.rivals.some((r) => r.who === 'person') ? L('Several people take turns at this screen.', 'Несколько человек ходят по очереди за этим экраном.') : L('Your rivals are played by bots.', 'Соперниками играют боты.'));
+const playersNote = () => (form.n === 1 ? t('newgame.alone_against') : form.rivals.some((r) => r.who === 'person') ? t('newgame.several_people') : t('newgame.rivals_played'));
 /** The whole screen, when it opens. */
 export function newGame(): string {
   const k = form.nation;
   const tiles = byStars().map((n) => `<button class="nt${n === k ? ' on' : ''}" data-ng-nation="${n}" style="--c:${D.nations[n].color}"><span class="ph" style="background-image:url(${art.nation(n)})"></span>${crest(n, 38)}<b>${name(n)}</b>${stars(D.nations[n].stars)}</button>`).join('');
   return `<div class="ng" style="--c:${D.nations[k]?.color}">
-<header><button class="pback" data-t-page="main">← ${L('Back', 'Назад')}</button><h2>${L('New game', 'Новая игра')}</h2></header>
+<header><button class="pback" data-t-page="main">← ${t('back')}</button><h2>${t('newgame.new_game')}</h2></header>
 <div class="ng-body"><section class="nations">${tiles}</section><section class="hero">${heroHtml()}</section></div>
 <section class="table">
-<div class="col"><h4>${L('Players', 'Игроки')}</h4><div class="set">${[1, 2, 3, 4, 5].map((n) => `<button class="${form.n === n ? 'on' : ''}" data-ng-n="${n}">${n === 1 ? L('Solo', 'Соло') : n}</button>`).join('')}</div><p class="note pn">${playersNote()}</p>
-<h4>${L('Seed', 'Зерно')}</h4><div class="seed"><input data-ng-seed value="${form.seed}" placeholder="${L('random', 'случайное')}" spellcheck="false"><button data-ng-dice title="${L('A random seed', 'Случайное зерно')}">${icon('die', 20)}</button></div>
-${form.ruleset === 'board' ? '' : `<p class="note">${L('Rules', 'Правила')}: ${form.ruleset}</p>`}</div>
+<div class="col"><h4>${t('newgame.players')}</h4><div class="set">${[1, 2, 3, 4, 5].map((n) => `<button class="${form.n === n ? 'on' : ''}" data-ng-n="${n}">${n === 1 ? t('newgame.solo') : n}</button>`).join('')}</div><p class="note pn">${playersNote()}</p>
+<h4>${t('newgame.seed')}</h4><div class="seed"><input data-ng-seed value="${form.seed}" placeholder="${t('newgame.random')}" spellcheck="false"><button data-ng-dice title="${t('newgame.random_seed')}">${icon('die', 20)}</button></div>
+${form.ruleset === 'board' ? '' : `<p class="note">${t('newgame.rules')}: ${form.ruleset}</p>`}</div>
 <div class="col rivals">${rivalsHtml()}</div>
-<button class="sail" data-ng-start><span>${L('Set sail', 'В путь')}</span><small>1620</small></button>
+<button class="sail" data-ng-start><span>${t('newgame.set_sail')}</span><small>1620</small></button>
 </section></div>`;
 }
 const box = () => document.querySelector<HTMLElement>('#title .ng');

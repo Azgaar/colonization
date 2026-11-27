@@ -1,7 +1,7 @@
 /* The advisor (FR-A-8): on request, the search bot's three best suggestions for the person's decision, best first, each told exactly (what is gathered and how much, what is sold, whom to hire, where a ship heads); one click plays a suggestion, the whole action. */
 import type { Resource } from '@col/data';
 import { recruitCost } from '@col/engine';
-import { $, ACT, D, L, P, pick } from '../data.ts';
+import { $, ACT, D, P, pick, t, table } from '../data.ts';
 import { settle } from '../flow.ts';
 import { Board } from '../map/board.ts';
 import { paint } from '../paint.ts';
@@ -22,83 +22,67 @@ const signs = (o: Opt) => Places.effect(o).join(' ');
 const got = (n: number, i: string) => { const r = Places.ico(i) === 'fish' ? 'food' : Places.ico(i); return `${Places.plus(n, Places.ico(i))} ${name(D.names.resources[r], r).toLowerCase()}`; };
 
 /** Where a move heads, by the bot's goal: `{at}` is the cell. */
-const GOALS: Record<string, Pair> = {
-  'ship: explore': ['sail to explore around {at}', 'плыть на разведку к {at}'],
-  'ship: to Europe': ['sail to Europe', 'плыть в Европу'],
-  'ship: fetch': ['sail to Europe to fetch the infantry', 'плыть в Европу за пехотой'],
-  'ship: load': ['sail to {at} to load goods', 'плыть к {at} за грузом'],
-  'ship: settle': ['sail to {at} to land settlers', 'плыть к {at}, чтобы высадить колонистов'],
-  'ship: ruin': ['sail to {at} to land at the ruins', 'плыть к {at}, чтобы высадиться у руин'],
-  'ship: wreck': ['sail to the shipwreck at {at}', 'плыть к кораблекрушению у {at}'],
-  'ship: natives': ['sail to the natives near {at}', 'плыть к индейцам у {at}'],
-  'ship: pick up': ['sail to {at} to pick up the infantry', 'плыть к {at} за пехотой'],
-  'ship: guard': ['sail to {at} to guard the colony', 'плыть к {at} охранять колонию'],
-  'infantry: settle': ['march to {at} to found a colony', 'идти к {at}, чтобы основать колонию'],
-  'infantry: ruin': ['march to the ruins at {at}', 'идти к руинам у {at}'],
-  'infantry: explore': ['march to explore around {at}', 'идти на разведку к {at}'],
-  'infantry: natives': ['march to the natives near {at}', 'идти к индейцам у {at}'],
-  'infantry: guard': ['march to {at} to guard the colony', 'идти к {at} охранять колонию'],
-  'infantry: board': ['march to {at} to board the ship', 'идти к {at}, чтобы сесть на корабль'],
-};
+const GOALS: Record<string, Pair> = table('goal');
 function move(a: Advice, ship: boolean): string {
-  const g = GOALS[a.goal];
+  const g = GOALS[a.goal.replace(/\W+/g, '_')];
   // Infantry aboard goes ashore next to the ship: the cell it heads for says little.
   const aboard = !ship && P.inf === 'ship';
-  if (aboard && a.goal === 'infantry: settle') return L('go ashore to found a colony', 'высадиться, чтобы основать колонию');
-  if (aboard && a.goal === 'infantry: ruin') return L('go ashore at the ruins', 'высадиться у руин');
-  if (!g || (a.to === undefined && pick(g).includes('{at}'))) return ship ? L('sail', 'плыть') : L('march', 'идти');
+  if (aboard && a.goal === 'infantry: settle') return t('advisor.go_ashore');
+  if (aboard && a.goal === 'infantry: ruin') return t('advisor.go_ashore2');
+  if (!g || (a.to === undefined && pick(g).includes('{at}'))) return ship ? t('advisor.sail') : t('advisor.march');
   return pick(g).replace('{at}', a.to === undefined ? '' : where(a.to));
 }
 
 /** One suggestion, told exactly: the agent, then what it does and what it brings or costs. */
 function describe(a: Advice): string {
   const c = a.choice as Opt, then = a.then as Opt[];
-  if (c.c === 'pass') return L('Pass', 'Пасовать');
-  if (c.c === 'recruit') return `${L('Recruit an agent with crosses', 'Завербовать агента за кресты')}: ${Places.plus(-recruitCost(Sim.s), 'crosses')}`;
+  if (c.c === 'pass') return t('advisor.pass');
+  if (c.c === 'recruit') return `${t('advisor.recruit_agent')}: ${Places.plus(-recruitCost(Sim.s), 'crosses')}`;
   if (c.c !== 'play') { const d = Sim.pending()!; return esc(look(c, d as Pending).title || c.c); }
   const card = c.card as string, who = `<b>${agent(card)}:</b> `;
   const what = ((): string => {
     switch (c.a) {
       case 'produce': {
         const n = D.yields[card]?.find((y) => y.cell === c.cell && y.icon === c.icon)?.n ?? 1;
-        return `${L('gather', 'добыть')} ${got(n, c.icon)} ${L('at', 'на')} ${where(c.cell)}`;
+        return `${t('advisor.gather')} ${got(n, c.icon)} ${t('advisor.at')} ${where(c.cell)}`;
       }
-      case 'docks': return `${L('fish from the docks', 'ловить рыбу у причала')} ${got(D.docks[card]?.find((y) => y.cell === c.cell)?.n ?? 1, 'fish')}`;
-      case 'work': return `${L('work in the', 'работать:')} ${name(D.buildings[c.building], c.building).toLowerCase()} ${signs(c)}`;
-      case 'build': return `${L('build the', 'построить:')} ${name(D.buildings[c.building], c.building).toLowerCase()} ${signs(c)}`;
-      case 'found': return `${L('found a colony at', 'основать колонию на')} ${typeof P.inf === 'number' ? where(P.inf) : ''} ${signs(c)}`;
+      case 'docks': return `${t('advisor.fish_docks')} ${got(D.docks[card]?.find((y) => y.cell === c.cell)?.n ?? 1, 'fish')}`;
+      case 'work': return `${t('advisor.work')} ${name(D.buildings[c.building], c.building).toLowerCase()} ${signs(c)}`;
+      case 'build': return `${t('advisor.build')} ${name(D.buildings[c.building], c.building).toLowerCase()} ${signs(c)}`;
+      case 'found': return `${t('advisor.found_colony')} ${typeof P.inf === 'number' ? where(P.inf) : ''} ${signs(c)}`;
       case 'moveShip': return move(a, true);
       case 'moveInfantry': return move(a, false);
       case 'attack': {
         const x = D.settlements.find((y) => y.alive && y.cell === c.cell);
-        return `${L('attack', 'атаковать')} ${x ? `${tribe(x.n)} ${L('at', 'на')} ` : ''}${where(c.cell)} ${c.token === 'ship' ? L('with the ship', 'кораблём') : L('with the infantry', 'пехотой')}`;
+        return `${t('advisor.attack')} ${x ? `${tribe(x.n)} ${t('advisor.at')} ` : ''}${where(c.cell)} ${c.token === 'ship' ? t('advisor.ship') : t('advisor.infantry')}`;
       }
       case 'trade': {
         const sold = then.filter((k) => k.c === 'sell');
-        if (!sold.length) return `${L('sell in Europe, up to', 'продать в Европе, до')} ${Places.plus(Places.worth(card), 'gold')}`;
+        if (!sold.length) return `${t('advisor.sell_europe')} ${Places.plus(Places.worth(card), 'gold')}`;
         const gold = sold.reduce((n, k) => n + k.n * (D.sell[card]?.[k.r] ?? D.price[k.r as Resource]), 0);
-        return `${L('sell in Europe', 'продать в Европе')} ${sold.map((k) => Places.plus(-k.n, k.r)).join(' ')} ${Places.plus(gold, 'gold')}`;
+        return `${t('advisor.sell_europe2')} ${sold.map((k) => Places.plus(-k.n, k.r)).join(' ')} ${Places.plus(gold, 'gold')}`;
       }
       case 'hire': {
         const hired = then.filter((k) => k.c === 'buy');
-        if (!hired.length) return L('call new agents to the pier, then hire', 'обновить причал и нанять');
-        return `${L('hire', 'нанять')} ${hired.map((k) => `${agent(k.agent)} ${Places.price(card, k.agent) ? Places.plus(-Places.price(card, k.agent), 'gold') : L('free', 'даром')}`).join(', ')}`;
+        if (!hired.length) return t('advisor.call_new');
+        return `${t('advisor.hire')} ${hired.map((k) => `${agent(k.agent)} ${Places.price(card, k.agent) ? Places.plus(-Places.price(card, k.agent), 'gold') : t('places.free')}`).join(', ')}`;
       }
       case 'propaganda': {
         const won = then.filter((k) => k.c === 'take');
-        if (!won.length) return L('win over a Founding Father', 'привлечь отца-основателя');
-        return `${L('win over', 'привлечь:')} ${won.map((k) => `${name(D.fathers[k.father], k.father)} ${Places.plus(-D.fathers[k.father].bells, 'bells')}`).join(', ')}`;
+        if (!won.length) return t('advisor.win_over');
+        return `${t('advisor.win_over')} ${won.map((k) => `${name(D.fathers[k.father], k.father)} ${Places.plus(-D.fathers[k.father].bells, 'bells')}`).join(', ')}`;
       }
-      case 'repair': return L('repair 1 damage of the ship in Europe', 'починить 1 повреждение корабля в Европе');
-      case 'shipyard': return L('repair the ship fully at the shipyard', 'полностью починить корабль на верфи');
-      case 'teach': { const base = D.agents[card]?.base; return `${L('teach the', 'обучить:')} ${agent(c.target)} → ${base && D.agents[base] ? agent(base) : agent(card)}`; }
-      case 'customs': return `${L('sell at the custom house', 'продать на таможне')} ${signs(c)}`;
-      case 'smuggle': return `${L('smuggle', 'контрабанда')} ${signs(c)}`;
-      case 'supply': return `${L('supply', 'снабжение')} ${signs(c)}`;
-      case 'exchange': return `${L('exchange it and the', 'обменять его и')} ${agent(c.other)} ${L('for a new agent', 'на нового агента')}`;
-      case 'gift': return `${L('give a gift to the', 'подарок:')} ${tribe(c.settlement)} ${signs(c)}`;
-      case 'preach': return `${L('preach to the', 'проповедь:')} ${tribe(c.settlement)}, ${L('a native agent joins', 'агент-индеец присоединится')}`;
-      case 'alliance': return `${L('make an alliance with the', 'союз:')} ${tribe(c.settlement)}`;
+      case 'repair': return t('advisor.repair_1');
+      case 'shipyard': return t('advisor.repair_ship');
+      case 'teach': { const base = D.agents[card]?.base; return `${t('advisor.teach')} ${agent(c.target)} → ${base && D.agents[base] ? agent(base) : agent(card)}`; }
+      case 'customs': return `${t('advisor.sell_custom')} ${signs(c)}`;
+      case 'smuggle': return `${t('advisor.smuggle')} ${signs(c)}`;
+      case 'supply': return `${t('advisor.supply')} ${signs(c)}`;
+      case 'exchange': return `${t('advisor.exchange')} ${agent(c.other)} ${t('advisor.new_agent')}`;
+      case 'gift': return `${t('advisor.give_gift')} ${tribe(c.settlement)} ${signs(c)}`;
+      case 'preach': return `${t('advisor.preach')} ${tribe(c.settlement)}, ${t('advisor.native_agent')}`;
+      case 'alliance': return `${t('advisor.make_alliance')} ${tribe(c.settlement)}`;
+      case 'recruit': return `${t('advisor.recruit_look', { n: c.n })} ${Places.plus(-c.n, 'crosses')}`;
       default: return esc(pick(ACT[c.a] ?? [c.a, c.a]).toLowerCase());
     }
   })();
@@ -110,7 +94,7 @@ export function advisor() {
   if (!mine || (advice && advice !== 'thinking' && advice.at !== Sim.s.log.length)) advice = null;
   el.hidden = !advice;
   if (!advice) return;
-  el.innerHTML = advice === 'thinking' ? `<p>${L('Thinking…', 'Думаю…')}</p>` : `<h4>${L('Advisor', 'Советник')}</h4>${advice.list.map((x, i) => `<div class="adv"><span>${i + 1}. ${describe(x)}</span><button data-adv-do="${i}">${L('Play it', 'Сделать')}</button></div>`).join('') || `<p>${L('Nothing to suggest here.', 'Здесь нечего посоветовать.')}</p>`}<button class="x" data-adv-close>${L('Close', 'Закрыть')}</button>`;
+  el.innerHTML = advice === 'thinking' ? `<p>${t('advisor.thinking')}</p>` : `<h4>${t('advisor.advisor')}</h4>${advice.list.map((x, i) => `<div class="adv"><span>${i + 1}. ${describe(x)}</span><button data-adv-do="${i}">${t('advisor.play')}</button></div>`).join('') || `<p>${t('advisor.nothing_suggest')}</p>`}<button class="x" data-adv-close>${t('close')}</button>`;
 }
 
 document.addEventListener('click', (e) => {

@@ -62,6 +62,20 @@
 | DD-51 | Rule change "base-defence-4" (direct) dropped from pc. Why it was tried: A colony's own defence in the war is 1, too small against any share of the King's army |
 | DD-52 | Rule change "refusal-1-cube" (direct) promoted from pc to board: Refusing the tax adds 1 cube to the King's army, not 2 (solo unchanged). / Отказ от налога добавляет в армию короля 1 кубик, а не 2 (соло без изменений). Why: Each refusal adds 2 cubes to a pool shared by all patriots, so refusing is cheap for the refuser and costly for the others (H2). To carry into the sources: settings.tax.refuseRef → 1 (packages/data/src/settings.ts: tax.refuseRef) |
 
+## Decided by the designer (2026-11-27)
+
+| # | Decision |
+|---|---|
+| DD-53 | "Leader at round 5 wins … very rare" (Q14) meant that games rarely end by round 5. The target "games ending before round 8: under 25%" covers it; who leads at round 5 is still reported, with no target |
+| DD-54 | A ship damaged by any cause (battle, storm, pirates, wreck) goes to Europe, or next to an own colony if its owner has a shipyard (Q15, the default kept) |
+| DD-55 | A settlement revealed next to an existing colony is placed as usual: the distance rule limits founding only (Q16, the default kept) |
+| DD-56 | Forest gives timber only; fur needs a fur bonus (R-4) or a trapper (R-5). The document is right here and the spreadsheet is to be corrected, an exception to DD-6 (Q17). In `board` as `forest-timber-only` (`terrain.forest.yields` → timber). A trapper on plain forest now gives 1 fur, 2 with the bonus |
+| DD-57 | Supply stays as written: spend 1 food, play 1 card, draw 1. It is a way to swap a card, not to gain one; H13 is answered as intended (Q18) |
+| DD-58 | A 2-player game has no loyalist. The war plays as with 3+ players without the loyalist's steps: the King's army attacks both players' colonies alone and the game rolls the dice, as in W-12 without a loyalist (Q20). In `board` as `two-players-no-loyalist` (new setting `war.loyalistFrom`: 2 as printed, 3 in `board`) |
+| DD-59 | It should be easy for the loyalist to take a colony. The loyalist's threshold for taking a fallen colony (W-13) uses the same strength per cube as the attack, so DD-49 lowered it from 2 to 1 per cube; that is intended |
+| DD-60 | Rule change "recruit-action" (direct) promoted from pc to board: Recruit (action). Play any agent. Spend any number of crosses, at least the round number, and look at that many top agents of the Europe deck. You may put one in your discard; the rest go to the bottom of the Europe deck in any order. Recruiting is no longer free. Roger Williams: when recruiting, take up to 2 of the agents you look at. / Вербовка (действие). Сыграйте любого агента. Сбросьте любое количество ✝️, но не меньше номера тура, и посмотрите столько же верхних агентов колоды Европы. Одного можете положить в свой сброс, остальных — под низ колоды Европы в любом порядке. Вербовка больше не бесплатна. Роджер Уильямс: при вербовке возьми до 2 из просмотренных агентов. Why: Every action takes an agent, except recruiting with crosses (T-8), which can also be done with an empty hand. As a card action it needs more pull: the crosses spent buy that many looks, so saving crosses pays. To carry into the sources: settings.crosses.recruitAction → true (packages/data/src/settings.ts: crosses.recruitAction); fathers.roger_williams.mods → [{"mod":"recruitTake","value":2}] (Fathers, F22 (effect)) |
+| DD-61 | The King's army is called the Royal Army (Королевская армия) in the game, its rules and the rulebook. Entries above keep the wording they were decided with |
+
 ## Proposed in this PRD, awaiting confirmation
 
 | # | Proposal | Why | Cost if reversed |
@@ -79,19 +93,9 @@
 
 Work can start with the defaults. "Matters" is an estimate of the effect on results.
 
-| # | Question | Default used | Matters |
-|---|---|---|---|
-| Q14 | "Leader at round 5 wins": should the player with the highest score at round 5 rarely win in the end, or did the answer mean that games rarely end by round 5? | Reported, no target | Low |
-| Q15 | What happens to a ship damaged by a storm, pirates or a wreck? It cannot move, and repair needs Europe or a shipyard | Goes to Europe (or next to a colony with a shipyard), as after a lost battle | High |
-| Q16 | May a settlement appear next to an existing colony when a fragment is revealed? | Yes | Low |
-| Q17 | Does forest give fur without a fur bonus? The document (15:13) says timber only, the spreadsheet 🟫, 🟩 | Yes, as in the spreadsheet | Medium |
-| Q18 | Is Supply meant to gain an action? As written it plays 1 card to draw 1, so it only swaps a card for 1 food and a turn | As written | Medium |
-| Q19 | The war is one-sided: the loyalist wins 87–89% and 4–5% of colonies survive. Adopt package B (each cube attacks with 1, colonies defend with 4, refusing gives no bell)? Evidence and alternatives in [proposals.md](proposals.md) | Board unchanged | High |
-| Q20 | With 2 players the loyalist wins 62–89% under every package tried. Should a 2-player game have a loyalist at all, or another kind of war? | As written | High |
+None at the moment. Smaller defaults are marked **[D]** in [rules-spec.md](rules-spec.md).
 
-Smaller defaults are marked **[D]** in [rules-spec.md](rules-spec.md).
-
-Answered: Q1 (DD-11), Q2 (DD-12), Q3 (DD-13), Q4 (DD-22), Q5 (DD-14), Q6 (DD-15), Q7 (DD-23), Q8 (DD-26), Q9 (DD-27), Q10 (DD-28), Q11 (DD-29), Q12 (DD-30), Q13 (DD-31).
+Answered: Q1 (DD-11), Q2 (DD-12), Q3 (DD-13), Q4 (DD-22), Q5 (DD-14), Q6 (DD-15), Q7 (DD-23), Q8 (DD-26), Q9 (DD-27), Q10 (DD-28), Q11 (DD-29), Q12 (DD-30), Q13 (DD-31), Q14 (DD-53), Q15 (DD-54), Q16 (DD-55), Q17 (DD-56), Q18 (DD-57), Q19 (DD-49 to DD-52), Q20 (DD-58).
 
 ## Source edits still to make
 
@@ -101,12 +105,16 @@ Checked on the 15:13 versions. Done by the designer: activation rule, docks, oce
 |---|---|---|
 | Document, Принципы | Describe the two rings | DD-12 |
 | Document, Салон | "1 Отца-Основателя" → up to 2 | DD-22 |
-| Document, terrain table | Forest also gives crops, or correct the spreadsheet | Q17 |
+| Spreadsheet, terrain | Forest gives timber only, not 🟩 | DD-56 |
 | Document, starting decks and stars | Follow the spreadsheet | DD-6 |
 | Document, Торговец | Education 🎓 in the document, 📖 in the spreadsheet | DD-6 |
 | Document, Поселенец | "Базовых построек" is not in the spreadsheet; every building is cheaper | DD-6 |
 | Spreadsheet, Tiles | Remove 🌽 from tile 8 cell 3, tile 35 cell 6, tile 37 cell 7 (mountains) | DD-47 |
 | Document, Эквиано | Slaves go under the deck in the document, are removed in the spreadsheet | DD-6 |
-| Document, war | Each King's army cube attacks with 1 ⚔️, not 2 | DD-49 |
+| Document, war | Each Royal Army cube attacks with 1 ⚔️, not 2 | DD-49 |
 | Document, tax | Refusing the tax gives no bell | DD-50 |
-| Document, tax | Refusing the tax adds 1 cube to the King's army, not 2 (solo unchanged) | DD-52 |
+| Document, tax | Refusing the tax adds 1 cube to the Royal Army, not 2 (solo unchanged) | DD-52 |
+| Document, war | With 2 players there is no loyalist; the war plays without the loyalist's steps | DD-58 |
+| Document and spreadsheet | Call the King's army the Royal Army (Королевская армия) everywhere | DD-61 |
+| Document, Кресты | Recruiting is an action: play an agent, spend ✝️ (at least the round number), look at that many agents, take one to the discard, the rest to the bottom | DD-60 |
+| Spreadsheet, Fathers F22 | Roger Williams: when recruiting, take up to 2 of the agents you look at | DD-60 |

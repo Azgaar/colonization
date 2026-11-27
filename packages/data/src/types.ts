@@ -30,7 +30,7 @@ export type Mod =
   | { mod: 'noAttackNatives' } | { mod: 'preachFree' } | { mod: 'preachCalm' }
   | { mod: 'nativeHostility'; add: number } | { mod: 'allianceMax'; value: number }
   | { mod: 'fatherLimit'; value: number } | { mod: 'lootFactor'; value: number }
-  | { mod: 'recruitLook'; value: number } | { mod: 'foundCost'; resource: Resource; value: number }
+  | { mod: 'recruitLook'; value: number } | { mod: 'recruitTake'; value: number } | { mod: 'foundCost'; resource: Resource; value: number }
   | { mod: 'onReveal'; gold?: number; hold?: Partial<Record<Resource, number>>; ifLand?: boolean }
   | { mod: 'colonyDefence'; building: string; add: number }
   | { mod: 'militiaPerBell'; value: number } | { mod: 'freeMilitia'; value: number }
@@ -157,7 +157,11 @@ export interface Settings {
   hire: { max: number };
   pier: { slots: number };
   market: { maxPrice: number };
-  crosses: { max: number; recruitPerRound: number };
+  crosses: {
+    max: number; recruitPerRound: number;
+    /** Recruiting is a card action: spend at least the round number in crosses and look at that many agents. Off: a free look at the top agent (A-7, T-8). */
+    recruitAction: boolean;
+  };
   collection: { min: number };
   natives: { maxSettlements: number; maxHostility: number; allianceMax: number; allianceBreak: number; giftDice: number; giftBase: number; preachMin: number; afterAttack: number };
   activation: { giftMaxHostility: number; raidMinHostility: number; gift: number };
@@ -173,6 +177,8 @@ export interface Settings {
     bells: number; refStrength: number; hostileCubes: number; hostileFrom: number; allyCubes: number; mercenaryGold: number;
     diceCap: number; refStrengthIncludesTactic: boolean;
     tokenBonus: number; baseDefence: number;
+    /** Fewest players with a loyalist in the war (W-2). Solo never has one. */
+    loyalistFrom: number;
   };
   score: { patriotColony: number; loyalistColony: number; perBell: number; agentsPerPoint: number; goldPerPoint: number; building: number; father: number };
 }

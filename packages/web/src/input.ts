@@ -1,6 +1,6 @@
 /* Lifting, hovering and dropping agents; clicks and keys. */
 import { clearNews } from './ui/reports.ts';
-import { art, colonyAt, D, L, me, P, pick, RES, settlementAt } from './data.ts';
+import { art, colonyAt, D, me, P, pick, RES, settlementAt, t } from './data.ts';
 import { act, cargo, commit, focus, go, read, settle } from './flow.ts';
 import { Board, PICK } from './map/board.ts';
 import { paint } from './paint.ts';
@@ -21,7 +21,7 @@ function hover(x: number, y: number) {
   const id = find(x, y);
   if (id !== S.over) { document.querySelectorAll('.over').forEach((e) => e.classList.remove('over')); S.over = id; if (id && !id.startsWith('cell:')) document.querySelector(`[data-space="${id}"]`)?.classList.add('over'); Board.draw(); }
   const b = bub(), s = id && S.card ? Places.spaces(S.card)[id] : null;
-  if (id?.startsWith('cell:') && s?.options?.length) { const o = s.options, v = settlementAt(+id.slice(5)); b.classList.toggle('ch', !!v); const say = (o.length === 1 ? `<b>${Places.verb(o[0])}</b> ${Places.effect(o[0]).join(' ')}` : `<b>${[...new Set(o.map(Places.verb))].join(L(' or ', ' или '))}</b>`) + (s.site ? `<small class="st">⚑ ${L('a colony can be founded here', 'здесь можно основать колонию')}</small>` : ''); b.innerHTML = (v ? `<img src="${art.tribe(v.tribe)}" alt=""><i>${pick(D.names.tribes[v.tribe])}</i><span>${say}</span>` : say); b.hidden = false; b.style.left = `${Math.min(innerWidth - 120, Math.max(120, x))}px`; b.style.top = `${y - 46}px`; } else b.hidden = true;
+  if (id?.startsWith('cell:') && s?.options?.length) { const o = s.options, v = settlementAt(+id.slice(5)); b.classList.toggle('ch', !!v); const say = (o.length === 1 ? `<b>${Places.verb(o[0])}</b> ${Places.effect(o[0]).join(' ')}` : `<b>${[...new Set(o.map(Places.verb))].join(t('input.or'))}</b>`) + (s.site ? `<small class="st">⚑ ${t('input.colony_founded')}</small>` : ''); b.innerHTML = (v ? `<img src="${art.tribe(v.tribe)}" alt=""><i>${pick(D.names.tribes[v.tribe])}</i><span>${say}</span>` : say); b.hidden = false; b.style.left = `${Math.min(innerWidth - 120, Math.max(120, x))}px`; b.style.top = `${y - 46}px`; } else b.hidden = true;
 }
 function drop(x: number, y: number) {
   const id = find(x, y), s = id ? Places.spaces(S.card)[id] : null;
@@ -74,7 +74,7 @@ document.addEventListener('click', async (e: MouseEvent) => {
   if ((x = q('[data-opt]'))) { const at = S.pickAt, o = at && Places.spaces(S.card)[at.id]?.options?.[+x.dataset.opt!]; if (at && o) commit(o, at.id); return; }
   if (q('[data-agent]')) return;
   if (S.card && !q('button:not([data-space])')) { const id = find(e.clientX, e.clientY); if (id && drop(e.clientX, e.clientY)) return; if (S.pickAt && !q('.kp')) { S.pickAt = null; paint(); return; } }
-  if (Sim.busy && !q('[data-menu],[data-fast],[data-mute],[data-sheet],[data-king],[data-deck]')) return;
+  if (Sim.busy && !q('[data-menu],[data-fast],[data-mute],[data-sheet],[data-king],[data-vp],[data-deck]')) return;
   if (q('[data-ok]')) read();
   else if ((x = q('[data-do]'))) act(JSON.parse(x.dataset.do!));
   else if ((x = q('[data-cargo]'))) cargo(x.dataset.cargo!, x.dataset.r ?? '');
@@ -95,20 +95,21 @@ document.addEventListener('click', async (e: MouseEvent) => {
   else if (q('[data-reset]')) { Object.assign(Board.view, Board.VIEW); keepOptions(); Board.look(); Board.land(); paint(); }
   else if ((x = q('[data-cam]'))) { const c = x.dataset.cam; if (c === 'in' || c === 'out') Board.stage.zoomBy(c === 'in' ? 1.25 : 0.8); else if (c === 'home') Board.home(); else Board.fit(); }
   else if (q('[data-auto]')) { const r = D.round; U.menu = false; await Sim.auto((s) => s.round > r || !!s.war); clearNews(); Sim.news(); settle(); }
-  else if (q('[data-menu]')) { U.menu = !U.menu; U.king = U.sheet = false; paint(); }
-  else if (q('[data-king]')) { U.king = !U.king; U.sheet = U.menu = false; paint(); }
-  else if (q('[data-sheet]')) { U.sheet = !U.sheet; U.king = U.menu = false; paint(); }
-  else if (q('[data-deck]')) { U.deck = !U.deck; U.king = U.sheet = U.menu = false; paint(); }
+  else if (q('[data-menu]')) { U.menu = !U.menu; U.king = U.sheet = false; U.vp = null; paint(); }
+  else if (q('[data-king]')) { U.king = !U.king; U.sheet = U.menu = false; U.vp = null; paint(); }
+  else if ((x = q('[data-vp]'))) { const i = +x.dataset.vp!; U.vp = U.vp === i ? null : i; U.king = U.menu = false; paint(); }
+  else if (q('[data-sheet]')) { U.sheet = !U.sheet; U.king = U.menu = false; U.vp = null; paint(); }
+  else if (q('[data-deck]')) { U.deck = !U.deck; U.king = U.sheet = U.menu = false; U.vp = null; paint(); }
   else if (q('[data-close]')) { S.view = 'map'; paint(); }
   else if ((x = q('[data-go]'))) { const g = x.dataset.go; if (!deciding() && (g === 'colony' || g === 'europe')) { S.view = S.view === g ? 'map' : g; U.peek = null; paint(); } }
-  else if (document.contains(el) && ((U.menu && !q('.menu')) || (U.king && !q('.kingbox')))) { U.menu = U.king = false; paint(); }
+  else if (document.contains(el) && ((U.menu && !q('.menu')) || ((U.king || U.vp !== null) && !q('.kingbox')))) { U.menu = U.king = false; U.vp = null; paint(); }
 });
 // The map sliders of the game menu: seen at once while dragged, kept when let go; a new tilt grows the trees differently, so the land is painted again.
 document.addEventListener('input', (e) => { const el = e.target as HTMLInputElement, k = el.dataset.viewSet as keyof typeof Board.view | undefined; if (!k) return; Board.view[k] = +el.value; el.nextElementSibling!.textContent = `${Board.view[k]}${el.dataset.unit}`; Board.look(); });
 document.addEventListener('change', (e) => { const k = (e.target as HTMLElement).dataset.viewSet; if (!k) return; keepOptions(); if (['tilt', 'most'].includes(k)) void Board.land(); });
 addEventListener('keydown', (e: KeyboardEvent) => {
   // Esc puts down or closes what is open, one thing at a time; with nothing left open on the map, it opens the options menu.
-  if (e.key === 'Escape' && !U.title) { put(); if (S.pickAt) S.pickAt = null; else if (S.card) S.card = null; else if (S.war >= 0) S.war = -1; else if (U.menu || U.king || U.sheet || U.deck) U.menu = U.king = U.sheet = U.deck = false; else if (S.view !== 'map') S.view = 'map'; else U.menu = true; bub().hidden = true; paint(); }
+  if (e.key === 'Escape' && !U.title) { put(); if (S.pickAt) S.pickAt = null; else if (S.card) S.card = null; else if (S.war >= 0) S.war = -1; else if (U.vp !== null) U.vp = null; else if (U.menu || U.king || U.sheet || U.deck) U.menu = U.king = U.sheet = U.deck = false; else if (S.view !== 'map') S.view = 'map'; else U.menu = true; bub().hidden = true; paint(); }
   if (e.key === 'Enter' && X.reports.length && !Sim.busy) { e.preventDefault(); read(); }
   if (/^[1-9]$/.test(e.key) && Sim.kind() === 'turn' && !Sim.busy && P.hand[+e.key - 1]) { S.card = P.hand[+e.key - 1]; S.pickAt = null; paint(); }
 });

@@ -1,6 +1,6 @@
 /* Events, ruins and wrecks: what their cards say, in words and signs. */
 import type { Cost, Node, PoiCardDef } from '@col/data';
-import { D, L, me, pick, t } from '../data.ts';
+import { D, me, pick, t } from '../data.ts';
 import { icon } from '../icons.ts';
 import { Sim, type Entry } from '../sim.ts';
 import { Texts } from '../texts.ts';
@@ -19,22 +19,22 @@ function says(n: Node): string {
   switch (n.n) {
     case 'gain': case 'lose': {
       const k = n.n === 'gain' ? 1 : -1, got = n.n === 'gain' ? n : null;
-      return [...GBC.filter((q) => n[q]).map((q) => plus(k * (n[q] ?? 0), q)), ...stock(got?.wh).map(([q, v]) => plus(k * v, q)), ...stock(got?.hold).map(([q, v]) => `${plus(k * v, q)} <small>${L('into the hold', 'в трюм')}</small>`)].join(' ');
+      return [...GBC.filter((q) => n[q]).map((q) => plus(k * (n[q] ?? 0), q)), ...stock(got?.wh).map(([q, v]) => plus(k * v, q)), ...stock(got?.hold).map(([q, v]) => `${plus(k * v, q)} <small>${t('cards.hold')}</small>`)].join(' ');
     }
-    case 'endMove': return L('the move ends', 'ход фишки окончен');
-    case 'moves': return `+${n.add} ${L(n.add === 1 ? 'move' : 'moves', 'хода')}`;
-    case 'toEurope': return L('sent to Europe', 'отправка в Европу') + skull;
-    case 'damage': return `${n.amount} ${L('damage', 'повр.')}${skull}`;
-    case 'hostilityNearest': return `${n.add > 0 ? '+' : '−'}${Math.abs(n.add)} ${icon('anger', 18)} <small>${L('nearest settlement', 'ближайшее поселение')}</small>`;
-    case 'discardCards': return L(`discard ${n.amount} card${n.amount > 1 ? 's' : ''}`, `сбросить карт: ${n.amount}`);
-    case 'pierLeftmost': return L('the first agent from the pier joins', 'первый агент с причала ваш');
-    case 'drawPoi': return L('draw another card', 'ещё одна карта');
-    case 'guide': return L(`look at ${n.look} cards, play one`, `посмотреть ${n.look} карты, разыграть одну`);
-    case 'revealAdjacent': return L('reveal the fragments around', 'открыть соседние фрагменты');
-    case 'freeBasicBuilding': return L('a free basic building', 'базовая постройка бесплатно');
-    case 'toColonyWater': return L('moved next to your colony', 'перенос к вашей колонии');
+    case 'endMove': return t('cards.move_ends');
+    case 'moves': return `+${n.add} ${t('cards.moves', { n: n.add })}`;
+    case 'toEurope': return t('cards.sent_europe') + skull;
+    case 'damage': return `${n.amount} ${t('cards.damage')}${skull}`;
+    case 'hostilityNearest': return `${n.add > 0 ? '+' : '−'}${Math.abs(n.add)} ${icon('anger', 18)} <small>${t('cards.nearest_settlement')}</small>`;
+    case 'discardCards': return t('cards.discard', { n: n.amount });
+    case 'pierLeftmost': return t('cards.first_agent');
+    case 'drawPoi': return t('cards.draw_another');
+    case 'guide': return t('cards.look_cards', { look: n.look });
+    case 'revealAdjacent': return t('cards.reveal_fragments');
+    case 'freeBasicBuilding': return t('cards.free_basic');
+    case 'toColonyWater': return t('cards.moved_next');
     case 'takeAgent': { const a = Object.values(D.agents).find((x) => x.base === n.agent); return `${n.amount} × ${pick(a || ['', ''])}`; }
-    case 'dropHold': return L('lose the cargo', 'потеря груза');
+    case 'dropHold': return t('cards.lose_cargo');
     case 'ref': return plus(n.add ?? 0, 'ref');
     default: return '';
   }
@@ -42,8 +42,8 @@ function says(n: Node): string {
 export const all = (list: Node[] | undefined) => (list || []).filter((n) => n.n !== 'roll' && n.n !== 'choice').map(says).filter(Boolean).join(', ');
 /** The roll among the effects, if there is one. */
 export const rollOf = (list: Node[] | undefined) => (list || []).find((n): n is Extract<Node, { n: 'roll' }> => n.n === 'roll');
-export const table = (list: Node[] | undefined) => { const q = rollOf(list); if (!q) return ''; let from = 1; return `<ul class="rl">${q.table.map((x) => { const span = from === x.max ? `${from}` : `${from}–${x.max}`; from = x.max + 1; return `<li><i>${span}</i>${all(x.do) || L('nothing', 'ничего')}</li>`; }).join('')}</ul>`; };
-export const costs = (k: Cost = {}) => [...GBC.filter((q) => k[q]).map((q) => plus(-(k[q] ?? 0), q)), k.cards ? `−${k.cards} ${L(k.cards === 1 ? 'card from hand' : 'cards from hand', 'карт с руки')}` : '', k.anyFood ? plus(-k.anyFood, 'food') : '', k.anyResource ? L(`−${k.anyResource} any good`, `−${k.anyResource} любой товар`) : '', k.holdResource ? L(`−${k.holdResource} good from the hold`, `−${k.holdResource} товар из трюма`) : '', k.wholeHold ? L(`the whole cargo, at least ${k.wholeHold}`, `весь груз, не меньше ${k.wholeHold}`) : '', k.agent ? `${k.agent === 'scout' ? L('needs a scout', 'нужен скаут') : `${L('needs an agent with', 'нужен агент с')} ${icon('sword', 15)}`}` : ''].filter(Boolean).join(', ');
+export const table = (list: Node[] | undefined) => { const q = rollOf(list); if (!q) return ''; let from = 1; return `<ul class="rl">${q.table.map((x) => { const span = from === x.max ? `${from}` : `${from}–${x.max}`; from = x.max + 1; return `<li><i>${span}</i>${all(x.do) || t('cards.nothing')}</li>`; }).join('')}</ul>`; };
+export const costs = (k: Cost = {}) => [...GBC.filter((q) => k[q]).map((q) => plus(-(k[q] ?? 0), q)), k.cards ? `−${k.cards} ${t('cards.from_hand', { n: k.cards })}` : '', k.anyFood ? plus(-k.anyFood, 'food') : '', k.anyResource ? t('cards.good', { anyResource: k.anyResource }) : '', k.holdResource ? t('cards.good_hold', { holdResource: k.holdResource }) : '', k.wholeHold ? t('cards.whole_cargo', { wholeHold: k.wholeHold }) : '', k.agent ? `${k.agent === 'scout' ? t('cards.needs_scout') : `${t('cards.needs_agent')} ${icon('sword', 15)}`}` : ''].filter(Boolean).join(', ');
 export const poiCard = (e: Entry, body: string, buttons = '') => bigCard(e.deck, e.card, pick(D.names[e.deck === 'ruin' ? 'ruins' : 'wrecks'][e.card]), t(e.deck), `${flav(e.deck, e.card)}${body}`, buttons);
 export const sinceEvent = (): Entry[] => { const l = Sim.s.log, i = l.findLastIndex((x) => x.e === 'event'); return i < 0 ? [] : l.slice(i + 1); };
 const flav = (k: keyof typeof D.flavor, id: string) => (D.flavor[k][id] ? `<p class="flav">${D.flavor[k][id]}</p>` : '');

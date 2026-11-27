@@ -1,10 +1,11 @@
 /* What every place means for the agent in hand: the options there, or why there are none. All options come from the rules engine. */
 import type { BuildingWork, Mod } from '@col/data';
 import { map } from '@col/engine';
-import { ACT, art, D, L, me, P, pick, RES, why as reason } from './data.ts';
+import { ACT, art, D, me, P, pick, why as reason, RES, t } from './data.ts';
 import { icon } from './icons.ts';
 import { Sim, type Opt } from './sim.ts';
 import type { Snapshot } from './view.ts';
+import { playerEmblem } from './emblem.ts';
 
 type Settlement = Snapshot['settlements'][number];
 /** What is missing for an option: amounts and icons, e.g. 2 timber. */
@@ -29,7 +30,7 @@ const ico = (i: string) => ({ corn: 'food', leaf: 'crops', fur: 'crops' } as Rec
 const homes = () => D.colonies.filter((c) => c.owner === me);
 const inEurope = () => D.zone[P.ship] === 'europe';
 const sum = (x: Record<string, number>) => RES.reduce((n, r) => n + x[r], 0);
-const AWAY = () => L('The ship must be in Europe', 'Корабль должен быть в Европе');
+const AWAY = () => t('places.ship_europe');
 /* ---- ways over the map ---- */
 /** Cells a token can reach with these points, with the way there. Infantry aboard may step ashore, which costs a point. */
 function ways(token: 'ship' | 'infantry', points: number): Map<number, Way> {
@@ -54,28 +55,30 @@ function spaces(card: string | null): Spaces { if (!card) return {}; if (kept?.c
 const price = (card: string, id: string) => Math.max(0, (D.agents[id].price ?? 0) + mods(allMods(card), 'cost').filter((m) => m.of === 'hire').reduce((n, m) => n + m.add, 0));
 const worth = (card: string | null) => RES.reduce((n, r) => n + P.hold[r] * (card ? D.sell[card]?.[r] ?? D.price[r] : D.price[r]), 0);
 function work(card: string): Spaces {
-  const list = new Map((D.actions[card] || []).map((a) => [a.action as string, a])), has = (a: string) => (list.get(a)?.options || []) as Opt[], why = (a: string, f = '') => { const w = list.get(a)?.why; return w ? reason(w) : f; }, out: Spaces = {}, only = D.agents[card].mods.some((m) => m.mod === 'onlyProduce'), gathers = L('Gathers only', 'Только добыча');
+  const list = new Map((D.actions[card] || []).map((a) => [a.action as string, a])), has = (a: string) => (list.get(a)?.options || []) as Opt[], why = (a: string, f = '') => { const w = list.get(a)?.why; return w ? reason(w) : f; }, out: Spaces = {}, only = D.agents[card].mods.some((m) => m.mod === 'onlyProduce'), gathers = t('places.gathers');
   // Buildings that stand.
   for (const b of P.buildings) {
     const w = D.buildings[b].work, k = w?.kind, need = uses(w), act = k ? ({ produce: 'work', ocean: 'docks', sell: 'customs', repair: 'shipyard', teach: 'teach' } as Record<string, string>)[k] : undefined;
     let o: Opt[] = k === 'produce' ? has('work').filter((q) => q.building === b) : k === 'ocean' ? has('docks').map((o) => ({ ...o, n: D.docks[card]?.find((y) => y.cell === o.cell)?.n ?? 1 })).sort((a, b) => b.n - a.n).slice(0, 1) : act ? has(act) : [];
     if (k === 'ocean' && !has('docks').length) o = [];
-    out[`lot:${b}`] = o.length ? { options: o } : { why: !w ? L('Works by itself', 'Работает само') : only && k !== 'produce' && k !== 'ocean' ? gathers : D.buildings[b].edu > D.agents[card].edu ? L('Needs more education', 'Нужно образование') : need && P.wh[need.res] < need.amount ? L('Needs crops', 'Нужно сырьё') : why(act ?? '', L('Not now', 'Недоступно')), passive: !w, need: !w || (only && k !== 'produce' && k !== 'ocean') ? null : D.buildings[b].edu > D.agents[card].edu ? [['', D.buildings[b].edu === 2 ? 'cap' : 'book']] : need && P.wh[need.res] < need.amount ? [[need.amount - P.wh[need.res], need.res]] : null };
+    out[`lot:${b}`] = o.length ? { options: o } : { why: !w ? t('places.works_itself') : only && k !== 'produce' && k !== 'ocean' ? gathers : D.buildings[b].edu > D.agents[card].edu ? t('places.needs_education') : need && P.wh[need.res] < need.amount ? t('places.needs_crops') : why(act ?? '', t('why')), passive: !w, need: !w || (only && k !== 'produce' && k !== 'ocean') ? null : D.buildings[b].edu > D.agents[card].edu ? [['', D.buildings[b].edu === 2 ? 'cap' : 'book']] : need && P.wh[need.res] < need.amount ? [[need.amount - P.wh[need.res], need.res]] : null };
   }
   // Buildings that could stand.
   for (const [b, def] of Object.entries(D.buildings)) if (!P.buildings.includes(b)) {
     const o = has('build').filter((q) => q.building === b), cost = D.build[card]?.[b] ?? def.timber;
-    out[`build:${b}`] = o.length ? { options: o, cost } : { cost, why: only ? gathers : !homes().length ? L('Needs a colony', 'Нужна колония') : D.left[b] <= 0 ? L('None left', 'Больше нет') : P.buildings.length >= D.settings.buildings.max ? L('No free place', 'Нет места') : def.requires && !P.buildings.includes(def.requires) ? `${L('Needs', 'Нужно')}: ${pick(D.buildings[def.requires]).toLowerCase()}` : L('Too little timber', 'Мало древесины'), need: !only && homes().length && D.left[b] > 0 && P.buildings.length < D.settings.buildings.max && !(def.requires && !P.buildings.includes(def.requires)) && cost > P.wh.timber ? [[cost - P.wh.timber, 'timber']] : null, wants: def.requires && !P.buildings.includes(def.requires) ? def.requires : null };
+    out[`build:${b}`] = o.length ? { options: o, cost } : { cost, why: only ? gathers : !homes().length ? t('places.needs_colony') : D.left[b] <= 0 ? t('places.none_left') : P.buildings.length >= D.settings.buildings.max ? t('places.no_free') : def.requires && !P.buildings.includes(def.requires) ? `${t('places.needs')}: ${pick(D.buildings[def.requires]).toLowerCase()}` : t('places.too_little'), need: !only && homes().length && D.left[b] > 0 && P.buildings.length < D.settings.buildings.max && !(def.requires && !P.buildings.includes(def.requires)) && cost > P.wh.timber ? [[cost - P.wh.timber, 'timber']] : null, wants: def.requires && !P.buildings.includes(def.requires) ? def.requires : null };
   }
   // Europe.
   const away = only ? gathers : inEurope() ? null : AWAY(), play = (a: string, x: Record<string, unknown> = {}): Opt => ({ c: 'play', card, a, ...x });
-  out['eu:market'] = away ? { why: away } : sum(P.hold) ? { options: [play('trade', { all: true })] } : { why: L('The hold is empty', 'Трюм пуст') };
-  out['eu:some'] = away || sum(P.hold) < 2 ? { why: away || L('The hold is empty', 'Трюм пуст') } : { options: [play('trade')] };
-  for (const [id] of D.pier) { const p = price(card, id); out[`pier:${id}`] = away ? { why: away, cost: p } : p <= P.gold ? { cost: p, options: [play('hire', { agent: id })] } : { cost: p, why: L('Too little gold', 'Мало золота'), need: [[p - P.gold, 'gold']] }; }
+  out['eu:market'] = away ? { why: away } : sum(P.hold) ? { options: [play('trade', { all: true })] } : { why: t('places.hold_empty') };
+  out['eu:some'] = away || sum(P.hold) < 2 ? { why: away || t('places.hold_empty') } : { options: [play('trade')] };
+  for (const [id] of D.pier) { const p = price(card, id); out[`pier:${id}`] = away ? { why: away, cost: p } : p <= P.gold ? { cost: p, options: [play('hire', { agent: id })] } : { cost: p, why: t('places.too_little2'), need: [[p - P.gold, 'gold']] }; }
   out['pier:new'] = away ? { why: away } : { options: [play('hire', { refresh: true })] };
   const full = (!has('propaganda').length && why('propaganda')) || '';
-  for (const f of D.salon) out[`salon:${f}`] = away ? { why: away } : D.fathers[f].bells > P.bells ? { why: L('Too few bells', 'Мало колоколов'), need: [[D.fathers[f].bells - P.bells, 'bells']] } : has('propaganda').length ? { options: [play('propaganda', { father: f })] } : { why: full };
-  out['eu:yard'] = away ? { why: away } : has('repair').length ? { options: has('repair') } : { why: L('No damage', 'Нет повреждений') };
+  for (const f of D.salon) out[`salon:${f}`] = away ? { why: away } : D.fathers[f].bells > P.bells ? { why: t('places.too_few'), need: [[D.fathers[f].bells - P.bells, 'bells']] } : has('propaganda').length ? { options: [play('propaganda', { father: f })] } : { why: full };
+  // Recruiting as an action works anywhere: the deck beside the pier takes the card.
+  if (D.settings.crosses.recruitAction) out['eu:recruit'] = has('recruit').length ? { options: has('recruit') } : { why: only ? gathers : why('recruit', t('why')), need: !only && P.crosses < D.recruit ? [[D.recruit - P.crosses, 'crosses']] : null };
+  out['eu:yard'] = away ? { why: away } : has('repair').length ? { options: has('repair') } : { why: t('places.no_damage') };
   // The map.
   const cell = (c: number, x: Space) => { const id = `cell:${c}`; out[id] = { ...(out[id] || {}), ...x, options: [...(out[id]?.options || []), ...(x.options || [])] }; };
   // Gathering: the engine's options, with the amount each would bring.
@@ -87,12 +90,12 @@ function work(card: string): Spaces {
   for (const a of ['gift', 'preach', 'alliance']) for (const o of has(a)) { const x = D.settlements[o.settlement - 1]; cell(x.cell, { village: x, options: [o] }); }
   for (const o of has('attack')) cell(o.cell, { attack: true, options: [o] });
   if (has('found').length && typeof P.inf === 'number') cell(P.inf, { found: true, options: has('found') });
-  out.found = has('found').length && typeof P.inf === 'number' ? { options: has('found'), cell: P.inf } : { why: only ? gathers : why('found', L('Not now', 'Недоступно')) };
+  out.found = has('found').length && typeof P.inf === 'number' ? { options: has('found'), cell: P.inf } : { why: only ? gathers : why('found', t('why')) };
   if (has('moveShip').length) { for (const [c, n] of ways('ship', points(card, 'ship'))) cell(c, { options: [play('moveShip', { cell: c, path: n.path, foot: n.foot })], sea: !n.foot, foot: n.foot, site: n.foot && !map.colonyProblem(Sim.s, c) }); if (typeof P.ship === 'number') cell(P.ship, { own: 'ship', options: [play('moveShip', { cell: P.ship, path: [] })] }); }
   if (has('moveInfantry').length && typeof P.inf === 'number') { for (const [c, n] of ways('infantry', points(card, 'infantry'))) cell(c, { options: [play('moveInfantry', { cell: c, path: n.path, foot: true })], foot: true, site: !map.colonyProblem(Sim.s, c) }); cell(P.inf, { own: 'infantry', options: [play('moveInfantry', { cell: P.inf, path: [] })] }); }
   // The hand and the piles.
   for (const q of has('exchange')) out[`who:${q.other}`] = { options: [q] };
-  out.deck = has('supply').length ? { options: has('supply') } : { why: only ? gathers : why('supply', L('Needs 1 food', 'Нужна 1 еда')), need: !only && P.wh.food < 1 ? [[1, 'food']] : null };
+  out.deck = has('supply').length ? { options: has('supply') } : { why: only ? gathers : why('supply', t('places.needs_1')), need: !only && P.wh.food < 1 ? [[1, 'food']] : null };
   if (has('smuggle').length) out.smuggle = { options: has('smuggle') };
   return out;
 }
@@ -102,21 +105,22 @@ function effect(o: Opt): string[] {
   if (o.a === 'produce') return [plus(o.n, ico(o.icon))];
   if (o.a === 'docks') return [plus(o.n, 'fish')];
   if (o.a === 'work') { const w = D.buildings[o.building].work; if (w?.kind !== 'produce') return []; const n = D.works[o.card]?.[o.building]; return [...(w.consumes ? [plus(-w.consumes.amount, w.consumes.res)] : []), plus(typeof n === 'number' ? n : w.amount, ico(w.icon))]; }
-  if (o.a === 'build') return [plus(-(D.build[o.card]?.[o.building] ?? 0), 'timber')];
+  if (o.a === 'build') return [plus(-(D.build[o.card]?.[o.building] ?? 0), 'timber'), plus(D.settings.score.building, 'vp')];
   if (o.a === 'trade') return o.all ? [plus(worth(o.card), 'gold')] : [];
-  if (o.a === 'hire') return o.refresh ? [] : [price(o.card, o.agent) ? plus(-price(o.card, o.agent), 'gold') : L('free', 'даром')];
-  if (o.a === 'propaganda') return [plus(-D.fathers[o.father].bells, 'bells')];
+  if (o.a === 'hire') return o.refresh ? [] : [price(o.card, o.agent) ? plus(-price(o.card, o.agent), 'gold') : t('places.free')];
+  if (o.a === 'propaganda') return [plus(-D.fathers[o.father].bells, 'bells'), plus(D.settings.score.father, 'vp')];
   if (o.a === 'customs') return [plus(-1, o.r), plus(D.sell[o.card][o.r], 'gold')];
   if (o.a === 'smuggle') return [plus(-1, o.r), `+ ${icon('gold', 18)}`];
-  if (o.a === 'supply') return [plus(-1, 'food'), L('draw 1', 'взять 1')];
-  if (o.a === 'exchange') return [L('draw 1', 'взять 1')];
+  if (o.a === 'supply') return [plus(-1, 'food'), t('places.draw_1')];
+  if (o.a === 'exchange') return [t('places.draw_1')];
   if (o.a === 'gift') return [plus(-1, 'goods'), `${icon('anger', 17)} −1–4`];
-  if (o.a === 'preach') return [L('native agent', 'агент-индеец')];
-  if (o.a === 'found') return homes().length ? [plus(-5, 'food')] : [L('free', 'даром')];
+  if (o.a === 'preach') return [t('places.native_agent')];
+  if (o.a === 'recruit') return [plus(-o.n, 'crosses')];
+  if (o.a === 'found') return [...(homes().length ? [plus(-5, 'food')] : []), plus(D.settings.score.patriotColony, 'vp')];
   if (o.path && !o.path.length) return [];
   return [];
 }
-const verb = (o: Opt): string => (o.a === 'hire' ? (o.refresh ? L('New agents on the pier', 'Обновить причал') : pick(D.agents[o.agent])) : o.a === 'propaganda' ? pick(D.fathers[o.father]) : o.a === 'build' || o.a === 'work' ? pick(D.buildings[o.building]) : o.a === 'teach' ? pick(D.agents[o.target]) : o.a === 'customs' || o.a === 'smuggle' ? pick(D.names.resources[o.r]) : o.a === 'trade' && o.all ? L('Sell everything', 'Продать всё') : o.path && !o.path.length ? (o.a === 'moveShip' ? L('Load, unload, explore', 'Погрузка, разведка') : L('Explore, go aboard', 'Разведка, посадка')) : o.foot && o.a === 'moveShip' ? L('Land the infantry', 'Высадить пехоту') : pick(ACT[o.a] || [o.a, o.a]));
+const verb = (o: Opt): string => (o.a === 'hire' ? (o.refresh ? t('places.new_agents') : pick(D.agents[o.agent])) : o.a === 'propaganda' ? pick(D.fathers[o.father]) : o.a === 'build' || o.a === 'work' ? pick(D.buildings[o.building]) : o.a === 'teach' ? pick(D.agents[o.target]) : o.a === 'recruit' ? t('places.look', { n: o.n }) : o.a === 'customs' || o.a === 'smuggle' ? pick(D.names.resources[o.r]) : o.a === 'trade' && o.all ? t('places.sell_everything') : o.path && !o.path.length ? (o.a === 'moveShip' ? t('places.load_unload') : t('places.explore_go')) : o.foot && o.a === 'moveShip' ? t('places.land_infantry') : pick(ACT[o.a] || [o.a, o.a]));
 const face = (o: Opt): string | null => (o.a === 'hire' && o.agent ? art.agent(o.agent) : o.father ? art.father(o.father) : o.building ? art.building(o.building) : o.a === 'docks' ? art.building('docks') : o.target ? art.agent(o.target) : null);
 const lack = (s: Space | undefined) => (s?.need ? s.need.map(([n, i]) => `<span class="lack" title="${s.why}">${n}${icon(i, 17)}</span>`).join('') : '');
 function label(s: Space | undefined): string {
@@ -133,6 +137,6 @@ function army() {
   return { ref: D.war ? D.war.pool : D.ref, hostile, pool, loyal, targets: targets.length, per };
 }
 const tokens = (id: string) => Sim.placed.filter((x) => x.space === id).map((x) => `<span class="placed" title="${pick(D.agents[x.card])}"><img src="${art.agent(x.card)}" alt=""></span>`).join('');
-const em = (p: number, s = 34) => `<span class="em" style="--c:${D.players[p].color};width:${s}px;height:${s}px"><img src="${art.emblem(D.players[p].nation)}" alt=""></span>`;
+const em = playerEmblem;
 const name = (p: number) => pick(D.names.nations[D.players[p].nation]);
 export const Places = { spaces, forget, ways, effect, verb, face, label, lack, army, tokens, em, name, homes, inEurope, worth, price, sum, ico, AWAY, plus };

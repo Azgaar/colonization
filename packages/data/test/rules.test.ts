@@ -4,7 +4,7 @@ import readWorkbook from 'read-excel-file/node';
 import { describe, expect, it } from 'vitest';
 import { importWorkbook, type RawSheet } from '../src/import.ts';
 import {
-  addDecision, changeList, compileRuleset, conversionReport, dropOverride, editable, gameData, loadRuleset, promoteOverride, sourceMap, sourceOf,
+  addDecision, changeList, compileRuleset, conversionReport, dropOverride, editable, flattenRuleset, gameData, loadRuleset, promoteOverride, rulesets, sourceMap, sourceOf,
   toCsv, validateChange, type Override, type Ruleset,
 } from '../src/index.ts';
 
@@ -35,7 +35,7 @@ describe('adding and removing cards', () => {
     expect(() => compile({ remove: ['events.stamp_act'], conversion: 'interface' }, false)).toThrow(/interface only/);
     expect(compile({ remove: ['events.stamp_act'], conversion: 'direct', table: 'Take Stamp Act out of the event deck' }, false).events.stamp_act).toBeUndefined();
   });
-  it('pc is board plus its own changes', () => { expect(loadRuleset('pc').rulesetHash).toBe(loadRuleset('board').rulesetHash); });
+  it('pc is board plus its own changes', () => { expect(flattenRuleset(rulesets.pc, rulesets).overrides).toEqual([...rulesets.board.overrides, ...rulesets.pc.overrides]); });
 });
 
 describe('sources and change lists', () => {

@@ -4,8 +4,8 @@ import { advise, botForLevel, goalBot, PERSONALITIES, type Bot, type Level, type
 import type { GameDef } from '@col/data';
 import { defOf, ids } from './rules.ts';
 import { exportRules, exportState, type GameView } from './view.ts';
-import { fx, hear, keepSound } from './sound.ts';
-import { devOptions, keepOptions, Options } from './options.ts';
+import { fx, hear } from './sound.ts';
+import { keepOptions, Options } from './options.ts';
 
 /** A log entry or a decision as the interface reads them: the engine keeps their fields loose. */
 export type Entry = LogEntry & Record<string, any>;
@@ -35,7 +35,7 @@ const SAVE = 'game', wait = (ms: number) => new Promise((r) => setTimeout(r, ms)
 export const LOCAL = typeof location !== 'undefined' && /^(localhost|127\.0\.0\.1|\[::1\]|.+\.local)$/.test(location.hostname);
 /** Dev mode, switched in Options and kept in this browser: the Dev menu (edit the game, force dice and cards, any seat, unlimited undo, other rules mid-game) and, if chosen, the forecast. */
 export const Dev = {
-  get on() { return LOCAL && Options.dev; }, set on(v: boolean) { Options.dev = v; if (v) devOptions(); keepSound(); },
+  get on() { return LOCAL && Options.dev; }, set on(v: boolean) { Options.dev = v; keepOptions(); },
   get forecast() { return Dev.on && Options.forecast; }, set forecast(v: boolean) { Options.forecast = v; keepOptions(); },
 };
 /** Log entries that show something hidden: dice, a new tile, a card from a deck. Undo stops there (FR-U-12). */

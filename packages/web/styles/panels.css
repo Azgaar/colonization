@@ -41,12 +41,27 @@
 .vs b { font:800 44px/1 var(--sc);display:block }
 .vs small { font-size:15px }
 .sgs { display:grid;gap:7px }
-.step .sg { display:grid;grid-template-columns:34px 1fr auto;gap:12px;align-items:center;text-align:left;padding:7px 14px }
+.nums { font:800 22px var(--sc);white-space:nowrap }
+.step .sg { display:grid;grid-template-columns:34px minmax(0,1fr) auto 128px;gap:12px;align-items:center;text-align:left;padding:7px 14px }
+.sgn { display:flex;flex-direction:column;min-width:0 }
 .sg b { display:block }
 .sg small { opacity:.8 }
-.step .sg[disabled] { opacity:1 }
-.nums { font:800 22px var(--sc);white-space:nowrap }
-.sg .nums b { display:inline }
+.step .sg[disabled] { opacity:1;cursor:default }
+.sgv { display:flex;flex-direction:column;gap:3px }
+.sgv .nums { display:flex;justify-content:space-between;font:800 18px/1 var(--sc) }
+.sgv .nums b { color:#93e09c }
+.sgv .nums i { font-style:normal;color:#ff9a82 }
+.sgv .wtug { height:7px }
+.sgv small { font-size:12.5px;text-align:center }
+/* The King's soldiers as little figures, wherever the war is shown. */
+.wmen { display:inline-flex;flex-wrap:wrap;align-items:center;max-width:180px }
+.wmen svg { width:20px;height:20px;margin:-2px -4px }
+.wmen em { font:800 14px var(--sc);font-style:normal;margin-left:6px }
+/* How many militia, mercenaries or cubes: round tokens, the number big and what it costs or brings under it. */
+.step .tok { width:56px;height:56px;padding:0;border-radius:50%;display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;background:#ffffff1a;box-shadow:inset 0 0 0 2px #f7f1e133 }
+.step .tok b { font:800 21px/1 var(--sc) }
+.step .tok small { display:inline-flex;align-items:center;gap:2px;font-size:12px;margin:0 }
+.step .tok:hover:not([disabled]) { background:#ffffff33;box-shadow:inset 0 0 0 2px var(--ochre) }
 .nums i { font-style:normal;color:#ff9a82 }
 .step.bar { display:flex;align-items:center;gap:14px;background:#0f3436f7;border-radius:99px;padding:9px 12px 9px 24px;box-shadow:0 10px 34px #000b;white-space:nowrap;bottom:26px }
 .step.bar .ttl { font-size:19px }

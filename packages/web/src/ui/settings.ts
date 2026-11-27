@@ -1,6 +1,7 @@
 /* The settings, drawn the same in both places they are changed: the title screen's Options page and the game menu.
  * A section heading, then rows: a name on the left, its switch, choices or slider on the right. A switch is the whole row, so a click anywhere on it turns it. */
-import { L, lang } from '../data.ts';
+import { lang, msg, t } from '../data.ts';
+import { inLang, LOCALES } from '../i18n.ts';
 import { Board } from '../map/board.ts';
 import { Dev, LOCAL, Sim } from '../sim.ts';
 import { Music, Sound } from '../sound.ts';
@@ -26,9 +27,9 @@ const named = (m: { composer: string; title: string }) => (m.composer ? `${short
 function player() {
   const n = Music.now, f = Music.file, off = Sound.mute ? ' disabled' : '';
   const all = Music.all.map((m) => ({ file: m.file, name: named(m) })).sort((a, b) => a.name.localeCompare(b.name));
-  const list = all.length ? `<select data-music-pick aria-label="${L('Piece', 'Произведение')}"${n ? ` title="${esc(`${n.composer ? `${n.composer}: ` : ''}${n.title}${n.by ? `\n${n.by}` : ''}`)}"` : ''}${off}>${n ? '' : `<option value="" selected disabled>${L('No music yet', 'Музыки пока нет')}</option>`}${all.map((m) => `<option value="${m.file}"${m.file === f ? ' selected' : ''}>${esc(m.name)}</option>`).join('')}</select>` : '';
-  const name = `<span class="tn">${list || `<small>${L('No music yet', 'Музыки пока нет')}</small>`}${n?.by ? `<small>${esc(n.by)}</small>` : ''}</span>`;
-  return `${name}<span class="ctl"><button data-music="toggle" aria-label="${Music.paused ? L('Play', 'Играть') : L('Pause', 'Пауза')}" title="${Music.paused ? L('Play', 'Играть') : L('Pause', 'Пауза')}"${off}>${svg(Music.paused ? PLAY : PAUSE)}</button><button data-music="next" aria-label="${L('Next piece', 'Следующая')}" title="${L('Next piece', 'Следующая')}"${off}>${svg(NEXT)}</button></span>`;
+  const list = all.length ? `<select data-music-pick aria-label="${t('settings.piece')}"${n ? ` title="${esc(`${n.composer ? `${n.composer}: ` : ''}${n.title}${n.by ? `\n${n.by}` : ''}`)}"` : ''}${off}>${n ? '' : `<option value="" selected disabled>${t('settings.no_music')}</option>`}${all.map((m) => `<option value="${m.file}"${m.file === f ? ' selected' : ''}>${esc(m.name)}</option>`).join('')}</select>` : '';
+  const name = `<span class="tn">${list || `<small>${t('settings.no_music')}</small>`}${n?.by ? `<small>${esc(n.by)}</small>` : ''}</span>`;
+  return `${name}<span class="ctl"><button data-music="toggle" aria-label="${Music.paused ? t('settings.play') : t('settings.pause')}" title="${Music.paused ? t('settings.play') : t('settings.pause')}"${off}>${svg(Music.paused ? PLAY : PAUSE)}</button><button data-music="next" aria-label="${t('settings.next_piece')}" title="${t('settings.next_piece')}"${off}>${svg(NEXT)}</button></span>`;
 }
 if (typeof document !== 'undefined') document.addEventListener('music', () => document.querySelectorAll<HTMLElement>('.prefs .player').forEach((el) => { el.innerHTML = player(); }));
 
@@ -36,22 +37,22 @@ if (typeof document !== 'undefined') document.addEventListener('music', () => do
 export function settings(inGame: boolean) {
   const v = Board.view;
   const slide = ([k, n, lo, hi, u]: [keyof typeof v, string, number, number, string]) => `<label class="orow range"><span>${n}</span><input type="range" data-view-set="${k}" data-unit="${u}" min="${lo}" max="${hi}" value="${v[k]}"><output>${v[k]}${u}</output></label>`;
-  const general = `<section>${head(L('General', 'Общие'))}
-${seg(L('Language', 'Язык'), [['data-lang="en"', 'English', lang() === 'en'], ['data-lang="ru"', 'Русский', lang() === 'ru']])}
-${row(L('Tutorial', 'Обучение'), tutorialOn(), ['data-tutorial="1"', 'data-tutorial=""'])}
-${row(L('Show others’ turns', 'Показывать чужие ходы'), !Sim.fast, ['data-fast=""', 'data-fast="1"'])}</section>`;
-  const sound = `<section>${tog('ohead', L('Sound', 'Звук'), !Sound.mute, ['data-mute=""', 'data-mute="1"'])}
+  const general = `<section>${head(t('settings.general'))}
+${seg(t('settings.language'), Object.keys(LOCALES).map((l) => [`data-lang="${l}"`, inLang(l, msg('lang.name')), lang() === l]))}
+${row(t('settings.tutorial'), tutorialOn(), ['data-tutorial="1"', 'data-tutorial=""'])}
+${row(t('settings.show_others'), !Sim.fast, ['data-fast=""', 'data-fast="1"'])}</section>`;
+  const sound = `<section>${tog('ohead', t('settings.sound'), !Sound.mute, ['data-mute=""', 'data-mute="1"'])}
 <div class="orow player">${player()}</div>
-${vol('music', L('Music', 'Музыка'))}${vol('fx', L('Effects', 'Эффекты'))}</section>`;
-  const map = `<section>${head(L('Map', 'Карта'), `<button class="pill" data-reset>${L('Reset', 'Сбросить')}</button>`)}
-${inGame ? seg(L('Camera', 'Камера'), [['data-cam="out" aria-label="−"', '−'], ['data-cam="in" aria-label="+"', '+'], ['data-cam="home"', L('Start', 'Начало')], ['data-cam="fit"', L('All', 'Всё')]]) : ''}
-${row(L('Tilt follows zoom', 'Наклон по масштабу'), !!v.auto, ['data-follow="1"', 'data-follow=""'])}
-${inGame ? `${slide(v.auto ? ['most', L('Closest tilt', 'Наклон вблизи'), 20, 70, '°'] : ['tilt', L('Tilt', 'Наклон'), 0, 45, '°'])}
-${slide(['depth', L('Perspective', 'Перспектива'), 0, 100, '%'])}
-${slide(['shift', L('Shift', 'Сдвиг'), -25, 25, '%'])}` : ''}
-${row(L('Cell grid', 'Сетка клеток'), Board.grid, ['data-grid="1"', 'data-grid=""'])}</section>`;
-  const dev = LOCAL ? `<section>${tog('ohead', L('Dev mode', 'Режим разработчика'), Dev.on, ['data-dev="1"', 'data-dev=""'])}
-${Dev.on ? row(L('Forecast in play', 'Прогноз в игре'), Dev.forecast, ['data-forecast="1"', 'data-forecast=""']) : ''}
-${Dev.on && inGame && Sim.sandbox ? `<div class="orow"><span>${L('Edit the game', 'Правка игры')}</span><button class="pill" data-sandbox>${L('Dev menu', 'Меню разработчика')}</button></div>` : ''}</section>` : '';
+${vol('music', t('settings.music'))}${vol('fx', t('settings.effects'))}</section>`;
+  const map = `<section>${head(t('map'), `<button class="pill" data-reset>${t('settings.reset')}</button>`)}
+${inGame ? seg(t('settings.camera'), [['data-cam="out" aria-label="−"', '−'], ['data-cam="in" aria-label="+"', '+'], ['data-cam="home"', t('settings.start')], ['data-cam="fit"', t('settings.all')]]) : ''}
+${row(t('settings.tilt_follows'), !!v.auto, ['data-follow="1"', 'data-follow=""'])}
+${inGame ? `${slide(v.auto ? ['most', t('settings.closest_tilt'), 20, 70, '°'] : ['tilt', t('settings.tilt'), 0, 45, '°'])}
+${slide(['depth', t('settings.perspective'), 0, 100, '%'])}
+${slide(['shift', t('settings.shift'), -25, 25, '%'])}` : ''}
+${row(t('settings.cell_grid'), Board.grid, ['data-grid="1"', 'data-grid=""'])}</section>`;
+  const dev = LOCAL ? `<section>${tog('ohead', t('settings.dev_mode'), Dev.on, ['data-dev="1"', 'data-dev=""'])}
+${Dev.on ? row(t('settings.forecast_play'), Dev.forecast, ['data-forecast="1"', 'data-forecast=""']) : ''}
+${Dev.on && inGame && Sim.sandbox ? `<div class="orow"><span>${t('settings.edit_game')}</span><button class="pill" data-sandbox>${t('sandbox.dev_menu')}</button></div>` : ''}</section>` : '';
   return `<div class="prefs">${general}${sound}${map}${dev}</div>`;
 }

@@ -4,9 +4,9 @@
   "overrides": [
     {
       "id": "cube-strength-1",
-      "why": "The King's army grows with every refusal at every seat (about 104 cubes at 4 players); colonies are defended by about 5, so 5% survive and the loyalist wins 87%",
+      "why": "The Royal Army grows with every refusal at every seat (about 104 cubes at 4 players); colonies are defended by about 5, so 5% survive and the loyalist wins 87%",
       "conversion": "direct",
-      "table": "Each King's army cube attacks with 1 ⚔️, not 2. / Каждый кубик армии короля атакует с силой 1 ⚔️, а не 2.",
+      "table": "Each Royal Army cube attacks with 1 ⚔️, not 2. / Каждый кубик королевской армии атакует с силой 1 ⚔️, а не 2.",
       "set": {
         "settings.war.refStrength": 1
       }
@@ -15,7 +15,7 @@
       "id": "refusal-no-bell",
       "why": "Refusing is free in bells and feeds the race to 15: refusals give 9 of 15 bells and end games early",
       "conversion": "direct",
-      "table": "Refusing the tax adds cubes to the King's army but gives no bell. / Отказ от налога добавляет кубики в армию короля, но не даёт колокола.",
+      "table": "Refusing the tax adds cubes to the Royal Army but gives no bell. / Отказ от налога добавляет кубики в королевскую армию, но не даёт колокола.",
       "set": {
         "settings.tax.refuseBells": 0
       }
@@ -24,9 +24,44 @@
       "id": "refusal-1-cube",
       "why": "Each refusal adds 2 cubes to a pool shared by all patriots, so refusing is cheap for the refuser and costly for the others (H2)",
       "conversion": "direct",
-      "table": "Refusing the tax adds 1 cube to the King's army, not 2 (solo unchanged). / Отказ от налога добавляет в армию короля 1 кубик, а не 2 (соло без изменений).",
+      "table": "Refusing the tax adds 1 cube to the Royal Army, not 2 (solo unchanged). / Отказ от налога добавляет в королевскую армию 1 кубик, а не 2 (соло без изменений).",
       "set": {
         "settings.tax.refuseRef": 1
+      }
+    },
+    {
+      "id": "forest-timber-only",
+      "why": "Designer's answer to Q17 (DD-56): the document is right, forest gives timber; fur needs a fur bonus or a trapper",
+      "conversion": "direct",
+      "table": "Forest gives timber only; fur needs a fur bonus or a trapper. / Лес даёт только древесину; мех — только с бонусом меха или траппером.",
+      "set": {
+        "terrain.forest.yields": [
+          "timber"
+        ]
+      }
+    },
+    {
+      "id": "two-players-no-loyalist",
+      "why": "Designer's answer to Q20 (DD-58): with one patriot against one loyalist, whoever has fewer bells wins 62–89% of games",
+      "conversion": "direct",
+      "table": "With 2 players there is no loyalist: the war plays as usual without the loyalist's steps, and the Royal Army attacks alone. / При 2 игроках лоялиста нет: война идёт как обычно, без шагов лоялиста, королевская армия атакует сама.",
+      "set": {
+        "settings.war.loyalistFrom": 3
+      }
+    },
+    {
+      "id": "recruit-action",
+      "why": "Every action takes an agent, except recruiting with crosses (T-8), which can also be done with an empty hand. As a card action it needs more pull: the crosses spent buy that many looks, so saving crosses pays",
+      "conversion": "direct",
+      "table": "Recruit (action). Play any agent. Spend any number of crosses, at least the round number, and look at that many top agents of the Europe deck. You may put one in your discard; the rest go to the bottom of the Europe deck in any order. Recruiting is no longer free. Roger Williams: when recruiting, take up to 2 of the agents you look at. / Вербовка (действие). Сыграйте любого агента. Сбросьте любое количество ✝️, но не меньше номера тура, и посмотрите столько же верхних агентов колоды Европы. Одного можете положить в свой сброс, остальных — под низ колоды Европы в любом порядке. Вербовка больше не бесплатна. Роджер Уильямс: при вербовке возьми до 2 из просмотренных агентов.",
+      "set": {
+        "settings.crosses.recruitAction": true,
+        "fathers.roger_williams.mods": [
+          {
+            "mod": "recruitTake",
+            "value": 2
+          }
+        ]
       }
     }
   ]

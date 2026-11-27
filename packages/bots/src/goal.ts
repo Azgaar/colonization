@@ -237,6 +237,8 @@ function scoreTurn(x: Situation): Considered[] {
       case 'gift': { const z = s.settlements[(c.settlement as number) - 1]; score = (z.ally === null && s.hostility[z.tribe] >= 2 ? 0.5 * allyValue(x) : 0) + (s.hostility[z.tribe] >= 4 && x.colonies ? 0.5 : 0) - x.res.goods - (x.last ? 0.6 : 0.1); break; }
       case 'preach': score = preachValue(x, 0) - 0.12 * w.cross * util.combinedHostility(s, me, s.settlements[(c.settlement as number) - 1].tribe); break;
       case 'alliance': score = allyValue(x); break;
+      // Each extra look is a better pick.
+      case 'recruit': score = (0.5 + agentValue(x, 'colonist')) * (0.9 + Math.min(0.5, 0.06 * ((c.n as number) - 1))) - (c.n as number) * w.cross * 1.1; break;
     }
     base.push({ choice: c, score, why, ...(to !== undefined ? { to } : {}) });
   }

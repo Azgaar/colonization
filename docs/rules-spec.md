@@ -54,12 +54,12 @@ Note: `причал` names both the pier in Europe and the Docks building. Code 
 |---|---|
 | T-1 | **Draw.** Each player draws up to 5 agents. An empty deck is refilled by shuffling the discard, also in mid-draw |
 | T-2 | **Actions.** Clockwise, one card and one action per turn. Passing ends the round for that player, who keeps or discards **[D]** any subset of the remaining cards |
-| T-3 | A player with no cards must pass |
+| T-3 | A player with no cards must pass. Every action takes an agent, recruiting too (DD-60) |
 | T-4 | **Event.** When all have passed, resolve the top event (section V) |
 | T-5 | **Tax.** If the rate is above 0, each player pays in full, or refuses: +1 🟥 to the REF (DD-52; was +2) (solo: +3 🟥), and no 🔔 (DD-50; was +1 🔔). A player who cannot pay in full must refuse **[D]** |
 | T-6 | **End.** Check for war (W-1), advance the round and year (1620 + 20 per round), pass the first-player marker left |
 | T-7 | At the end of a player's turn, warehouse excess is discarded by choice. **[D]** The check also applies after events |
-| T-8 | Free actions, such as recruiting with crosses, happen on one's own turn, any number of times **[D]** |
+| T-8 | There are no free actions: recruiting takes an agent (DD-60; was free, on one's own turn, any number of times) |
 
 ## P. Playing a card
 
@@ -87,7 +87,7 @@ Note: `причал` names both the pier in Europe and the Docks building. Code 
 | M-11 | Entering an unexplored ruin or wreck triggers it at once (section X). "Token ends its move" stops further movement in this action |
 | M-12 | Infantry sent to Europe waits off the map. **[D]** Its ship may board it from any Europe cell for 1 point |
 | M-13 | A ship sent to Europe goes to the nearest free Europe cell **[D]**, with its infantry and, unless stated, its cargo |
-| M-14 | **[D]** A ship that takes damage from any cause goes to Europe, or next to an own colony if its owner has a shipyard (`damage.sendsToEurope = true`). Otherwise a ship damaged by a storm or wreck could never be repaired, since it cannot move. Q15 |
+| M-14 | **[A]** A ship that takes damage from any cause goes to Europe, or next to an own colony if its owner has a shipyard (`damage.sendsToEurope = true`, DD-54). Otherwise a ship damaged by a storm or wreck could never be repaired, since it cannot move |
 
 ## F. Colonies
 
@@ -111,7 +111,7 @@ Require the player's ship on a Europe cell.
 | A-4 | Discarded pier cards form a common discard, reshuffled when the agent deck is empty **[D]** |
 | A-5 | **Propaganda.** Take up to 2 Fathers for bells **[A]**. Limit 4 Fathers in total |
 | A-6 | **Repair.** Remove 1 damage in Europe. With own shipyard, all damage when next to an own colony |
-| A-7 | **Cross recruitment** (free, no ship needed): pay crosses equal to the round number, look at the top agent, take it to the discard, return it, or put it on the bottom |
+| A-7 | **Recruit** (DD-60, no ship needed): spend any number of ✝️, at least the round number, and look at that many top agents of the Europe deck. Put one in the discard or none; the rest go to the bottom. Roger Williams takes up to 2. Was: free, pay the round number to look at the top agent, take it, return it or put it on the bottom |
 
 ## C. Combat
 
@@ -121,7 +121,7 @@ Require the player's ship on a Europe cell.
 | C-2 | Both sides then secretly add any number of hand cards. The defender may add the unseen top card of their deck |
 | C-3 | Strength = number of cards, including the played one **[A]**, plus matching ⚔️ bonuses, plus terrain and other bonuses. Cards without ⚔️ count 1 |
 | C-4 | **[D]** Each side uses the ⚔️ of its own token: a ship's battle uses ship ⚔️, anything else infantry ⚔️. A bombarding side uses the higher of the two on each card. Terrain-bound bonuses (highlander) look at the fighter's own cell |
-| C-5 | Attacker's strength not greater: the attack fails, no further effect. Otherwise roll dice equal to the difference; 4 and 5 are successes. One success = 1 damage. **[D]** `combat.diceCap = none` outside the war |
+| C-5 | Attacker's strength not greater: the attack fails, no further effect. Otherwise roll dice equal to the difference; 5 and 6 are successes. One success = 1 damage. **[D]** `combat.diceCap = none` outside the war |
 | C-6 | **Land token:** 1+ damage sends the defender to Europe. Tokens are never destroyed |
 | C-7 | **Ship vs ship:** each damage fills one hold slot (maximum 4 **[D]**); the loser moves to Europe, or next to an own colony if its owner has a shipyard. Winner takes cargo up to free hold space; the rest is lost if the winner wishes. Cargo beyond the damaged hold's capacity is discarded. Infantry that beats a ship takes no cargo **[D]** |
 | C-8 | **Colony:** defender gets +1, terrain, stockade +1 or fort +2 (a fort replaces the stockade **[D]**). Each success: take 1 chosen resource to own warehouse, or destroy 1 of the cheapest buildings. Destroying a building an improvement depends on is not allowed while the improvement stands **[D]**. Infantry then moves to the attacker's nearest colony, or to Europe if none **[D]**; a bombarding ship stays **[D]**. Infantry inside a colony cannot be attacked separately **[D]** |
@@ -136,7 +136,7 @@ Require the player's ship on a Europe cell.
 | ID | Rule |
 |---|---|
 | R-1 | **Produce on a cell:** 1 resource from a colony's cell (it may be worked itself **[A]**) or one of its 8 neighbours that is empty. **[D]** Empty means no colony, settlement or token |
-| R-2 | Terrain yields: forest timber or crops (fur); grassland food or crops (leaf); mountains silver; ocean food (fish); desert and tundra nothing |
+| R-2 | Terrain yields: forest timber only **[A]** (DD-56; fur needs a fur bonus or a trapper; `board` sets `terrain.forest.yields`); grassland food or crops (leaf); mountains silver; ocean food (fish); desert and tundra nothing |
 | R-3 | **Ocean.** Working an ocean cell directly gives 1 food (fish) and needs no building. Docks are a building to work in (R-7, no education needed): the agent works an ocean cell through them for +1, so 2 food **[A]** . The player picks an eligible ocean cell (R-1), so its fish bonus adds +1, and a fisherman +1 more: up to 4 food **[A]** |
 | R-4 | A cell's bonus icon adds +1 when that resource is produced. **[D]** A bonus on terrain that does not normally yield the resource allows producing it, for 1 in total |
 | R-5 | Agent and Father bonuses add to each matching production. A location-bound agent bonus (cossack, trapper, planter) also allows that production where the terrain yields nothing **[A]**. The cossack gives 2 crops on empty tundra |
@@ -146,7 +146,7 @@ Require the player's ship on a Europe cell.
 | R-9 | **Build:** pay timber, at most 6 buildings, one of each type. **[D]** An improvement requires the basic building, which stays and keeps its slot |
 | R-10 | **School and university:** the played agent is the teacher. Another card in hand is replaced by a copy of the teacher's type from the agent deck or common discard; both cards go to the player's discard, the replaced one to the common discard **[D]**. School teaches 📖 professions, university also 🎓, never unique agents; the teacher's own education must fit. Not allowed if no copy is available **[D]** |
 | R-11 | **Custom house:** sell 1 resource from the warehouse at market price, trader bonus included **[D]**; it counts towards demand **[D]** |
-| R-12 | **Supply:** spend 1 food, draw 1 card |
+| R-12 | **Supply:** spend 1 food, draw 1 card. A swap, not a gain **[A]** (DD-57) |
 | R-13 | **Exchange:** discard 2 cards, the played one included **[D]**, draw 1 |
 | R-14 | **Smuggling** (smuggler): sell 1 warehouse resource at price -1; does not count towards demand **[D]** |
 | R-15 | Crosses are capped at 15. Bells have no cap |
@@ -168,7 +168,7 @@ Require the player's ship on a Europe cell.
 | N-11 | **Activation of settlement N [A].** Affects the owner of the colony nearest to that settlement. Hostility 0–2: the owner receives 1 food. 3: nothing. 4–5: raid on that colony (N-12). Nothing happens if settlement N or any colony does not exist **[A]**. **[D]** A gift that does not fit falls under T-7 |
 | N-12 | **Raid** on the nearest colony (straight distance; ties by turn order **[D]**): its owner discards 2 resources or loses 1 building; a fort prevents it. With fewer than 2 resources and no buildings, all resources are lost **[D]** |
 | N-13 | Pocahontas lowers hostility by 1 for her owner in all checks, but not the stored value |
-| N-14 | **[D]** A settlement revealed next to an existing colony is placed as usual: the distance rule limits founding only. Q16 |
+| N-14 | **[A]** A settlement revealed next to an existing colony is placed as usual: the distance rule limits founding only (DD-55) |
 
 ## B. Founding Fathers
 
@@ -220,7 +220,7 @@ All 34 cards are implemented as printed in the spreadsheet. Clarifications:
 | ID | Rule |
 |---|---|
 | W-1 | Starts at the end of a round, after tax, if any player has 15 🔔 or round 10 is over |
-| W-2 | Loyalist is the player with the fewest 🔔 (then fewest ✝️, then fewest 🟡 **[D]** on direction). No loyalist in solo **[A]**, or if every player has 15+ 🔔. The second case needs all to reach 15 in the same final round, and is meant to be very rare **[A]** |
+| W-2 | Loyalist is the player with the fewest 🔔 (then fewest ✝️, then fewest 🟡 **[D]** on direction). No loyalist in solo **[A]** or with 2 players **[A]** (DD-58: the war plays without the loyalist's steps; `war.loyalistFrom = 3` in `board`, 2 as printed), or if every player has 15+ 🔔. The second case needs all to reach 15 in the same final round, and is meant to be very rare **[A]** |
 | W-3 | Draw one King tactic |
 | W-4 | REF pool = accumulated 🟥, plus 1 per settlement with hostility 4–5, plus tactic additions |
 | W-5 | Deal 🟥 one per patriot colony, in order of most 🔔 (then ✝️, 🟡), repeating until the pool is empty. **[D]** Within a player, colonies go in founding order |
@@ -231,7 +231,7 @@ All 34 cards are implemented as printed in the spreadsheet. Clarifications:
 | W-10 | Defence = 1 + terrain + buildings + 1 per own token on or next to the colony + cards' ⚔️ + support cubes |
 | W-11 | A colony not attacked, with no 🟥 and no loyalist card, is kept **[D]** |
 | W-12 | If attack is greater, the loyalist rolls (solo and no loyalist: the game rolls **[D]**) dice equal to the difference, at most 10. No success: colony holds. 1+ success: colony falls. Equal or less: colony holds |
-| W-13 | If the colony falls and the loyalist's own strength there is at least the REF strength, the loyalist takes it. REF strength = 2 × 🟥 + tactic **[D]** |
+| W-13 | If the colony falls and the loyalist's own strength there is at least the REF strength, the loyalist takes it. REF strength = 1 × 🟥 (as W-9, `war.refStrength`) + tactic. Taking a colony is meant to be easy **[A]** (DD-59) |
 | W-14 | Tactics modify the above as printed in the spreadsheet. Loyalist Militia has no effect without a loyalist **[D]** |
 | W-15 | Sieges are resolved in the same player order as W-5; all commitments are fixed beforehand |
 

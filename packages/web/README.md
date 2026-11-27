@@ -56,12 +56,13 @@ Builds `dist/app.js`, the lab's worker `dist/lab-worker.js` and the list of soun
 | `forecast.ts` | The standing forecast, from the shown seat's view |
 | `view.ts` | What the interface reads from a game state (`GameView`), only what the shown seat may know |
 | `data.ts` | The view object `D` and the shown player `P`, language (`pick`, `L`, `t`), words, art paths |
+| `i18n.ts`, `../locales/` | Every word of the interface, one file per language (`en.json`, `ru.json`); a new language is a new file, offered in Options by its `lang.name`. Code says `t('file.word', { name })` for text shown now and `msg(…)` for text kept in data and said later by `pick`; plurals and ordinals as `{n, plural, one {…} other {…}}` and `{n, selectordinal, …}`; a missing word falls back to English. Keys are short: the file, then one or two words. Card names and Russian card texts come from the workbook. The first language shown is the browser's, until one is picked in Options. `test/i18n.test.ts` checks that every language has every key with the same placeholders, and that every key the code names exists |
 | `state.ts` | What the interface is doing: `S` (agent in hand, open screen, clicked cell), `U` (open boxes), `X` (decision panels and reports) |
 | `places.ts` | What every place means for the agent in hand: the engine's options there, or why there are none |
 | `flow.ts` | Choices to the engine, then the bots play until it is the player's decision again |
 | `input.ts` | Dragging and dropping agents, hovering, clicks, keys |
 | `paint.ts` | `paint()` draws everything again after any change. Call it rather than a single painter |
-| `icons.ts`, `texts.ts`, `plural.ts` | Flat pictograms and emblems; card texts in both languages; Russian number forms |
+| `icons.ts`, `texts.ts` | Flat pictograms and emblems; card texts (Russian as printed in the workbook, other languages from the locale files) |
 | `map/` | `board.ts` the map and what stands on it, `camera.ts` pan, zoom and tilt, `terrain.ts` the painted ground and sea, `sprites.ts` and `towns.ts` ships, infantry, villages, colonies, `bonus.ts` bonus resources on the ground |
 | `ui/` | One module per part of the screen: `top`, `hand`, `fans` (choices off the map and the glimpse behind a door), `scenes` (Colony and Europe), `look` (a clicked cell), `decisions` (a panel per decision), `reports`, `cards` and `news` (events, ruins, wrecks, other players' turns), `war`, `title`, `attract`, `newgame` and `intro` (the title screen, its living map, the new game screen, the opening film), `setup` (starting games, files, replays), `toasts`, `goods`, `kit` (shared pieces), `bench`, `lab` and `md` (the design bench and its reports), `sandbox` (the Dev menu), `advisor`, `tutorial` and `guide` (the coach and the rules) |
 

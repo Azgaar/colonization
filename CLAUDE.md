@@ -10,4 +10,4 @@
 - Don't show what's already on screen: no repeated counts, headers or subtitles.
 - Keep labels plain: no "Bot" in difficulty names, no "…" in menu items.
 - Dev-only features (Sandbox, Forecast, Dev menu) appear only in dev mode, switched in Options.
-- Switch dev mode on in Options when opening the game (it turns the music off), and stop the servers and browsers you started.
+- Open the game with the sound off (Options → Sound), and stop the servers and browsers you started.

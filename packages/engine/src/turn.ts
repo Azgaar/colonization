@@ -184,6 +184,12 @@ export function actionsFor(s: State, p: number, card: string): { action: string;
   add('customs', !customs ? 'needs a custom house' : a.edu < building(s, customs).edu ? 'not enough education' : total(pl.wh) ? null : 'the warehouse is empty', stockKinds(pl.wh).map((r) => ({ r })));
   if (cardHas(s, card, 'smuggle')) add('smuggle', noColony ?? (total(pl.wh) ? null : 'the warehouse is empty'), stockKinds(pl.wh).map((r) => ({ r })));
 
+  if (set.crosses.recruitAction) {
+    // Crosses spent = agents looked at, at least the round number; looking past the whole deck shows nothing more.
+    const min = recruitCost(s), most = Math.min(pl.crosses, s.agentDeck.length + s.agentDiscard.length);
+    add('recruit', s.agentDeck.length + s.agentDiscard.length ? (pl.crosses >= min ? null : `needs ${min} crosses`) : 'the deck is empty',
+      Array.from({ length: Math.max(0, most - min + 1) }, (_, i) => ({ n: min + i })));
+  }
   add('supply', noColony ?? (pl.wh.food < 1 ? 'needs 1 food' : pl.deck.length + pl.discard.length ? null : 'no card to draw'));
   const others = uniq(pl.hand.filter((_, i) => i !== pl.hand.indexOf(card)));
   add('exchange', null, others.map((other) => ({ other })));
@@ -205,7 +211,7 @@ decision('turn', {
     // T-3: without cards there is nothing but to pass.
     if (!pl.hand.length) return [{ c: 'pass' }];
     const out: Choice[] = uniq(pl.hand).flatMap((card) => actionsFor(s, d.player, card).flatMap((x) => x.options));
-    if (pl.crosses >= recruitCost(s) && s.agentDeck.length + s.agentDiscard.length > 0) out.push({ c: 'recruit' });
+    if (!s.def.settings.crosses.recruitAction && pl.crosses >= recruitCost(s) && s.agentDeck.length + s.agentDiscard.length > 0) out.push({ c: 'recruit' });
     out.push({ c: 'pass' });
     return out;
   },
@@ -292,6 +298,10 @@ const actions: Record<string, (s: State, p: number, c: any) => void> = {
     gainNative(s, p);
     if (!mods(s, p, 'preachCalm').length) setHostility(s, x.tribe, s.hostility[x.tribe] + 1);
     reducePopulation(s, x, 1);
+  },
+  recruit(s, p, c) {
+    addCrosses(s, p, -c.n, 'recruit');
+    push(s, { t: 'recruit', p, n: c.n });
   },
   alliance(s, p, c) { s.settlements[c.settlement - 1].ally = p; log(s, { e: 'alliance', p, settlement: c.settlement }); },
 };
@@ -390,22 +400,25 @@ export function gainFather(s: State, p: number, f: string) {
 }
 
 task('recruit', (s, t) => {
-  const look = mods(s, t.p, 'recruitLook').reduce((n, m) => Math.max(n, m.value), 1);
-  const cards: string[] = [];
-  while (cards.length < look) { const c = drawAgent(s); if (!c) break; cards.push(c); }
-  if (cards.length) ask(s, { kind: 'recruit', player: t.p, cards });
+  // As an action (recruitAction), the crosses spent are the cards looked at, and Roger Williams takes 2 of them; otherwise one look, or his 3.
+  const look = t.n ?? mods(s, t.p, 'recruitLook').reduce((n, m) => Math.max(n, m.value), 1);
+  const take = t.n ? mods(s, t.p, 'recruitTake').reduce((n, m) => Math.max(n, m.value), 1) : 1;
+  const cards: string[] = t.cards ?? [];
+  if (!t.cards) while (cards.length < look) { const c = drawAgent(s); if (!c) break; cards.push(c); }
+  if (cards.length) ask(s, { kind: 'recruit', player: t.p, cards, take, action: !!t.n });
 });
 decision('recruit', {
   always: true,
   options: (_, d) => {
     const cards = d.cards as string[];
-    return [...uniq(cards).map((card) => ({ c: 'take', card })), { c: 'top' }, { c: 'bottom' }];
+    return [...uniq(cards).map((card) => ({ c: 'take', card })), ...(d.action ? [] : [{ c: 'top' }]), { c: 'bottom' }];
   },
   resolve(s, d, c) {
     const cards = [...d.cards] as string[];
     if (c.c === 'take') { removeOne(cards, c.card); s.players[d.player].discard.push(c.card); log(s, { e: 'recruit', p: d.player, agent: c.card }); }
-    // The first card looked at was on top.
-    if (c.c === 'bottom') s.agentDeck.unshift(...cards.reverse());
+    if (c.c === 'take' && d.action && d.take > 1 && cards.length) return push(s, { t: 'recruit', p: d.player, n: cards.length, cards, take: d.take - 1 });
+    // The first card looked at was on top. As an action, the rest always go to the bottom.
+    if (c.c === 'bottom' || d.action) s.agentDeck.unshift(...cards.reverse());
     else s.agentDeck.push(...cards.reverse());
   },
 });

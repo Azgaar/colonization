@@ -1,7 +1,7 @@
 /* Clouds over the unknown: solid inside unknown fragments, thinning over their edge. The same clouds that were once painted into the land,
    now in a layer of their own above everything that stands on the map, and a little sharper. The land under them is painted whole, so exploring redraws only them. */
 import { CELL, D, W } from '../data.ts';
-import { noise, wavyCell } from './terrain.ts';
+import { noise } from './terrain.ts';
 
 /** What lay under the clouds before the land was painted there too. */
 const HIDDEN = [38, 96, 120];
@@ -12,9 +12,13 @@ export function drawClouds(canvas: HTMLCanvasElement, k: number, box: [number, n
   // The part painted, inside a wider window so that distances to the unknown near its edge are still right.
   const M = 64, x0 = box ? px(box[0]) : 0, y0 = box ? px(box[1]) : 0, x1 = box ? px(box[2]) : N, y1 = box ? px(box[3]) : N;
   const ox = box ? px(box[0] - M) : 0, oy = box ? px(box[1] - M) : 0, ww = (box ? px(box[2] + M) : N) - ox, wh = (box ? px(box[3] + M) : N) - oy;
-  // The unknown follows the same wavy lines as the ground.
-  const fog = new Uint8Array(ww * wh);
-  for (let ly = 0; ly < wh; ly++) for (let lx = 0; lx < ww; lx++) { const c = wavyCell((lx + ox) / k, (ly + oy) / k); fog[ly * ww + lx] = D.open[c] && D.terrain[c] ? 0 : 1; }
+  // The unknown covers every closed cell whole, so that it lines up with the grid and with what can be explored; its edge only wavers outwards a little
+  // (a sixth of a cell at most), and the clouds thin out beyond it.
+  const fog = new Uint8Array(ww * wh), at = (v: number) => Math.min(W - 1, Math.max(0, Math.floor(v / CELL))), closed = (X: number, Y: number) => { const c = at(Y) * W + at(X); return !(D.open[c] && D.terrain[c]); };
+  for (let ly = 0; ly < wh; ly++) for (let lx = 0; lx < ww; lx++) {
+    const X = (lx + ox) / k, Y = (ly + oy) / k;
+    fog[ly * ww + lx] = closed(X, Y) || closed(X + (noise(X / 26, Y / 26) - 0.5) * 16 + (noise(X / 8 + 50, Y / 8) - 0.5) * 5, Y + (noise(X / 26 + 90, Y / 26 + 40) - 0.5) * 16 + (noise(X / 8, Y / 8 + 70) - 0.5) * 5) ? 1 : 0;
+  }
   // How far each pixel is from the unknown, in pixels.
   const d = new Float32Array(ww * wh).fill(1e4), r = 1.41;
   for (let i = 0; i < ww * wh; i++) if (fog[i]) d[i] = 0;

@@ -41,7 +41,6 @@ body:not([data-view=map]) .door,body:not([data-view=map]) #heaps,body:not([data-
 .two>div>h4:first-child,.zone>h4 { margin-top:0 }
 .lands { display:grid;gap:12px }
 .lands.n2,.lands.n3 { grid-template-columns:1fr 1fr }
-.land .def { position:absolute;right:10px;bottom:10px;background:#0f3436e6;border-radius:99px;padding:3px 12px;font-weight:800 }
 .stores { display:grid;grid-template-columns:1fr auto;gap:22px }
 .two.eu { grid-template-columns:minmax(330px,420px) minmax(0,1fr) }
 .note { font-size:15.500px;opacity:.85;margin:9px 0 0 }
@@ -81,13 +80,13 @@ body:not([data-view=map]) .door,body:not([data-view=map]) #heaps,body:not([data-
 .dk.rec:hover:not(:disabled) { transform:translateY(-3px) }
 .dk.rec:disabled { cursor:default }
 .dk.rec.off { opacity:.72 }
+.dk.rec.ok { box-shadow:0 0 0 4px var(--hot),0 5px 16px #0008;cursor:copy }
 .dk.rec.off .pile,.dk.rec.dear .pile { filter:saturate(.3) brightness(.85) }
 .dk.newp { display:grid;place-items:center;align-content:center;gap:4px;text-align:center;padding:10px;background:#f7f1e1d9;font:800 16px/1.1 var(--sc) }
 .dk .rot { font-size:40px;line-height:1 }
 /* two or three colonies share the column */
 .lands.n2 .land .c span.y,.lands.n3 .land .c span.y { padding:2px 7px 2px 4px;font-size:14px }
 .lands.n2 .land .c span.y svg,.lands.n3 .land .c span.y svg { width:15px;height:15px }
-.lands.n2 .land .def,.lands.n3 .land .def { right:6px;bottom:6px;padding:1px 8px;font-size:14px }
 .dk.fa .pic { aspect-ratio:1.25 }
 .dk.fa .dt { min-height:calc(140cqw - 100cqw/1.25) }
 .dk.bl .dt { min-height:calc(140cqw - 100cqw/1.3) }

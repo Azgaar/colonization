@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { createGame, legal, problems, apply, applyInPlace, IllegalChoice, map, scorePlayer, taxRate, year } from '../src/index.ts';
-import { act, at, build, can, canPlay, colony, def, defWith, event, father, game, NATIONS, P, play, poi, rig, runTasks, settle, stock, total, turn, world } from './h.ts';
+import { act, at, boardWith, build, can, canPlay, colony, def, defWith, event, father, game, NATIONS, P, play, poi, rig, runTasks, settle, stock, total, turn, world } from './h.ts';
 
 const fresh = (n = 2, seed = 'x', d = def) => createGame({ def: d, seed, nations: NATIONS.slice(0, n) });
 
@@ -153,14 +153,13 @@ describe('Round', () => {
     act(s, { c: 'discard', r: 'food' }, { c: 'discard', r: 'food' }, { c: 'discard', r: 'timber' }, { c: 'discard', r: 'timber' });
     expect(total(P(s).wh)).toBe(6);
   });
-  it('[T-8] recruiting with crosses is free and repeatable', () => {
+  it('[T-8] recruiting takes an agent: with no cards there is nothing but to pass (DD-60)', () => {
     const s = game(1);
     P(s).crosses = 2;
-    act(s, { c: 'recruit' }, { c: 'bottom' });
-    expect(s.pending!.kind).toBe('turn');
-    act(s, { c: 'recruit' }, { c: 'top' });
-    expect(P(s).crosses).toBe(0);
-    expect(can(s, { c: 'recruit' })).toBe(false);
+    turn(s, 0, 'colonist');
+    expect([can(s, { c: 'recruit' }), canPlay(s, 'colonist', 'recruit', { n: 1 })]).toEqual([false, true]);
+    P(s).hand = [];
+    expect(legal(s)).toEqual([{ c: 'pass' }]);
   });
 });
 
@@ -532,7 +531,8 @@ describe('Europe', () => {
     s.agentDeck = [];
     s.pier = s.pier.slice(0, 4);
     P(s).crosses = 1;
-    act(s, { c: 'recruit' });
+    turn(s, 0, 'colonist');
+    play(s, 'colonist', 'recruit', { n: 1 });
     expect(s.agentDiscard.length).toBe(0);
   });
   it('[A-5] propaganda takes up to two Fathers', () => {
@@ -561,8 +561,8 @@ describe('Europe', () => {
     play(s, 'colonist', 'shipyard');
     expect(P(s).damage).toBe(0);
   });
-  it('[A-7] cross recruitment costs the round number and shows the top agent', () => {
-    const s = game(1);
+  it('[A-7] the printed free recruitment, still a setting: costs the round number and shows the top agent', () => {
+    const s = game(1, boardWith({ 'settings.crosses.recruitAction': false }));
     s.round = 3;
     P(s).crosses = 4;
     const top = s.agentDeck.at(-1)!;
@@ -574,6 +574,25 @@ describe('Europe', () => {
     expect(s.agentDeck.at(-1)).toBe(next);
     act(s, { c: 'recruit' }, { c: 'bottom' });
     expect(s.agentDeck[0]).toBe(next);
+  });
+  it('[A-7] recruiting is an action, crosses spent are the agents looked at, Roger Williams takes 2 (DD-60)', () => {
+    const s = game(1);
+    s.round = 2;
+    P(s).crosses = 4;
+    turn(s, 0, 'colonist', 'sailor');
+    expect([can(s, { c: 'recruit' }), canPlay(s, 'colonist', 'recruit', { n: 1 }), canPlay(s, 'colonist', 'recruit', { n: 5 })]).toEqual([false, false, false]);
+    s.agentDeck.push('farmer', 'miner', 'scout');
+    play(s, 'colonist', 'recruit', { n: 3 });
+    expect(legal(s).map((c) => c.c === 'take' ? c.card : c.c)).toEqual(['scout', 'miner', 'farmer', 'bottom']);
+    act(s, { c: 'take', card: 'miner' });
+    expect([P(s).crosses, P(s).discard.includes('miner'), s.agentDeck.slice(0, 2)]).toEqual([1, true, ['farmer', 'scout']]);
+    father(s, 0, 'roger_williams');
+    P(s).crosses = 2;
+    turn(s, 0, 'sailor');
+    s.agentDeck.push('farmer', 'miner');
+    play(s, 'sailor', 'recruit', { n: 2 });
+    act(s, { c: 'take', card: 'miner' }, { c: 'take', card: 'farmer' });
+    expect(P(s).discard.filter((c) => c === 'miner' || c === 'farmer').length).toBe(3);
   });
 });
 

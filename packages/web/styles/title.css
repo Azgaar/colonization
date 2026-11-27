@@ -61,7 +61,6 @@ body.loading .brand.enter,body.loading .menu-t.enter { animation-play-state:paus
 .title .page .prefs section+section { margin-top:0 }
 .title .page .prefs>section { min-width:0 }
 .title .page .prefs .ohead { border-top:0;padding-top:0 }
-.title .save .em,.ng .hero .em { background-image:radial-gradient(circle at 34% 28%,#ffffff40,#fff0 58%);border-width:3px }
 .title .save { display:grid;grid-template-columns:auto 1fr auto;gap:16px;align-items:center;padding:14px 16px;border-radius:16px;background:#ffffff10 }
 .title .save b { display:block;font:800 22px var(--sc) }
 .title .save div>span { display:block;opacity:.85 }

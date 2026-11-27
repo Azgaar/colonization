@@ -1,6 +1,6 @@
 /** What the interface shows, taken from a game state. The caller sees only what seat `me` may know. */
 import { actionsFor, buildingDefence, buildPrice, buildingYield, cellYield, combatStrength, docksYields, findLoyalist, map, recruitCost, scorePlayer, sellPrice, siegeStrength, taxRate, util, workableCells, year, type State } from '@col/engine';
-import type { GameDef, Icon } from '@col/data';
+import type { GameDef, Icon, TerrainId } from '@col/data';
 
 const ICONS: Icon[] = ['corn', 'fish', 'timber', 'leaf', 'fur', 'silver'];
 /** A name in both languages: English first, Russian second. */
@@ -14,7 +14,8 @@ const flavor = (m: Record<string, { flavor?: string }>) => record(Object.keys(m)
 
 export function exportRules(def: GameDef) {
   return {
-    track: def.settings.tax.track, settings: def.settings,
+    track: def.settings.tax.track, settings: def.settings, tacticEffects: record(Object.keys(def.tactics), (id) => def.tactics[id].effect),
+    terrainYields: record(Object.keys(def.terrain), (id) => def.terrain[id as TerrainId].yields),
     agents: record(Object.keys(def.agents), (id) => { const a = def.agents[id]; return { base: a.base, en: a.en, ru: a.ru, edu: a.edu, price: a.price, unique: a.unique, mods: a.mods }; }),
     buildings: record(Object.keys(def.buildings), (id) => { const b = def.buildings[id]; return { en: b.en, ru: b.ru, timber: b.timber, edu: b.edu, requires: b.requires, improvement: b.improvement, work: b.work, storage: b.storage, defence: b.defence }; }),
     fathers: record(Object.keys(def.fathers), (id) => { const f = def.fathers[id]; return { en: f.en, ru: f.ru, bells: f.bells }; }),

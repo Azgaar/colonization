@@ -3,14 +3,15 @@
 import { flattenRuleset, rulesets, type Ruleset } from '@col/data';
 import { PERSONALITIES, type Personality } from '@col/bots';
 import { detect, detectMarkdown, diffTable, runAllBrowser, sweep, sweepMarkdown, SWEEP_KEYS, table, type BotSpec, type GameRecord, type GameSpec } from '@col/lab/browser';
-import { L } from '../data.ts';
+import { msg, pick, t, type Msg, type Text } from '../data.ts';
+import { inLang } from '../i18n.ts';
 import { all, defOf } from '../rules.ts';
 import { esc, md } from './md.ts';
 
 type Mode = 'compare' | 'sweep' | 'detect';
 /** The lab's form, its progress and its last report. `b` is the ruleset under test, `a` what it is compared with. */
 export const lab = { mode: 'compare' as Mode, a: 'board', b: 'pc', games: 200, players: 4, bots: 'mixed', path: 'settings.tax.refuseRef', values: '1,2,3', done: 0, total: 0, report: '', error: '', stop: null as AbortController | null };
-const BOTS: Record<string, [string, string]> = { mixed: ['Eight characters, rotating', 'Восемь характеров по кругу'], balanced: ['Balanced bots only', 'Только сбалансированные'], search: ['One search bot against goal bots (slow)', 'Один поисковый бот против целевых (медленно)'] };
+const BOTS: Record<string, Msg> = { mixed: msg('lab.eight_characters'), balanced: msg('lab.balanced_bots'), search: msg('lab.one_search') };
 /** The bots of a batch; seats rotate through the list, so a list as long as the table puts one search bot in every game. */
 const botsOf = (k: string, players: number): BotSpec[] =>
   k === 'balanced' ? [{ kind: 'goal', name: 'balanced' }]
@@ -27,20 +28,20 @@ function axis(path: string, v: string) {
 
 export function labTab(): string {
   const ids = Object.keys(all()), opt = (v: string) => ids.map((id) => `<option${id === v ? ' selected' : ''}>${esc(id)}</option>`).join('');
-  const mode = (m: Mode, n: [string, string]) => `<button class="${lab.mode === m ? 'on' : ''}" data-l-mode="${m}">${L(...n)}</button>`;
+  const mode = (m: Mode, n: Text) => `<button class="${lab.mode === m ? 'on' : ''}" data-l-mode="${m}">${pick(n)}</button>`;
   return `<div class="b-lab"><div class="l-form">
-<div class="set">${mode('compare', ['Compare two rulesets', 'Сравнить два набора'])}${mode('sweep', ['Sweep a value', 'Перебрать значение'])}${mode('detect', ['Find problems', 'Найти проблемы'])}</div>
+<div class="set">${mode('compare', msg('lab.compare_two'))}${mode('sweep', msg('lab.sweep_value'))}${mode('detect', msg('lab.find_problems'))}</div>
 <div class="l-grid">
-${lab.mode === 'compare' ? `<label>${L('Ruleset', 'Набор')}<select data-l="b">${opt(lab.b)}</select></label><label>${L('against', 'против')}<select data-l="a">${opt(lab.a)}</select></label>` : `<label>${L('Ruleset', 'Набор')}<select data-l="b">${opt(lab.b)}</select></label>`}
-${lab.mode === 'sweep' ? `<label class="wide">${L('Value (path)', 'Значение (путь)')}<input data-l="path" value="${esc(lab.path)}" spellcheck="false"></label><label class="wide">${L('Values: 1,2,3 or 1:5:1', 'Значения: 1,2,3 или 1:5:1')}<input data-l="values" value="${esc(lab.values)}" spellcheck="false"></label>` : ''}
-<label>${L('Games', 'Партий')}<input type="number" min="10" max="5000" step="10" data-l="games" value="${lab.games}"></label>
-<label>${L('Players', 'Игроков')}<select data-l="players">${[1, 2, 3, 4, 5].map((n) => `<option${n === lab.players ? ' selected' : ''}>${n}</option>`).join('')}</select></label>
-<label class="wide">${L('Bots', 'Боты')}<select data-l="bots">${Object.entries(BOTS).map(([k, n]) => `<option value="${k}"${k === lab.bots ? ' selected' : ''}>${L(...n)}</option>`).join('')}</select></label></div>
-<div class="b-acts">${lab.stop ? `<button data-l-stop>${L('Stop', 'Остановить')}</button>` : `<button class="go" data-l-run>${L('Run', 'Запустить')}</button>`}<span class="l-prog" id="l-prog">${progress()}</span></div>
-<p class="note">${L('Same seeds, nations and seats on every side, so differences are the rules, not luck. Bold: outside the 95% interval.', 'Одинаковые зёрна, нации и места с каждой стороны, поэтому разница — это правила, а не удача. Жирным: вне 95% интервала.')}</p></div>
+${lab.mode === 'compare' ? `<label>${t('bench.ruleset')}<select data-l="b">${opt(lab.b)}</select></label><label>${t('decisions.against')}<select data-l="a">${opt(lab.a)}</select></label>` : `<label>${t('bench.ruleset')}<select data-l="b">${opt(lab.b)}</select></label>`}
+${lab.mode === 'sweep' ? `<label class="wide">${t('lab.value_path')}<input data-l="path" value="${esc(lab.path)}" spellcheck="false"></label><label class="wide">${t('lab.values_1')}<input data-l="values" value="${esc(lab.values)}" spellcheck="false"></label>` : ''}
+<label>${t('lab.games')}<input type="number" min="10" max="5000" step="10" data-l="games" value="${lab.games}"></label>
+<label>${t('lab.players')}<select data-l="players">${[1, 2, 3, 4, 5].map((n) => `<option${n === lab.players ? ' selected' : ''}>${n}</option>`).join('')}</select></label>
+<label class="wide">${t('lab.bots')}<select data-l="bots">${Object.entries(BOTS).map(([k, n]) => `<option value="${k}"${k === lab.bots ? ' selected' : ''}>${pick(n)}</option>`).join('')}</select></label></div>
+<div class="b-acts">${lab.stop ? `<button data-l-stop>${t('lab.stop')}</button>` : `<button class="go" data-l-run>${t('lab.run')}</button>`}<span class="l-prog" id="l-prog">${progress()}</span></div>
+<p class="note">${t('lab.same_seeds')}</p></div>
 <div class="l-out md">${lab.error ? `<p class="b-warn">${esc(lab.error)}</p>` : ''}${lab.report ? md(lab.report) : ''}</div></div>`;
 }
-const progress = () => (lab.total ? `${lab.done} / ${lab.total} ${L('games', 'партий')}` : '');
+const progress = () => (lab.total ? `${lab.done} / ${lab.total} ${t('lab.games2')}` : '');
 const paintProgress = () => { const el = document.getElementById('l-prog'); if (el) el.textContent = progress(); };
 
 async function run(redraw: () => void) {
@@ -56,7 +57,7 @@ async function run(redraw: () => void) {
     if (lab.mode === 'compare') {
       lab.total = games * 2;
       const a = await go(specs(lab.a)), b = await go(specs(lab.b));
-      lab.report = `# ${lab.b} against ${lab.a}\n\n${games} paired games, ${lab.players} players, ${BOTS[lab.bots][0].toLowerCase()}. Each change: ${lab.b} minus ${lab.a} on the same seeds.\n\n${diffTable(a, [[lab.b, b]], SWEEP_KEYS)}`;
+      lab.report = `# ${lab.b} against ${lab.a}\n\n${games} paired games, ${lab.players} players, ${inLang('en', BOTS[lab.bots]).toLowerCase()}. Each change: ${lab.b} minus ${lab.a} on the same seeds.\n\n${diffTable(a, [[lab.b, b]], SWEEP_KEYS)}`;
     } else if (lab.mode === 'sweep') {
       const x = axis(lab.path, lab.values);
       lab.total = games * x.values.length;
@@ -67,7 +68,7 @@ async function run(redraw: () => void) {
       lab.total = games;
       lab.report = detectMarkdown(detect(await go(specs(lab.b)), def));
     }
-  } catch (e) { lab.error = signal.aborted ? L('Stopped.', 'Остановлено.') : (e as Error).message; }
+  } catch (e) { lab.error = signal.aborted ? t('lab.stopped') : (e as Error).message; }
   lab.stop = null; redraw();
 }
 

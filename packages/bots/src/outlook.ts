@@ -1,5 +1,5 @@
 import type { State } from '@col/engine';
-import { buildingDefence, findLoyalist, rebelOrder, scorePlayer, util } from '@col/engine';
+import { buildingDefence, findLoyalist, hasLoyalist, rebelOrder, scorePlayer, util } from '@col/engine';
 import { holdChance } from './war.ts';
 
 export interface Change { strength?: number; ref?: number; gold?: number; /** Defence of one more colony. */ colony?: number }
@@ -18,7 +18,7 @@ export function cardPower(s: State, card: string) {
 
 /** Who would side with the King, seen from a player that does or does not want to. */
 export function expectedLoyalist(s: State, me: number, wants: boolean): number | null {
-  if (s.players.length === 1) return null;
+  if (!hasLoyalist(s)) return null;
   const l = findLoyalist(s);
   if (wants) return me;
   if (l === me && s.round < 7) return rebelOrder(s).at(-2)!;

@@ -118,7 +118,7 @@ These come from reading the rules and from small calculations on the data. None 
 | H10 | Four-card nations are harder by the intended amount | Deliberate handicap **[A]**: Sweden, Denmark, Russia, Courland and Scotland start with one action fewer. Test whether the size fits their stars and whether the order of difficulty is right |
 | H11 | Settlement cap makes exploration order decisive | About 12 villages are printed per map, 6 are placed, so the first explored become real |
 | H12 | Colonies rarely survive a moderate gap, which rewards all-in defence | Holding chance is 67% at 1 die, 30% at 3, 13% at 5, 2% at 10 |
-| H13 | Supply is never worth an action | It plays 1 card to draw 1, so it gains no action and costs 1 food |
+| H13 | Supply is never worth an action | It plays 1 card to draw 1, so it gains no action and costs 1 food. Answered: intended as a swap (DD-57) |
 
 Further questions: Is there a first-player advantage? Is early player conflict ever worth it? Does the Cossack's empty-tundra production make up for a smaller deck? How much food do ocean cells supply, and do docks pay off? Do settlement gifts make low hostility worth pursuing? Do 2-player games work with one loyalist and one patriot? Which of the 22 events matter?
 
@@ -133,7 +133,7 @@ Agreed with the designer **[A]**, except where marked. Used to flag results, not
 | Loyalist win rate, 4 players | about 15% (flag outside 10–20%) |
 | Games ending before round 8 | under 25% |
 | Colonies surviving the war | 40–70% |
-| Leader at round 5 also wins the game | reported without a target until Q14 is answered; designer: "very rare" |
+| Leader at round 5 also wins the game | reported, no target: "very rare" meant games ending by round 5, covered above (DD-53) |
 | Any personality's win rate in mixed games | 15–35% |
 | Fathers or agents never worth taking | none |
 

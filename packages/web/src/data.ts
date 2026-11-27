@@ -4,6 +4,11 @@ import { icon } from "./icons.ts";
 import type { Entry } from "./sim.ts";
 import { Sim } from "./sim.ts";
 import type { Pair, PlayerView } from "./view.ts";
+import { lang, LOCALES, msg, t, table, type Msg } from "./i18n.ts";
+
+export { lang, msg, t, table, type Msg };
+/** Something to say in the shown language: a phrase from the locale files (`msg`), or a pair of names from the game data. */
+export type Text = Pair | Msg;
 
 export const D = Sim.D,
   CELL = 64;
@@ -30,131 +35,19 @@ export type Own = Omit<PlayerView, "hand" | "deck"> & {
 };
 /** The shown player's own record. It keeps its identity when the game changes. */
 export const P = D.players[me] as Own;
-export const lang = () => document.documentElement.lang || "en";
-/** English or Russian: from a pair `[en, ru]` or from a record with `en` and `ru`. */
-export const pick = (x: Pair | { en: string; ru: string }): string =>
-  Array.isArray(x) ? x[lang() === "ru" ? 1 : 0] : lang() === "ru" ? x.ru : x.en;
+/** In the shown language: a phrase from the locale files (`msg`), or names from the game data as a pair `[en, ru]` or a record with `en` and `ru`. */
+export const pick = (x: Text | { en: string; ru: string }): string =>
+  Array.isArray(x) ? x[lang() === "ru" ? 1 : 0] : "k" in x ? t(x.k, x.v) : lang() === "ru" ? x.ru : x.en;
 /** A phrase in both languages, picked now. */
 export const L = (en: string, ru: string) => pick([en, ru]);
 /** An element of the page by id. The page always has the ones the code asks for. */
 export const $ = (id: string) => document.getElementById(id)!;
-const T: Record<string, Pair> = {
-  round: ["Round", "Тур"],
-  of: ["of", "из"],
-  tax: ["Tax", "Налог"],
-  gold: ["Gold", "Золото"],
-  bells: ["Bells", "Колокола"],
-  crosses: ["Crosses", "Кресты"],
-  ref: ["King’s army", "Армия короля"],
-  hand: ["Your agents", "Ваши агенты"],
-  deck: ["deck", "колода"],
-  discard: ["discard", "сброс"],
-  pass: ["Pass", "Пас"],
-  warehouse: ["Warehouse", "Склад"],
-  hold: ["Hold", "Трюм"],
-  buildings: ["Buildings", "Постройки"],
-  fathers: ["Founding Fathers", "Отцы-основатели"],
-  colony: ["Colony", "Колония"],
-  europe: ["Europe", "Европа"],
-  market: ["Market", "Рынок"],
-  pier: ["Pier", "Причал"],
-  salon: ["Salon", "Салон"],
-  plans: ["Building projects", "Проекты построек"],
-  demand: ["demand", "спрос"],
-  free: ["free", "свободно"],
-  slot: ["Free slot", "Свободно"],
-  war: ["War of Independence", "Война за независимость"],
-  warshort: ["War", "Война"],
-  map: ["Map", "Карта"],
-  rivals: ["Governors", "Губернаторы"],
-  log: ["Chronicle", "Хроника"],
-  defence: ["Defence", "Защита"],
-  yields: ["This agent can gather", "Этот агент может добыть"],
-  settlement: ["Settlement", "Поселение"],
-  population: ["Population", "Население"],
-  hostility: ["Hostility", "Враждебность"],
-  loot: ["Loot", "Добыча"],
-  ally: ["Ally", "Союз"],
-  none: ["none", "нет"],
-  terrain: ["Terrain", "Местность"],
-  bonus: ["Bonus", "Бонус"],
-  raid: ["Raids when an event calls it", "Набег при активации"],
-  calm: ["Quiet", "Спокойно"],
-  gift: ["Brings food when an event calls it", "Дарит еду при активации"],
-  attack: ["Attack", "Атака"],
-  holds: ["Holds", "Удержана"],
-  falls: ["Falls", "Пала"],
-  loyalist: ["Loyalist", "Лоялист"],
-  patriot: ["Patriot", "Патриот"],
-  tactic: ["King’s tactic", "Тактика короля"],
-  cubes: ["redcoats", "красные мундиры"],
-  odds: ["Chance to hold", "Шанс удержать"],
-  dice: ["Dice", "Кубики"],
-  result: ["Final score", "Итоговый счёт"],
-  choose: ["Pick an agent, then an action", "Выберите агента, затем действие"],
-  why: ["Not now", "Недоступно"],
-  show: ["Show", "Показать"],
-  score: ["points", "очков"],
-  unexplored: ["Unexplored", "Не исследовано"],
-  ship: ["Ship", "Корабль"],
-  infantry: ["Infantry", "Пехота"],
-  ruin: ["Ruins", "Руины"],
-  wreck: ["Shipwreck", "Кораблекрушение"],
-  sea: ["Open sea", "Открытое море"],
-  forecast: ["If the war came now", "Если бы война началась сейчас"],
-  you: ["you", "вы"],
-  close: ["Close", "Закрыть"],
-  confirm: ["Do it", "Выполнить"],
-  back: ["Back", "Назад"],
-  undo: ["Undo", "Отмена"]
-};
-export const t = (k: string) => (T[k] ? pick(T[k]) : k);
-export const ACT: Record<string, Pair> = {
-  produce: ["Gather", "Добыча"],
-  docks: ["Fish from the docks", "Ловля у причала"],
-  work: ["Work in a building", "Работа в постройке"],
-  moveShip: ["Sail", "Плыть"],
-  moveInfantry: ["March", "Идти"],
-  found: ["Found a colony", "Основать колонию"],
-  attack: ["Attack", "Атака"],
-  trade: ["Sell in Europe", "Торговля"],
-  hire: ["Hire", "Наём"],
-  propaganda: ["Win over a Father", "Пропаганда"],
-  repair: ["Repair", "Ремонт"],
-  shipyard: ["Repair at the shipyard", "Ремонт на верфи"],
-  build: ["Build", "Строительство"],
-  teach: ["Teach", "Обучение"],
-  customs: ["Sell at the custom house", "Таможня"],
-  supply: ["Supply", "Снабжение"],
-  exchange: ["Exchange agents", "Обмен"],
-  gift: ["Give a gift", "Подарок"],
-  preach: ["Preach", "Проповедь"],
-  alliance: ["Make an alliance", "Союз"],
-  smuggle: ["Smuggle", "Контрабанда"]
-};
-const WHY_RU: Record<string, string> = {
-  "infantry must be on land": "пехота должна быть на суше",
-  "not a revealed land cell": "не открытая суша",
-  "on the edge of the map": "на краю карты",
-  "the cell is taken": "клетка занята",
-  "next to a colony": "рядом колония",
-  "next to a settlement": "рядом поселение",
-  "no sea passage to Europe": "нет морского пути в Европу",
-  "needs 5 food": "нужно 5 еды",
-  "needs 2 timber": "нужно 2 древесины",
-  "the ship must be in Europe": "корабль должен быть в Европе",
-  "no settlement next to a token": "нет поселения рядом",
-  "needs an agent with ⚔️": "нужен военный агент",
-  "no target in reach": "нет цели рядом",
-  "needs a school": "нужна школа",
-  "needs a custom house": "нужна таможня",
-  "needs a shipyard": "нужна верфь",
-  "needs 1 food": "нужна 1 еда",
-  "needs higher education or a scout": "нужно высшее образование или скаут",
-  "nothing to choose from": "не из чего выбрать",
-  "the limit of colonies is reached": "достигнут предел колоний"
-};
-export const why = (s: string) => (lang() === "ru" && WHY_RU[s] ? WHY_RU[s] : s);
+
+
+export const ACT: Record<string, Pair> = table('act');
+/** Why an action is not possible, in the shown language: the engine says it in English, which is also how the locale files know it (`why.*`). */
+const WHY = new Map(Object.entries(LOCALES.en).filter(([k]) => k.startsWith("why.")).map(([k, v]) => [v, k]));
+export const why = (s: string) => { const k = WHY.get(s); return k ? t(k) : s; };
 export const art = {
   agent: (id: string) => `art/agent/${D.agents[id].base}.webp`,
   building: (id: string) => `art/building/${id === "blacksmith_shop" ? "blacksmiths_shop" : id}.webp`,
@@ -196,16 +89,16 @@ export function logLine(e: Entry) {
   const A = (k: string) => pick(ACT[k] || [k, k]).toLowerCase();
   if (e.e === "play") return `${who}${pick(D.agents[e.card])}: ${A(e.a)}`;
   if (e.e === "event") return `<em>${pick(D.names.events[e.id])}</em>`;
-  if (e.e === "build") return `${who}${pick(["built", "строит"])}: ${pick(D.buildings[e.building])}`;
-  if (e.e === "found") return `${who}${pick(["founded a colony", "основывает колонию"])}`;
-  if (e.e === "raid") return `${who}${pick(["raided by natives", "набег индейцев"])}`;
+  if (e.e === "build") return `${who}${t('data.built')}: ${pick(D.buildings[e.building])}`;
+  if (e.e === "found") return `${who}${t('data.founded_colony')}`;
+  if (e.e === "raid") return `${who}${t('data.raided_natives')}`;
   if (e.e === "tax")
-    return `${who}${e.pay ? pick(["paid the tax", "платит налог"]) : pick(["refused the tax", "отказ от налога"])} (${e.rate})`;
+    return `${who}${e.pay ? t('data.paid_tax') : t('data.refused_tax')} (${e.rate})`;
   if (e.e === "father") return `${who}${pick(D.fathers[e.father])}`;
-  if (e.e === "hire") return `${who}${pick(["hired", "нанимает"])}: ${pick(D.agents[e.agent])}`;
-  if (e.e === "reveal") return `${who}${pick(["charted new waters", "открывает карту"])}`;
-  if (e.e === "poi") return `${who}${pick(["explored", "исследует"])}: ${e.deck === "ruin" ? t("ruin") : t("wreck")}`;
-  if (e.e === "sell") return `${who}${pick(["sold", "продаёт"])} ${e.n} ${icon(e.r, 14)} × ${e.price}`;
+  if (e.e === "hire") return `${who}${t('data.hired')}: ${pick(D.agents[e.agent])}`;
+  if (e.e === "reveal") return `${who}${t('data.charted_new')}`;
+  if (e.e === "poi") return `${who}${t('data.explored')}: ${e.deck === "ruin" ? t("ruin") : t("wreck")}`;
+  if (e.e === "sell") return `${who}${t('data.sold')} ${e.n} ${icon(e.r, 14)} × ${e.price}`;
   return "";
 }
 export const cap = (x: string) => x.charAt(0).toUpperCase() + x.slice(1);

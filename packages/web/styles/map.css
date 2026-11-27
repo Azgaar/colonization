@@ -30,3 +30,6 @@
 .sp text { font-family:var(--ui) }
 .haze { position:fixed;inset:0 0 auto;height:34vh;background:linear-gradient(#a9cdd6,#a9cdd600);opacity:var(--haze,0);pointer-events:none }
 .vig { position:fixed;inset:0;pointer-events:none;background:radial-gradient(430px 240px at 0 100%,#0b2b33e0,#0b2b3300),radial-gradient(430px 240px at 100% 100%,#0b2b33e0,#0b2b3300),linear-gradient(#0b2b33d1,#0b2b3385 46px,#0b2b3300 84px),linear-gradient(#0b2b3300 calc(100% - 150px),#0b2b33b8) }
+/* A soldier of the King's army landing next to a colony. */
+.sp .landing { animation:landing .28s ease-out;transform-box:fill-box;transform-origin:50% 100% }
+@keyframes landing { from { transform:translateY(-14px) scale(1.15);opacity:0 } }

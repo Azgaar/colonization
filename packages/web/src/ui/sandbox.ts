@@ -1,6 +1,6 @@
 /* The Dev menu (FR-U-19, FR-R-6): edit the game, force what comes next, play any seat, change the rules. Only in dev mode. */
 import { RESOURCES } from '@col/data';
-import { $, L, me, pick, showSeat } from '../data.ts';
+import { $, me, pick, showSeat, t } from '../data.ts';
 import { settle } from '../flow.ts';
 import { Board } from '../map/board.ts';
 import { paint } from '../paint.ts';
@@ -20,18 +20,18 @@ export function sandbox() {
   if (!on || el.contains(document.activeElement)) return; // not redrawn under the pointer while a value is typed
   const s = Sim.s, pl = s.players[me], ev = [...new Set(s.eventDeck)], ag = [...new Set(s.agentDeck)];
   const common = Object.values(s.def.agents).filter((a) => a.kind === 'common').map((a) => a.id);
-  el.innerHTML = `<button class="x" data-sandbox>${L('Close', 'Закрыть')}</button><h3>${L('Dev menu', 'Меню разработчика')}</h3>
-<h4>${L('Seats', 'Места')}</h4>${s.players.map((_, i) => `<div class="sb-seat${i === me ? ' on' : ''}">${Places.em(i, 26)}<span>${Places.name(i)}</span>
-<span class="set"><button class="${Sim.humans.has(i) ? 'on' : ''}" data-sb-human="${i}">${L('Person', 'Человек')}</button><button class="${Sim.humans.has(i) ? '' : 'on'}" data-sb-bot="${i}">${L('Bot', 'Бот')}</button></span><button data-sb-show="${i}" ${i === me ? 'disabled' : ''}>${L('Show', 'Показать')}</button></div>`).join('')}
-<h4>${Places.name(me)}</h4><div class="sb-grid">${num('gold', pick(['Gold', 'Золото']), pl.gold)}${num('bells', pick(['Bells', 'Колокола']), pl.bells)}${num('crosses', pick(['Crosses', 'Кресты']), pl.crosses)}${num('damage', L('Ship damage', 'Повреждения'), pl.damage)}
+  el.innerHTML = `<button class="x" data-sandbox>${t('close')}</button><h3>${t('sandbox.dev_menu')}</h3>
+<h4>${t('sandbox.seats')}</h4>${s.players.map((_, i) => `<div class="sb-seat${i === me ? ' on' : ''}">${Places.em(i, 26)}<span>${Places.name(i)}</span>
+<span class="set"><button class="${Sim.humans.has(i) ? 'on' : ''}" data-sb-human="${i}">${t('sandbox.person')}</button><button class="${Sim.humans.has(i) ? '' : 'on'}" data-sb-bot="${i}">${t('sandbox.bot')}</button></span><button data-sb-show="${i}" ${i === me ? 'disabled' : ''}>${t('show')}</button></div>`).join('')}
+<h4>${Places.name(me)}</h4><div class="sb-grid">${num('gold', t('gold'), pl.gold)}${num('bells', t('bells'), pl.bells)}${num('crosses', t('crosses'), pl.crosses)}${num('damage', t('sandbox.ship_damage'), pl.damage)}
 ${RESOURCES.map((r) => num(`wh.${r}`, name(s.def.resources, r), pl.wh[r])).join('')}</div>
-<h4>${L('King’s army', 'Армия короля')}</h4><div class="sb-grid">${num('ref', L('Cubes in the barracks', 'Кубиков в казармах'), s.ref)}</div>
-<h4>${L('What comes next', 'Что будет дальше')}</h4>
-${ev.length ? `<div class="sb-row">${sel('event', ev.map((e) => [e, name(s.def.events, e)]))}<button data-sb-top="event">${L('Next event', 'Следующее событие')}</button></div>` : ''}
-${ag.length ? `<div class="sb-row">${sel('agent', ag.map((a) => [a, name(s.def.agents, a)]))}<button data-sb-top="agent">${L('Top of the deck', 'Наверх колоды')}</button></div>` : ''}
-<div class="sb-row">${sel('give', common.map((a) => [a, name(s.def.agents, a)]))}<button data-sb-give>${L('Into the hand', 'В руку')}</button></div>
-<div class="sb-row"><input data-sb-dice placeholder="${L('Dice, e.g. 6 6 1', 'Кубики, напр. 6 6 1')}" value="${(s.forced?.dice ?? []).join(' ')}"><button data-sb-dice-set>${L('Next dice', 'Следующие кубики')}</button></div>
-<h4>${L('Rules', 'Правила')}</h4><div class="sb-row">${sel('rules', RULESETS().map((r) => [r, r]))}<button data-sb-rules>${L('Play on with these', 'Играть дальше с ними')}</button></div><p class="sb-note">${note}</p>`;
+<h4>${t('ref')}</h4><div class="sb-grid">${num('ref', t('sandbox.cubes_barracks'), s.ref)}</div>
+<h4>${t('sandbox.comes_next')}</h4>
+${ev.length ? `<div class="sb-row">${sel('event', ev.map((e) => [e, name(s.def.events, e)]))}<button data-sb-top="event">${t('sandbox.next_event')}</button></div>` : ''}
+${ag.length ? `<div class="sb-row">${sel('agent', ag.map((a) => [a, name(s.def.agents, a)]))}<button data-sb-top="agent">${t('sandbox.top_deck')}</button></div>` : ''}
+<div class="sb-row">${sel('give', common.map((a) => [a, name(s.def.agents, a)]))}<button data-sb-give>${t('sandbox.hand')}</button></div>
+<div class="sb-row"><input data-sb-dice placeholder="${t('sandbox.dice_e')}" value="${(s.forced?.dice ?? []).join(' ')}"><button data-sb-dice-set>${t('sandbox.next_dice')}</button></div>
+<h4>${t('newgame.rules')}</h4><div class="sb-row">${sel('rules', RULESETS().map((r) => [r, r]))}<button data-sb-rules>${t('sandbox.play')}</button></div><p class="sb-note">${note}</p>`;
   el.querySelector<HTMLSelectElement>('[data-sb-pick="rules"]')!.value = Sim.setup.ruleset;
 }
 
@@ -46,7 +46,7 @@ document.addEventListener('change', (e) => {
   paint();
 });
 document.addEventListener('click', (e) => {
-  const t = e.target as HTMLElement, q = (x: string) => t.closest<HTMLElement>(x);
+  const el = e.target as HTMLElement, q = (x: string) => el.closest<HTMLElement>(x);
   let x: HTMLElement | null;
   if (q('[data-sandbox]')) { U.sandbox = !U.sandbox; U.menu = false; paint(); return; }
   // Dev mode and the forecast, from Options (in play or on the title screen).
@@ -74,7 +74,7 @@ document.addEventListener('click', (e) => {
     paint();
   } else if (q('[data-sb-rules]')) {
     const why = Sim.setRules(pickOf('rules'));
-    note = why ?? L('The game goes on under these rules.', 'Игра продолжается по этим правилам.');
+    note = why ?? t('sandbox.game_goes');
     if (!why) Board.land();
     paint();
   }

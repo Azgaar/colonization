@@ -1,6 +1,6 @@
 /* The map: a tilted plane of fixed pictures, with everything that stands on it as separate upright elements. */
 import { map, type Move } from '@col/engine';
-import { $, ACT, art, at, colonyAt, column, D, L, lang, me, P, pick, RES, settlementAt, SIZE, syncWidth, t, tokenAt, W } from '../data.ts';
+import { $, ACT, art, at, colonyAt, column, D, lang, me, P, pick, RES, settlementAt, SIZE, syncWidth, t, tokenAt, W } from '../data.ts';
 import { DEFS, roundel, SHAPES } from '../icons.ts';
 import { Bonus } from './bonus.ts';
 import { stage, type Pitch, type Stage } from './camera.ts';
@@ -10,7 +10,7 @@ import { drawRich, drawSea, isKept } from './terrain.ts';
 import { paint } from '../paint.ts';
 import { keepOptions, Options, VIEW } from '../options.ts';
 import { Places, type Spaces, type Way } from '../places.ts';
-import { S } from '../state.ts';
+import { S, X } from '../state.ts';
 import { Sim, type Opt } from '../sim.ts';
 import type { Snapshot } from '../view.ts';
 type Colony = Snapshot['colonies'][number];
@@ -27,8 +27,9 @@ const lens = () => 3600 * (900 / 3600) ** (view.depth / 100), up = () => 1 / Mat
 /** As in strategy games: straight down when zoomed far out, leaning more the closer one gets. The lean grows fast at first and levels off near the ground (ease-out over the logarithm of the zoom). */
 const pitch: Pitch = (z, min, max) => { const u = Math.min(1, Math.max(0, Math.log(z / min) / Math.log(max / min))); return most() * (1 - (1 - u) ** 2); };
 const haze = () => document.body.style.setProperty('--haze', ((B.stage.angle() / 45) ** 1.3 * 0.34).toFixed(2));
-/** Farthest zoom: the whole board just fits between the top line and the hand, seen from above. */
-const whole = () => Math.min((innerWidth - 24) / SIZE(), (innerHeight - 220) / SIZE());
+/** Farthest zoom: the whole board just fits between the top line and the hand, seen from above. Never 0 or less, even in a window
+ *  shorter than the top line and the hand (or one not laid out yet), or the tilt (`pitch`) and every point on the map become NaN. */
+const whole = () => Math.max(0.05, Math.min((innerWidth - 24) / SIZE(), (innerHeight - 220) / SIZE()));
 function look() { B.stage.tilt(view.tilt, lens(), (view.shift / 100) * innerHeight, view.auto ? pitch : null); haze(); }
 /* ---- what stands on the map ---- */
 let fid = 0;
@@ -38,8 +39,8 @@ const pill = (x: number, y: number, text: string) => { const w = text.length * 8
 /** A colony in the war: the attack against its defence, and once its siege is shown, whether it held. */
 function warPlate(c: Colony, x: number, y: number) {
   const sieges = D.war?.sieges ?? [], q = sieges.find((z) => z.cell === c.cell); if (!q) return null;
-  const i = sieges.indexOf(q), shown = S.war >= 0, done = shown && i <= S.war && q.fell !== undefined, w = 92;
-  return `<g transform="translate(${x + 32 - w / 2} ${y + 54})" data-war="${i}" style="cursor:pointer">${i === S.war ? `<rect x="-4" y="-4" width="${w + 8}" height="30" rx="15" fill="#fff08a"/>` : ''}<rect width="${w}" height="22" rx="11" fill="#0f3436f2"/>${roundel(-6, -3, q.owner, 28)}<text x="33" y="16" font-size="15" font-weight="800" fill="#ff8f78">${q.attack.total}</text><text x="52" y="16" font-size="13" fill="#f7f1e1" fill-opacity=".7">/</text><text x="59" y="16" font-size="15" font-weight="800" fill="#f7f1e1">${q.defence.total}</text>${done ? (q.fell ? '<path d="M78 7l8 8m0-8l-8 8" stroke="#ff8f78" stroke-width="3" stroke-linecap="round"/>' : '<path d="M77 11l4 4 7-8" stroke="#8fe09a" stroke-width="3" fill="none" stroke-linecap="round"/>') : ''}</g>`;
+  const i = sieges.indexOf(q), shown = S.war >= 0, done = shown && i <= S.war && q.fell !== undefined, w = 102;
+  return `<g transform="translate(${x + 32 - w / 2} ${y + 54})" data-war="${i}" style="cursor:pointer">${i === S.war ? `<rect x="-4" y="-4" width="${w + 8}" height="30" rx="15" fill="#fff08a"/>` : ''}<rect width="${w}" height="22" rx="11" fill="#0f3436f2"/>${roundel(-6, -3, q.owner, 28)}<text x="38" y="16" font-size="15" font-weight="800" fill="#93e09c" text-anchor="middle">${q.defence.total}</text><svg x="47" y="4" width="14" height="14" viewBox="0 0 24 24" color="#f7f1e1" opacity=".7">${SHAPES.sword}</svg><text x="70" y="16" font-size="15" font-weight="800" fill="#ff8f78" text-anchor="middle">${q.attack.total}</text>${done ? (q.fell ? '<path d="M88 7l8 8m0-8l-8 8" stroke="#ff8f78" stroke-width="3" stroke-linecap="round"/>' : '<path d="M87 11l4 4 7-8" stroke="#8fe09a" stroke-width="3" fill="none" stroke-linecap="round"/>') : ''}</g>`;
 }
 /** A settlement: how many live there and how alarmed they are. */
 function count(v: Village, x: number, y: number) {
@@ -51,7 +52,7 @@ function cargoPlate(i: number, x: number, y: number) {
   const p = D.players[i], hold: Record<string, number> = p.hold, l = RES.filter((r) => hold[r]).map((r): [string, number] => [r, hold[r]]);
   if (p.inf === 'ship') l.push(['infantry', 1]);
   const w = l.length ? l.length * 34 + 10 : 66, item = ([k, n]: [string, number], j: number) => `<svg x="${7 + j * 34}" y="2" width="15" height="15" viewBox="0 0 24 24" color="#f7f1e1">${SHAPES[k]}</svg><text x="${24 + j * 34}" y="15" font-size="14.500" font-weight="800" fill="#f7f1e1">${n}</text>`;
-  return `<g transform="translate(${x - w / 2} ${y})"><rect width="${w}" height="19" rx="9.500" fill="#0f3436e6"/>${l.length ? l.map(item).join('') : `<text x="${w / 2}" y="14.500" text-anchor="middle" font-size="13" font-weight="700" fill="#f7f1e1" fill-opacity=".8">${L('empty', 'пусто')}</text>`}</g>`;
+  return `<g transform="translate(${x - w / 2} ${y})"><rect width="${w}" height="19" rx="9.500" fill="#0f3436e6"/>${l.length ? l.map(item).join('') : `<text x="${w / 2}" y="14.500" text-anchor="middle" font-size="13" font-weight="700" fill="#f7f1e1" fill-opacity=".8">${t('board.empty')}</text>`}</g>`;
 }
 /** A colony under the pointer: how well it holds. */
 function colonyPlate(c: Colony, x: number, y: number) {
@@ -111,6 +112,48 @@ function overview(sp: Spaces, at: Put, near: (c: number) => boolean) {
     if (typeof p.inf === 'number') { const c = colonyAt(p.inf), s = sp[`cell:${p.inf}`], hit = s?.attack && !mine && !c, a = c ? 10 : 32, b = c ? 54 : 32; put(`i${i}`, p.inf, 32, 32, (x, y) => (hit ? halo(x + a, y + b, 12) : '') + dot(x + a, y + b, 12, p.color, SHAPES.infantry!) + (hit ? pill(x + 32, y + 60, pick(ACT.attack)) : ''), 6); }
   });
 }
+/* ---- The Royal Army: when the war begins it lands colony by colony, a ship off the coast and one soldier at a time on the land around ---- */
+type Landing = { siege: number; cell: number; ship: boolean };
+const ARMY: { key: string; plan: Landing[]; shown: number; timer: number } = { key: '', plan: [], shown: 0, timer: 0 };
+/** The cells around `c`, clockwise from the top left, that are on the map. */
+const around = (c: number) => { const x = c % W, y = Math.floor(c / W), h = D.terrain.length / W; return [[-1, -1], [0, -1], [1, -1], [1, 0], [1, 1], [0, 1], [-1, 1], [-1, 0]].filter(([a, b]) => x + a! >= 0 && x + a! < W && y + b! >= 0 && y + b! < h).map(([a, b]) => c + a! + b! * W); };
+/** Where each ship and soldier goes, in the order they land: for each besieged colony its ship, then its soldiers round the free land next to it. */
+function landings(): Landing[] {
+  const plan: Landing[] = [], busy = (c: number) => colonyAt(c) || settlementAt(c);
+  D.war!.sieges.forEach((x, siege) => {
+    const near = around(x.cell), land = near.filter((c) => D.terrain[c] && D.terrain[c] !== 'ocean'), free = land.filter((c) => !busy(c)), sea = near.find((c) => D.terrain[c] === 'ocean');
+    const ring = free.length ? free : land.length ? land : [x.cell];
+    if (sea !== undefined && x.cubes) plan.push({ siege, cell: sea, ship: true });
+    for (let k = 0; k < x.cubes; k++) plan.push({ siege, cell: ring[k % ring.length]!, ship: false });
+  });
+  return plan;
+}
+/** Starts the landing when the war is new and the map is in view; once the game is over (or loaded at war) it is all there at once. */
+function muster() {
+  const w = D.war; if (!w) { ARMY.key = ''; return; }
+  const key = `${Sim.s.seed} ${w.tactic} ${w.pool} ${w.sieges.length}`;
+  if (key !== ARMY.key) { ARMY.key = key; ARMY.plan = landings(); ARMY.shown = D.over || Sim.replay ? ARMY.plan.length : 0; clearTimeout(ARMY.timer); ARMY.timer = 0; }
+  if (ARMY.shown >= ARMY.plan.length || ARMY.timer || X.reports.length || S.view !== 'map' || document.body.classList.contains('titled')) return;
+  const step = () => {
+    const next = ARMY.plan[ARMY.shown], prev = ARMY.plan[ARMY.shown - 1];
+    // A new colony: the camera goes there first.
+    if (next && next.siege !== prev?.siege) B.stage.look(D.war!.sieges[next.siege]!.cell + W);
+    ARMY.shown++; draw();
+    const after = ARMY.plan[ARMY.shown], cubes = D.war!.sieges[next?.siege ?? 0]?.cubes ?? 1;
+    ARMY.timer = after ? window.setTimeout(step, after.siege !== next?.siege ? 650 : Math.max(35, Math.min(140, 1800 / cubes))) : 0;
+  };
+  ARMY.timer = window.setTimeout(step, 500);
+}
+/** A click or Esc while the army lands puts the rest down at once. */
+const allAshore = () => { if (!ARMY.timer) return; clearTimeout(ARMY.timer); ARMY.timer = 0; ARMY.shown = ARMY.plan.length; draw(); };
+addEventListener('pointerdown', allAshore, true); addEventListener('keydown', (e) => { if (e.key === 'Escape') allAshore(); }, true);
+/** The soldiers on one cell, back rows first; the one that just landed drops in. */
+function squad(n: number, x: number, y: number, fresh: boolean) {
+  const rows = Math.ceil(n / 3), gap = Math.min(8, 30 / rows), out: string[] = [];
+  for (let j = 0; j < n; j++) { const row = Math.floor(j / 3), col = j % 3, cx = x + 14 + col * 18 + (row % 2 ? 6 : 0), fy = y + 24 + row * gap; out.push(`<g${fresh && j === n - 1 ? ' class="landing"' : ''}>${SVG(cx - 16, fy - 28, 32, REDCOAT)}</g>`); }
+  return out.join('');
+}
+const REDCOAT = Sprite.redcoat(), REFSHIP = Sprite.refShip();
 /** Everything that stands on the map now. */
 function things(sp: Spaces) {
   const o: Thing[] = [], lift = !!S.card;
@@ -124,18 +167,22 @@ function things(sp: Spaces) {
   // Plates with numbers only for the cell under the pointer or the clicked one; at rest a colony shows whose it is.
   // A village grows with its people: 5 is a little larger than a cell's picture, 1 about two thirds of it.
   for (const v of D.settlements) if (v.alive) { const k = 0.58 + 0.1 * v.pop, s = sp[`cell:${v.cell}`], on = s?.village || s?.attack, acts = on ? [...new Set((s.options ?? []).map((q) => pick(ACT[q.a] || ['', ''])))].join(' / ') : ''; put(`v${v.cell}`, v.cell, 32, 56, (x, y) => (on ? glow(x + 32, y + 50) : '') + SVG(x + 32 - 32 * k, y + 53 - 57 * k, 64 * k, Sprite.village(v)) + (v.ally !== null ? roundel(x + 32 + 12 * k, y + 53 - 55 * k, v.ally, 22) : '') + (on ? pill(x + 32, y + 64, acts) : '')); if (!on && near(v.cell)) put(`h${v.cell}`, v.cell, 32, 56, (x, y) => count(v, x + 32, y + 57), 3000); }
-  for (const c of D.colonies) { const s = sp[`cell:${c.cell}`]; put(`c${c.cell}`, c.cell, 32, 56, (x, y) => (s?.attack ? glow(x + 32, y + 50) : '') + SVG(x - 2, y - 6, 68, Sprite.colony(c)) + (warPlate(c, x, y) ?? roundel(x + 20, y + 52, c.owner, 24)) + (s?.attack ? pill(x + 32, y - 12, pick(ACT.attack)) : ''), 0, !!D.war); if (near(c.cell) && !warPlate(c, 0, 0)) put(`h${c.cell}`, c.cell, 32, 56, (x, y) => colonyPlate(c, x + 32, y + 57), 3000); }
+  for (const c of D.colonies) { const s = sp[`cell:${c.cell}`]; put(`c${c.cell}`, c.cell, 32, 56, (x, y) => (s?.attack ? glow(x + 32, y + 50) : '') + SVG(x - 2, y - 6, 68, Sprite.colony(c)) + (warPlate(c, 0, 0) ? '' : roundel(x + 20, y + 52, c.owner, 24)) + (s?.attack ? pill(x + 32, y - 12, pick(ACT.attack)) : '')); /* In the war its plate stands over the soldiers around it. */ if (warPlate(c, 0, 0)) put(`w${c.cell}`, c.cell, 32, 56, (x, y) => warPlate(c, x, y)!, 2500, true); if (near(c.cell) && !warPlate(c, 0, 0)) put(`h${c.cell}`, c.cell, 32, 56, (x, y) => colonyPlate(c, x + 32, y + 57), 3000); }
   D.players.forEach((p, i) => {
     const mine = i === me;
     if (typeof p.ship === 'number') { const s = sp[`cell:${p.ship}`], hit = s?.attack && !mine; put(`s${i}`, p.ship, 32, 54, (x, y) => (hit ? glow(x + 32, y + 52) : mine ? own(x + 32, y + 54, 30) : '') + SVG(x, y - 3, 64, Sprite.ship(i)) + (p.damage ? `<text x="${x + 10}" y="${y + 14}" font-size="17" font-weight="800" fill="#ff6a52" stroke="#1c2a2a" stroke-width="3" paint-order="stroke">−${p.damage}</text>` : '') + (hit ? pill(x + 32, y + 66, pick(ACT.attack)) : '')); if (near(p.ship) && !hit) put(`hs${i}`, p.ship, 32, 54, (x, y) => cargoPlate(i, x + 32, y + 58), 3000); }
     // Infantry is drawn a little smaller than its 64-unit picture, with its feet where they were.
     if (typeof p.inf === 'number') { const c = colonyAt(p.inf), s = sp[`cell:${p.inf}`], hit = s?.attack && !mine && !c; put(`i${i}`, p.inf, c ? 6 : 32, 58, (x, y) => (hit ? glow(x + 32, y + 54) : mine ? own(x + (c ? 6 : 32), y + (c ? 52 : 57), c ? 14 : 16) : '') + SVG(x + (c ? -18 : 5), y + 9, c ? 48 : 54, Sprite.infantry(i)) + (hit ? pill(x + 32, y + 68, pick(ACT.attack)) : ''), 2); }
   });
+  muster();
+  const men = new Map<number, number>(), last = ARMY.plan[ARMY.shown - 1];
+  for (const l of ARMY.plan.slice(0, ARMY.shown)) { if (l.ship) put(`R${l.siege}`, l.cell, 32, 54, (x, y) => SVG(x, y - 3, 64, REFSHIP), 5); else men.set(l.cell, (men.get(l.cell) ?? 0) + 1); }
+  for (const [c, n] of men) put(`r${c}`, c, 32, 60, (x, y) => squad(n, x, y, !!ARMY.timer && last?.cell === c && !last.ship), 1);
   }
   if (lift) for (const [id, s] of Object.entries(sp)) {
     const c = +id.slice(5);
     if (s.gather) { const best = s.gather, dy = tokenAt(c) || colonyAt(c) ? 14 : 34, w = best.length * 33; put(`g${c}`, c, 32, dy, (x, y) => `<rect x="${x + 32 - w / 2}" y="${y + dy - 13}" width="${w}" height="27" rx="13.500" fill="${S.over === id ? '#fff08a' : '#f7f1e1'}"/>${best.map((b, i) => `<svg x="${x + 36 - w / 2 + i * 33}" y="${y + dy - 9}" width="17" height="17" viewBox="0 0 24 24">${SHAPES[Places.ico(b.icon)]}</svg><text x="${x + 55 - w / 2 + i * 33}" y="${y + dy + 6}" font-size="16" font-weight="800" fill="#1c2a2a">${b.n}</text>`).join('')}`, 2000); }
-    else if (s.found) put(`g${c}`, c, 32, 14, (x, y) => pill(x + 32, y + 6, L('Found a colony', 'Основать колонию')), 2000);
+    else if (s.found) put(`g${c}`, c, 32, 14, (x, y) => pill(x + 32, y + 6, t('act.found')), 2000);
   }
   // Agents stay where they were placed until the round ends.
   const home = Places.homes()[0]?.cell; fid = 0;
@@ -193,7 +240,7 @@ function reach() {
   if (pick) for (const c of pick) sea.add(c);
   else if (mv) { for (const [c, n] of mv.ways) (n.foot ? foot : sea).add(c); for (const f of mv.frags) D.frag.forEach((x, c) => { if (x === f) closed.add(c); }); }
   else for (const [id, s] of Object.entries(sp)) if (id.startsWith('cell:')) { if (s.foot) foot.add(+id.slice(5)); else if (s.sea) sea.add(+id.slice(5)); }
-  const area = (set: Set<number>, cls: string) => { if (!set.size) return ''; let d = ''; const line = (a: number, b: number, c: number, e: number) => `M${pt(a, b)}L${pt(c, e)}`; for (const c of set) { const [x, y] = at(c); if (!set.has(c - W)) d += line(x, y, x + 64, y); if (!set.has(c + W)) d += line(x, y + 64, x + 64, y + 64); if (!set.has(c - 1)) d += line(x, y, x, y + 64); if (!set.has(c + 1)) d += line(x + 64, y, x + 64, y + 64); } return `<path class="${cls} area" d="${[...set].map((c) => quad(c)).join('')}"/><path class="${cls} rim" d="${d}"/>`; };
+  const area = (set: Set<number>, cls: string) => { if (!set.size) return ''; let d = ''; const line = (a: number, b: number, c: number, e: number) => `M${pt(a, b)}L${pt(c, e)}`; for (const c of set) { const [x, y] = at(c); if (!set.has(c - W)) d += line(x, y, x + 64, y); if (!set.has(c + W)) d += line(x, y + 64, x + 64, y + 64); if (c % W === 0 || !set.has(c - 1)) d += line(x, y, x, y + 64); if (c % W === W - 1 || !set.has(c + 1)) d += line(x + 64, y, x + 64, y + 64); } return `<path class="${cls} area" d="${[...set].map((c) => quad(c)).join('')}"/><path class="${cls} rim" d="${d}"/>`; };
   // The cell under the pointer: the way there, or the closed land it would explore.
   const over = S.over ?? '', h = over.startsWith('cell:') ? +over.slice(5) : null, way = h === null ? undefined : mv?.ways.get(h);
   const o: Partial<Opt>[] | null | undefined = h === null ? null : pick ? (pick.has(h) ? [{}] : null) : mv ? (way ? [{ path: way.path }] : closed.has(h) ? [{}] : null) : sp[over]?.options;
@@ -326,7 +373,7 @@ const B = {
   moving(): Moving { const move = D.move!; if (moved?.move === move && moved.n === Sim.s.log.length) return moved; const l: Opt[] = Sim.legal(); moved = { move, n: Sim.s.log.length, ways: Places.ways(move.token, move.points), frags: l.filter((c) => c.c === 'explore').map((c): number => c.frag), legal: l }; return moved; },
   fit() { resize(); const a = view.auto ? 0 : view.tilt, S = SIZE(); B.stage.frame(0, 0, S, S, [70 - a, 0, 150 - a * 3, 0]); },
   /** The whole inner map between the top line and the hand. */
-  home() { resize(); const z = Math.min(innerWidth / 900, (innerHeight - 200) / 715), m = SIZE() / 2; B.stage.frame(m - innerWidth / 2 / z, m - innerHeight / 2 / z, m + innerWidth / 2 / z, m + innerHeight / 2 / z); const [x, , k] = B.stage.get(); B.stage.set([x, innerHeight / 2 - (m + 8) * k - 4, k]); },
+  home() { resize(); const z = Math.max(0.05, Math.min(innerWidth / 900, (innerHeight - 200) / 715)), m = SIZE() / 2; B.stage.frame(m - innerWidth / 2 / z, m - innerHeight / 2 / z, m + innerWidth / 2 / z, m + innerHeight / 2 / z); const [x, , k] = B.stage.get(); B.stage.set([x, innerHeight / 2 - (m + 8) * k - 4, k]); },
   open(onCell: (c: number) => void) { cam = stage(document.querySelector<HTMLElement>('.map-stage')!, { onMove: place, onCell, min: whole, max: 2.8, zoom: 1, center: 0 }); look(); B.home(); addEventListener('resize', look); },
 };
 export { B as Board };

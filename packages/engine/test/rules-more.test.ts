@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { map, attackOptions, buildingDefence, cardStrength, cellYield, cellYields, combatStrength, findLoyalist, legal, rebelOrder, scorePlayer, siegeStrength, workableCells } from '../src/index.ts';
 import { push, run } from '../src/core.ts';
-import { act, at, build, canPlay, colony, defWith, event, father, game, opt, P, play, poi, rig, runTasks, settle, stock, total, turn, world } from './h.ts';
+import { act, at, boardWith, build, canPlay, colony, def, defWith, event, father, game, opt, P, play, poi, rig, runTasks, settle, stock, total, turn, world } from './h.ts';
 
 /** Infantry of both players next to each other on grassland. */
 function duel(n = 2, d?: ReturnType<typeof defWith>) {
@@ -54,14 +54,14 @@ describe('Combat', () => {
     const c = { attacker: 0, defender: 1, token: 'infantry', mode: 'shore', target: 'ship', from: at(5, 5), cell: at(4, 5), bombard: false, card: 'soldier', a: [], d: ['corsair', 'soldier'], top: null };
     expect(combatStrength(s, c as never).defence.total).toBe(2 + 2);
   });
-  it('[C-5] only a stronger attacker rolls, 4 and 5 succeed', () => {
+  it('[C-5] only a stronger attacker rolls, 5 and 6 succeed', () => {
     const s = duel();
     Object.assign(P(s, 1), { hand: ['soldier'] });
     turn(s, 0, 'soldier', 'soldier');
     play(s, 'soldier', 'attack');
     act(s, { c: 'done' }, { c: 'add', card: 'soldier' });
     expect(P(s, 1).inf).toBe(at(5, 6)); // 3 against 3
-    for (const [d, won] of [[6, false], [3, false], [4, true], [5, true]] as const) {
+    for (const [d, won] of [[4, false], [3, false], [5, true], [6, true]] as const) {
       const t = duel();
       turn(t, 0, 'soldier', 'farmer');
       P(t).hand = ['soldier', 'farmer'];
@@ -136,7 +136,7 @@ describe('Combat', () => {
     expect(buildingDefence(both, 1).reduce((n, x) => n + x.value, 0)).toBe(3);
     turn(s, 0, 'dragoon', 'dragoon', 'dragoon');
     play(s, 'dragoon', 'attack');
-    rig(s, 4, 4, 1, 1, 1);
+    rig(s, 5, 5, 1, 1, 1);
     act(s, { c: 'add', card: 'dragoon' }, { c: 'add', card: 'dragoon' });
     expect(s.pending).toMatchObject({ kind: 'plunder', player: 0 });
     // Cheapest first: docks cost 1. The stockade is protected by the fort.
@@ -161,7 +161,7 @@ describe('Combat', () => {
     P(s, 1).wh = stock({ silver: 1 });
     turn(s, 0, 'cannoneer', 'dragoon');
     play(s, 'cannoneer', 'attack', { mode: 'bombard' });
-    rig(s, 4, 1, 1, 1);
+    rig(s, 5, 1, 1, 1);
     act(s, { c: 'add', card: 'dragoon' });
     expect([P(s).ship, P(s).inf, P(s).wh.silver]).toEqual([at(4, 6), at(5, 5), 1]);
   });
@@ -241,11 +241,16 @@ describe('Colony actions', () => {
     const s = farm({ [at(5, 6)]: 'forest', [at(6, 5)]: 'mountains', [at(6, 6)]: 'desert', [at(4, 4)]: 'tundra' });
     const y = (cell: number) => cellYields(s, 0, 'colonist').filter((x) => x.cell === cell).map((x) => `${x.icon}${x.total}`);
     expect(y(at(5, 5))).toEqual(['corn1', 'leaf1']);
-    expect(y(at(5, 6))).toEqual(['timber1', 'fur1']);
+    expect(y(at(5, 6))).toEqual(['timber1']);
     expect(y(at(6, 5))).toEqual(['silver1']);
     expect(y(at(6, 6))).toEqual([]);
     expect(y(at(4, 4))).toEqual([]);
     expect(y(at(4, 5))).toEqual(['fish1']);
+  });
+  it('[R-2] forest gives fur only with its bonus (DD-56)', () => {
+    const s = farm({ [at(5, 6)]: 'forest' });
+    s.map.bonus[at(5, 6)] = 'fur';
+    expect(cellYields(s, 0, 'colonist').filter((x) => x.cell === at(5, 6)).map((x) => `${x.icon}${x.total}`)).toEqual(['timber1', 'fur1']);
   });
   it('[R-3] ocean gives 1, through docks 2, with fish 3, with a fisherman 4', () => {
     const s = farm();
@@ -276,7 +281,7 @@ describe('Colony actions', () => {
     expect(cellYield(s, 0, 'cossack_russian', at(5, 6), 'fur')!.total).toBe(2);
     expect(cellYield(s, 0, 'colonist', at(5, 6), 'fur')).toBe(null);
     expect(cellYield(s, 0, 'slave', at(5, 6), 'fur')).toBe(null);
-    expect(cellYield(s, 0, 'trapper_french', at(6, 5), 'fur')!.total).toBe(2);
+    expect(cellYield(s, 0, 'trapper_french', at(6, 5), 'fur')!.total).toBe(1);
   });
   it('[R-6] the planter needs an island of three cells or fewer', () => {
     const s = farm({ [at(5, 6)]: 'desert', [at(6, 7)]: 'grassland' });
@@ -615,6 +620,7 @@ describe('Founding Father rules', () => {
     world(s, { [at(5, 5)]: 'grassland', [at(5, 6)]: 'forest' });
     colony(s, 0, at(5, 5));
     father(s, 0, 'john_rolfe', 'squanto');
+    s.map.bonus[at(5, 6)] = 'fur';
     const y = (cell: number, icon: 'corn' | 'leaf' | 'fur' | 'fish') => cellYield(s, 0, 'colonist', cell, icon)!.total;
     expect([y(at(5, 5), 'corn'), y(at(5, 5), 'leaf'), y(at(5, 6), 'fur'), y(at(4, 4), 'fish')]).toEqual([2, 2, 1, 1]);
   });
@@ -854,9 +860,11 @@ describe('Ruin and wreck rules', () => {
 });
 
 describe('War', () => {
+  /** `board` with a loyalist at 2 players, as printed, so a two-player game tests the loyalist's steps. */
+  const TWO = boardWith({ 'settings.war.loyalistFrom': 2 });
   /** Two players with one colony each on grassland, player 0 more rebellious. */
-  function eve(n = 2, tactic = 'gentlemans_war') {
-    const s = game(n);
+  function eve(n = 2, tactic = 'gentlemans_war', d = TWO) {
+    const s = game(n, d);
     world(s, { [at(5, 5)]: 'grassland', [at(9, 9)]: 'grassland', [at(5, 9)]: 'grassland' });
     colony(s, 0, at(5, 5));
     if (n > 1) colony(s, 1, at(9, 9));
@@ -904,6 +912,12 @@ describe('War', () => {
     for (const p of s.players) p.bells = 15;
     expect(findLoyalist(s)).toBe(null);
     expect(findLoyalist(eve(1))).toBe(null);
+  });
+  it('[W-2] no loyalist with 2 players (DD-58): the King attacks both colonies', () => {
+    const s = start(eve(2, 'gentlemans_war', def));
+    expect(s.war!.loyalist).toBe(null);
+    expect(s.war!.sieges.map((x) => x.owner)).toEqual([0, 1]);
+    expect(findLoyalist(eve(3, 'gentlemans_war', def))).toBe(2);
   });
   it('[W-3] one tactic is drawn', () => {
     const s = start(eve());
@@ -988,7 +1002,7 @@ describe('War', () => {
   it('[W-12] dice decide when the attack is stronger', () => {
     const run2 = (dice: number[], ref: number) => { const s = eve(1); s.ref = ref; start(s); while (!s.over) { rig(s, ...dice); const o = legal(s); act(s, o.find((c) => c.c === 'keep' || c.n === 0) ?? o[0]); } return s.war!.sieges[0]; };
     expect(run2([1, 2, 3], 4)).toMatchObject({ attack: 4, defence: 1, fell: false });
-    expect(run2([1, 2, 4], 4)).toMatchObject({ fell: true });
+    expect(run2([1, 2, 5], 4)).toMatchObject({ fell: true });
     expect(run2([], 20).dice!.length).toBe(10);
     const s = eve(1);
     s.ref = 1;
@@ -1004,7 +1018,7 @@ describe('War', () => {
       P(s).discard = ['colonist', 'colonist'];
       start(s);
       act(s, { c: 'place', card: cards[0] });
-      while (!s.over) { rig(s, 4, 4, 4, 4); act(s, legal(s).find((c) => c.n === 0 || c.c === 'keep')!); }
+      while (!s.over) { rig(s, 5, 5, 5, 5); act(s, legal(s).find((c) => c.n === 0 || c.c === 'keep')!); }
       expect(s.war!.sieges[0].fell).toBe(true);
       expect(s.war!.sieges[0].takenBy).toBe(taken);
     }

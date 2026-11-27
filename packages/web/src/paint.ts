@@ -22,7 +22,7 @@ import { war } from './ui/war.ts';
 /** Everything shown follows the game and the interface state. */
 export function paint() {
   Places.forget(); if (S.card && (!P.hand.includes(S.card) || Sim.kind() !== 'turn')) S.card = null;
-  const b = document.body; b.classList.toggle('lift', !!S.card); b.dataset.view = S.view; b.classList.toggle('war', S.war >= 0); b.classList.toggle('busy', Sim.busy);
+  const b = document.body; b.classList.toggle('lift', !!S.card); b.classList.toggle('atwar', !!D.war && !D.over); b.dataset.view = S.view; b.classList.toggle('war', S.war >= 0); b.classList.toggle('busy', Sim.busy);
   // The title screen first: whether it covers the table decides what can be measured below (card names are fitted to their cards).
   title(); const sp = Places.spaces(S.card); top(); menu(); hand(sp); fans(sp); peek(); scenes(sp); details(); paintStep(); war(); replayBar(); sandbox(); advisor(); coach(); guide(); Board.edge(); Board.ground(); Board.draw(); picker(); marks();
   // The signature piece on the main menu; one rotation for the game; marches for the War of Independence; one piece for the end, won or lost.

@@ -6,9 +6,9 @@
   "overrides": [
     {
       "id": "events-1-cube",
-      "why": "Five event cards add 2 cubes per player, card or unit; with cube strength 1 and no refusal bell the King's army still takes most colonies (loyalist wins 45-69% at 4 players)",
+      "why": "Five event cards add 2 cubes per player, card or unit; with cube strength 1 and no refusal bell the Royal Army still takes most colonies (loyalist wins 45-69% at 4 players)",
       "conversion": "direct",
-      "table": "El Dorado Rumors: the King's army gains 1 cube per player, not 2. Mutiny, Boston Tea Party, Pirate Blockade, Black Market: 1 cube instead of 2 for each refusal, unit or seller. / Слухи об Эльдорадо: армия короля получает 1 кубик за игрока, а не 2. Роптание в гарнизоне, Бостонское чаепитие, Пиратская блокада, Чёрный рынок: 1 кубик вместо 2 за каждый отказ, товар или продавца.",
+      "table": "El Dorado Rumors: the Royal Army gains 1 cube per player, not 2. Mutiny, Boston Tea Party, Pirate Blockade, Black Market: 1 cube instead of 2 for each refusal, unit or seller. / Слухи об Эльдорадо: королевская армия получает 1 кубик за игрока, а не 2. Роптание в гарнизоне, Бостонское чаепитие, Пиратская блокада, Чёрный рынок: 1 кубик вместо 2 за каждый отказ, товар или продавца.",
       "set": {
         "events.el_dorado_rumors.do.2.perPlayer": 1,
         "events.mutiny.do.1.refEach": 1,

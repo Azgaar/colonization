@@ -13,7 +13,7 @@ export { viewFor, type View } from './view.ts';
 export { actionsFor, buildPrice, fatherLimit, foundCost, recruitCost, sellPrice, taxRate, year } from './turn.ts';
 export { attackOptions, buildingDefence, cardStrength, combatStrength } from './combat.ts';
 export { buildingYield, cellYield, cellYields, docksYields, workableCells } from './production.ts';
-export { attacked, findLoyalist, rebelOrder, scorePlayer, siegeStrength } from './war.ts';
+export { attacked, findLoyalist, hasLoyalist, rebelOrder, scorePlayer, siegeStrength } from './war.ts';
 export * as map from './map.ts';
 export * as util from './util.ts';
 

@@ -1,24 +1,85 @@
-/* The war, colony by colony. */
-.wl { display:flex;flex-direction:column;gap:7px }
-.wl header { display:flex;gap:16px;align-items:center;flex-wrap:wrap }
-.wl h3 { font-size:23px }
-.wl .out { margin-left:auto;font:800 24px var(--sc);color:#93e09c }
-.wl .out.fell { color:#ff9a82 }
-.wscore { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px 30px }
-.wscore div { display:grid;grid-template-columns:34px auto 1fr auto;gap:12px;align-items:center }
-.wscore strong { font:800 28px/1 var(--sc) }
-.wscore .lost { opacity:.5 }
+/* The war, colony by colony: the colony on the left, the King's army on the right, a tug bar between their strengths, the dice and what came of it. */
+.warbox { position:fixed;left:50%;bottom:20px;transform:translateX(-50%);width:min(900px,94vw);z-index:12;background:#0c2c31f7;border-radius:20px;padding:14px 22px 14px;display:none;flex-direction:column;gap:12px;box-shadow:0 12px 40px #000b }
+body.war .warbox { display:flex }
+body.war.ended .warbox { display:none }
+body.war .hand,body.war .door,body.war #heaps,body.war .side,body.war .kingbox { display:none }
+.wtop { display:flex;justify-content:center;gap:18px;font:700 16px var(--sc) }
+.wtop span { display:inline-flex;align-items:center;gap:7px;opacity:.85 }
+.wfight { display:grid;grid-template-columns:1fr auto 1fr;gap:14px;align-items:start }
+.wvs { align-self:center;font:italic 700 20px var(--sc);opacity:.6 }
+.wside header { display:flex;align-items:center;gap:10px }
+.wside h3 { font-size:22px }
+.wside strong { margin-left:auto;font:800 40px/1 var(--sc) }
+.wside.def strong { color:#93e09c }
+.wside.atk { text-align:right }
+.wside.atk header { flex-direction:row-reverse }
+.wside.atk strong { margin:0 auto 0 0;color:#ff9a82 }
+.wcrown { display:grid;place-items:center;width:40px;height:40px;border-radius:50%;background:#7a1d22;box-shadow:0 0 0 2px #edb443 }
+.wparts { display:flex;flex-wrap:wrap;gap:6px;margin-top:8px }
+.wside.atk .wparts { justify-content:flex-end }
+.wchip { display:inline-flex;align-items:center;gap:4px;padding:3px 9px 3px 4px;border-radius:99px;background:#ffffff14;min-height:32px }
+.wchip b { font:800 15px var(--sc);margin-left:2px }
+.wchip.men { flex-wrap:wrap;max-width:100%;padding:3px 10px 3px 6px;border-radius:14px }
+.wchip.men svg { margin:-3px -5px -2px }
+.wchip.men em { font:800 14px var(--sc);font-style:normal;margin:0 4px }
+.wface,.wbld { width:26px;height:26px;border-radius:50%;object-fit:cover;object-position:50% 18%;border:2px solid var(--bone) }
+.wface+.wface { margin-left:-8px }
+.wbld { border-radius:7px }
+.wtxt { font-style:normal;font-size:14px;opacity:.85;padding-left:5px }
+/* Who is stronger, at a glance: the colony's share in its owner's colour, the King's in red. */
+.wtug { display:flex;height:10px;border-radius:5px;overflow:hidden;background:#b0242a }
+.wtug i:first-child { background:var(--pc);box-shadow:inset 0 0 0 1px #fff5 }
+.wtug i:last-child { flex:1 }
+.wend { display:flex;align-items:center;justify-content:center;gap:16px }
+.wend .dice i { width:34px;height:34px;line-height:34px;font-size:20px;border-radius:8px }
+.wodds { opacity:.7;font-size:15px }
+.wend b { font:800 26px var(--sc);color:#93e09c;padding:4px 18px;border-radius:12px;background:#93e09c1f }
+.wend.fell b { color:#ff9a82;background:#ff9a821f }
 .wnav { display:flex;gap:5px;align-items:center;justify-content:center }
 .wnav button { min-width:34px;height:34px;border-radius:99px;display:grid;place-items:center;background:#ffffff1f;font-weight:800 }
 .wnav .wd { background:none;min-width:0;opacity:.6 }
 .wnav .wd.on { opacity:1;transform:scale(1.18) }
 .wnav .fell .em { filter:grayscale(.75) brightness(.7) }
 .wnav .tx { padding:0 14px;background:#ffffff1f;opacity:1 }
-.warbox { position:fixed;left:50%;bottom:20px;transform:translateX(-50%);width:min(860px,94vw);z-index:12;background:#0c2c31f7;border-radius:20px;padding:15px 22px 14px;display:none;flex-direction:column;gap:11px;box-shadow:0 12px 40px #000b }
-body.war .warbox { display:flex }
-.warbox>p { margin:0;text-align:center;font-size:17px }
-body.war .hand,body.war .door,body.war #heaps,body.war .side,body.war .kingbox { display:none }
-/* The final score by source, under each player's total. */
-.wscore div .parts { grid-column:1/-1;display:flex;flex-wrap:wrap;gap:3px 12px;font-size:14px;opacity:.85;margin:-2px 0 4px 44px }
-.wscore .parts .pt { display:inline-flex;align-items:center;gap:3px }
-.wscore .parts svg { opacity:.9 }
+/* The end of the game: the picture of the ending beside the result, the player's game in numbers and the standings. */
+.ending { position:fixed;inset:0;z-index:30;display:grid;place-items:center;background:#06181ad9 }
+.ending[hidden] { display:none }
+.ebox { display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);width:min(1180px,94vw);max-height:92vh;background:var(--deep);border-radius:22px;overflow:hidden;box-shadow:0 0 0 1.5px #edb44366,0 30px 80px #000d }
+.epic { margin:0;position:relative }
+.epic img { display:block;width:100%;height:100%;object-fit:cover }
+.epic::after { content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent 70%,var(--deep)) }
+.etext { padding:30px 34px 26px;overflow:auto;display:flex;flex-direction:column;gap:14px }
+.eside { margin:0;display:flex;align-items:center;gap:9px;font:700 16px var(--sc);opacity:.8 }
+.ending h2 { font-size:48px;line-height:1;color:var(--ochre) }
+.ending.patriotLost h2,.ending.loyalistLost h2 { color:var(--bone) }
+.eline { margin:-4px 0 0;font-size:18px;opacity:.85 }
+.escore { display:flex;align-items:center;gap:18px }
+.escore strong { display:flex;align-items:center;gap:6px;font:800 56px/1 var(--sc) }
+.escore span { display:flex;flex-direction:column;font:700 22px var(--sc) }
+.escore small { font:500 15px var(--ui);opacity:.7 }
+.estats { list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(104px,1fr));gap:8px }
+.estats li { display:grid;grid-template-columns:auto 1fr;align-items:center;gap:2px 8px;padding:8px 10px;border-radius:12px;background:#ffffff0f }
+.estats b { font:800 24px/1 var(--sc) }
+.estats span { grid-column:1/-1;font-size:13.5px;opacity:.75 }
+.erank { list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px }
+.erank li { display:grid;grid-template-columns:28px 1fr auto 48px 46px;gap:10px;align-items:center;padding:5px 12px;border-radius:12px }
+.erank li.me { background:#ffffff12 }
+.erank li.out { opacity:.5 }
+.erank b { display:flex;align-items:center;gap:5px;font:700 17px var(--sc) }
+.erank .eic { display:inline-flex;align-items:center;gap:4px;font-weight:800;opacity:.85 }
+.erank strong { font:800 26px/1 var(--sc);text-align:right }
+.eacts { display:flex;gap:8px;justify-content:flex-end;margin-top:4px }
+.eacts button { padding:9px 18px;border-radius:12px;background:#ffffff17;font:800 17px var(--sc) }
+.eacts button:hover { background:#ffffff2b }
+.eacts .go { background:var(--ochre);color:#3a2408 }
+.eacts .go:hover { background:#f6c862 }
+@media (max-width:900px) { .ebox { grid-template-columns:1fr } .epic { max-height:28vh } }
+/* While the war is fought, the peace-time row below the map (hand, piles, doors, warehouse, pier) has nothing to do. */
+body.atwar .hand,body.atwar .door,body.atwar #heaps,body.atwar .side { display:none }
+/* The war card: three tiles, the Royal Army, the King's tactic, the loyalist. */
+.rc .wcard { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:6px 0 4px;text-align:center }
+.rc .wct { display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 6px;border-radius:12px;background:#1c2a2a12 }
+.rc .wpic { display:flex;align-items:center;justify-content:center;height:36px }
+.rc .wct b { font:800 16px/1.1 var(--sc) }
+.rc .wct small { font-size:13px;line-height:1.25;opacity:.8 }
+.rc .wct .wmen { max-width:110px;justify-content:center }

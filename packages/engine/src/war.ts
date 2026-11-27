@@ -16,8 +16,10 @@ export function rebelOrder(s: State): number[] {
     return y.bells - x.bells || y.crosses - x.crosses || y.gold - x.gold || seat(a) - seat(b);
   });
 }
+/** Whether this game can have a loyalist at all: not solo, and not below `war.loyalistFrom` players (W-2). */
+export const hasLoyalist = (s: State) => s.players.length > 1 && s.players.length >= s.def.settings.war.loyalistFrom;
 export function findLoyalist(s: State): number | null {
-  if (s.players.length === 1 || s.players.every((p) => p.bells >= s.def.settings.war.bells)) return null;
+  if (!hasLoyalist(s) || s.players.every((p) => p.bells >= s.def.settings.war.bells)) return null;
   return rebelOrder(s).at(-1)!;
 }
 

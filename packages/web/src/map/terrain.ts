@@ -4,8 +4,8 @@ import { CELL, colonyAt, D, settlementAt, W } from '../data.ts';
 import TEXTURES from '../generated/textures.json';
 function rnd(x: number, y: number) { let h = Math.imul(x, 374761393) ^ Math.imul(y, 668265263); h = Math.imul(h ^ (h >>> 13), 1274126177); return ((h ^ (h >>> 16)) >>> 0) / 4294967296; }
 export function noise(x: number, y: number) { const a = Math.floor(x), b = Math.floor(y), u = x - a, v = y - b, s = u * u * (3 - 2 * u), q = v * v * (3 - 2 * v); return (rnd(a, b) * (1 - s) + rnd(a + 1, b) * s) * (1 - q) + (rnd(a, b + 1) * (1 - s) + rnd(a + 1, b + 1) * s) * q; }
-/** The cell a point of the map (map units) belongs to, with cells meeting on wavy lines: the ground and the clouds over the unknown follow them alike. */
-export function wavyCell(X: number, Y: number) {
+/** The cell a point of the map (map units) belongs to, with cells meeting on wavy lines, so that kinds of ground blend into each other. */
+function wavyCell(X: number, Y: number) {
   const wx = X + (noise(X / 26, Y / 26) - 0.5) * 40 + (noise(X / 8 + 50, Y / 8) - 0.5) * 13, wy = Y + (noise(X / 26 + 90, Y / 26 + 40) - 0.5) * 40 + (noise(X / 8, Y / 8 + 70) - 0.5) * 13;
   return Math.min(W - 1, Math.max(0, Math.floor(wy / CELL))) * W + Math.min(W - 1, Math.max(0, Math.floor(wx / CELL)));
 }

@@ -7,7 +7,7 @@ export interface Bot { name: string; choose(v: View): Choice }
 /** Weights that make a random player actually settle, so that fuzzing reaches the later game. */
 const EAGER: Record<string, number> = {
   'play:found': 60, 'play:build': 12, 'play:work': 8, 'play:produce': 4, 'play:docks': 4, 'play:trade': 12, 'play:teach': 6, 'play:attack': 3, 'play:alliance': 4,
-  'play:hire': 0.5, 'play:exchange': 0.1, 'play:supply': 0.3, 'play:moveInfantry': 2, 'disembark:': 5, 'explore:': 3, 'cargo:': 4, 'end:': 0.3, 'pass:': 0.1, 'recruit:': 2,
+  'play:hire': 0.5, 'play:exchange': 0.1, 'play:supply': 0.3, 'play:moveInfantry': 2, 'disembark:': 5, 'explore:': 3, 'cargo:': 4, 'end:': 0.3, 'pass:': 0.1, 'recruit:': 2, 'play:recruit': 2,
 };
 /** Uniform over kinds of action first, so rare actions are exercised as often as common ones. */
 export function randomBot(seed: string, eager = false): Bot {

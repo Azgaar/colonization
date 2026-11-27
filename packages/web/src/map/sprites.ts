@@ -1,6 +1,8 @@
 /* Things that stand on the map, upright: ships, infantry, ruins, wrecks; villages and colonies come from towns.ts. */
 import { colony, village } from './towns.ts';
-import { art, D } from '../data.ts';
+import { D } from '../data.ts';
+import { SHAPES } from '../icons.ts';
+import { emblemArt } from '../emblem.ts';
 /* Sprites in a 64-unit box, feet at the bottom. */
 const ring = (y: number, r: number) => `<ellipse cx="32" cy="${y}" rx="${r}" ry="${r * 0.34}" fill="#0a1d1b" fill-opacity=".34"/>`;
 export const Sprite = {
@@ -14,7 +16,7 @@ ${light('M17 16Q6 27 0 34Q9 33 16 34Z')}
 ${sail('M44 15Q54 23 58 31Q50 29.500 43 32Q46 24 44 15Z')}
 ${sail('M12 17Q18 14.500 25 17Q23 21 24.500 25Q18 22.500 12 25Q10 21 12 17Z')}${sail('M10 26Q18 23 26.500 26Q24 33 26 39Q18 35.500 9.500 39Q7 32 10 26Z')}
 ${sail('M26 8Q32 5.500 39 8Q37 12 38.500 16Q32 13.500 26 16Q24.500 12 26 8Z')}${sail('M23.500 17Q32 13.500 41 17Q38.500 26 41.500 35Q32 30.500 23 35Q20 26 23.500 17Z')}
-<image href="${art.emblem(D.players[p].nation)}" x="26.750" y="19.250" width="10.500" height="10.500" filter="url(#lift)"/>
+${emblemArt(D.players[p].nation, 32, 24.500, 10)}
 <path d="M32 4l-9 1.600 9 1.800ZM45 13l-7 1.300 7 1.500ZM18 13l-7 1.300 7 1.500Z" fill="#fff"/>
 <path d="M5 40Q8 49 13 55H48Q55 51 59 34L49 35.500V41Q36 46 22 44.500L14 43V39.500Z" fill="#5b371d"/><path d="M5 40Q7 45 9.500 49Q30 54 54.500 46Q57 41 59 34L49 35.500V41Q36 46 22 44.500L14 43V39.500Z" fill="#8a5730"/><path d="M6.500 43.500Q30 51 57 41" stroke="#e0b878" stroke-width="1.500" fill="none"/><path d="M49 35.500L59 34L58.300 37L49 38.500ZM5 40L14 39.500V42.500L6 42.500Z" fill="${c}"/><path d="M49 35.500L59 34M5 40L14 39.500" stroke="#e9c987" stroke-width="1.300"/><path d="M17 48.300h2.600v2.400H17Zm7 .9h2.600v2.400H24Zm7 .2h2.600v2.400H31Zm7-.6h2.600v2.400H38Zm7-1.600h2.600v2.400H45Z" fill="#2b1a0d"/><path d="M51.500 39.800h2v2.200h-2Zm3.200-.6h1.900v2.200h-1.900Z" fill="#ffdf8c"/>`;
   },
@@ -33,6 +35,35 @@ ${sail('M26 8Q32 5.500 39 8Q37 12 38.500 16Q32 13.500 26 16Q24.500 12 26 8Z')}${
       + `<path d="M47.200 10q7.500-2.500 15 0v11q-7.500-2.500-15 0Z" fill="${c}"/><path d="M47.200 10q7.500-2.500 15 0v11q-7.500-2.500-15 0Z" fill="url(#billow)" stroke="#fff" stroke-opacity=".7" stroke-width=".8"/>${flagEmblem(n)}`
       + arm('M40 25.500q4 2.500 6 7') + hand(46.600, 32.800)
       + `<circle cx="32" cy="18" r="5.500" fill="#e2b48b"/>${HAT[n] ?? HAT.english}`;
+  },
+  /** A soldier of the Royal Army: a grenadier in a tall mitre cap with the crown on it, red coat with royal-blue facings, black gaiters, musket and bayonet; no flag, so it is never taken for a player's infantry. */
+  redcoat() {
+    const arm = (d: string) => `<path d="${d}" stroke="${RED}" stroke-width="3.400" stroke-linecap="round" fill="none"/>`, hand = (x: number, y: number) => `<circle cx="${x}" cy="${y}" r="1.700" fill="#e2b48b"/>`;
+    return ring(56, 14)
+      + `<path d="M26.700 43.500h4.600V55h-4.600Zm6 0h4.600V55h-4.600Z" fill="#f4efe4"/><path d="M26.500 48h5v8.500h-5Zm6.200 0h5v8.500h-5Z" fill="${INK}"/><path d="M26.200 55h5.600v1.800h-5.600Zm6.200 0h5.600v1.800h-5.600Z" fill="#111"/>`
+      + `<path d="M24.500 36.500L22.300 46H29l3-5.500 3 5.500h6.700l-2.200-9.500Z" fill="${RED}"/><path d="M22.300 46l1.800-4.500L26 46ZM41.700 46l-1.800-4.500L38 46Z" fill="${ROYAL}"/>`
+      + `<path d="M23 26.500q0-3.500 3.500-3.500h11q3.500 0 3.500 3.500l-1.500 12h-15Z" fill="${RED}" stroke="#fff" stroke-opacity=".45" stroke-width=".8"/><path d="M28 23.200h8l-1 13h-6Z" fill="${ROYAL}"/><path d="M29 26h6M29.300 29h5.400M29.600 32h4.800" stroke="${BRASS}" stroke-width=".9"/>`
+      + `<path d="M26 24.500l11.500 12M38 24.500l-11.500 12" stroke="#fffaf0" stroke-width="1.800"/><path d="M24.300 35.500h15.400v2H24.300Z" fill="#fffaf0"/><path d="M31 35.300h2v2.400h-2Z" fill="${BRASS}"/>`
+      + arm('M24 25.500q-3 6-2.500 12') + hand(21.500, 38.500)
+      // musket with bayonet, held upright on the right
+      + `<path d="M45.800 55.500l1.400-8" stroke="#6b4226" stroke-width="3" stroke-linecap="round"/><path d="M47.200 47.500L46.400 12" stroke="#5a3a20" stroke-width="1.800"/><path d="M46.400 13V5" stroke="${STEEL}" stroke-width="1"/><path d="M46.400 5l-.7 2h1.400Z" fill="${STEEL}"/>`
+      + arm('M40 25.500q4 2.500 6 7') + hand(46.600, 32.800)
+      // face, and the mitre cap: royal-blue front edged in gold, the crown on it
+      + `<circle cx="32" cy="18.500" r="5.500" fill="#e2b48b"/><path d="M25.500 16.500Q27 6 32 1.500Q37 6 38.500 16.500Z" fill="${ROYAL}"/><path d="M25.500 16.500Q27 6 32 1.500Q37 6 38.500 16.500Z" fill="none" stroke="${BRASS}" stroke-width="1"/><path d="M25.200 15.500h13.600v1.800H25.200Z" fill="${RED}"/>`
+      + `<svg x="28" y="6.500" width="8" height="8" viewBox="0 0 24 24">${CROWN}</svg>`;
+  },
+  /** A ship of the King's navy: a dark man-of-war with a gold stripe, white sails, the crown on the mainsail and a red ensign. */
+  refShip() {
+    const sail = (d: string) => `<path d="${d}" fill="#f6efdc"/><path d="${d}" fill="url(#billow)" stroke="#fff" stroke-opacity=".6" stroke-width=".7"/>`;
+    return `<ellipse cx="33" cy="56" rx="30" ry="5.500" fill="#06283a" fill-opacity=".42"/><path d="M1 55q8-5 15-1M22 59q16 3 34-2" stroke="#f2fbf7" stroke-opacity=".75" stroke-width="1.500" fill="none" stroke-linecap="round"/>
+<path d="M9 41L-2 34.500" stroke="#3a2a1c" stroke-width="1.700" stroke-linecap="round"/><path d="M18 44V13M32 45V4M45 42V13" stroke="#3a2a1c" stroke-width="1.700"/><path d="M18 14L-1 35M32 5L52 33M32 5L12 41" stroke="#2b1c10" stroke-opacity=".5" stroke-width=".6" fill="none"/>
+${sail('M17 16Q6 27 0 34Q9 33 16 34Z')}${sail('M44 15Q54 23 58 31Q50 29.500 43 32Q46 24 44 15Z')}
+${sail('M12 17Q18 14.500 25 17Q23 21 24.500 25Q18 22.500 12 25Q10 21 12 17Z')}${sail('M10 26Q18 23 26.500 26Q24 33 26 39Q18 35.500 9.500 39Q7 32 10 26Z')}
+${sail('M26 8Q32 5.500 39 8Q37 12 38.500 16Q32 13.500 26 16Q24.500 12 26 8Z')}${sail('M23.500 17Q32 13.500 41 17Q38.500 26 41.500 35Q32 30.500 23 35Q20 26 23.500 17Z')}
+<svg x="25.500" y="18.500" width="13" height="13" viewBox="0 0 24 24">${CROWN}</svg>
+<path d="M32 4l-9 1.600 9 1.800ZM45 13l-7 1.300 7 1.500Z" fill="#fff"/><path d="M18 13l-8 1.400 8 1.600Z" fill="${RED}"/>
+<path d="M5 40Q8 49 13 55H48Q55 51 59 34L49 35.500V41Q36 46 22 44.500L14 43V39.500Z" fill="#1d1a17"/><path d="M5 40Q7 45 9.500 49Q30 54 54.500 46Q57 41 59 34L49 35.500V41Q36 46 22 44.500L14 43V39.500Z" fill="#2e2924"/><path d="M6 42.500Q30 50.500 57.500 40" stroke="${BRASS}" stroke-width="3.200" fill="none"/><path d="M14 45.300h2.600v2.400H14Zm6.500 1h2.600v2.400h-2.600Zm6.500.5h2.600v2.400H27Zm6.500 0h2.600v2.400h-2.600Zm6.500-.6h2.600v2.400H40Zm6.500-1.500h2.600v2.400h-2.600Z" fill="#111"/><path d="M49 35.500L59 34L58.300 37L49 38.500ZM5 40L14 39.500V42.500L6 42.500Z" fill="${RED}"/><path d="M49 35.500L59 34M5 40L14 39.500" stroke="${BRASS}" stroke-width="1.300"/><path d="M51.500 39.800h2v2.200h-2Zm3.200-.6h1.900v2.200h-1.900Z" fill="#ffdf8c"/>
+<path d="M58.500 35V25.500" stroke="#3a2a1c" stroke-width="1.200"/><path d="M58.500 25.500h8l-1.200 2.300 1.200 2.300h-8Z" fill="${RED}"/><path d="M58.500 25.500h3.400v2.300h-3.400Z" fill="${ROYAL}"/>`;
   },
   /** A ruin: one of a few pictures, always the same for the same cell. */
   ruin: (c: number) => RUINS[(Math.imul(c + 7, 0x9e3779b1) >>> 0) % RUINS.length]!,
@@ -75,6 +106,8 @@ const RUINS = [
 ];
 /* ---- infantry by nation ---- */
 const STEEL = '#c3cad0', BRASS = '#c9a25a', INK = '#22262b';
+/* The King's colours and his crown (the same crown as the Royal Army everywhere in the game). */
+const RED = '#b0242a', ROYAL = '#23366e', CROWN = SHAPES.ref!;
 const tricorne = (trim: string, cockade = '') => `<path d="M21 16.500q11-11 22 0-11-3.500-22 0Z" fill="${INK}"/><path d="M21.600 16.200q10.400-3.300 20.800 0" stroke="${trim}" stroke-width="1" fill="none"/>${cockade ? `<circle cx="32" cy="12.600" r="1.600" fill="${cockade}"/>` : ''}`;
 const morion = `<path d="M21 13.500q11 5 22 0-2 3.500-11 3.500t-11-3.500Z" fill="#aeb6bc"/><path d="M26 15q0-7 6-7t6 7Z" fill="${STEEL}"/><path d="M28 9.500q4-5 8 0" stroke="#8d969c" stroke-width="2" fill="none"/>`;
 /** The colour of the crossbelts of each nation. */
@@ -92,10 +125,5 @@ const HAT: Record<string, string> = {
   curonian: `<path d="M26.500 15.500L29 5q3-2 5 0l3.500 10.500Z" fill="#9b1212"/><path d="M26.500 15.500L29 5q3-2 5 0l3.500 10.500Z" fill="none" stroke="${BRASS}" stroke-width="1"/><path d="M27.500 13l9 0" stroke="${BRASS}" stroke-width="1.300"/><circle cx="31.500" cy="4.200" r="1.300" fill="${BRASS}"/>`,
   scottish: `<path d="M24.500 14.500q-1-5.500 7.500-5.500 8.500 0 7.500 5.500Z" fill="#2f4a7a"/><path d="M24.800 14h14.400v1.800H24.800Z" fill="#e6e0d0"/><path d="M26.500 14h2v1.800h-2Zm4 0h2v1.800h-2Zm4 0h2v1.800h-2Z" fill="#b8452e"/><circle cx="32" cy="9" r="1.500" fill="#b8452e"/>`,
 };
-/** Where each emblem is drawn inside its picture, as parts of its width and height: left, top, right, bottom (measured from the pictures). */
-const EMBLEM_BOX: Record<string, [number, number, number, number]> = { curonian: [0, 0.031, 0.992, 0.961], danish: [0.09, 0, 0.883, 0.996], dutch: [0.055, 0.004, 0.898, 0.996], english: [0.016, 0, 0.988, 0.996], french: [0.051, 0, 0.941, 0.996], portuguese: [0.008, 0, 0.988, 0.996], russian: [0.055, 0, 0.934, 0.992], scottish: [0, 0.008, 0.996, 0.992], spanish: [0.07, 0, 0.93, 0.996], swedish: [0, 0.07, 0.996, 0.879] };
-/** The emblem of nation `n` on the infantry's flag: what is drawn of it, at most 8 units across, centred on the middle of the waving flag. */
-function flagEmblem(n: string) {
-  const [x0, y0, x1, y1] = EMBLEM_BOX[n] ?? [0, 0, 1, 1], s = 8 / Math.max(x1 - x0, y1 - y0), f = (v: number) => v.toFixed(2);
-  return `<image href="${art.emblem(n)}" x="${f(54.7 - ((x0 + x1) / 2) * s)}" y="${f(14.3 - ((y0 + y1) / 2) * s)}" width="${f(s)}" height="${f(s)}" filter="url(#lift)"/>`;
-}
+/** The emblem of nation `n` on the infantry's flag, centred on the middle of the waving flag. */
+const flagEmblem = (n: string) => emblemArt(n, 54.7, 14.3, 8);

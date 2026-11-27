@@ -13,7 +13,7 @@ import { report } from './ui/reports.ts';
 import { Toast } from './ui/toasts.ts';
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 /** The fields of an option that the engine takes with each action. */
-const KEEP: Record<string, string[]> = { produce: ['cell', 'icon'], docks: ['cell'], work: ['building'], build: ['building'], customs: ['r'], smuggle: ['r'], exchange: ['other'], teach: ['target'], attack: ['token', 'mode', 'cell'], gift: ['settlement'], preach: ['settlement'], alliance: ['settlement'] };
+const KEEP: Record<string, string[]> = { produce: ['cell', 'icon'], docks: ['cell'], work: ['building'], build: ['building'], customs: ['r'], smuggle: ['r'], exchange: ['other'], teach: ['target'], attack: ['token', 'mode', 'cell'], gift: ['settlement'], preach: ['settlement'], alliance: ['settlement'], recruit: ['n'] };
 const clean = (o: Opt): Choice => { const keep = KEEP[o.a] || []; return { c: 'play', card: o.card, a: o.a, ...Object.fromEntries(keep.map((k) => [k, o[k]])) }; };
 export async function commit(o: Opt, space: string) {
   if (Sim.busy) return;

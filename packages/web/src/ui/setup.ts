@@ -1,5 +1,5 @@
 /* Starting games, games in files (FR-E-10) and replays (FR-U-17, FR-T-6). */
-import { $, D, L, pick, showSeat } from '../data.ts';
+import { $, D, pick, showSeat, t } from '../data.ts';
 import { settle } from '../flow.ts';
 import { Board } from '../map/board.ts';
 import { paint } from '../paint.ts';
@@ -17,9 +17,9 @@ export function replayBar() {
   document.body.classList.toggle('watching', !!r);
   if (!r) return;
   const n = r.data.choices.length;
-  el.innerHTML = `<button data-rp="0" title="${L('Start', 'В начало')}">⏮</button><button data-rp="${r.at - 1}">◀</button><button data-rp-play>${timer ? '⏸' : '▶'}</button><button data-rp="${r.at + 1}">▶▶</button><button data-rp="${n}" title="${L('End', 'В конец')}">⏭</button>
-<input type="range" min="0" max="${n}" value="${r.at}" data-rp-at><span class="at">${r.at} / ${n} · ${L('round', 'тур')} ${D.round}</span>
-<select data-rp-seat>${D.players.map((p, i) => option(`${i}`, pick(D.names.nations[p.nation]), i === Sim.seat)).join('')}</select><button data-rp-close>${L('Close the replay', 'Закрыть запись')}</button>`;
+  el.innerHTML = `<button data-rp="0" title="${t('setup.start')}">⏮</button><button data-rp="${r.at - 1}">◀</button><button data-rp-play>${timer ? '⏸' : '▶'}</button><button data-rp="${r.at + 1}">▶▶</button><button data-rp="${n}" title="${t('setup.end')}">⏭</button>
+<input type="range" min="0" max="${n}" value="${r.at}" data-rp-at><span class="at">${r.at} / ${n} · ${t('setup.round')} ${D.round}</span>
+<select data-rp-seat>${D.players.map((p, i) => option(`${i}`, pick(D.names.nations[p.nation]), i === Sim.seat)).join('')}</select><button data-rp-close>${t('setup.close_replay')}</button>`;
 }
 
 let timer: ReturnType<typeof setInterval> | null = null;
@@ -45,9 +45,9 @@ async function openFile(f: File) {
     const x = JSON.parse(text) as Partial<Replay> & { game?: string };
     if (Array.isArray(x.choices)) { stop(); showSeat(0); Sim.watch(x as Replay); }
     else if (typeof x.game === 'string' && Sim.open(text)) showSeat(0);
-    else throw new Error(L('not a saved game or a replay', 'это не сохранённая игра и не запись'));
+    else throw new Error(t('setup.not_saved'));
     Board.home(); enterGame();
-  } catch (e) { alert(`${L('Cannot open the file', 'Не удалось открыть файл')}: ${(e as Error).message}`); }
+  } catch (e) { alert(`${t('setup.cannot_open')}: ${(e as Error).message}`); }
 }
 /** The game at this moment, as a file to keep or to send. */
 export function saveFile() {

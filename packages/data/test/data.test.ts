@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url';
 import readWorkbook from 'read-excel-file/node';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { formatIssue, importWorkbook, toId, type RawSheet } from '../src/import.ts';
-import { compileRuleset, gameData, loadRuleset, RulesetError } from '../src/index.ts';
+import { compileRuleset, gameData, loadRuleset, rulesets, RulesetError } from '../src/index.ts';
 
 const at = (p: string) => fileURLToPath(new URL(p, import.meta.url));
 const reviewed = JSON.parse(readFileSync(at('../src/reviewed-texts.json'), 'utf8'));
@@ -70,7 +70,7 @@ describe('import', () => {
 
 describe('rulesets', () => {
   const rs = (o: object, sandbox = false) => ({ id: 't', title: '', sandbox, overrides: [{ id: 'x', why: '', set: {}, ...o }] }) as never;
-  it('board and pc start identical', () => { expect(loadRuleset('pc').rulesetHash).toBe(loadRuleset('board').rulesetHash); });
+  it('pc without its own changes plays as board', () => { expect(compileRuleset(gameData, { ...rulesets.pc, overrides: [] }).rulesetHash).toBe(loadRuleset('board').rulesetHash); });
   it('overrides numbers, lists and card values', () => {
     const d = compileRuleset(gameData, rs({ set: { 'agents.priest.price': 5, 'settings.tax.track': [0, 0], 'fathers.francis_drake.mods.0.add': 3 } }, true));
     expect([d.agents.priest.price, d.settings.tax.track, (d.fathers.francis_drake.mods[0] as { add: number }).add]).toEqual([5, [0, 0], 3]);

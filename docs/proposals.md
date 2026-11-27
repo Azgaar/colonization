@@ -6,7 +6,8 @@ Every candidate is a **direct** change: printed numbers only, with the table wor
 
 ## Decided so far
 
-- **Accepted** (DD-49, DD-50, DD-52): each King's army cube attacks with 1, not 2; refusing the tax gives no bell; refusing adds 1 cube, not 2. All three are now in `board`.
+- **Accepted** (DD-49, DD-50, DD-52): each Royal Army cube attacks with 1, not 2; refusing the tax gives no bell; refusing adds 1 cube, not 2. All three are now in `board`.
+- **Accepted** (DD-60, the designer's own change): recruiting with crosses is an action; the crosses spent are the agents looked at; Roger Williams takes up to 2.
 - **Rejected** (DD-51): a base colony defence of 4. The designer's rule: a colony's strength is balanced by the King's cubes, not by raising the colony.
 
 ## Where the board stands
@@ -25,13 +26,13 @@ At 3 and 5 players with mixed bots: the loyalist wins 23% and 6%, colonies survi
 
 | Id | Table wording | Setting |
 |---|---|---|
-| `events-1-cube` | El Dorado Rumors: the King's army gains 1 cube per player, not 2. Mutiny, Boston Tea Party, Pirate Blockade, Black Market: 1 cube instead of 2 for each refusal, unit or seller. | five event-card numbers 2 → 1 |
+| `events-1-cube` | El Dorado Rumors: the Royal Army gains 1 cube per player, not 2. Mutiny, Boston Tea Party, Pirate Blockade, Black Market: 1 cube instead of 2 for each refusal, unit or seller. | five event-card numbers 2 → 1 |
 
-Russian wording is in `rulesets/proposed.json`. Tested before refusal 1 cube was adopted: it removes 6–8 cubes and moves the loyalist only 4–9 points, because events give about a quarter of the King's army (refusals gave 72 of about 105 cubes at 4 players). Kept for fine-tuning one player count, not as a fix.
+Russian wording is in `rulesets/proposed.json`. Tested before refusal 1 cube was adopted: it removes 6–8 cubes and moves the loyalist only 4–9 points, because events give about a quarter of the Royal Army (refusals gave 72 of about 105 cubes at 4 players). Kept for fine-tuning one player count, not as a fix.
 
 ## Open
 
-1. **Two players stay loyalist-heavy**: with one patriot against one loyalist, whoever has fewer bells nearly always wins. This looks structural (for example, no loyalist with 2 players, or a different 2-player war) and is a question for the designer. Asked as Q19 in [decisions.md](decisions.md#open-questions).
+1. **Two players stay loyalist-heavy**: with one patriot against one loyalist, whoever has fewer bells nearly always wins. Decided (DD-58): a 2-player game has no loyalist, and the war plays without the loyalist's steps. In `board` as `two-players-no-loyalist` (setting `war.loyalistFrom` = 3).
 2. **Early endings** rose to 56–67% at 4–5 players with mixed bots now that the war is winnable: racing to 15 bells pays again. The refusal bell is gone, so where the racing player's bells come from (buildings, fathers, events) needs a look before choosing a fix.
 3. **5 players may overshoot** (loyalist 6% with mixed bots). Event cards can tune this later.
 4. **Tuned bots** still let the loyalist win 29–49% at 3–5 players. They were trained under the old war and should be tuned again under the new rules before these numbers are trusted further.
@@ -40,7 +41,6 @@ Russian wording is in `rulesets/proposed.json`. Tested before refusal 1 cube was
 
 - **Dead cards** (detectors, 800 games): the school (built by 9 of 1,929 seats it was offered to), the slave, the smuggler. Teaching and smuggling are actions the bots hardly use ([system-check.md](system-check.md)), so this may be the bots, not the cards.
 - **"Dominated" town hall, stockade, the work action, alliances**: their holders win less, but they are what patriots build, and patriots lost under the old war. Recheck after the war change.
-- **Supply** (H13) plays one card to draw one. Its food cost and draw are fixed in the engine rather than read from the settings, so trying "Supply draws 2" first needs them made settings.
 
 ## Caveats
 

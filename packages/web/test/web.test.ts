@@ -3,7 +3,6 @@ import { applyInPlace, choiceKey, createGame, replay, viewFor, type Choice } fro
 import { goalBot, PERSONALITIES } from '@col/bots';
 import { loadRuleset } from '@col/data';
 import { exportState } from '../src/view.ts';
-import { plural } from '../src/plural.ts';
 
 // The session keeps its saved game in the browser's storage; a map stands in for it here.
 const store = new Map<string, string>();
@@ -51,8 +50,3 @@ describe('the game session', () => {
   });
 });
 
-describe('words', () => {
-  it('picks the Russian form for a number', () => {
-    expect([1, 2, 5, 11, 21, 23, 112].map((n) => plural(n, 'клетка', 'клетки', 'клеток'))).toEqual(['клетка', 'клетки', 'клеток', 'клеток', 'клетка', 'клетки', 'клеток']);
-  });
-});

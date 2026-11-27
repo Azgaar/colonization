@@ -35,7 +35,7 @@ body.shaded .shade { opacity:.72;visibility:visible }
 .rc .dice i { width:32px;height:32px;line-height:32px;font-size:19px;background:var(--a);color:#fff }
 .rc .who { list-style:none;margin:2px auto 6px;padding:7px 0 0;border-top:1px solid #1c2a2a2e;display:grid;gap:5px;width:fit-content;max-width:100%;font-size:15.500px }
 .rc .who li { display:flex;gap:4px 7px;align-items:center;flex-wrap:wrap;line-height:1.25 }
-.rc .who .em { width:22px!important;height:22px!important;border-width:1.500px;box-shadow:none;align-self:center }
+.rc .who .em { width:22px!important;height:22px!important;box-shadow:none;align-self:center }
 .rc .who li.tr { flex-wrap:nowrap }
 .rc .who li.tr>span { flex:1 1 0;min-width:0 }
 .rc .who .pl { display:inline-flex;gap:5px;align-items:center;vertical-align:middle;white-space:nowrap }

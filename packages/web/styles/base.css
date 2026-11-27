@@ -17,8 +17,8 @@ img { -webkit-user-drag:none }
 .marks { overflow:visible }
 .marks text { font-family:var(--ui) }
 body.lift .map-stage { cursor:default }
-.em { flex:none;background-color:var(--c);background-image:repeating-linear-gradient(0deg,#ffffff1c 0 1px,#0000 1px 3px),repeating-linear-gradient(90deg,#0000001f 0 1px,#0000 1px 3px);border-radius:50%;display:inline-grid;place-items:center;border:2.5px solid #fff;box-shadow:0 2px 6px #0008 }
-.em img { width:70%;filter:drop-shadow(0 1.5px 1.5px #000a) }
+/* A nation's badge (emblem.ts): an SVG that draws its own disc, rim and emblem at any size. */
+.em { flex:none;display:inline-block;vertical-align:middle;border-radius:50%;box-shadow:0 2px 6px #0008 }
 .ghost { position:fixed;z-index:60;width:78px;height:78px;border-radius:50%;overflow:hidden;border:4px solid var(--hot);transform:translate(-50%,-58%);pointer-events:none;box-shadow:0 9px 24px #000b;background:var(--bone) }
 .ghost img { width:100%;height:150%;object-fit:cover;object-position:50% 0 }
 .kb { position:fixed;z-index:61;transform:translate(-50%,-100%);background:var(--bone);color:var(--ink);border-radius:12px;padding:7px 14px;font-size:17.5px;pointer-events:none;white-space:nowrap;box-shadow:0 6px 20px #000a }

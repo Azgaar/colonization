@@ -1,9 +1,12 @@
 /* The person's options, kept together in this browser under one key: language, sound, how the map is seen and its grid, speed, the tutorial's tips, dev mode.
  * Content and progress are kept apart under their own keys: the game in progress, the designer's rulesets, the tutorial's step. */
 
+import { LOCALES } from './i18n.ts';
+
 /** How the map is seen at first and after Reset: tilt, perspective (depth), shift, whether the tilt follows the zoom (auto) and how far it leans then (most). */
 export const VIEW = { tilt: 24, depth: 55, shift: -4, auto: 1, most: 52 };
-const DEFAULTS = { lang: 'en', grid: false, fast: false, tutorial: true, dev: false, forecast: false, sound: { music: 50, fx: 70, mute: false }, view: { ...VIEW } };
+/** `lang` stays empty until the person picks a language; until then the browser's language is used (see `shownLang`). */
+const DEFAULTS = { lang: '', grid: false, fast: false, tutorial: true, dev: false, forecast: false, sound: { music: 50, fx: 70, mute: false }, view: { ...VIEW } };
 export type OptionValues = typeof DEFAULTS;
 
 const KEY = 'options';
@@ -24,6 +27,10 @@ function read(): OptionValues {
 /** The options, read when the page opens. Change a value, then call `keepOptions`. */
 export const Options: OptionValues = read();
 export const keepOptions = () => localStorage.setItem(KEY, JSON.stringify(Options));
-/** What switching dev mode on sets, as a start for working on the game: music off. Each can be changed again in Options. */
-export function devOptions() { Options.sound.music = 0; }
-if (typeof document !== 'undefined') document.documentElement.lang = Options.lang;
+/** The language shown: the one picked in Options, else the first of the browser's languages the interface speaks, else English. */
+export function shownLang(): string {
+  if (Options.lang && LOCALES[Options.lang]) return Options.lang;
+  const asked = typeof navigator === 'undefined' ? [] : navigator.languages?.length ? navigator.languages : [navigator.language];
+  return asked.map((l) => l.toLowerCase().split('-')[0]).find((l) => LOCALES[l]) ?? 'en';
+}
+if (typeof document !== 'undefined') document.documentElement.lang = shownLang();

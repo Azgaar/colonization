@@ -19,7 +19,7 @@ import {
   validateChange,
   where
 } from "@col/data";
-import { L, pick } from "../data.ts";
+import { msg as say, pick, t, type Text } from "../data.ts";
 import { all, custom, defOf, forget, keep } from "../rules.ts";
 import { Dev } from "../sim.ts";
 import { U } from "../state.ts";
@@ -29,11 +29,11 @@ import { esc, md } from "./md.ts";
 export type Tab = "rules" | "lab" | "export";
 const B: { tab: Tab; rs: string; q: string } = { tab: "rules", rs: "", q: "" };
 const VALUES: Editable[] = editable(gameData);
-const LABELS: Record<Conversion, [string, string]> = {
-  direct: ["Direct: a printed number or text changes", "Прямое: меняется напечатанное число или текст"],
-  component: ["Component: needs a new card, token or track", "Компонент: нужна новая карта, жетон или трек"],
-  interface: ["Interface only", "Только интерфейс"],
-  notConvertible: ["Not convertible: sandbox only", "Неконвертируемое: только песочница"]
+const LABELS: Record<Conversion, Text> = {
+  direct: say('bench.direct_printed'),
+  component: say('bench.component_needs'),
+  interface: say('bench.interface'),
+  notConvertible: say('bench.not_convertible')
 };
 const show = (v: unknown) =>
   v === null || v === undefined
@@ -42,8 +42,8 @@ const show = (v: unknown) =>
       ? v.join(", ")
       : typeof v === "boolean"
         ? v
-          ? L("yes", "да")
-          : L("no", "нет")
+          ? t('bench.yes')
+          : t('bench.no')
         : String(v);
 const label = (e: Editable) => pick(e.label);
 /** A value as the rules have it: board for the default, the chosen ruleset for the current one. */
@@ -65,8 +65,8 @@ const settle = (r: Ruleset): Ruleset => ({
 export function bench(): string {
   if (!B.rs || !all()[B.rs]) B.rs = Object.keys(custom())[0] ?? "pc";
   return `<div class="bench">
-<header><button class="pback" data-t-page="main">← ${L("Back", "Назад")}</button><h2>${L("Design bench", "Мастерская")}</h2>
-<nav class="tabs">${(["rules", "lab", "export"] as Tab[]).map(t => `<button class="${B.tab === t ? "on" : ""}" data-b-tab="${t}">${pick({ rules: ["Rules", "Правила"], lab: ["Lab", "Лаборатория"], export: ["Export", "Экспорт"] }[t] as [string, string])}</button>`).join("")}</nav></header>
+<header><button class="pback" data-t-page="main">← ${t('back')}</button><h2>${t('bench.design_bench')}</h2>
+<nav class="tabs">${(["rules", "lab", "export"] as Tab[]).map(t => `<button class="${B.tab === t ? "on" : ""}" data-b-tab="${t}">${pick({ rules: say('newgame.rules'), lab: say('bench.lab'), export: say('bench.export') }[t] as Text)}</button>`).join("")}</nav></header>
 <section class="b-body">${body()}</section></div>`;
 }
 const body = () => (B.tab === "rules" ? rulesTab() : B.tab === "lab" ? labTab() : exportTab());
@@ -83,15 +83,15 @@ function rulesTab() {
   const list = all(),
     r = list[B.rs],
     own = !!custom()[B.rs];
-  const picker = `<div class="b-rs"><h4>${L("Rulesets", "Наборы правил")}</h4>${Object.values(list)
+  const picker = `<div class="b-rs"><h4>${t('bench.rulesets')}</h4>${Object.values(list)
     .map(
       x =>
-        `<button class="${x.id === B.rs ? "on" : ""}" data-b-rs="${x.id}"><b>${esc(x.id)}</b><small>${rulesets[x.id] ? L("built in", "встроенный") : x.sandbox ? L("yours · sandbox only", "ваш · только песочница") : L("yours", "ваш")}</small></button>`
+        `<button class="${x.id === B.rs ? "on" : ""}" data-b-rs="${x.id}"><b>${esc(x.id)}</b><small>${rulesets[x.id] ? t('bench.built') : x.sandbox ? t('bench.sandbox') : t('bench.yours')}</small></button>`
     )
     .join("")}
-<div class="b-new"><input data-b-name placeholder="${L("New ruleset name", "Имя нового набора")}" spellcheck="false"><button data-b-create>${L("Create", "Создать")}</button></div><p class="b-msg" id="b-msg"></p></div>`;
-  return `<div class="b-rules">${picker}<div class="b-main">${own ? changes(r) : `<p class="note">${L(`"${r.id}" is built in and cannot be changed here. Create your own ruleset (it starts from pc) to change values.`, `«${r.id}» встроенный, его здесь не изменить. Создайте свой набор (он начнётся с pc), чтобы менять значения.`)}</p>`}
-<div class="b-search"><input data-b-q value="${esc(B.q)}" placeholder="${L("Search values: tax, priest, war.bells…", "Поиск: налог, священник, war.bells…")}" spellcheck="false"></div><div class="b-values">${values(own)}</div></div></div>`;
+<div class="b-new"><input data-b-name placeholder="${t('bench.new_ruleset')}" spellcheck="false"><button data-b-create>${t('bench.create')}</button></div><p class="b-msg" id="b-msg"></p></div>`;
+  return `<div class="b-rules">${picker}<div class="b-main">${own ? changes(r) : `<p class="note">${t('bench.built_cannot', { id: r.id })}</p>`}
+<div class="b-search"><input data-b-q value="${esc(B.q)}" placeholder="${t('bench.search_values')}" spellcheck="false"></div><div class="b-values">${values(own)}</div></div></div>`;
 }
 /** The changes this ruleset makes, each with how it would reach the table. */
 function changes(r: Ruleset) {
@@ -100,15 +100,15 @@ function changes(r: Ruleset) {
     .map(o => {
       const [path, to] = Object.entries(o.set ?? {})[0] ?? ["", ""],
         e = VALUES.find(v => v.path === path);
-      return `<div class="b-ch" data-b-o="${esc(o.id)}"><div class="b-ch-h"><b>${e ? esc(label(e)) : esc(path)}</b><span>${show(value("board", path))} → <b>${show(to)}</b></span><button data-b-reset="${esc(path)}">${L("Undo change", "Отмена")}</button></div>
+      return `<div class="b-ch" data-b-o="${esc(o.id)}"><div class="b-ch-h"><b>${e ? esc(label(e)) : esc(path)}</b><span>${show(value("board", path))} → <b>${show(to)}</b></span><button data-b-reset="${esc(path)}">${t('bench.undo_change')}</button></div>
 <div class="b-ch-f"><select data-b-conv>${(Object.keys(LABELS) as Conversion[]).map(k => `<option value="${k}"${o.conversion === k ? " selected" : ""}>${pick(LABELS[k])}</option>`).join("")}</select>
-<input data-b-table value="${esc(o.table)}" placeholder="${L("How it reads at the table", "Как это звучит за столом")}"><input data-b-why value="${esc(o.why)}" placeholder="${L("Why", "Зачем")}">
-${o.conversion === "component" ? `<input data-b-comp value="${esc((o.components ?? []).join(", "))}" placeholder="${L("Components, comma separated", "Компоненты через запятую")}">` : ""}</div>
-${promoteProblem(o) ? `<small class="b-warn">${L("Sandbox only until", "Только песочница, пока")}: ${esc(promoteProblem(o))}</small>` : ""}</div>`;
+<input data-b-table value="${esc(o.table)}" placeholder="${t('bench.reads_table')}"><input data-b-why value="${esc(o.why)}" placeholder="${t('bench.why')}">
+${o.conversion === "component" ? `<input data-b-comp value="${esc((o.components ?? []).join(", "))}" placeholder="${t('bench.components_comma')}">` : ""}</div>
+${promoteProblem(o) ? `<small class="b-warn">${t('bench.sandbox_until')}: ${esc(promoteProblem(o))}</small>` : ""}</div>`;
     })
     .join("");
-  return `<div class="b-chs"><h4>${esc(r.id)}: ${r.overrides.length ? L(`${r.overrides.length} change(s)`, `изменений: ${r.overrides.length}`) : L("no changes yet", "изменений пока нет")}${flat.overrides.length > r.overrides.length ? ` <small>${L(`on top of ${r.base}`, `поверх ${r.base}`)}</small>` : ""}</h4>${rows}
-<div class="b-acts"><button data-b-play>${L("Play it", "Сыграть")}</button><button data-b-test>${L("Test it in the lab", "Проверить в лаборатории")}</button><button data-b-delete>${L("Delete ruleset", "Удалить набор")}</button></div></div>`;
+  return `<div class="b-chs"><h4>${esc(r.id)}: ${r.overrides.length ? t('bench.change_s', { length: r.overrides.length }) : t('bench.no_changes')}${flat.overrides.length > r.overrides.length ? ` <small>${t('bench.top', { base: r.base })}</small>` : ""}</h4>${rows}
+<div class="b-acts"><button data-b-play>${t('bench.play')}</button><button data-b-test>${t('bench.test_lab')}</button><button data-b-delete>${t('bench.delete_ruleset')}</button></div></div>`;
 }
 /** Every value that can change, found by name or path: board's default, this ruleset's value, and a field to change it. */
 function values(own: boolean) {
@@ -122,7 +122,7 @@ function values(own: boolean) {
       )
     : VALUES.filter(e => e.group === "settings");
   return (
-    `<div class="b-v head"><span>${L("Value", "Значение")}</span><span>${L("Board", "Настольная")}</span><span>${esc(B.rs)}</span><span>${L("Where it is printed", "Где напечатано")}</span></div>` +
+    `<div class="b-v head"><span>${t('bench.value')}</span><span>${t('bench.board')}</span><span>${esc(B.rs)}</span><span>${t('bench.printed')}</span></div>` +
     found
       .slice(0, 80)
       .map(e => {
@@ -133,16 +133,16 @@ function values(own: boolean) {
       })
       .join("") +
     (found.length > 80
-      ? `<p class="note">${L(`${found.length - 80} more: narrow the search.`, `Ещё ${found.length - 80}: уточните поиск.`)}</p>`
+      ? `<p class="note">${t('bench.narrow_search', { v: found.length - 80 })}</p>`
       : !found.length
-        ? `<p class="note">${L("Nothing found.", "Ничего не найдено.")}</p>`
+        ? `<p class="note">${t('bench.nothing_found')}</p>`
         : "")
   );
 }
 function field(e: Editable, v: unknown) {
   const a = `data-b-set="${esc(e.path)}"`;
   if (e.type === "boolean")
-    return `<select ${a}><option value="true"${v ? " selected" : ""}>${L("yes", "да")}</option><option value="false"${v ? "" : " selected"}>${L("no", "нет")}</option></select>`;
+    return `<select ${a}><option value="true"${v ? " selected" : ""}>${t('bench.yes')}</option><option value="false"${v ? "" : " selected"}>${t('bench.no')}</option></select>`;
   if (e.options)
     return `<select ${a}>${e.options.map(o => `<option${o === v ? " selected" : ""}>${esc(o)}</option>`).join("")}</select>`;
   if (e.type === "number")
@@ -175,15 +175,15 @@ function exportTab() {
     base: "board",
     overrides: flat.overrides.filter(o => !rulesets.board.overrides.some(b => b.id === o.id))
   });
-  return `<div class="b-export"><div class="b-acts"><label>${L("Ruleset", "Набор")} <select data-b-pick>${Object.keys(
+  return `<div class="b-export"><div class="b-acts"><label>${t('bench.ruleset')} <select data-b-pick>${Object.keys(
     all()
   )
     .map(id => `<option${id === B.rs ? " selected" : ""}>${esc(id)}</option>`)
     .join("")}</select></label>
-<button data-b-dl="csv">${L("Cells to edit (CSV)", "Ячейки для правки (CSV)")}</button><button data-b-dl="md">${L("Cells to edit (Markdown)", "Ячейки для правки (Markdown)")}</button><button data-b-dl="report">${L("Conversion report", "Отчёт о конверсии")}</button><button data-b-dl="json">${L("Ruleset file", "Файл набора")}</button></div>
-<p class="note">${L("To make a change part of the board game: put the ruleset file's change into rulesets/pc.json, then run", "Чтобы перенести изменение в настольную игру: добавьте его в rulesets/pc.json и выполните")} <code>pnpm rules promote &lt;id&gt;</code> ${L("(or drop). The decision is logged in docs/decisions.md.", "(или drop). Решение записывается в docs/decisions.md.")}</p>
+<button data-b-dl="csv">${t('bench.cells_edit')}</button><button data-b-dl="md">${t('bench.cells_edit2')}</button><button data-b-dl="report">${t('bench.conversion_report')}</button><button data-b-dl="json">${t('bench.ruleset_file')}</button></div>
+<p class="note">${t('bench.make_change')} <code>pnpm rules promote &lt;id&gt;</code> ${t('bench.drop_decision')}</p>
 ${Dev.on ? `<section class="b-board" id="b-board">${toBoard()}</section>` : ""}
-<div class="md">${md(report)}</div><h4>${L("Cells to edit", "Ячейки для правки")}</h4><div class="md">${md(toMarkdown(rows))}</div></div>`;
+<div class="md">${md(report)}</div><h4>${t('bench.cells_edit3')}</h4><div class="md">${md(toMarkdown(rows))}</div></div>`;
 }
 
 /* ---- toward the board game (dev mode, FR-R-9): the local server writes rulesets/*.json and docs/decisions.md, as `pnpm rules` does ---- */
@@ -208,41 +208,41 @@ async function readServer() {
   if (el) el.innerHTML = toBoard();
 }
 function toBoard(): string {
-  const h = `<h4>${L("Toward the board game", "В настольную игру")}</h4>`;
+  const h = `<h4>${t('bench.toward_board')}</h4>`;
   if (S.down)
-    return `${h}<p class="note">${L("The rules files are changed through the local server, which is not answering. Start the game with", "Файлы правил меняет локальный сервер, а он не отвечает. Запустите игру через")} <code>pnpm web</code> ${L("or use", "или используйте")} <code>pnpm rules</code>.</p>`;
+    return `${h}<p class="note">${t('bench.rules_files')} <code>pnpm web</code> ${t('bench.use')} <code>pnpm rules</code>.</p>`;
   if (!S.rs) {
     void readServer();
-    return `${h}<p class="note">${L("Reading the rules files…", "Читаю файлы правил…")}</p>`;
+    return `${h}<p class="note">${t('bench.reading_rules')}</p>`;
   }
   const pc = S.rs.pc.overrides,
     board = S.rs.board.overrides,
     off = S.busy ? " disabled" : "";
   const line = (o: Override, acts: string) => {
     const why = promoteProblem(o);
-    return `<div class="b-ch"><div class="b-ch-h"><b>${esc(o.id)}</b><span>${esc(o.table || o.why || Object.keys(o.set ?? {}).join(", "))}</span>${acts}</div>${why ? `<small class="b-warn">${L("Not ready for the table", "Не готово для стола")}: ${esc(why)}</small>` : ""}</div>`;
+    return `<div class="b-ch"><div class="b-ch-h"><b>${esc(o.id)}</b><span>${esc(o.table || o.why || Object.keys(o.set ?? {}).join(", "))}</span>${acts}</div>${why ? `<small class="b-warn">${t('bench.not_ready')}: ${esc(why)}</small>` : ""}</div>`;
   };
   const pcRows = pc.length
     ? pc
         .map(o =>
           line(
             o,
-            `<button data-b-promote="${esc(o.id)}"${promoteProblem(o) ? " disabled" : off}>${L("Promote to board", "В настольную")}</button><button data-b-drop="${esc(o.id)}"${off}>${L("Drop", "Отклонить")}</button>`
+            `<button data-b-promote="${esc(o.id)}"${promoteProblem(o) ? " disabled" : off}>${t('bench.promote_board')}</button><button data-b-drop="${esc(o.id)}"${off}>${t('bench.drop')}</button>`
           )
         )
         .join("")
-    : `<p class="note">${L("pc plays exactly as board: nothing is waiting for a decision.", "pc играет как board: решений не ждёт ничего.")}</p>`;
+    : `<p class="note">${t('bench.pc_plays')}</p>`;
   const from = B.rs !== "pc" && B.rs !== "board" ? all()[B.rs] : undefined;
   const add = from
-    ? `<h5>${L(`Changes in ${from.id}`, `Изменения в ${from.id}`)}</h5>${from.overrides.length ? from.overrides.map(o => line(o, pc.some(x => x.id === o.id) ? `<small>${L("in pc", "в pc")}</small>` : board.some(x => x.id === o.id) ? `<small>${L("on board", "в board")}</small>` : `<button data-b-add="${esc(o.id)}"${promoteProblem(o) ? " disabled" : off}>${L("Add to pc", "В pc")}</button>`)).join("") : `<p class="note">${L("No changes.", "Изменений нет.")}</p>`}`
+    ? `<h5>${t('bench.changes', { id: from.id })}</h5>${from.overrides.length ? from.overrides.map(o => line(o, pc.some(x => x.id === o.id) ? `<small>${t('bench.pc')}</small>` : board.some(x => x.id === o.id) ? `<small>${t('bench.board2')}</small>` : `<button data-b-add="${esc(o.id)}"${promoteProblem(o) ? " disabled" : off}>${t('bench.add_pc')}</button>`)).join("") : `<p class="note">${t('bench.no_changes')}</p>`}`
     : "";
-  return `${h}<p class="note">${L("A change goes into pc, where it is played and tested; then you promote it to board or drop it. Each decision is logged in docs/decisions.md.", "Изменение попадает в pc, где его играют и проверяют; затем вы переносите его в board или отклоняете. Каждое решение записывается в docs/decisions.md.")}</p>
-<h5>${L("Waiting in pc", "Ждут в pc")}</h5>${pcRows}${add}
-${S.msg ? `<p class="b-msg">${esc(S.msg)}${S.fresh ? ` <button data-b-reload>${L("Reload the game", "Перезагрузить игру")}</button>` : ""}</p>` : ""}${S.rows ? `<div class="md">${md(S.rows)}</div>` : ""}`;
+  return `${h}<p class="note">${t('bench.change_goes')}</p>
+<h5>${t('bench.waiting_pc')}</h5>${pcRows}${add}
+${S.msg ? `<p class="b-msg">${esc(S.msg)}${S.fresh ? ` <button data-b-reload>${t('bench.reload_game')}</button>` : ""}</p>` : ""}${S.rows ? `<div class="md">${md(S.rows)}</div>` : ""}`;
 }
 async function step(kind: "add" | "promote" | "drop", x: { id?: string; override?: Override }) {
   S.busy = true;
-  S.msg = L("Writing the files and rebuilding the game…", "Записываю файлы и пересобираю игру…");
+  S.msg = t('bench.writing_files');
   S.rows = "";
   const el = () => document.getElementById("b-board");
   el()!.innerHTML = toBoard();
@@ -259,11 +259,11 @@ async function step(kind: "add" | "promote" | "drop", x: { id?: string; override
       };
     S.msg =
       out.error ??
-      `${out.message} ${L("Reload to play the new rules.", "Перезагрузите, чтобы играть по новым правилам.")}`;
+      `${out.message} ${t('bench.reload_play')}`;
     S.fresh = !out.error;
     if (out.rows?.length) S.rows = toMarkdown(out.rows);
   } catch {
-    S.msg = L("The local server did not answer.", "Локальный сервер не ответил.");
+    S.msg = t('bench.local_server');
   }
   S.busy = false;
   await readServer();
@@ -320,8 +320,8 @@ const msg = (t: string) => {
 
 document.addEventListener("click", e => {
   if (U.title !== "bench") return;
-  const t = e.target as HTMLElement,
-    q = (s: string) => t.closest<HTMLElement>(s);
+  const el = e.target as HTMLElement,
+    q = (s: string) => el.closest<HTMLElement>(s);
   let x: HTMLElement | null;
   if ((x = q("[data-b-tab]"))) {
     B.tab = x.dataset.bTab as Tab;
@@ -335,8 +335,8 @@ document.addEventListener("click", e => {
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-|-$/g, "");
-    if (!name) return msg(L("Give it a name first.", "Сначала дайте имя."));
-    if (all()[name]) return msg(L("That name is taken.", "Это имя занято."));
+    if (!name) return msg(t('bench.give_name'));
+    if (all()[name]) return msg(t('bench.name_taken'));
     save({ id: name, title: name, base: "pc", overrides: [] });
     B.rs = name;
     redraw();
@@ -350,7 +350,7 @@ document.addEventListener("click", e => {
       redraw();
     }
   } else if (q("[data-b-delete]")) {
-    if (confirm(L(`Delete the ruleset "${B.rs}"?`, `Удалить набор «${B.rs}»?`))) {
+    if (confirm(t('bench.delete_ruleset2', { rs: B.rs }))) {
       forget(B.rs);
       B.rs = "";
       redraw();
@@ -365,16 +365,13 @@ document.addEventListener("click", e => {
     const id = x.dataset.bPromote!;
     if (
       confirm(
-        L(
-          `Make "${id}" part of the board game? This changes rulesets/board.json and pc.json and logs the decision.`,
-          `Сделать «${id}» частью настольной игры? Это изменит rulesets/board.json и pc.json и запишет решение.`
-        )
+        t('bench.make_part', { id })
       )
     )
       void step("promote", { id });
   } else if ((x = q("[data-b-drop]"))) {
     const id = x.dataset.bDrop!;
-    if (confirm(L(`Drop "${id}" from pc? The decision is logged.`, `Убрать «${id}» из pc? Решение будет записано.`)))
+    if (confirm(t('bench.drop_pc', { id })))
       void step("drop", { id });
   } else if ((x = q("[data-b-add]"))) {
     const o = all()[B.rs]?.overrides.find(v => v.id === x!.dataset.bAdd);

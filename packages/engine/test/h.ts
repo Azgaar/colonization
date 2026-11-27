@@ -9,6 +9,8 @@ import { emptyStock } from '../src/util.ts';
 
 export const def = loadRuleset('board');
 export const defWith = (set: Record<string, unknown>) => compileRuleset(gameData, { id: 'test', title: '', sandbox: true, overrides: [{ id: 'x', why: 'test', set }] });
+/** `board` with more changes on top. */
+export const boardWith = (set: Record<string, unknown>) => compileRuleset(gameData, { id: 'test', title: '', base: 'board', sandbox: true, overrides: [{ id: 'x', why: 'test', set }] });
 export const at = (r: number, c: number) => r * 16 + c;
 export const NATIONS = ['english', 'french', 'dutch', 'spanish', 'portuguese'];
 

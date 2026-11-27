@@ -7852,7 +7852,8 @@
   },
   "crosses": {
    "max": 15,
-   "recruitPerRound": 1
+   "recruitPerRound": 1,
+   "recruitAction": false
   },
   "collection": {
    "min": 4
@@ -7880,8 +7881,8 @@
   },
   "combat": {
    "successFaces": [
-    4,
-    5
+    5,
+    6
    ],
    "diceCap": null,
    "countPlayedCard": true,
@@ -7907,7 +7908,8 @@
    "diceCap": 10,
    "refStrengthIncludesTactic": true,
    "tokenBonus": 1,
-   "baseDefence": 1
+   "baseDefence": 1,
+   "loyalistFrom": 2
   },
   "score": {
    "patriotColony": 6,
