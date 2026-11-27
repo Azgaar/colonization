@@ -1,5 +1,5 @@
 import type { Choice, State, View } from '@col/engine';
-import { components } from '@col/engine';
+import { components, map } from '@col/engine';
 import type { Bot } from '@col/bots';
 
 /** What is kept of one game. Everything in reports is computed from these. */
@@ -23,6 +23,10 @@ export interface GameRecord {
   offered?: Record<string, number>[];
   /** Per seat: decisions taken, and those with a single legal choice. Missing in older records. */
   decisions?: number[]; forced?: number[];
+  /** Per seat: what was produced, by icon (corn, fish, leaf, fur, timber, silver). Missing in older records. */
+  produced?: Record<string, number>[];
+  /** Per seat: colonies founded next to the ocean. Missing in older records. */
+  coastal?: number[];
 }
 
 /** What the seats saw while deciding. Filled by the bots that `watch` wraps. */
@@ -56,7 +60,7 @@ export function record(s: State, choices: Choice[], names: string[], ruleset: st
     fathers: s.players.map((p) => [...p.fathers]), buildings: s.players.map((p) => [...p.buildings]), agents: s.players.map((p) => [...p.hand, ...p.deck, ...p.discard].sort()),
     sieges: s.war!.sieges.map((x) => ({ owner: x.owner, cubes: x.cubes, attack: x.attack ?? 0, defence: x.defence ?? 0, dice: x.dice?.length ?? 0, fell: !!x.fell, takenBy: x.takenBy ?? null, loyalist: x.loyalist.length })),
     attacks: [], settlements: { total: s.settlements.length, gone: s.settlements.filter((x) => !x.alive).length, allied: s.settlements.filter((x) => x.alive && x.ally !== null).length, hostile: s.settlements.filter((x) => x.alive && s.hostility[x.tribe] >= 4).length },
-    frags: s.revealed.filter(Boolean).length, events: [], poi: {}, raids: 0, gifts: 0, passesWithCards: 0, peak: {}, sold: {},
+    frags: s.revealed.filter(Boolean).length, events: [], poi: {}, raids: 0, gifts: 0, passesWithCards: 0, peak: {}, sold: {}, produced: maps(), coastal: s.players.map(() => 0),
     ...(seen ? { offered: seen.offered, decisions: seen.decisions, forced: seen.forced } : {}),
   };
   let round = 0, target = '';
@@ -73,7 +77,8 @@ export function record(s: State, choices: Choice[], names: string[], ruleset: st
       case 'crosses': bump(r.crosses[p], `${(e.n as number) > 0 ? '+' : '-'}${e.why}`, Math.abs(e.n as number)); break;
       case 'tax': r.tax.push({ round, p, pay: e.pay as boolean, could: purse[p] >= (e.rate as number), rate: e.rate as number }); break;
       case 'ref': bump(r.refBy, e.why as string, e.n as number); break;
-      case 'found': r.foundRounds[p].push(round); break;
+      case 'found': r.foundRounds[p].push(round); if (map.nb(s, e.cell as number).some((c) => s.map.terrain[c] === 'ocean')) r.coastal![p]!++; break;
+      case 'produce': bump(r.produced![p]!, e.icon as string, e.n as number); break;
       case 'hire': bump(r.hired[p], e.agent as string); break;
       case 'attack': target = e.target as string; break;
       case 'combat': { const a = e.attack as { total: number }, d = e.defence as { total: number }; r.attacks.push({ kind: target, p, round, gap: a.total - d.total, hits: e.hits as number }); break; }

@@ -1,6 +1,6 @@
 /* The top line, the King's army box, the Governors sheet and the game menu. */
 import { Sprite } from '../map/sprites.ts';
-import { $, D, logLine, me, P, placeOf, t } from '../data.ts';
+import { $, cap, D, logLine, me, P, placeOf, t } from '../data.ts';
 import type { Entry } from '../sim.ts';
 import { icon } from '../icons.ts';
 import { Places } from '../places.ts';
@@ -28,10 +28,10 @@ function points(i: number) {
   const rate = loyal ? sc.loyalistColony : sc.patriotColony;
   // Fathers may change how much gold a point costs (Jakob Fugger).
   const perGold = p.fathers.flatMap((f) => Sim.s.def.fathers[f].mods).reduce((n, m) => (m.mod === 'goldPerPoint' ? Math.min(n, m.value) : n), sc.goldPerPoint);
-  const row = (ic: string, l: string, calc: string) => `<dt>${icon(ic, 18)}${named(l)}</dt><dd class="calc">${calc}</dd><dd>${part(l)}</dd>`;
+  const row = (ic: string, l: string, calc: string) => `<dt>${icon(ic, 18)}${cap(named(l))}</dt><dd class="calc">${calc}</dd><dd>${part(l)}</dd>`;
   const own = ['colonies', 'bells', 'agents', 'gold', 'buildings', 'fathers'];
   return `<h3>${Places.em(i, 30)}${Places.name(i)}</h3><dl>${row('house', 'colonies', `${part('colonies') / rate} × ${rate}`)}${loyal ? '' : row('bells', 'bells', `${p.bells} × ${sc.perBell}`)}${row('people', 'agents', `${p.agents} ÷ ${sc.agentsPerPoint}`)}${row('gold', 'gold', `${p.gold} ÷ ${perGold}`)}${row('house', 'buildings', `${p.buildings.length} × ${sc.building}`)}${row('father', 'fathers', `${p.fathers.length} × ${sc.father}`)}
-${p.parts.filter((x) => !own.includes(x.label)).map((x) => `<dt>${named(x.label)}</dt><dd class="calc"></dd><dd>${x.value}</dd>`).join('')}<dt class="sum">${icon('vp', 20)}${t('vp')}</dt><dd class="sum calc"></dd><dd class="sum">${p.score}</dd></dl><p>${t('top.vp_note')}</p>`;
+${p.parts.filter((x) => !own.includes(x.label)).map((x) => `<dt>${cap(named(x.label))}</dt><dd class="calc"></dd><dd>${x.value}</dd>`).join('')}<dt class="sum">${icon('vp', 20)}${t('vp')}</dt><dd class="sum calc"></dd><dd class="sum">${p.score}</dd></dl><p>${t('top.vp_note')}</p>`;
 }
 /** The forecast (FR-U-15): expected scores, the likely loyalist, and how the shown player's colonies would fare in the war. Only worked out while the sheet is open. */
 function foresight() {

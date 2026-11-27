@@ -75,6 +75,13 @@
 | DD-59 | It should be easy for the loyalist to take a colony. The loyalist's threshold for taking a fallen colony (W-13) uses the same strength per cube as the attack, so DD-49 lowered it from 2 to 1 per cube; that is intended |
 | DD-60 | Rule change "recruit-action" (direct) promoted from pc to board: Recruit (action). Play any agent. Spend any number of crosses, at least the round number, and look at that many top agents of the Europe deck. You may put one in your discard; the rest go to the bottom of the Europe deck in any order. Recruiting is no longer free. Roger Williams: when recruiting, take up to 2 of the agents you look at. / Вербовка (действие). Сыграйте любого агента. Сбросьте любое количество ✝️, но не меньше номера тура, и посмотрите столько же верхних агентов колоды Европы. Одного можете положить в свой сброс, остальных — под низ колоды Европы в любом порядке. Вербовка больше не бесплатна. Роджер Уильямс: при вербовке возьми до 2 из просмотренных агентов. Why: Every action takes an agent, except recruiting with crosses (T-8), which can also be done with an empty hand. As a card action it needs more pull: the crosses spent buy that many looks, so saving crosses pays. To carry into the sources: settings.crosses.recruitAction → true (packages/data/src/settings.ts: crosses.recruitAction); fathers.roger_williams.mods → [{"mod":"recruitTake","value":2}] (Fathers, F22 (effect)) |
 | DD-61 | The King's army is called the Royal Army (Королевская армия) in the game, its rules and the rulebook. Entries above keep the wording they were decided with |
+| DD-62 | Rule change "colony-on-edge" (direct) promoted from pc to board: A colony may be founded on the edge of the map. / Колонию можно основать на краю карты. Why: The printed rule keeps colonies off the outer edge of the map. It dates from when the tiles touched Europe; with the ring of open sea between the map and Europe (DD-12) an edge colony is two cells from Europe and still needs a sea passage, so the rule only blocks good-looking sites. To carry into the sources: settings.colony.onEdge → true (packages/data/src/settings.ts: colony.onEdge) |
+| DD-63 | Rule change "grassland-crops-only" (direct) promoted from pc to board: Grassland gives 🍂 only, not 🌽. / Луг даёт только 🍂, без 🌽. Why: Grassland gives both food and crops, so food is everywhere and the coast matters little; with crops only, every terrain gives one product (forest timber since DD-56) and food comes from fish (and corn bonuses), so where to found a colony becomes a choice between the sea and the fields. To carry into the sources: terrain.grassland.yields → ["leaf"] (Terrain, D4 (production)) |
+| DD-64 | Rule change "farmer-crops" (direct) promoted from pc to board: Farmer: +1 🍂, not +1 🌽. / Фермер: +1 🍂 вместо +1 🌽. Why: With grassland on crops only, the farmer's +1 corn works only on the 11 corn-bonus cells; on crops he keeps his place on grassland. To carry into the sources: agents.farmer.mods.0.icons → ["leaf"] (Agents, D6 (effect)) |
+| DD-65 | Rule change "squanto-fish" (direct) promoted from pc to board: Squanto: +1 🐟, not +1 🌽. / Скванто: +1 🐟 вместо +1 🌽. Why: With grassland on crops only, Squanto's +1 corn works only on corn-bonus cells; fish is then the food every colony gathers. To carry into the sources: fathers.squanto.mods.0.icons → ["fish"] (Fathers, F16 (effect)) |
+| DD-66 | Rule change "indian-fish" (direct) promoted from pc to board: Indian: +1 🐟, not +1 🍂. / Индеец: +1 🐟 вместо +1 🍂. Why: With the farmer on crops, the converted Indian turns to the sea, so food has a helper of its own. To carry into the sources: agents.indian.mods.0.icons → ["fish"] (Sp Agents, E47 (effect)) |
+| DD-67 | Corn is gone from the game: food comes from fish only, so no tile carries a corn bonus (the importer drops all 14 printed ones, the 3 of DD-47 among them, until the workbook is edited), and food is drawn as a fish. One product per terrain (Q21: DD-63 to DD-66) |
+| DD-68 | Card names: the farmer is the Planter (Земледелец), and the Danish planter the Cane Planter (Плантатор), so that the common crops worker and the Danish expert never share a name. Ids, art and effects stay; the importer applies the names until the workbook carries them |
 
 ## Proposed in this PRD, awaiting confirmation
 
@@ -95,7 +102,7 @@ Work can start with the defaults. "Matters" is an estimate of the effect on resu
 
 None at the moment. Smaller defaults are marked **[D]** in [rules-spec.md](rules-spec.md).
 
-Answered: Q1 (DD-11), Q2 (DD-12), Q3 (DD-13), Q4 (DD-22), Q5 (DD-14), Q6 (DD-15), Q7 (DD-23), Q8 (DD-26), Q9 (DD-27), Q10 (DD-28), Q11 (DD-29), Q12 (DD-30), Q13 (DD-31), Q14 (DD-53), Q15 (DD-54), Q16 (DD-55), Q17 (DD-56), Q18 (DD-57), Q19 (DD-49 to DD-52), Q20 (DD-58).
+Answered: Q1 (DD-11), Q2 (DD-12), Q3 (DD-13), Q4 (DD-22), Q5 (DD-14), Q6 (DD-15), Q7 (DD-23), Q8 (DD-26), Q9 (DD-27), Q10 (DD-28), Q11 (DD-29), Q12 (DD-30), Q13 (DD-31), Q14 (DD-53), Q15 (DD-54), Q16 (DD-55), Q17 (DD-56), Q18 (DD-57), Q19 (DD-49 to DD-52), Q20 (DD-58), Q21 (DD-63 to DD-67).
 
 ## Source edits still to make
 
@@ -109,7 +116,11 @@ Checked on the 15:13 versions. Done by the designer: activation rule, docks, oce
 | Document, starting decks and stars | Follow the spreadsheet | DD-6 |
 | Document, Торговец | Education 🎓 in the document, 📖 in the spreadsheet | DD-6 |
 | Document, Поселенец | "Базовых построек" is not in the spreadsheet; every building is cheaper | DD-6 |
-| Spreadsheet, Tiles | Remove 🌽 from tile 8 cell 3, tile 35 cell 6, tile 37 cell 7 (mountains) | DD-47 |
+| Spreadsheet, Tiles | Remove every 🌽: tiles 1 (cells 2, 4), 8 (3), 23 (5), 27 (8), 29 (2), 35 (6), 37 (7), 42 (9), 55 (8), 56 (5, 7), 61 (8), 62 (9) | DD-47, DD-67 |
+| Spreadsheet, Terrain D4; Agents D6; Fathers F16; Sp Agents E47 | Grassland 🍂 only; Planter (the farmer) +1 🍂; Squanto +1 🐟; Indian +1 🐟 | DD-63 to DD-66 |
+| Document | Food is 🐟 only; the rules and resource lists lose 🌽 | DD-67 |
+| Spreadsheet, Agents and Sp Agents | Фермер → Земледелец (English: Planter); the Danish Плантатор keeps its Russian name, English: Cane Planter | DD-68 |
+| Document, agents | Farmer → Planter (Земледелец); Danish Planter → Cane Planter | DD-68 |
 | Document, Эквиано | Slaves go under the deck in the document, are removed in the spreadsheet | DD-6 |
 | Document, war | Each Royal Army cube attacks with 1 ⚔️, not 2 | DD-49 |
 | Document, tax | Refusing the tax gives no bell | DD-50 |
@@ -118,3 +129,4 @@ Checked on the 15:13 versions. Done by the designer: activation rule, docks, oce
 | Document and spreadsheet | Call the King's army the Royal Army (Королевская армия) everywhere | DD-61 |
 | Document, Кресты | Recruiting is an action: play an agent, spend ✝️ (at least the round number), look at that many agents, take one to the discard, the rest to the bottom | DD-60 |
 | Spreadsheet, Fathers F22 | Roger Williams: when recruiting, take up to 2 of the agents you look at | DD-60 |
+| Document, Колонии | Remove «на краю карты»: a colony may be founded on the edge of the map | DD-62 |

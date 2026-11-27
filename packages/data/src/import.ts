@@ -141,6 +141,14 @@ export function importWorkbook(sheets: RawSheet[], reviewed: Record<string, stri
     mark(`agents.${toId(nick)}`, agents[toId(nick)], r, { ru: 'name', en: 'nickname', nation: 'nation', copies: 'e', edu: 'education', mods: 'effect' });
   }
 
+  // DD-68: the designer's names, until the workbook carries them. The ids stay (art, effects and bots use them).
+  const RENAMED: Record<string, { en: string; ru?: string }> = { farmer: { en: 'Planter', ru: 'Земледелец' }, planter: { en: 'Cane Planter' } };
+  for (const a of Object.values(agents)) {
+    const n = RENAMED[a.base]; if (!n) continue;
+    a.en = n.en;
+    if (n.ru && a.ru !== n.ru) { warn('Agents', `${a.id}: "${a.ru}" in the workbook is "${n.ru}" in the game (DD-68)`); a.ru = n.ru; }
+  }
+
   // Nations
   const nations: Record<string, NationDef> = {};
   for (const r of table('Europeans')) {
@@ -254,8 +262,8 @@ export function importWorkbook(sheets: RawSheet[], reviewed: Record<string, stri
       const b = r.get(`resource ${i}`);
       if (b) {
         if (!ICONS[b]) err('Tiles', r.row, `resource ${i}`, `"${b}" is not a resource icon`);
-        // DD-47: food does not grow on mountains, so a corn bonus there is dropped until the workbook loses it.
-        else if (t === 'mountains' && ICONS[b] === 'corn') warn('Tiles', `tile ${id} cell ${i}: food bonus on mountains is dropped (DD-47)`, r.row);
+        // DD-47, DD-67: corn is gone from the game (food comes from fish), so a corn bonus is dropped until the workbook loses it.
+        else if (ICONS[b] === 'corn') warn('Tiles', `tile ${id} cell ${i}: corn bonus is dropped (DD-67)`, r.row);
         else c.bonus = ICONS[b];
       }
       cells.push(c);

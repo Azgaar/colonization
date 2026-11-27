@@ -14,7 +14,7 @@ export const SETTINGS: Settings = {
   hold: { size: 4, maxDamage: 4 },
   damage: { sendsToEurope: true },
   warehouse: { base: 6 },
-  colony: { max: 3, foundCost: { resource: 'food', value: 5 } },
+  colony: { max: 3, foundCost: { resource: 'food', value: 5 }, onEdge: false },
   buildings: { max: 6 },
   fathers: { max: 4, salon: 5 },
   propaganda: { maxFathers: 2 },

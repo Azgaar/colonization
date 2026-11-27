@@ -25,7 +25,8 @@ export interface Editable {
   options?: readonly string[];
 }
 
-/** Effect blocks: only their numbers and switches are offered, the structure stays as reviewed in effects.ts. */
+/** Effect blocks: only their numbers and switches are offered, the structure stays as reviewed in effects.ts;
+ * the one exception is which resources a talent works on (`icons`), the symbol printed on the card. */
 const EFFECT = new Set(['mods', 'onGain', 'do', 'work', 'effect']);
 const SKIP = new Set(['id', 'ru', 'en', 'flavor', 'color', 'base', 'kind', 'nation', 'unique', 'improvement', 'category']);
 const LAND = ['forest', 'grassland', 'mountains', 'desert', 'tundra'];
@@ -45,6 +46,7 @@ function limits(data: GameData, path: string): Pick<Editable, 'min' | 'max' | 'o
     if (path === 'settings.combat.successFaces') return { min: 1, max: 6 };
     return /penalty/i.test(last) ? {} : { min: 0 };
   }
+  if (last === 'icons') return { options: ICONS };
   if (keys.slice(2).some((k) => EFFECT.has(k))) return {};
   if (last === 'edu') return { min: 0, max: 2 };
   if (last === 'requires') return { options: Object.keys(data.buildings).filter((b) => b !== keys[1]) };
@@ -66,6 +68,7 @@ export function editable(data: GameData): Editable[] {
     const base = { path, value, group, label, ...limits(data, path) };
     if (typeof value === 'number' || typeof value === 'boolean') out.push({ ...base, type: typeof value as 'number' });
     else if (value === null && group === 'settings') out.push({ ...base, type: 'number', nullable: true });
+    else if (inEffect && path.endsWith('.icons') && Array.isArray(value) && value.every((x) => typeof x === 'string')) out.push({ ...base, type: 'string[]' });
     else if (inEffect) return;
     else if (typeof value === 'string' && (base.options || group === 'settings')) out.push({ ...base, type: 'string' });
     else if (Array.isArray(value) && value.every((x) => typeof x === 'number')) out.push({ ...base, type: 'number[]' });

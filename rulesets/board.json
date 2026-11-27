@@ -63,6 +63,59 @@
           }
         ]
       }
+    },
+    {
+      "id": "colony-on-edge",
+      "why": "The printed rule keeps colonies off the outer edge of the map. It dates from when the tiles touched Europe; with the ring of open sea between the map and Europe (DD-12) an edge colony is two cells from Europe and still needs a sea passage, so the rule only blocks good-looking sites",
+      "conversion": "direct",
+      "table": "A colony may be founded on the edge of the map. / Колонию можно основать на краю карты.",
+      "set": {
+        "settings.colony.onEdge": true
+      }
+    },
+    {
+      "id": "grassland-crops-only",
+      "why": "Grassland gives both food and crops, so food is everywhere and the coast matters little; with crops only, every terrain gives one product (forest timber since DD-56) and food comes from fish (and corn bonuses), so where to found a colony becomes a choice between the sea and the fields",
+      "conversion": "direct",
+      "table": "Grassland gives 🍂 only, not 🌽. / Луг даёт только 🍂, без 🌽.",
+      "set": {
+        "terrain.grassland.yields": [
+          "leaf"
+        ]
+      }
+    },
+    {
+      "id": "farmer-crops",
+      "why": "With grassland on crops only, the farmer's +1 corn works only on the 11 corn-bonus cells; on crops he keeps his place on grassland",
+      "conversion": "direct",
+      "table": "Planter: +1 🍂, not +1 🌽. / Земледелец: +1 🍂 вместо +1 🌽.",
+      "set": {
+        "agents.farmer.mods.0.icons": [
+          "leaf"
+        ]
+      }
+    },
+    {
+      "id": "squanto-fish",
+      "why": "With grassland on crops only, Squanto's +1 corn works only on corn-bonus cells; fish is then the food every colony gathers",
+      "conversion": "direct",
+      "table": "Squanto: +1 🐟, not +1 🌽. / Скванто: +1 🐟 вместо +1 🌽.",
+      "set": {
+        "fathers.squanto.mods.0.icons": [
+          "fish"
+        ]
+      }
+    },
+    {
+      "id": "indian-fish",
+      "why": "With the farmer on crops, the converted Indian turns to the sea, so food has a helper of its own",
+      "conversion": "direct",
+      "table": "Indian: +1 🐟, not +1 🍂. / Индеец: +1 🐟 вместо +1 🍂.",
+      "set": {
+        "agents.indian.mods.0.icons": [
+          "fish"
+        ]
+      }
     }
   ]
 }

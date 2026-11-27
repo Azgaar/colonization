@@ -150,7 +150,11 @@ export interface Settings {
   hold: { size: number; maxDamage: number };
   damage: { sendsToEurope: boolean };
   warehouse: { base: number };
-  colony: { max: number; foundCost: { resource: Resource; value: number } };
+  colony: {
+    max: number; foundCost: { resource: Resource; value: number };
+    /** A colony may stand on the outer edge of the map. Off: not on the edge, as printed (F-2). */
+    onEdge: boolean;
+  };
   buildings: { max: number };
   fathers: { max: number; salon: number };
   propaganda: { maxFathers: number };

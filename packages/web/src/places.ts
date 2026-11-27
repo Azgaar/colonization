@@ -100,6 +100,8 @@ function work(card: string): Spaces {
   return out;
 }
 /* ---- what a choice changes, in signs ---- */
+/** What a building or a Father to gain gives at the end, after the rest of what it does: "· 1 ⓥ", kept on one line. */
+const gain = (n: number) => `<span class="gain" title="${t('vp')}">·&nbsp;${n}${icon('vp', 16)}</span>`;
 const plus = (n: number, i: string, s = 18) => `${n > 0 ? '+' : '−'}${Math.abs(n)} ${icon(i, s)}`;
 function effect(o: Opt): string[] {
   if (o.a === 'produce') return [plus(o.n, ico(o.icon))];
@@ -139,4 +141,4 @@ function army() {
 const tokens = (id: string) => Sim.placed.filter((x) => x.space === id).map((x) => `<span class="placed" title="${pick(D.agents[x.card])}"><img src="${art.agent(x.card)}" alt=""></span>`).join('');
 const em = playerEmblem;
 const name = (p: number) => pick(D.names.nations[D.players[p].nation]);
-export const Places = { spaces, forget, ways, effect, verb, face, label, lack, army, tokens, em, name, homes, inEurope, worth, price, sum, ico, AWAY, plus };
+export const Places = { spaces, forget, ways, effect, verb, face, label, lack, army, tokens, em, name, homes, inEurope, worth, price, sum, ico, AWAY, plus, gain };

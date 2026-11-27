@@ -36,7 +36,7 @@ function building(b: string, sp: Spaces) {
   if (P.buildings.includes(b)) return deck({ id: `lot:${b}`, pic: art.building(b), name, does: (S.card && Places.label(sp[`lot:${b}`])) || work(b), cls: `bl built${def.improvement ? ' up' : ''}` });
   const s = sp[`build:${b}`], gone = D.left[b] <= 0, base = def.requires && !P.buildings.includes(def.requires);
   const note = gone ? t('scenes.none_left') : base ? `${t('scenes.needs')} ${cap(pick(D.buildings[def.requires!]))}` : S.card && s && !s.options ? (s.need ? Places.lack(s) : s.why) : '';
-  return deck({ id: `build:${b}`, pic: art.building(b), name, does: work(b), note, cost: `${s?.cost ?? def.timber}${icon('timber', 16)}`, cls: `bl plan${def.improvement ? ' up' : ''}${gone ? ' gone' : ''}${base ? ' locked' : ''}` });
+  return deck({ id: `build:${b}`, pic: art.building(b), name, does: `${work(b)} ${Places.gain(D.settings.score.building)}`, note, cost: `${s?.cost ?? def.timber}${icon('timber', 16)}`, cls: `bl plan${def.improvement ? ' up' : ''}${gone ? ' gone' : ''}${base ? ' locked' : ''}` });
 }
 function colony(sp: Spaces) {
   const homes = Places.homes(), ys = S.card ? D.yields[S.card] || [] : D.land;
@@ -75,7 +75,7 @@ function europe(sp: Spaces) {
   const extra = `${S.card && sp['eu:some']?.options ? `<div class="tls wide"><div class="tl" data-space="eu:some"><img src="art/crate.webp" alt=""><span><b>${t('fans.sell2')}</b></span></div></div>` : ''}${P.damage ? `<div class="tls wide"><div class="tl" data-space="eu:yard"><img src="${art.building('shipyard')}" alt=""><span><b>${pick(ACT.repair)}</b></span><span class="rs">${lab('eu:yard')}</span></div></div>` : ''}`;
   const agents = D.pier.map(([x, n]) => deck({ id: `pier:${x}`, pic: art.agent(x), name: `${pick(D.agents[x])}${n > 1 ? ` ×${n}` : ''}`, does: trait(x) || t('fans.no_talent'), cost: `${icon('gold', 16)}${sp[`pier:${x}`]?.cost ?? D.agents[x].price}`, cls: `ag${(D.agents[x].price ?? 0) > P.gold ? ' dear' : ''}` })).join('') + (S.card ? `<div class="dk newp" data-space="pier:new"><span class="rot">↻</span><b>${t('fans.new_agents')}</b></div>` : '');
   const pier = agents + recruit(sp);
-  const salon = D.salon.map((f) => deck({ id: `salon:${f}`, pic: art.father(f), name: pick(D.fathers[f]), does: Texts.father(f, 14), story: lore(f), cost: `${icon('bells', 16)}${D.fathers[f].bells}`, cls: `fa${D.fathers[f].bells > P.bells ? ' dear' : ''}` })).join('');
+  const salon = D.salon.map((f) => deck({ id: `salon:${f}`, pic: art.father(f), name: pick(D.fathers[f]), does: `${Texts.father(f, 14)} ${Places.gain(D.settings.score.father)}`, story: lore(f), cost: `${icon('bells', 16)}${D.fathers[f].bells}`, cls: `fa${D.fathers[f].bells > P.bells ? ' dear' : ''}` })).join('');
   $('sEu').innerHTML = `${back()}<div class="in"><h2>${t('europe')}</h2><div class="two eu"><div>${market}${extra}</div><div><h4>${t('pier')} <small>${t('scenes.up_2')}</small></h4><div class="row-dk">${pier}</div><h4>${t('salon')} <small>${t('scenes.up_2')}</small></h4><div class="row-dk">${salon}</div></div></div></div>`;
 }
 export function scenes(sp: Spaces) {

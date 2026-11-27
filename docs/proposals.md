@@ -8,6 +8,8 @@ Every candidate is a **direct** change: printed numbers only, with the table wor
 
 - **Accepted** (DD-49, DD-50, DD-52): each Royal Army cube attacks with 1, not 2; refusing the tax gives no bell; refusing adds 1 cube, not 2. All three are now in `board`.
 - **Accepted** (DD-60, the designer's own change): recruiting with crosses is an action; the crosses spent are the agents looked at; Roger Williams takes up to 2.
+- **Accepted** (DD-62, the designer's own change): a colony may be founded on the edge of the map. The edge rule dates from when the tiles touched Europe; the open-sea ring (DD-12) already keeps edge colonies apart from it.
+- **Accepted** (DD-63 to DD-67): one product per terrain. Grassland gives crops only, the farmer +1 🍂, Squanto and the Indian +1 🐟; corn is gone from the game, bonuses included, and food is drawn as a fish.
 - **Rejected** (DD-51): a base colony defence of 4. The designer's rule: a colony's strength is balanced by the King's cubes, not by raising the colony.
 
 ## Where the board stands
@@ -29,6 +31,40 @@ At 3 and 5 players with mixed bots: the loyalist wins 23% and 6%, colonies survi
 | `events-1-cube` | El Dorado Rumors: the Royal Army gains 1 cube per player, not 2. Mutiny, Boston Tea Party, Pirate Blockade, Black Market: 1 cube instead of 2 for each refusal, unit or seller. | five event-card numbers 2 → 1 |
 
 Russian wording is in `rulesets/proposed.json`. Tested before refusal 1 cube was adopted: it removes 6–8 cubes and moves the loyalist only 4–9 points, because events give about a quarter of the Royal Army (refusals gave 72 of about 105 cubes at 4 players). Kept for fine-tuning one player count, not as a fix.
+
+## One product per terrain (2026-11-27, accepted: DD-63 to DD-67)
+
+The designer's idea: grassland gives crops only, so every terrain gives one product (ocean food, forest timber since DD-56, grassland crops, mountains silver; desert and tundra nothing), food has to come from the sea, and the rules read cleaner. With it, the three cards whose talent was corn or crops move with the land (the designer's choice), so none loses its purpose:
+
+| Id | Table wording | Setting |
+|---|---|---|
+| `grassland-crops-only` | Grassland gives 🍂 only, not 🌽. | `terrain.grassland.yields` corn, leaf → leaf |
+| `farmer-crops` | Farmer: +1 🍂, not +1 🌽. | `agents.farmer.mods.0.icons` corn → leaf |
+| `squanto-fish` | Squanto: +1 🐟, not +1 🌽. | `fathers.squanto.mods.0.icons` corn → fish |
+| `indian-fish` | Indian: +1 🐟, not +1 🍂. | `agents.indian.mods.0.icons` leaf → fish |
+
+All four are direct changes (one rule and three printed symbols), together the package `one-product-per-terrain` in `rulesets/proposed.json`, with Russian wording. To make the three card changes possible the bench now also offers which resources a talent works on (`…mods.N.icons`).
+
+Evidence (`node packages/lab/src/terrain.ts 400`, writes `out/terrain.md`): 400 paired games per cell, 3 and 4 players, tuned and mixed bots.
+
+| Per player | Board | Grassland only | The package |
+|---|---|---|---|
+| Corn produced | 1.4–2.9 | 0.1–0.4 | 0.1–0.3 |
+| Fish produced | 6.6–13.5 | +0.9 to +2.4 | +1.0 to +2.4 |
+| All food produced | 8.0–16.2 | −0.1 to −0.3 | −0.2 to −0.3 |
+| Crops produced | 1.6–5.1 | no change | +0.1 to +0.2 |
+| Colonies, buildings, rounds | | no real change | no real change |
+| Mean score | | −0.3 to −0.4 | −0.2 to −0.5 |
+| Loyalist wins | 11–45% | +8 points at 3 players, tuned bots; else no change | within ±4 points everywhere |
+
+What it shows:
+
+- **Food moves to the sea and barely falls.** Players fish instead of farming; total food drops by 0.1–0.3 per player.
+- **Every colony is already coastal.** 100% of colonies touch the ocean under every rule here: 398 of the 666 cells are ocean and the islands are small. So the change does not create a choice between the sea and the fields; it makes fish the only food, and the number of ocean and fish cells next to a colony matters more.
+- **The farmer keeps his place on grassland**, now for crops: crops rise a little with the package, and the one shift grassland alone made (the loyalist +8 points at 3 players with tuned bots) halves to within the noise.
+- **Squanto and the Indian are not tested by play**: the bots never took Squanto in these games and hold almost no Indians (0–0.1 per player, on board too). Their changes stand on the reading: both then help the food every colony gathers.
+
+Recommendation: **adopt the package**, all four together. The game plays as before, the rules lose an exception (one product per terrain), and no card loses its purpose. Grassland alone is not recommended: it leaves the farmer and Squanto nearly empty.
 
 ## Open
 

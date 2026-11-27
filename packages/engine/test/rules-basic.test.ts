@@ -141,10 +141,10 @@ describe('Round', () => {
   it('[T-7] warehouse excess is discarded at the end of the turn and after events', () => {
     const s = game(1);
     colony(s, 0, at(5, 5));
-    world(s, { [at(5, 5)]: 'grassland' });
+    world(s, { [at(5, 5)]: 'grassland', [at(4, 4)]: 'ocean' });
     turn(s, 0, 'farmer', 'colonist');
     P(s).wh = stock({ food: 6 });
-    play(s, 'farmer', 'produce', { icon: 'corn' });
+    play(s, 'farmer', 'produce', { icon: 'fish' });
     expect(total(P(s).wh)).toBe(6); // only food to discard, so no choice was needed
     P(s).wh = stock({ food: 5, timber: 5 });
     s.eventDeck = ['pontiacs_rebellion'];
@@ -429,7 +429,10 @@ describe('Colonies', () => {
   it('[F-2] where a colony may be founded', () => {
     const s = game(1);
     world(s, { [at(2, 5)]: 'grassland', [at(5, 5)]: 'grassland', [at(5, 6)]: 'grassland', [at(6, 6)]: 'grassland', [at(9, 9)]: 'grassland' });
-    expect(map.colonyProblem(s, at(2, 5))).toMatch(/edge/);
+    expect(map.colonyProblem(s, at(2, 5))).toBe(null);
+    const printed = game(1, defWith({ 'settings.colony.onEdge': false }));
+    world(printed, { [at(2, 5)]: 'grassland' });
+    expect(map.colonyProblem(printed, at(2, 5))).toMatch(/edge/);
     expect(map.colonyProblem(s, at(4, 4))).toMatch(/land/);
     expect(map.colonyProblem(s, at(5, 5))).toBe(null);
     settle(s, 'sioux', at(6, 6));
@@ -470,8 +473,8 @@ describe('Colonies', () => {
     build(s, 0, 'stockade');
     turn(s, 0, 'colonist', 'colonist');
     play(s, 'colonist', 'produce', { icon: 'silver' });
-    play(s, 'colonist', 'produce', { icon: 'corn' });
-    expect([P(s).wh.silver, P(s).wh.food]).toEqual([1, 1]);
+    play(s, 'colonist', 'produce', { icon: 'leaf' });
+    expect([P(s).wh.silver, P(s).wh.crops]).toEqual([1, 1]);
   });
   it('[F-5] capacity 6, or 12 with a warehouse', () => {
     const s = game(1);

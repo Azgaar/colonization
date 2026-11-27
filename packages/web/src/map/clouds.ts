@@ -1,8 +1,10 @@
 /* Clouds over the unknown: solid inside unknown fragments, thinning over their edge. The same clouds that were once painted into the land,
    now in a layer of their own above everything that stands on the map, and a little sharper. The land under them is painted whole, so exploring redraws only them. */
 import { CELL, D, W } from '../data.ts';
-import { noise } from './terrain.ts';
+import { noise, wavyCell } from './terrain.ts';
 
+/** How far past the hidden land the clouds stay solid (map units): over its foam line and dark shore. */
+const PAD = 5;
 /** What lay under the clouds before the land was painted there too. */
 const HIDDEN = [38, 96, 120];
 /** Paints the clouds at `k` times the map's size: all of them, or only those within `box` (left, top, right, bottom in map units). */
@@ -12,12 +14,12 @@ export function drawClouds(canvas: HTMLCanvasElement, k: number, box: [number, n
   // The part painted, inside a wider window so that distances to the unknown near its edge are still right.
   const M = 64, x0 = box ? px(box[0]) : 0, y0 = box ? px(box[1]) : 0, x1 = box ? px(box[2]) : N, y1 = box ? px(box[3]) : N;
   const ox = box ? px(box[0] - M) : 0, oy = box ? px(box[1] - M) : 0, ww = (box ? px(box[2] + M) : N) - ox, wh = (box ? px(box[3] + M) : N) - oy;
-  // The unknown covers every closed cell whole, so that it lines up with the grid and with what can be explored; its edge only wavers outwards a little
-  // (a sixth of a cell at most), and the clouds thin out beyond it.
-  const fog = new Uint8Array(ww * wh), at = (v: number) => Math.min(W - 1, Math.max(0, Math.floor(v / CELL))), closed = (X: number, Y: number) => { const c = at(Y) * W + at(X); return !(D.open[c] && D.terrain[c]); };
+  // The unknown covers every closed cell whole, and wherever the land painter drew a closed cell's ground past its edge (cells meet on wavy lines there):
+  // nothing of the hidden land may show. The clouds are solid a little beyond that, over the line of foam along its coasts, and thin out further on.
+  const fog = new Uint8Array(ww * wh), shut = (c: number) => !(D.open[c] && D.terrain[c]), at = (v: number) => Math.min(W - 1, Math.max(0, Math.floor(v / CELL)));
   for (let ly = 0; ly < wh; ly++) for (let lx = 0; lx < ww; lx++) {
     const X = (lx + ox) / k, Y = (ly + oy) / k;
-    fog[ly * ww + lx] = closed(X, Y) || closed(X + (noise(X / 26, Y / 26) - 0.5) * 16 + (noise(X / 8 + 50, Y / 8) - 0.5) * 5, Y + (noise(X / 26 + 90, Y / 26 + 40) - 0.5) * 16 + (noise(X / 8, Y / 8 + 70) - 0.5) * 5) ? 1 : 0;
+    fog[ly * ww + lx] = shut(at(Y) * W + at(X)) || shut(wavyCell(X, Y)) ? 1 : 0;
   }
   // How far each pixel is from the unknown, in pixels.
   const d = new Float32Array(ww * wh).fill(1e4), r = 1.41;
@@ -26,7 +28,7 @@ export function drawClouds(canvas: HTMLCanvasElement, k: number, box: [number, n
   for (let y = wh - 1; y >= 0; y--) for (let x = ww - 1; x >= 0; x--) { const i = y * ww + x; let v = d[i]; if (x < ww - 1) v = Math.min(v, d[i + 1] + 1); if (y < wh - 1) { v = Math.min(v, d[i + ww] + 1); if (x) v = Math.min(v, d[i + ww - 1] + r); if (x < ww - 1) v = Math.min(v, d[i + ww + 1] + r); } d[i] = v; }
   const g = canvas.getContext('2d')!, im = g.createImageData(x1 - x0, y1 - y0), o = im.data;
   for (let y = y0; y < y1; y++) for (let x = x0; x < x1; x++) {
-    const i = (y - oy) * ww + x - ox, X = x / k, Y = y / k, f = fog[i], fd = f ? 99 : d[i] / k, cl = f ? 1 : Math.max(0, 1 - fd / 22);
+    const i = (y - oy) * ww + x - ox, X = x / k, Y = y / k, f = fog[i] || d[i] / k < PAD, fd = f ? 99 : d[i] / k - PAD, cl = f ? 1 : Math.max(0, 1 - fd / 22);
     if (cl <= 0) continue;
     const n = noise(X / 46, Y / 34) * 0.55 + noise(X / 17 + 30, Y / 14) * 0.3 + noise(X / 7, Y / 7) * 0.15, a = Math.min(0.95, Math.max(0, f ? 0.93 : cl * 1.5 - (1 - n)));
     if (a <= 0) continue;

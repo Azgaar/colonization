@@ -38,3 +38,5 @@ body.lift[data-view=map] .fan { opacity:1;transform:none;pointer-events:auto }
 .kb .st { display:block;font-size:14.500px;margin-top:2px;font-weight:700 }
 .awl { display:block;font-weight:700 }
 .fan.e:has(.awl) { width:auto }
+/* What a building or a Father to gain gives at the end, after what it does. */
+.gain { display:inline-flex;align-items:center;gap:4px;white-space:nowrap;vertical-align:middle }

@@ -165,8 +165,8 @@
   "farmer": {
    "id": "farmer",
    "base": "farmer",
-   "ru": "Фермер",
-   "en": "Farmer",
+   "ru": "Земледелец",
+   "en": "Planter",
    "kind": "common",
    "unique": false,
    "copies": 2,
@@ -1058,7 +1058,7 @@
    "id": "planter_danish",
    "base": "planter",
    "ru": "Плантатор",
-   "en": "Planter",
+   "en": "Cane Planter",
    "kind": "nation",
    "unique": true,
    "nation": "danish",
@@ -5219,15 +5219,13 @@
     },
     {
      "terrain": "grassland",
-     "poi": "village",
-     "bonus": "corn"
+     "poi": "village"
     },
     {
      "terrain": "ocean"
     },
     {
-     "terrain": "grassland",
-     "bonus": "corn"
+     "terrain": "grassland"
     },
     {
      "terrain": "ocean"
@@ -5999,8 +5997,7 @@
      "terrain": "ocean"
     },
     {
-     "terrain": "grassland",
-     "bonus": "corn"
+     "terrain": "grassland"
     },
     {
      "terrain": "ocean"
@@ -6148,8 +6145,7 @@
      "terrain": "grassland"
     },
     {
-     "terrain": "grassland",
-     "bonus": "corn"
+     "terrain": "grassland"
     },
     {
      "terrain": "ocean"
@@ -6197,8 +6193,7 @@
      "terrain": "ocean"
     },
     {
-     "terrain": "grassland",
-     "bonus": "corn"
+     "terrain": "grassland"
     },
     {
      "terrain": "ocean"
@@ -6673,8 +6668,7 @@
      "terrain": "forest"
     },
     {
-     "terrain": "grassland",
-     "bonus": "corn"
+     "terrain": "grassland"
     }
    ]
   },
@@ -7118,8 +7112,7 @@
      "terrain": "ocean"
     },
     {
-     "terrain": "grassland",
-     "bonus": "corn"
+     "terrain": "grassland"
     },
     {
      "terrain": "ocean"
@@ -7145,16 +7138,14 @@
      "poi": "village"
     },
     {
-     "terrain": "grassland",
-     "bonus": "corn"
+     "terrain": "grassland"
     },
     {
      "terrain": "ocean"
     },
     {
      "terrain": "grassland",
-     "poi": "village",
-     "bonus": "corn"
+     "poi": "village"
     },
     {
      "terrain": "ocean"
@@ -7323,8 +7314,7 @@
      "terrain": "ocean"
     },
     {
-     "terrain": "grassland",
-     "bonus": "corn"
+     "terrain": "grassland"
     },
     {
      "terrain": "grassland"
@@ -7361,8 +7351,7 @@
      "terrain": "ocean"
     },
     {
-     "terrain": "grassland",
-     "bonus": "corn"
+     "terrain": "grassland"
     }
    ]
   },
@@ -7829,7 +7818,8 @@
    "foundCost": {
     "resource": "food",
     "value": 5
-   }
+   },
+   "onEdge": false
   },
   "buildings": {
    "max": 6

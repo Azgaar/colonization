@@ -30,7 +30,7 @@ These are the rules of the board game. PC rules start identical and may change o
 | Patriot / Loyalist | патриот / лоялист | Sides in the war |
 | Education | 🚫 / 📖 / 🎓 | none / basic / higher. There is no "middle" level **[A]** |
 
-Resources: food 🟨 (🌽, 🐟), timber 🟫 (🪵), crops 🟩 (🍂, 🦫), goods 🟦 (📦), silver ⬜ (🪙). Corn and fish are both food; leaf and fur are both crops. The icon matters only for bonuses.
+Resources: food 🟨 (🐟), timber 🟫 (🪵), crops 🟩 (🍂, 🦫), goods 🟦 (📦), silver ⬜ (🪙). Food is fish (corn is gone, DD-67); leaf and fur are both crops. The icon matters only for bonuses.
 
 Note: `причал` names both the pier in Europe and the Docks building. Code and English text use different words.
 
@@ -94,7 +94,7 @@ Note: `причал` names both the pier in Europe and the Docks building. Code 
 | ID | Rule |
 |---|---|
 | F-1 | Up to 3 per player. First is free, others cost 5 food each from the warehouse |
-| F-2 | Founded by infantry on its own land cell. Not on the outer edge of the 12×12 map; not adjacent, diagonals included, to a colony or a settlement; at least one adjacent ocean cell that connects through revealed water to Europe |
+| F-2 | Founded by infantry on its own land cell, also on the outer edge of the 12×12 map **[A]** (DD-62: the document forbids the edge; `colony.onEdge`); not adjacent, diagonals included, to a colony or a settlement; at least one adjacent ocean cell that connects through revealed water to Europe |
 | F-3 | Colonies are never removed. They can be occupied only in the war |
 | F-4 | Warehouse, buildings and Fathers belong to the player and serve all colonies **[A]** |
 | F-5 | Warehouse capacity is 6, or 12 with the warehouse building |
@@ -136,11 +136,11 @@ Require the player's ship on a Europe cell.
 | ID | Rule |
 |---|---|
 | R-1 | **Produce on a cell:** 1 resource from a colony's cell (it may be worked itself **[A]**) or one of its 8 neighbours that is empty. **[D]** Empty means no colony, settlement or token |
-| R-2 | Terrain yields: forest timber only **[A]** (DD-56; fur needs a fur bonus or a trapper; `board` sets `terrain.forest.yields`); grassland food or crops (leaf); mountains silver; ocean food (fish); desert and tundra nothing |
+| R-2 | Terrain yields: forest timber only **[A]** (DD-56; fur needs a fur bonus or a trapper; `board` sets `terrain.forest.yields`); grassland crops (leaf) only **[A]** (DD-63); mountains silver; ocean food (fish); desert and tundra nothing. One product per terrain; corn is gone (DD-67) |
 | R-3 | **Ocean.** Working an ocean cell directly gives 1 food (fish) and needs no building. Docks are a building to work in (R-7, no education needed): the agent works an ocean cell through them for +1, so 2 food **[A]** . The player picks an eligible ocean cell (R-1), so its fish bonus adds +1, and a fisherman +1 more: up to 4 food **[A]** |
 | R-4 | A cell's bonus icon adds +1 when that resource is produced. **[D]** A bonus on terrain that does not normally yield the resource allows producing it, for 1 in total |
-| R-5 | Agent and Father bonuses add to each matching production. A location-bound agent bonus (cossack, trapper, planter) also allows that production where the terrain yields nothing **[A]**. The cossack gives 2 crops on empty tundra |
-| R-6 | Planter: "island" is a land group of 3 or fewer cells, connected in 8 directions **[D]** |
+| R-5 | Agent and Father bonuses add to each matching production. A location-bound agent bonus (cossack, trapper, cane planter) also allows that production where the terrain yields nothing **[A]**. The cossack gives 2 crops on empty tundra |
+| R-6 | Cane Planter: "island" is a land group of 3 or fewer cells, connected in 8 directions **[D]** |
 | R-7 | **Produce in a building:** one building per action; the agent's education must be at least the building's. No limit on reuse of cells and buildings |
 | R-8 | Workshop: 1 crops → 1 goods. Factory: 1 crops → 2 goods. Bonuses add output, not input. Factory, newspaper and church do not add to the basic building; the better one is used **[D]** |
 | R-9 | **Build:** pay timber, at most 6 buildings, one of each type. **[D]** An improvement requires the basic building, which stays and keeps its slot |

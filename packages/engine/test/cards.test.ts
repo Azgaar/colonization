@@ -24,11 +24,12 @@ const strength = (card: string, kind: 'infantry' | 'ship', native = false, cell 
 
 /** One test per card. The last test checks that none is missing. */
 const agents: Record<string, () => void> = {
-  criminal: () => { const s = home(); turn(s, 0, 'criminal', 'colonist'); expect(yields(s, 'criminal', at(5, 5), 'corn')).toBe(1); expect(canPlay(s, 'criminal', 'moveShip')).toBe(false); },
+  criminal: () => { const s = home(); turn(s, 0, 'criminal', 'colonist'); expect(yields(s, 'criminal', at(5, 5), 'leaf')).toBe(1); expect(canPlay(s, 'criminal', 'moveShip')).toBe(false); },
   slave: () => { const s = home(); build(s, 0, 'docks'); expect(yields(s, 'slave', at(5, 5), 'leaf')).toBe(2); turn(s, 0, 'slave', 'slave'); play(s, 'slave', 'docks'); expect(P(s).wh.food).toBe(3); },
-  colonist: () => { const s = home(); expect(yields(s, 'colonist', at(5, 5), 'corn')).toBe(1); },
-  fisherman: () => { const s = home(); expect(yields(s, 'fisherman', at(4, 4), 'fish')).toBe(2); expect(yields(s, 'fisherman', at(5, 5), 'corn')).toBe(1); },
-  farmer: () => { const s = home(); expect(yields(s, 'farmer', at(5, 5), 'corn')).toBe(2); expect(yields(s, 'farmer', at(4, 4), 'fish')).toBe(1); },
+  colonist: () => { const s = home(); expect(yields(s, 'colonist', at(5, 5), 'leaf')).toBe(1); },
+  fisherman: () => { const s = home(); expect(yields(s, 'fisherman', at(4, 4), 'fish')).toBe(2); expect(yields(s, 'fisherman', at(5, 5), 'leaf')).toBe(1); },
+  // DD-64: the farmer works crops.
+  farmer: () => { const s = home(); expect(yields(s, 'farmer', at(5, 5), 'leaf')).toBe(2); expect(yields(s, 'farmer', at(4, 4), 'fish')).toBe(1); },
   lumberjack: () => expect(yields(home(), 'lumberjack', at(5, 6), 'timber')).toBe(2),
   miner: () => expect(yields(home(), 'miner', at(6, 5), 'silver')).toBe(2),
   scout: () => { expect(points('scout', 'moveInfantry')).toBe(7); expect(points('scout', 'moveShip')).toBe(5); },
@@ -56,7 +57,8 @@ const agents: Record<string, () => void> = {
   cossack: () => { expect(strength('cossack_russian', 'infantry')).toBe(2); expect(yields(home(), 'cossack_russian', at(6, 6), 'fur')).toBe(2); },
   adventurer: () => { const s = home(); s.pier = [['soldier']]; P(s).gold = 4; turn(s, 0, 'adventurer_curonian', 'sailor'); play(s, 'adventurer_curonian', 'hire'); act(s, { c: 'buy', agent: 'soldier' }); expect(P(s).gold).toBe(0); },
   highlander: () => expect([strength('highlander_scottish', 'infantry'), strength('highlander_scottish', 'infantry', false, at(6, 5))]).toEqual([1, 3]),
-  indian: () => { const s = home(); expect(yields(s, 'indian', at(5, 5), 'leaf')).toBe(2); turn(s, 0, 'indian', 'sailor'); expect(canPlay(s, 'indian', 'moveShip')).toBe(true); },
+  // DD-66: the Indian works the sea.
+  indian: () => { const s = home(); expect(yields(s, 'indian', at(4, 4), 'fish')).toBe(2); expect(yields(s, 'indian', at(5, 5), 'leaf')).toBe(1); turn(s, 0, 'indian', 'sailor'); expect(canPlay(s, 'indian', 'moveShip')).toBe(true); },
 };
 
 const buildings: Record<string, () => void> = {
@@ -101,7 +103,8 @@ const fathers: Record<string, () => void> = {
   henry_hudson: () => { const s = home(); s.agentDeck.push('captain'); take(s, 'henry_hudson'); expect(P(s).discard).toContain('captain'); },
   samuel_de_champlain: () => { const s = home(); s.map.terrain[at(9, 9)] = 'grassland'; take(s, 'samuel_de_champlain'); expect(can(s, { c: 'cell', cell: at(5, 6) })).toBe(false); act(s, { c: 'cell', cell: at(9, 9) }); expect(s.colonies.length).toBe(2); },
   john_smith: () => { const s = home(); father(s, 0, 'john_smith'); s.map.terrain[at(9, 9)] = 'grassland'; settle(s, 'aztec', at(9, 9), { hostility: 3 }); P(s).ship = at(8, 8); turn(s, 0, 'scout', 'sailor'); expect(canPlay(s, 'scout', 'alliance')).toBe(true); },
-  squanto: () => { const s = home(); father(s, 0, 'squanto'); expect([yields(s, 'colonist', at(5, 5), 'corn'), yields(s, 'colonist', at(4, 4), 'fish')]).toEqual([2, 1]); },
+  // DD-65: Squanto helps fishing.
+  squanto: () => { const s = home(); father(s, 0, 'squanto'); expect([yields(s, 'colonist', at(5, 5), 'leaf'), yields(s, 'colonist', at(4, 4), 'fish')]).toEqual([1, 2]); },
   john_rolfe: () => { const s = home(); father(s, 0, 'john_rolfe'); s.map.bonus[at(5, 6)] = 'fur'; expect([yields(s, 'colonist', at(5, 5), 'leaf'), yields(s, 'colonist', at(5, 6), 'fur')]).toEqual([2, 1]); },
   thomas_hooker: () => { const s = home(); father(s, 0, 'thomas_hooker'); build(s, 0, 'chapel'); expect(work(s, 'colonist', 'chapel')).toBe(2); },
   peter_minuit: () => { const s = home(); father(s, 0, 'peter_minuit'); settle(s, 'aztec', at(9, 9), { ally: 0, hostility: 0 }); expect(scorePlayer(s, 0).parts).toContainEqual({ label: 'alliances', value: 1 }); },

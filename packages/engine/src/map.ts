@@ -125,7 +125,7 @@ export function colonyProblem(s: State, cell: number): string | null {
   if (s.map.zone[cell] !== 'map' || !isLand(s, cell)) return 'not a revealed land cell';
   const w = s.map.width, e = s.def.settings.ring.openSea + s.def.settings.ring.europe;
   const r = Math.floor(cell / w), c = cell % w;
-  if (Math.min(r, c, w - 1 - r, w - 1 - c) === e) return 'on the edge of the map';
+  if (!s.def.settings.colony.onEdge && Math.min(r, c, w - 1 - r, w - 1 - c) === e) return 'on the edge of the map';
   if (settlementAt(s, cell) || colonyAt(s, cell)) return 'the cell is taken';
   for (const x of nb(s, cell)) {
     if (colonyAt(s, x)) return 'next to a colony';

@@ -40,7 +40,7 @@ function sections(): Section[] {
       msg('guide.edge_map'),
     ] },
     { id: 'colony', title: msg('guide.colonies'), items: [
-      msg('guide.infantry_founds', { value: s.colony.foundCost.value, v: ic(s.colony.foundCost.resource) }),
+      msg('guide.infantry_founds', { edge: s.colony.onEdge ? '' : t('guide.not_edge'), value: s.colony.foundCost.value, v: ic(s.colony.foundCost.resource) }),
       msg('guide.produce', { forest: t(fur ? 'guide.forest_fur' : 'guide.forest', { timber: ic('timber'), fur: ic('fur') }), food: ic('food'), silver: ic('silver'), fish: ic('fish') }),
       msg('guide.build_timber', { max: s.buildings.max }),
       msg('guide.warehouse_resources', { base: s.warehouse.base }),

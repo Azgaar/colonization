@@ -240,7 +240,7 @@ describe('Colony actions', () => {
   it('[R-2] terrain yields', () => {
     const s = farm({ [at(5, 6)]: 'forest', [at(6, 5)]: 'mountains', [at(6, 6)]: 'desert', [at(4, 4)]: 'tundra' });
     const y = (cell: number) => cellYields(s, 0, 'colonist').filter((x) => x.cell === cell).map((x) => `${x.icon}${x.total}`);
-    expect(y(at(5, 5))).toEqual(['corn1', 'leaf1']);
+    expect(y(at(5, 5))).toEqual(['leaf1']); // DD-63: grassland gives crops only
     expect(y(at(5, 6))).toEqual(['timber1']);
     expect(y(at(6, 5))).toEqual(['silver1']);
     expect(y(at(6, 6))).toEqual([]);
@@ -270,11 +270,11 @@ describe('Colony actions', () => {
     expect(P(s).wh.food).toBe(4);
   });
   it('[R-4] bonus icons add one, or allow one where the terrain yields nothing', () => {
-    const s = farm({ [at(5, 5)]: { t: 'grassland', bonus: 'corn' }, [at(5, 6)]: { t: 'mountains', bonus: 'corn' } });
-    expect(cellYield(s, 0, 'colonist', at(5, 5), 'corn')!.total).toBe(2);
-    expect(cellYield(s, 0, 'colonist', at(5, 5), 'leaf')!.total).toBe(1);
-    expect(cellYield(s, 0, 'colonist', at(5, 6), 'corn')!.total).toBe(1);
-    expect(cellYield(s, 0, 'farmer', at(5, 6), 'corn')!.total).toBe(2);
+    const s = farm({ [at(5, 5)]: { t: 'grassland', bonus: 'leaf' }, [at(5, 6)]: { t: 'mountains', bonus: 'leaf' } });
+    expect(cellYield(s, 0, 'colonist', at(5, 5), 'leaf')!.total).toBe(2);
+    expect(cellYield(s, 0, 'colonist', at(5, 5), 'fish')).toBe(null);
+    expect(cellYield(s, 0, 'colonist', at(5, 6), 'leaf')!.total).toBe(1);
+    expect(cellYield(s, 0, 'farmer', at(5, 6), 'leaf')!.total).toBe(2);
   });
   it('[R-5] the cossack works empty tundra', () => {
     const s = farm({ [at(5, 6)]: 'tundra', [at(6, 5)]: 'forest' });
@@ -621,8 +621,9 @@ describe('Founding Father rules', () => {
     colony(s, 0, at(5, 5));
     father(s, 0, 'john_rolfe', 'squanto');
     s.map.bonus[at(5, 6)] = 'fur';
-    const y = (cell: number, icon: 'corn' | 'leaf' | 'fur' | 'fish') => cellYield(s, 0, 'colonist', cell, icon)!.total;
-    expect([y(at(5, 5), 'corn'), y(at(5, 5), 'leaf'), y(at(5, 6), 'fur'), y(at(4, 4), 'fish')]).toEqual([2, 2, 1, 1]);
+    const y = (cell: number, icon: 'leaf' | 'fur' | 'fish') => cellYield(s, 0, 'colonist', cell, icon)!.total;
+    // John Rolfe adds to leaf, not fur; Squanto to fish (DD-65).
+    expect([y(at(5, 5), 'leaf'), y(at(5, 6), 'fur'), y(at(4, 4), 'fish')]).toEqual([2, 1, 2]);
   });
   it('[B-6] Champlain founds anywhere legal, within the limit', () => {
     const s = game(2);
@@ -630,7 +631,7 @@ describe('Founding Father rules', () => {
     P(s, 1).inf = at(5, 9);
     s.poi[at(9, 9)] = 'ruin';
     onGain(s, 'samuel_de_champlain');
-    expect(legal(s).map((c) => c.cell ?? c.c)).toEqual([at(5, 5), 'skip']);
+    expect(legal(s).map((c) => c.cell ?? c.c)).toEqual([at(2, 5), at(5, 5), 'skip']);
     for (const c of [at(5, 5), at(7, 7), at(9, 5)]) colony(s, 0, c);
     onGain(s, 'samuel_de_champlain');
     expect(s.pending!.kind).toBe('stop');

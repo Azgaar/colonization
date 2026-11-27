@@ -7,18 +7,24 @@ import { emblemArt } from '../emblem.ts';
 const ring = (y: number, r: number) => `<ellipse cx="32" cy="${y}" rx="${r}" ry="${r * 0.34}" fill="#0a1d1b" fill-opacity=".34"/>`;
 export const Sprite = {
   village, colony,
-  /** The ship of player `p`, its sails in the player's colour. */
+  /** The ship of player `p`: the sails in the player's colour with its emblem on the mainsail; the hull, its paint, the bow rig, the pennants and the flag on the mainmast are the nation's. */
   ship(p: number) {
-    const c = D.players[p].color, sail = (d: string) => `<path d="${d}" fill="${c}"/><path d="${d}" fill="url(#billow)" stroke="#fff" stroke-opacity=".55" stroke-width=".7"/>`, light = (d: string) => `<path d="${d}" fill="#f4ead2"/><path d="${d}" fill="url(#billow)"/>`;
+    const { color: c, nation: n } = D.players[p], v = NAVY[n] ?? NAVY.english!, h = HULLS[v.hull];
+    const sail = (d: string) => `<path d="${d}" fill="${c}"/><path d="${d}" fill="url(#billow)" stroke="#fff" stroke-opacity=".55" stroke-width=".7"/>`, light = (d: string) => `<path d="${d}" fill="#f4ead2"/><path d="${d}" fill="url(#billow)"/>`;
+    const pennant = (x: number, y: number) => `<path d="M${x} ${y}l-7 1.300 7 .100Z" fill="${v.pennant[0]}"/><path d="M${x} ${y + 1.400}l-7-.100 7 1.500Z" fill="${v.pennant[1]}"/>`;
+    // the bow: a jib from the foremast, or a square spritsail under the bowsprit (drawn over the bow), maybe with the nation's mark on it
+    const jib = v.sprit ? '' : light('M17 16Q6 27 0 34Q9 33 16 34Z');
+    const sprit = v.sprit ? `<path d="M.500 36.600L8.500 37.800" stroke="#4a2f1a" stroke-width="1"/>${light('M1 37Q5 36.800 8.500 38.200Q7.800 42 8.500 45.500Q4.800 44.300 .800 44.500Q0 40.500 1 37Z')}${v.mark ?? ''}` : '';
     return `<ellipse cx="33" cy="56" rx="30" ry="5.500" fill="#06283a" fill-opacity=".42"/><path d="M1 55q8-5 15-1M22 59q16 3 34-2" stroke="#f2fbf7" stroke-opacity=".75" stroke-width="1.500" fill="none" stroke-linecap="round"/>
-<path d="M9 41L-2 34.500" stroke="#4a2f1a" stroke-width="1.700" stroke-linecap="round"/><path d="M18 44V13M32 45V4M45 42V13" stroke="#4a2f1a" stroke-width="1.700"/><path d="M18 14L-1 35M32 5L52 33M32 5L12 41" stroke="#2b1c10" stroke-opacity=".5" stroke-width=".6" fill="none"/>
-${light('M17 16Q6 27 0 34Q9 33 16 34Z')}
+<path d="M9 41L-2 34.500" stroke="#4a2f1a" stroke-width="1.700" stroke-linecap="round"/><path d="M18 44V13M32 45V.400M45 42V13" stroke="#4a2f1a" stroke-width="1.700"/><path d="M18 14L-1 35M32 5L52 33M32 5L12 41" stroke="#2b1c10" stroke-opacity=".5" stroke-width=".6" fill="none"/>
+${jib}
 ${sail('M44 15Q54 23 58 31Q50 29.500 43 32Q46 24 44 15Z')}
 ${sail('M12 17Q18 14.500 25 17Q23 21 24.500 25Q18 22.500 12 25Q10 21 12 17Z')}${sail('M10 26Q18 23 26.500 26Q24 33 26 39Q18 35.500 9.500 39Q7 32 10 26Z')}
 ${sail('M26 8Q32 5.500 39 8Q37 12 38.500 16Q32 13.500 26 16Q24.500 12 26 8Z')}${sail('M23.500 17Q32 13.500 41 17Q38.500 26 41.500 35Q32 30.500 23 35Q20 26 23.500 17Z')}
-${emblemArt(D.players[p].nation, 32, 24.500, 10)}
-<path d="M32 4l-9 1.600 9 1.800ZM45 13l-7 1.300 7 1.500ZM18 13l-7 1.300 7 1.500Z" fill="#fff"/>
-<path d="M5 40Q8 49 13 55H48Q55 51 59 34L49 35.500V41Q36 46 22 44.500L14 43V39.500Z" fill="#5b371d"/><path d="M5 40Q7 45 9.500 49Q30 54 54.500 46Q57 41 59 34L49 35.500V41Q36 46 22 44.500L14 43V39.500Z" fill="#8a5730"/><path d="M6.500 43.500Q30 51 57 41" stroke="#e0b878" stroke-width="1.500" fill="none"/><path d="M49 35.500L59 34L58.300 37L49 38.500ZM5 40L14 39.500V42.500L6 42.500Z" fill="${c}"/><path d="M49 35.500L59 34M5 40L14 39.500" stroke="#e9c987" stroke-width="1.300"/><path d="M17 48.300h2.600v2.400H17Zm7 .9h2.600v2.400H24Zm7 .2h2.600v2.400H31Zm7-.6h2.600v2.400H38Zm7-1.600h2.600v2.400H45Z" fill="#2b1a0d"/><path d="M51.500 39.800h2v2.200h-2Zm3.200-.6h1.900v2.200h-1.900Z" fill="#ffdf8c"/>`;
+${emblemArt(n, 31.200, 24.900, 10)}
+${pennant(45, 13)}${pennant(18, 13)}
+<svg x="21" y=".700" width="11" height="5.200" viewBox="0 0 22 10" preserveAspectRatio="none"><g transform="matrix(-1 0 0 1 22 0)">${v.flag}</g><path d="M0 0H22V10H0Z" fill="url(#billow)" stroke="#0005" stroke-width=".6"/></svg>
+<path d="${h.outer}" fill="${v.dark}"/><path d="${h.upper}" fill="${v.wood}"/><path d="${h.strake}" stroke="${v.strake}" stroke-width="1.500" fill="none"/><path d="${h.trim}" fill="${c}"/><path d="${h.rail}" stroke="#e9c987" stroke-width="1.300"/>${h.extra.replaceAll('DARK', v.dark)}<path d="M17 48.300h2.600v2.400H17Zm7 .9h2.600v2.400H24Zm7 .2h2.600v2.400H31Zm7-.6h2.600v2.400H38Zm7-1.600h2.600v2.400H45Z" fill="#2b1a0d"/><path d="${h.lights}" fill="#ffdf8c"/>${v.gilt ? `<path d="${h.gilt}" stroke="${BRASS}" stroke-width=".9" fill="none" stroke-linecap="round"/>` : ''}${sprit}`;
   },
   /** The infantry of player `p`: the coat and the flag of the standard in the player's colour, the headgear and the belts of the nation, its emblem on the flag. */
   infantry(p: number) {
@@ -125,5 +131,46 @@ const HAT: Record<string, string> = {
   curonian: `<path d="M26.500 15.500L29 5q3-2 5 0l3.500 10.500Z" fill="#9b1212"/><path d="M26.500 15.500L29 5q3-2 5 0l3.500 10.500Z" fill="none" stroke="${BRASS}" stroke-width="1"/><path d="M27.500 13l9 0" stroke="${BRASS}" stroke-width="1.300"/><circle cx="31.500" cy="4.200" r="1.300" fill="${BRASS}"/>`,
   scottish: `<path d="M24.500 14.500q-1-5.500 7.500-5.500 8.500 0 7.500 5.500Z" fill="#2f4a7a"/><path d="M24.800 14h14.400v1.800H24.800Z" fill="#e6e0d0"/><path d="M26.500 14h2v1.800h-2Zm4 0h2v1.800h-2Zm4 0h2v1.800h-2Z" fill="#b8452e"/><circle cx="32" cy="9" r="1.500" fill="#b8452e"/>`,
 };
-/** The emblem of nation `n` on the infantry's flag, centred on the middle of the waving flag. */
-const flagEmblem = (n: string) => emblemArt(n, 54.7, 14.3, 8);
+/** The emblem of nation `n` on the infantry's flag, centred on the middle of the waving flag (its centre of area). */
+const flagEmblem = (n: string) => emblemArt(n, 54.7, 14.65, 8);
+/* ---- ships by nation ---- */
+/** The hulls, bow on the left: a ship, a galleon with high castles and a beak, a round-bellied fluyt with a narrow high stern. `extra` is drawn over the hull, DARK standing for the hull's dark paint. */
+const HULLS = {
+  ship: {
+    outer: 'M5 40Q8 49 13 55H48Q55 51 59 34L49 35.500V41Q36 46 22 44.500L14 43V39.500Z',
+    upper: 'M5 40Q7 45 9.500 49Q30 54 54.500 46Q57 41 59 34L49 35.500V41Q36 46 22 44.500L14 43V39.500Z',
+    strake: 'M6.500 43.500Q30 51 57 41', trim: 'M49 35.500L59 34L58.300 37L49 38.500ZM5 40L14 39.500V42.500L6 42.500Z', rail: 'M49 35.500L59 34M5 40L14 39.500',
+    lights: 'M51.500 39.800h2v2.200h-2Zm3.200-.6h1.900v2.200h-1.900Z', gilt: 'M50 43.500q4 .500 7.500-3M5.800 44.300q1.600 2 4 2.300', extra: '',
+  },
+  galleon: {
+    outer: 'M4 37Q8 49 13 55H48Q56 50 60 30L49 31.500V41Q36 46 22 44.500L14 43V36.500Z',
+    upper: 'M4 37Q7 45 9.500 49Q30 54 55 46Q58 39 60 30L49 31.500V41Q36 46 22 44.500L14 43V36.500Z',
+    strake: 'M5.500 41Q30 51 58 39.500', trim: 'M49 31.500L60 30L59.300 33L49 34.500ZM4 37L14 36.500V39.500L5 39.500Z', rail: 'M49 31.500L60 30M4 37L14 36.500',
+    lights: 'M51.500 35.800h2v2h-2Zm3.200-.5h1.900v2h-1.900ZM51.500 40h2v2h-2Zm3.200-.6h1.900v2h-1.900Z', gilt: 'M50 44q4.500 0 8.300-4.500M49.500 33.300q5-.200 9.800-1.600M5 40.500q1.800 3 4.500 3.800', extra: '<path d="M5.500 41.500L.500 40.200 6.500 45Z" fill="DARK"/>',
+  },
+  fluyt: {
+    outer: 'M7 39Q4 50 15 55H46Q55 52 57 33L50 34V41Q36 46 22 44.500L15 43V38.500Z',
+    upper: 'M7 39Q6 45 10 49Q30 54 53.500 46.500Q56 41 57 33L50 34V41Q36 46 22 44.500L15 43V38.500Z',
+    strake: 'M7.500 43Q30 51 55.500 41.500', trim: 'M50 34L57 33L56.600 36L50 37ZM7 39L15 38.500V41.500L7.500 41.500Z', rail: 'M50 34L57 33M7 39L15 38.500',
+    lights: 'M51.800 38.600h1.800v2h-1.800Zm2.800-.3h1.600v2h-1.600Z', gilt: 'M50.500 43.500q3.500 0 5.500-3', extra: '',
+  },
+};
+/** A flag drawn in a 22×10 box, hoist on the left; swallow-tailed ones are cut at the fly. */
+const SWALLOW = 'M0 0H22L17 5 22 10H0Z';
+const nordic = (field: string, cross: string) => `<path d="${SWALLOW}" fill="${field}"/><path d="M6 0h3v10H6ZM0 3.800h18.200L19 5l-.800 1.200H0Z" fill="${cross}"/>`;
+const saltire = (field: string, cross: string) => `<path d="M0 0H22V10H0Z" fill="${field}"/><path d="M0 0L22 10M0 10L22 0" stroke="${cross}" stroke-width="2.400"/>`;
+const stripes = (...c: string[]) => c.map((f, i) => `<path d="M0 ${(i * 10) / c.length}H22V${((i + 1) * 10) / c.length}H0Z" fill="${f}"/>`).join('');
+type Navy = { hull: keyof typeof HULLS; dark: string; wood: string; strake: string; pennant: [string, string]; flag: string; sprit?: boolean; mark?: string; gilt?: boolean };
+/** How the ships of each nation look: hull and paint, bow rig, the pennants on the fore- and mizzenmast, the flag on the mainmast. */
+const NAVY: Record<string, Navy> = {
+  english: { hull: 'ship', dark: '#3a2a1e', wood: '#7a5232', strake: '#d9b45a', pennant: ['#fff', '#c8102e'], flag: `<path d="M0 0H22V10H0Z" fill="#fff"/><path d="M9.500 0h3v10h-3ZM0 3.700h22v2.600H0Z" fill="#c8102e"/>` },
+  french: { hull: 'ship', dark: '#232c44', wood: '#3d4b6e', strake: '#e0c070', pennant: ['#fff', '#e9c987'], flag: `<path d="M0 0H22V10H0Z" fill="#f7f4ec"/><path d="M5 2.200l.900 1.400-.900 1.400-.900-1.400ZM11 4.300l.900 1.400-.900 1.400-.900-1.400ZM17 2.200l.900 1.400-.900 1.400-.900-1.400ZM5 6.400l.900 1.400-.900 1.400-.900-1.400ZM17 6.400l.900 1.400-.900 1.400-.900-1.400Z" fill="#d4a93a"/>`, gilt: true },
+  dutch: { hull: 'fluyt', dark: '#3e2c1a', wood: '#6f5530', strake: '#3f8a5c', pennant: ['#e8862a', '#21468b'], flag: stripes('#e8862a', '#fff', '#21468b'), sprit: true },
+  spanish: { hull: 'galleon', dark: '#4a2216', wood: '#8a3a24', strake: '#e3b85a', pennant: ['#c8102e', '#f2c94c'], flag: saltire('#f7f4ec', '#b8202a'), sprit: true, gilt: true, mark: `<path d="M2.500 38.500L7 44M7 38.800L2.300 43.800" stroke="#b8202a" stroke-width="1.100" stroke-linecap="round"/>` },
+  portuguese: { hull: 'galleon', dark: '#43301e', wood: '#7f5c38', strake: '#efe6d0', pennant: ['#2e7d32', '#c8102e'], flag: `<path d="M0 0H22V10H0Z" fill="#fff"/><path d="M8.500 2h5v4q0 2.500-2.500 3-2.500-.5-2.500-3Z" fill="#c8102e"/><path d="M9.500 3h3v3q0 1.600-1.500 2-1.500-.4-1.500-2Z" fill="#fff"/><path d="M10.400 4h1.200v2.200h-1.200Z" fill="#23366e"/>`, sprit: true, mark: `<path d="M3.900 38.600h1.600v6h-1.600ZM1.800 40.700h5.800v1.600H1.800Z" fill="#c8102e"/>` },
+  swedish: { hull: 'ship', dark: '#33281c', wood: '#5e4430', strake: '#e9c24a', pennant: ['#1f5aa6', '#f2c94c'], flag: nordic('#1f5aa6', '#f2c94c') },
+  danish: { hull: 'ship', dark: '#33241a', wood: '#7c3a26', strake: '#f4efe4', pennant: ['#c8102e', '#fff'], flag: nordic('#c8102e', '#fff') },
+  russian: { hull: 'ship', dark: '#2c3328', wood: '#4e5e3e', strake: '#e9c987', pennant: ['#fff', '#1f4fa0'], flag: saltire('#fff', '#1f4fa0') },
+  curonian: { hull: 'fluyt', dark: '#3a2418', wood: '#6a4026', strake: '#c0392b', pennant: ['#9b1212', '#fff'], flag: stripes('#b3202a', '#fff'), sprit: true },
+  scottish: { hull: 'ship', dark: '#22262f', wood: '#3b4352', strake: '#f4efe4', pennant: ['#005eb8', '#fff'], flag: saltire('#005eb8', '#fff') },
+};
