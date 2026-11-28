@@ -13,6 +13,7 @@ import { Places, type Spaces, type Way } from '../places.ts';
 import { S, X } from '../state.ts';
 import { Sim, type Opt } from '../sim.ts';
 import type { Snapshot } from '../view.ts';
+import { plate } from '../ui/war.ts';
 type Colony = Snapshot['colonies'][number];
 type Village = Snapshot['settlements'][number];
 const terrain = document.querySelector<HTMLCanvasElement>('canvas.terrain')!;
@@ -36,11 +37,15 @@ let fid = 0;
 const face = (x: number, y: number, card: string, r = 15) => { const id = `f${fid++}`; return `<clipPath id="${id}"><circle cx="${x}" cy="${y}" r="${r - 2}"/></clipPath><circle cx="${x}" cy="${y}" r="${r}" fill="#f7f1e1"/><image href="${art.agent(card)}" x="${x - r}" y="${y - r + 1}" width="${r * 2}" height="${r * 2.9}" preserveAspectRatio="xMidYMin slice" clip-path="url(#${id})"/>`; };
 const SVG = (x: number, y: number, s: number, body: string) => `<svg x="${x}" y="${y}" width="${s}" height="${s}" viewBox="0 0 64 64">${body}</svg>`;
 const pill = (x: number, y: number, text: string) => { const w = text.length * 8.2 + 18; return `<rect x="${x - w / 2}" y="${y - 10}" width="${w}" height="22" rx="11" fill="#f7f1e1"/><text x="${x}" y="${y + 6}" text-anchor="middle" font-size="15" font-weight="800" fill="#1c2a2a">${text}</text>`; };
-/** A colony in the war: the attack against its defence, and once its siege is shown, whether it held. */
+/** A colony in the war: the attack against its defence as far as the player knows them (`?` while cards hide part), and once its cards are turned over, whether it held. */
 function warPlate(c: Colony, x: number, y: number) {
-  const sieges = D.war?.sieges ?? [], q = sieges.find((z) => z.cell === c.cell); if (!q) return null;
-  const i = sieges.indexOf(q), shown = S.war >= 0, done = shown && i <= S.war && q.fell !== undefined, w = 102;
-  return `<g transform="translate(${x + 32 - w / 2} ${y + 54})" data-war="${i}" style="cursor:pointer">${i === S.war ? `<rect x="-4" y="-4" width="${w + 8}" height="30" rx="15" fill="#fff08a"/>` : ''}<rect width="${w}" height="22" rx="11" fill="#0f3436f2"/>${roundel(-6, -3, q.owner, 28)}<text x="38" y="16" font-size="15" font-weight="800" fill="#93e09c" text-anchor="middle">${q.defence.total}</text><svg x="47" y="4" width="14" height="14" viewBox="0 0 24 24" color="#f7f1e1" opacity=".7">${SHAPES.power}</svg><text x="70" y="16" font-size="15" font-weight="800" fill="#ff8f78" text-anchor="middle">${q.attack.total}</text>${done ? (q.fell ? '<path d="M88 7l8 8m0-8l-8 8" stroke="#ff8f78" stroke-width="3" stroke-linecap="round"/>' : '<path d="M87 11l4 4 7-8" stroke="#8fe09a" stroke-width="3" fill="none" stroke-linecap="round"/>') : ''}</g>`;
+  const sieges = D.war?.sieges ?? [], i = sieges.findIndex((z) => z.cell === c.cell); if (i < 0) return null;
+  const q = sieges[i]!, k = plate(i), w = 112, more = '<tspan font-size="11" fill="#edb443">?</tspan>';
+  const says = (v: Omit<typeof k, 'late' | 'before'>) => `<text x="47" y="16" font-size="15" font-weight="800" fill="#93e09c" text-anchor="end">${v.def}${v.hidD ? more : ''}</text><text x="67" y="16" font-size="15" font-weight="800" fill="#ff8f78">${v.atk}${v.hidA ? more : ''}</text>`
+    + (v.fell === undefined ? '' : v.fell ? '<path d="M96 7l8 8m0-8l-8 8" stroke="#ff8f78" stroke-width="3" stroke-linecap="round"/>' : '<path d="M95 11l4 4 7-8" stroke="#8fe09a" stroke-width="3" fill="none" stroke-linecap="round"/>');
+  // While its cards are turning, the plate keeps what was known, then shows what they showed.
+  const body = k.before ? `<g class="sold" style="--late:${k.late}">${says(k.before)}</g><g class="wmk" style="--late:${k.late}">${says(k)}</g>` : says(k);
+  return `<g transform="translate(${x + 32 - w / 2} ${y + 54})" data-war="${i}" style="cursor:pointer">${i === S.war ? `<rect x="-4" y="-4" width="${w + 8}" height="30" rx="15" fill="#fff08a"/>` : ''}<rect width="${w}" height="22" rx="11" fill="#0f3436f2"/>${roundel(-6, -3, q.owner, 28)}<svg x="50" y="4" width="14" height="14" viewBox="0 0 24 24" color="#f7f1e1" opacity=".7">${SHAPES.power}</svg>${body}</g>`;
 }
 /** A settlement: how many live there and how alarmed they are. */
 function count(v: Village, x: number, y: number) {

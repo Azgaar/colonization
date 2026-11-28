@@ -125,7 +125,9 @@ if (cmd === 'new') {
   if (!Number.isInteger(n) || n < 0 || n >= v.legal.length) throw new Error(`pick a number from 0 to ${v.legal.length - 1}`);
   const c = v.legal[n], gb = goalBot(`${g.seed}-agree`);
   // --is: words the picked line must contain, so that a number taken from an older list picks nothing.
-  if (opt.is && !opt.is.toLowerCase().split(/\s+/).every((word) => choiceText(v, c).toLowerCase().includes(word))) {
+  // Whole words, so that a letter or a fragment cannot pass on the wrong line.
+  const words = (t: string) => t.toLowerCase().split(/[^\p{L}\p{N}]+/u).filter(Boolean), line = new Set(words(choiceText(v, c)));
+  if (opt.is && !(words(opt.is).length && words(opt.is).every((word) => line.has(word)))) {
     console.log(`Nothing picked: choice ${n} is "${choiceText(v, c)}", which does not contain "${opt.is}". The current decision:\n`);
     show(g, s);
     process.exit(0);

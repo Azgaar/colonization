@@ -1,18 +1,21 @@
 /** One simulated game from a plain description. Pure: runs the same in Node, in worker threads and in the browser. */
 import { compileRuleset, flattenRuleset, gameData, rulesets, type GameDef, type Override, type Ruleset } from '@col/data';
-import { goalBot, PERSONALITIES, randomBot, searchBot, type Bot, type Personality, type Weights } from '@col/bots';
+import { botForLevel, goalBot, LEVELS, PERSONALITIES, randomBot, searchBot, type Bot, type Level, type Personality, type Weights } from '@col/bots';
 import { playGame } from './play.ts';
 import { record, watch, type GameRecord } from './record.ts';
 
 export type BotSpec = { kind: 'random' | 'eager' } | { kind: 'goal'; name: string; weights?: Partial<Weights>; personality?: Personality }
-  | { kind: 'search'; name: string; iterations?: number; ms?: number; horizon?: number; width?: number; weights?: Partial<Weights>; personality?: Personality };
+  | { kind: 'search'; name: string; iterations?: number; ms?: number; horizon?: number; width?: number; weights?: Partial<Weights>; personality?: Personality }
+  /** A difficulty level as players meet it, counting samples only (no clock) so that batches repeat. */
+  | { kind: 'level'; name: string; level: Level; personality?: Personality };
 /** `rules` carries a ruleset that is not built in (one made in the browser's rules editor), flattened onto its base; `ruleset` names it. */
 export interface GameSpec { seed: string; nations: string[]; bots: BotSpec[]; ruleset?: string; rules?: Ruleset; changes?: Override['set'] }
 
 const weightsOf = (b: { weights?: Partial<Weights>; personality?: Personality }) => ({ ...(b.weights ?? {}), ...(b.personality ? PERSONALITIES[b.personality] : {}) });
 /** Search counts iterations unless given only a time, so that batches repeat exactly. */
 export const makeBot = (b: BotSpec, seed: string): Bot =>
-  b.kind === 'goal' ? goalBot(seed, weightsOf(b), b.name)
+  b.kind === 'level' ? Object.assign(botForLevel(b.level, seed, b.personality, LEVELS[b.level].search ? { iterations: LEVELS[b.level].search!.iterations } : undefined), { name: b.name })
+    : b.kind === 'goal' ? goalBot(seed, weightsOf(b), b.name)
     : b.kind === 'search' ? searchBot(seed, { name: b.name, weights: weightsOf(b), iterations: b.iterations ?? (b.ms === undefined ? 100 : undefined), ms: b.ms, horizon: b.horizon, width: b.width })
       : randomBot(seed, b.kind === 'eager');
 

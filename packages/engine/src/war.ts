@@ -40,7 +40,13 @@ export function rebelOrder(s: State): number[] {
 export const hasLoyalist = (s: State) => s.players.length > 1 && s.players.length >= s.def.settings.war.loyalistFrom;
 export function findLoyalist(s: State): number | null {
   if (!hasLoyalist(s) || s.players.every((p) => p.bells >= s.def.settings.war.bells)) return null;
-  return rebelOrder(s).at(-1)!;
+  const order = rebelOrder(s), last = order.at(-1)!;
+  return s.def.settings.war.noLoyalistOnTie && loyalistTie(s, order) ? null : last;
+}
+/** Whether the two least rebellious players tie on 🔔, ✝️ and 🟡 alike, so that only the turn order would tell them apart (W-2). */
+export function loyalistTie(s: State, order = rebelOrder(s)): boolean {
+  const a = s.players[order.at(-1)!], b = s.players[order.at(-2)!];
+  return a.bells === b.bells && a.crosses === b.crosses && a.gold === b.gold;
 }
 
 task('warStart', (s, t) => {
@@ -62,7 +68,9 @@ task('warStart', (s, t) => {
     targets.forEach((x, k) => { x.cubes = each + (k < rest ? 1 : 0); });
   }
   // Who declared independence (20 🔔 or more) and everyone's bells, for telling why the war began and why the loyalist sides with the King.
-  log(s, { e: 'war', loyalist, tactic: id, pool: s.war.pool, reason: t.reason, rebels: s.players.flatMap((p, k) => (p.bells >= set.bells ? [k] : [])), bells: s.players.map((p) => p.bells) });
+  // `tie`: the fewest 🔔, ✝️ and 🟡 were tied, so nobody sides with the King.
+  const tie = loyalist === null && hasLoyalist(s) && !s.players.every((p) => p.bells >= set.bells);
+  log(s, { e: 'war', loyalist, tie, tactic: id, pool: s.war.pool, reason: t.reason, rebels: s.players.flatMap((p, k) => (p.bells >= set.bells ? [k] : [])), bells: s.players.map((p) => p.bells) });
   push(s, ...turn.map((p) => ({ t: 'raise', p })), { t: 'deploy', i: 0, stopped: [] },
     ...(loyalist !== null && mods(s, loyalist, 'betray').length ? [{ t: 'betray', p: loyalist }] : []),
     { t: 'sieges' }, { t: 'score', reason: t.reason });

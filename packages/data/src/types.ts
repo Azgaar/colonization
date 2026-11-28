@@ -105,7 +105,7 @@ export type Node =
   | { n: 'payOrRemove'; which: 'military' | 'slave'; gold: number; refEach: number }
   | { n: 'sacredForest'; goods: number; gold: number; hostility: number }
   | { n: 'boycott'; res: Resource; goldPerUnit: number; refPerUnit: number }
-  | { n: 'blockade'; gold: number; refEach: number }
+  | { n: 'blockade'; gold: number; refEach: number; /** On: the ransom is the round number in 🟡, not `gold`. */ byRound: boolean }
   | { n: 'activate'; settlement: number };
 
 export interface ChoiceOption { id: string; ru: string; en: string; cost?: Cost; needs?: 'colony' | 'sea-colony'; do: Node[] }
@@ -226,6 +226,8 @@ export interface Settings {
     tokenBonus: number; baseDefence: number;
     /** Fewest players with a loyalist in the war (W-2). Solo never has one. */
     loyalistFrom: number;
+    /** On: when the players with the fewest 🔔 also tie on ✝️ and 🟡, nobody sides with the King. Off: the one who plays last in the round does. */
+    noLoyalistOnTie: boolean;
   };
   score: { patriotColony: number; loyalistColony: number; perBell: number; agentsPerPoint: number; goldPerPoint: number; building: number; father: number;
     /** On: each Father scores its price in 🔔 as 🏅. Off: each scores `father`, as printed. */

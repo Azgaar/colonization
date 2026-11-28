@@ -14,6 +14,9 @@ Questions and candidates awaiting the designer. Candidates are the overrides of 
 | O-5 | Dead cards: school (before DD-75), slave, smuggler | May be the bots, not the cards |
 | O-6 | Town hall, stockade, work action, alliances look dominated | Recheck after the war changes |
 | O-7 | Bots move one token per action | Lab numbers understate DD-73 |
+| O-20 | Taxes are dead: nobody has the gold | Only 27% of players have 1 🟡 after round 2 (mean 2.4–2.7). The rules allow about 20: a colony on silver in round 1, 4 silver made, shipped (2 steps from the edge) and sold in round 2 for 4 × 5 🟡; a crops site gives 12, food or timber 4. But it costs 6 of the first 10 cards, silver is in sight in round 1 only 39% of the time, and early gold does not raise the score: bots forced into that opening had 8.5 🟡 after round 2 and the same final score (+0.2 ±0.7, 300 paired games). So bots explore and build instead (10 timber a game against 0.9 silver). Trade changes (crops at 4, five custom houses at 2 🪵, prices recovering, a hold of 6) add about 3 🟡 a game, nothing by round 2. What gives early gold (400 paired games, 2 / 4 players): (a) colony income, "before taxes, take 1 🟡 per colony": 4.2 / 3.7 🟡 after round 2, taxes paid 7 → 17% / 5 → 15%, Royal Army 44.5 → 39.3 / 54.9 → 48.6; (b) start with 5 🟡: 6.0 / 6.2 🟡, taxes paid 21% / 12%, Royal Army 37.9 / 48.5. Both direct, each a new setting. Gold at 1 🏅 per 3 🟡 (`settings.score.goldPerPoint`) doubles trade (units sold 2.7 → 5.9) but not round-2 gold. Selling on arrival in Europe, without a trade action, saves a card a trip for a person (round-2 ceiling 32–36 🟡) |
+| O-23 | Franklin (5 🔔; each card that makes 🔔 makes 2 more): his takers win 64% at 4 players, at any price | The bell leader takes him, so making him weaker or dearer only changes how often he is taken: +1 🔔 instead of +2 left his takers at 56%; 7 🔔 at 66% (taken in 26% of games, from 31%), 9 🔔 at 61% (21%). To break the snowball, change what he does. To test: (a) catch-up: the +2 🔔 only while you do not have the most 🔔; (b) the French alliance: no bells, but in the war one free card of 🗡️ 3 on a colony of yours. Each converts directly (card text) and needs a small engine change |
+| O-24 | Natives: a stockade (2 🪵) answers them, not gifts, preaching or attacks | 6 of 13 tribe cards start at hostility 4–5, so half the settlements raid from the start; 2 of 3 seats build a stockade, attacks on settlements happen 0.2 times a game. Making the stockade stop nothing alone is not enough: raids 2.8 → 4.3 a game, gifts 5.8 → 6.1 (400 paired games, 4 players), as a raid costs only 2 resources. The threat has to reach the score. To test, together: (a) war-path: at the war, each settlement at hostility 4–5 puts 🟥 equal to its population on the siege of its nearest colony, instead of 1 🟥 to the shared army; (b) the stockade keeps buildings, not stores: a raided colony with a stockade loses 2 resources but never a building; (c) land pressure: at the end of each round, every settlement within 2 cells of a colony gains 1 hostility (to 5). Then a gift buys time, preaching shrinks the war party, and an attack that empties the settlement ends it. Each converts directly (war setup, card text, round-end step) and needs engine work |
 
 ## Where the board stands
 
@@ -194,6 +197,11 @@ Questions Q1–Q21 are answered in DD-11 to DD-67.
 |---|---|
 | DD-147 | Applied `destroyed-scores-zero`: A nation with no colony after the war is destroyed and scores 0 🏅 |
 | DD-148 | Applied `tax-two-2`: Tax refusal in a 2-player game adds 2 🟥 (not 1) |
+| DD-149 | Applied `loyalist-colony-4`: Scoring: each colony the loyalist holds after the war scores 4 🏅, not 6 |
+| DD-150 | Applied `no-loyalist-on-tie`: War, sides: if the players with the fewest 🔔 also tie on ✝️ and 🟡, there is no loyalist (was O-18) |
+| DD-151 | Dropped O-19: 3 players keep `loyalist-colony-4`, though the loyalist wins 26% there |
+| DD-152 | Applied O-22: a pawn aboard counts for a colony's defence only through its ship. Conversion: direct (rulebook wording, already printed); La Salle and single-copy improvements need no wording |
+| DD-153 | Dropped O-21's timing idea (cube events into the lower half of the deck): the setup stays simple. Pirate Blockade's ransom equal to the round number is candidate `pirate-ransom-round` |
 
 ## Source edits still to make
 

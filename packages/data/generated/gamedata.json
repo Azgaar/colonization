@@ -2858,7 +2858,8 @@
     {
      "n": "blockade",
      "gold": 3,
-     "refEach": 2
+     "refEach": 2,
+     "byRound": false
     }
    ]
   }
@@ -7883,11 +7884,12 @@
    "refStrengthIncludesTactic": true,
    "tokenBonus": 1,
    "baseDefence": 1,
-   "loyalistFrom": 3
+   "loyalistFrom": 3,
+   "noLoyalistOnTie": true
   },
   "score": {
    "patriotColony": 6,
-   "loyalistColony": 6,
+   "loyalistColony": 4,
    "perBell": 1,
    "agentsPerPoint": 5,
    "goldPerPoint": 5,

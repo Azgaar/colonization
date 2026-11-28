@@ -723,7 +723,8 @@
         {
           "n": "blockade",
           "gold": 3,
-          "refEach": 2
+          "refEach": 2,
+          "byRound": false
         }
       ],
       "$checked": "3f10c41d15"

@@ -183,7 +183,8 @@ export function searchBot(seed: string, o: SearchOptions = {}): SearchBot {
     choose(v) {
       bot.stats.decisions++;
       const pick = guide.choose(v);
-      const cands = guide.last.map((x) => x.choice);
+      // Passing ends the round with cards unplayed: the forecast sees no cost in actions never taken, so search passes only when the goal bot would.
+      const kept = guide.last.filter((x, i) => i === 0 || x.choice.c !== 'pass'), cands = kept.map((x) => x.choice);
       if (v.legal.length < 2 || DELEGATE.has(v.state.pending!.kind) || cands.length < 2) { bot.last = guide.last.slice(0, 5); return pick; }
       const t0 = performance.now(), me = v.player, round = v.state.round;
       const arms: Arm[] = cands.map((choice) => ({ choice, n: 0, sum: 0, tries: 0, res: [] }));
@@ -244,7 +245,7 @@ export function searchBot(seed: string, o: SearchOptions = {}): SearchBot {
         const mean = a.n ? a.sum / a.n : 0, share = Math.round((100 * a.n) / Math.max(1, total));
         const vs = v.state.players.length > 1 ? ' vs the best rival' : '';
         const g = i ? `, ${gain[i].mean >= 0 ? '+' : ''}${gain[i].mean.toFixed(1)} vs the goal bot's choice` : ", the goal bot's choice";
-        return { choice: a.choice, score: mean, why: `${share}% of ${total} samples, ${mean >= 0 ? '+' : ''}${mean.toFixed(1)} points${vs}${g} (${guide.last[i].why})`, goal: guide.last[i].why, to: guide.last[i].to };
+        return { choice: a.choice, score: mean, why: `${share}% of ${total} samples, ${mean >= 0 ? '+' : ''}${mean.toFixed(1)} points${vs}${g} (${kept[i].why})`, goal: kept[i].why, to: kept[i].to };
       });
       return order[0].a.choice;
     },

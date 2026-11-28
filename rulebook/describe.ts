@@ -145,7 +145,7 @@ export function describe(R: GameDef) {
       case 'priceReset': return `The prices of ${resList(n.res)} return to their start.`;
       case 'hostilityAll': return `The 💢 of every settlement ${n.add < 0 ? 'falls' : 'rises'} by ${Math.abs(n.add)}.`;
       case 'boycott': return `Each player with ${RES[n.res]} pays ${n.goldPerUnit} 🟡 for each one, or boycotts: discards them all and gains 1 🔔 for each. Add ${n.refPerUnit} 🟥 for each one discarded.`;
-      case 'blockade': return `Each player whose ship is outside Europe pays a ransom of ${n.gold} 🟡, or takes 1 damage and loses the whole cargo. Add ${n.refEach} 🟥 for each damaged ship.`;
+      case 'blockade': return `Each player whose ship is outside Europe pays a ransom of ${n.byRound ? '🟡 equal to the round number' : `${n.gold} 🟡`}, or takes 1 damage and loses the whole cargo. Add ${n.refEach} 🟥 for each damaged ship.`;
       default: return '';
     }
   }

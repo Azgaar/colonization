@@ -219,7 +219,7 @@ All 34 cards are implemented as printed in the spreadsheet. Clarifications:
 | ID | Rule |
 |---|---|
 | W-1 | Starts at the end of a round, after tax, if any player has 20 🔔 or round 10 is over |
-| W-2 | Loyalist is the player with the fewest 🔔 (then fewest ✝️, then fewest 🟡 **[D]** on direction). No loyalist in solo **[A]** or with 2 players **[A]** (DD-58: the war plays without the loyalist's steps; `war.loyalistFrom = 3` in `board`, 2 as printed), or if every player has 15+ 🔔. The second case needs all to reach 15 in the same final round, and is meant to be very rare **[A]** |
+| W-2 | Loyalist is the player with the fewest 🔔 (then fewest ✝️, then fewest 🟡 **[D]** on direction); if they still tie, there is no loyalist (DD-150). No loyalist in solo **[A]** or with 2 players **[A]** (DD-58: the war plays without the loyalist's steps; `war.loyalistFrom = 3` in `board`, 2 as printed), or if every player has 20+ 🔔 (`war.bells`). The second case needs all to reach 20 in the same final round, and is meant to be very rare **[A]** |
 | W-3 | Draw one King tactic |
 | W-4 | REF pool = accumulated 🟥, plus 1 per settlement with hostility 4–5, plus tactic additions |
 | W-5 | The war is played on the colony slots of the nation boards (1–3, as the colony markers), not on the map (DD-123). Royal Army by formula: each patriot colony gets ⌊pool ÷ patriot colonies⌋ 🟥; the rest go one each in order of most 🔔 (then ✝️, 🟡), colony 1 first within a player |
@@ -227,7 +227,7 @@ All 34 cards are implemented as printed in the spreadsheet. Clarifications:
 | W-7 | Placing, clockwise from the loyalist, until all have passed: one or more cards face down on one colony slot, or pass for good. Loyalist: own slots or a patriot's. Patriot: own slots or the loyalist's, never another patriot's (no kingmaking). A stack on an enemy slot carries the placer's nation token, and later cards join it. Any card may be placed; counts are public |
 | W-8 | Washington: 2 swaps per 🔔. Revere: up to 4 swaps for no 🔔. Each swap still needs an agent without 🗡️. Loyalist Militia tactic: the loyalist takes 1 Militia card per ✝️, free |
 | W-9 | Patriot colony: attack = 1 × 🟥 (DD-49) + tactic + loyalist cards' 🗡️. Card count does not add strength here, unlike C-3 |
-| W-10 | Patriot colony: defence = 1 + terrain + buildings + 1 per own token on or next to the colony + own cards' 🗡️. Loyalist colony: attack = patriots' cards' 🗡️; defence = 1 + terrain + loyalist's buildings + tokens + their cards' 🗡️; the tactic does not apply |
+| W-10 | Patriot colony: defence = 1 + terrain + buildings + 1 per own token on or next to the colony (a pawn aboard counts only through its ship) + own cards' 🗡️. Loyalist colony: attack = patriots' cards' 🗡️; defence = 1 + terrain + loyalist's buildings + tokens + their cards' 🗡️; the tactic does not apply |
 | W-11 | A colony with no enemy cubes or cards on its slot is not attacked |
 | W-12 | If attack is greater, the attacker rolls dice equal to the difference, at most 10 (for the King alone, another player rolls). No success: the colony holds. 1+ success: it falls. Equal or less: it holds |
 | W-13 | A fallen patriot colony: the loyalist takes it if their cards' 🗡️ beat the REF strength (1 × 🟥 + tactic); a tie is a die roll each, the player on the loyalist's left rolling for the King, higher wins, again on a tie; if the King is stronger, the colony is removed and scores for nobody. A fallen loyalist colony goes to the patriot with the most 🗡️ there; ties by a die roll each |
@@ -238,7 +238,7 @@ All 34 cards are implemented as printed in the spreadsheet. Clarifications:
 
 | ID | Rule |
 |---|---|
-| W-20 | Patriot: 6 per held colony, 1 per 2 unspent 🔔 (DD-106). Loyalist: 6 per colony (DD-104), captured ones included |
+| W-20 | Patriot: 6 per held colony, 1 per 2 unspent 🔔 (DD-106). Loyalist: 4 per colony (DD-104, DD-149), captured ones included |
 | W-21 | All: 1 per 5 agents (war cards and swapped agents included, W-6), 1 per 5 🟡 (Fugger 3; DD-97, DD-99), 1 per building, 1 per Father, plus card bonuses. Fractions are dropped |
 | W-22 | A nation with no colony after the war is destroyed and scores 0 (DD-147). To win, a player must hold at least 1 colony and have the most points. Ties: gold, then number of agents, then shared |
 | W-23 | If nobody qualifies, the Crown wins **[D]**. Solo: the player wins by holding at least 1 colony **[A]**, and the score is the measure |

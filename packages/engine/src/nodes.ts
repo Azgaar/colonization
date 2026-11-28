@@ -280,7 +280,7 @@ const nodes: { [K in Node['n']]: Fn<K> } = {
     if (p !== null) ask(s, { kind: 'sacredForest', player: p, goods: n.goods, gold: n.gold, hostility: n.hostility });
   },
   boycott(s, n) { eachPlayer(s, 'boycott', { res: n.res, gold: n.goldPerUnit, ref: n.refPerUnit }, (p) => s.players[p].wh[n.res] > 0); },
-  blockade(s, n) { eachPlayer(s, 'blockade', { gold: n.gold, ref: n.refEach }, (p) => !shipInEurope(s, p)); },
+  blockade(s, n) { eachPlayer(s, 'blockade', { gold: n.byRound ? s.round : n.gold, ref: n.refEach }, (p) => !shipInEurope(s, p)); },
   activate(s, n) { push(s, { t: 'activate', n: n.settlement }); },
 };
 

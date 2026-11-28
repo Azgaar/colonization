@@ -18,15 +18,26 @@ let game = '', turning = -1, front = false;
 const shown = new Set<number>();
 export function reveal() { shown.add(S.war); turning = S.war; }
 export function showFront(on: boolean) { front = on; }
+/**
+ * What the map's plate at a colony may tell the player: the strengths known so far, whether cards still hide part of them,
+ * and the result only once the siege's cards are turned over, after the last of them has turned (`late`).
+ */
+export function plate(k: number) {
+  const x = D.war!.sieges[k]!, { below, above } = stacksOf(x);
+  // After the war the state holds every card; before their siege is told, the others' are left out, as in the war box.
+  const told = (seen: boolean) => { const cut = !!D.over && !seen; return { def: x.defence.total - (cut ? unseenPower(below) : 0), atk: x.attack.total - (cut ? unseenPower(above) : 0), hidD: seen ? 0 : unseen(below), hidA: seen ? 0 : unseen(above), fell: seen ? x.fell : undefined }; };
+  const late = k === turning && k === S.war && !front ? `${((unseen(below) + unseen(above)) * 0.26 + 0.5).toFixed(2)}s` : '';
+  return { ...told(shown.has(k)), late, before: late ? told(false) : null };
+}
 /** Whether anyone attacked a colony: redcoats or cards against it. */
 const struck = (x: Siege) => x.cubes > 0 || Object.keys(x.stacks).some((q) => Number(q) !== x.owner && x.stacks[Number(q)]!.length > 0);
 /** What came of a siege once seen: held, fallen to the King, or taken by a player; nothing before its cards are turned. */
 const mark = (x: Siege, k: number) => (!shown.has(k) || !struck(x) ? '' : !x.fell ? '<i class="ok">✓</i>' : x.takenBy !== null && x.takenBy !== undefined ? Places.em(x.takenBy, 16) : seal('king', 16));
-/** The war's tabs: the front lines, each colony by its owner's emblem with what came of it, the final score. */
+/** The war's tabs (the mark of the siege turning now comes once its cards have turned): the front lines, each colony by its owner's emblem with what came of it, the final score. */
 function tabs(w: NonNullable<Snapshot['war']>) {
   const groups: { owner: number; tabs: string[] }[] = [];
   w.sieges.forEach((x, k) => {
-    const tab = `<button class="wtab${k === S.war && !front ? ' on' : ''}${shown.has(k) && x.fell ? ' fell' : ''}" data-war="${k}">${colonyName(x)}${mark(x, k)}</button>`, g = groups.at(-1);
+    const tab = `<button class="wtab${k === S.war && !front ? ' on' : ''}${shown.has(k) && x.fell ? ' fell' : ''}" data-war="${k}">${colonyName(x)}${k === turning && k === S.war && !front ? `<span class="wmk" style="--late:${(unseen(stacksOf(x).below) * 0.26 + unseen(stacksOf(x).above) * 0.26 + 0.5).toFixed(2)}s">${mark(x, k)}</span>` : mark(x, k)}</button>`, g = groups.at(-1);
     if (g?.owner === x.owner) g.tabs.push(tab); else groups.push({ owner: x.owner, tabs: [tab] });
   });
   const end = D.over ? `<button class="wtab" data-war="${w.sieges.length}">${t('result')}</button>` : `<button class="wtab" data-peace>${t('close')}</button>`;
@@ -46,10 +57,12 @@ export function war() {
   ending();
   if (!x) { $('war').innerHTML = ''; return; }
   const paint = (html: string) => { const el = $('war'); if (el.dataset.h !== html) { el.innerHTML = html; el.dataset.h = html; } };
+  // A siege with no card hidden from the player is seen as soon as it is opened: there is nothing to turn over.
+  if (!front && unseen(stacksOf(x).below) + unseen(stacksOf(x).above) === 0) shown.add(S.war);
   if (front) return paint(`${tabs(w)}<div class="siege front">${frontLines(w.sieges, (i) => `data-war="${i}"`, true)}<div class="bts">${onward(w, 0)}</div></div>`);
   // Who placed what: the owner's cards defend, everyone else's attack. Your own are always face up.
   const { below, above } = stacksOf(x), hidD = unseen(below), hidA = unseen(above);
-  const open = shown.has(S.war) || hidD + hidA === 0, how = turning === S.war ? 'turn' : 'open';
+  const open = shown.has(S.war), how = turning === S.war ? 'turn' : 'open';
   // Before the cards are turned over, each side shows what is known; its hidden agents are a range.
   const known = (e: Siege['attack'], hid: number, power: number, open: boolean) => {
     if (open) return { total: e.total, lines: lines(e) };

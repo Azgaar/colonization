@@ -30,6 +30,8 @@ Each command prints what happened since your last decision ("Since your last dec
 
 ## When the game is over
 
+The last pick, and `result`, replay the whole game with a bot in your seat, which takes minutes against Hard or Expert bots: run them with the longest command timeout (10 minutes).
+
 Your final reply must have these four parts, with these headings:
 1. **Result**: the final result lines exactly as printed.
 2. **How it went**: two or three sentences.

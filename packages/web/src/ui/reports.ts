@@ -21,7 +21,7 @@ const warStart = (e: Entry) => {
   // Why the war began: a governor rang the bells of liberty, or the King would wait no longer; and why the loyalist sides with him.
   const rebels: number[] = e.rebels ?? [], bells: number[] = e.bells ?? [], list = (l: string[]) => new Intl.ListFormat(lang(), { type: 'conjunction' }).format(l);
   const why = e.reason === 'bells' && rebels.length ? t('war.declared', { who: list(rebels.map((p) => name(p))), n: `${Math.max(...rebels.map((p) => bells[p] ?? 0))} ${icon('bells', 16)}` }) : t('war.king_moves', { year: D.year });
-  const side = e.loyalist === null ? t('war.no_loyalist') : t('war.loyalist_why', { who: name(e.loyalist), n: `${bells[e.loyalist] ?? 0} ${icon('bells', 16)}` });
+  const side = e.loyalist === null ? t(e.tie ? 'war.no_loyalist_tie' : 'war.no_loyalist') : t('war.loyalist_why', { who: name(e.loyalist), n: `${bells[e.loyalist] ?? 0} ${icon('bells', 16)}` });
   // The two sides, each its emblems and its name on one line; who they are is said just above.
   const tile = (pics: string, role: string) => `<div class="wct"><span class="wpic">${pics}</span><b>${role}</b></div>`;
   return `<p class="wwhy">${why}</p><p class="wwhy">${side}</p><div class="wcard two">${tile(e.loyalist === null ? seal('king', 30) : Places.em(e.loyalist, 30), e.loyalist === null ? t('battle.king') : `${t('loyalist')}${you(e.loyalist)}`)}${tile(patriots.map((p) => Places.em(p, 30)).join(''), `${t(patriots.length === 1 ? 'patriot' : 'patriots')}${patriots.includes(me) ? ` (${t('you')})` : ''}`)}</div>`;

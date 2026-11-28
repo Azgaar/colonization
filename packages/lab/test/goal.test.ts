@@ -96,7 +96,8 @@ describe('lab', () => {
     r.parts.forEach((x, p) => expect(Object.values(x).reduce((a, b) => a + b, 0)).toBe(r.scores[p]));
     r.bells.forEach((b, p) => {
       const net = Object.entries(b).reduce((n, [k, v]) => n + (k.startsWith('+') ? v : -v), 0);
-      if (r.sides[p] === 'patriot') expect(r.parts[p].bells ?? 0).toBe(Math.floor(net / def.settings.score.bellsPerPoint) * def.settings.score.perBell);
+      // A destroyed nation scores nothing (DD-147).
+      if (r.sides[p] === 'patriot' && r.qualifies[p]) expect(r.parts[p].bells ?? 0).toBe(Math.floor(net / def.settings.score.bellsPerPoint) * def.settings.score.perBell);
     });
     for (const f of Object.values(PER_GAME)) { const v = f(r); expect(v === null || Number.isFinite(v)).toBe(true); }
     expect(leaderWins(r, 99)).toBe(null);

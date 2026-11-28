@@ -10,7 +10,7 @@ export type Level = 'easy' | 'normal' | 'hard' | 'expert';
  * - easy: the goal bot with much noise (about two points either way, so it often takes a clearly worse action)
  *   and no weight on opportunity cost or on keeping a colony, so it plays for the moment.
  * - normal: the goal bot with its tuned weights, the default opponent.
- * - hard: search over the goal bot's 5 best candidates, 60 samples per decision.
+ * - hard: search over the goal bot's 3 best candidates, 30 samples per decision (5 and 60 played as well as expert, 2026-11-28).
  * - expert: search over 8 candidates, 150 samples per decision.
  * Search met its strength goal at 60 samples (PRD); thousands, as a fixed 3 s gave, cost seconds a decision for little more.
  * Both stop sooner once no other candidate can still beat the goal bot's choice, which is how most decisions end.
@@ -19,7 +19,7 @@ export type Level = 'easy' | 'normal' | 'hard' | 'expert';
 export const LEVELS: Record<Level, { label: string; weights?: Partial<Weights>; search?: Budget & { width: number; settle?: boolean } }> = {
   easy: { label: 'Easy', weights: { noise: 2, regret: 0, qualify: 3, rush: 0 } },
   normal: { label: 'Normal' },
-  hard: { label: 'Hard', search: { iterations: 60, ms: 1000, width: 5, settle: true } },
+  hard: { label: 'Hard', search: { iterations: 30, ms: 1000, width: 3, settle: true } },
   expert: { label: 'Expert', search: { iterations: 150, ms: 3000, width: 8, settle: true } },
 };
 

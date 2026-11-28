@@ -3,6 +3,25 @@
   "title": "Candidate changes for the designer, on top of board (docs/decisions.md, Open); nothing here is decided",
   "base": "board",
   "sandbox": true,
-  "overrides": [],
+  "overrides": [
+    {
+      "id": "pirate-ransom-round",
+      "why": "Pirate Blockade in round 1 asks 3 🟡 of players who have none, so it only adds 2 🟥 per ship at sea (8 🟥 in one game, playtest 2026-11-28, O-21); a ransom of the round number is payable early and still bites late. Tested (400 paired games, 4 players): when the event comes in rounds 1–3 it still adds 6.0 🟥, as players have no gold even for 1–3 🟡 (O-20); from round 4 it adds 3.8 🟥 instead of 2.8. It helps only once the economy gives early gold",
+      "conversion": "direct",
+      "table": "Pirate Blockade: the ransom is 🟡 equal to the round number (not 3). / Пиратская блокада: выкуп — столько 🟡, каков номер тура (а не 3).",
+      "set": {
+        "events.pirate_blockade.do.1.byRound": true
+      }
+    },
+    {
+      "id": "bolivar-2",
+      "why": "Bolívar's takers win 55% at 4 players (parity 25%): 4 🔔 for up to +9 🏅. At +2 they win 47%, at +1 41%; a dearer card (6 🔔) is almost never taken (5% of games). 400 paired games a point, Normal bots (playtest 2026-11-28)",
+      "conversion": "direct",
+      "table": "Simón Bolívar (4 🔔): at the end, +2 🏅 for each colony you hold as a patriot (not +3). / Симон Боливар (4 🔔): в финале +2 ПО за каждую неоккупированную колонию, если вы патриот (а не +3).",
+      "set": {
+        "fathers.simon_bolivar.mods.0.value": 2
+      }
+    }
+  ],
   "packages": {}
 }

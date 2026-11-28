@@ -112,8 +112,6 @@ const VALUES: Record<string, () => string | number> = {
 };
 /** The Founding Fathers who add points of their own at the end. */
 function scoringFathers(l: Lang) { return Object.values(R.fathers).filter((f) => f.mods.some((m) => m.mod === 'pointsPerAlliance' || m.mod === 'pointsPerPatriotColony')).map((f) => cap(l === 'ru' ? f.ru : f.en)); }
-// The scoring table gives one value for a colony, the loyalist's and the patriots' alike.
-if (S.score.loyalistColony !== S.score.patriotColony) throw new Error('rulebook: the scoring table assumes a colony scores the same for the loyalist and the patriots');
 function value(p: string): string {
   if (VALUES[p]) return String(VALUES[p]!());
   let v: unknown;

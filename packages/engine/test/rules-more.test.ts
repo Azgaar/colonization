@@ -929,6 +929,16 @@ describe('War', () => {
     expect(findLoyalist(s)).toBe(null);
     expect(findLoyalist(eve(1))).toBe(null);
   });
+  it('[W-2] no loyalist when the fewest bells, crosses and gold all tie (DD-150)', () => {
+    const s = eve(3);
+    P(s, 2).bells = P(s, 1).bells;
+    expect(findLoyalist(s)).toBe(null);
+    P(s, 1).gold = 1;
+    expect(findLoyalist(s)).toBe(2);
+    s.def = { ...s.def, settings: { ...s.def.settings, war: { ...s.def.settings.war, noLoyalistOnTie: false } } };
+    P(s, 1).gold = 0;
+    expect(findLoyalist(s)).toBe(2);
+  });
   it('[W-2] no loyalist with 2 players (DD-58): the King attacks both colonies, the most rebellious plays first', () => {
     const s = start(eve(2, 'gentlemans_war', def));
     expect([s.war!.loyalist, s.war!.turn]).toEqual([null, [0, 1]]);
@@ -1078,11 +1088,11 @@ describe('War', () => {
     const s = eve(2);
     passAll(start(s));
     expect(scorePlayer(s, 0).parts).toEqual(expect.arrayContaining([{ label: 'colonies', value: 6 }, { label: 'bells', value: 10 / s.def.settings.score.bellsPerPoint }]));
-    expect(scorePlayer(s, 1).parts).toEqual([{ label: 'colonies', value: 6 }]); // DD-104
+    expect(scorePlayer(s, 1).parts).toEqual([{ label: 'colonies', value: s.def.settings.score.loyalistColony }]); // DD-104, DD-149
     s.war!.sieges[0].fell = true;
     s.war!.sieges[0].takenBy = 1;
     expect(scorePlayer(s, 0).colonies).toBe(0);
-    expect(scorePlayer(s, 1).parts[0].value).toBe(12);
+    expect(scorePlayer(s, 1).parts[0].value).toBe(2 * s.def.settings.score.loyalistColony);
   });
   it('[W-21] points for everything else, rounded down', () => {
     const s = game(1);

@@ -1,5 +1,5 @@
 import type { Siege, State, View } from '@col/engine';
-import { attacked, loyalistColony, siegeStrength, warStrength } from '@col/engine';
+import { attacked, loyalistColony, scorePlayer, siegeStrength, warStrength } from '@col/engine';
 
 /** Chance that a colony holds, given attack minus defence. */
 export function holdChance(gap: number, faces = 2, need = 1): number {
@@ -12,6 +12,33 @@ export const odds = (s: State) => {
   const e = s.def.tactics[s.war!.tactic].effect;
   return { faces: e.t === 'successFrom' ? e.faces.length : 2, need: e.t === 'minSuccesses' ? e.value : 1 };
 };
+
+/**
+ * What a player loses on top of the colonies if none of them holds: winning at all needs a colony, and a destroyed nation
+ * scores nothing (DD-147), so then it is everything else the score holds (bells, buildings, gold, Fathers, agents).
+ */
+export function lastColonyStake(s: State, p: number): number {
+  if (!s.def.settings.score.destroyedScoresZero) return 4;
+  const r = scorePlayer(s, p), col = r.parts.filter((x) => x.label === 'colonies' || x.label === 'simon_bolivar').reduce((n, x) => n + x.value, 0);
+  return 4 + Math.max(0, r.score - col);
+}
+/** Chance that every other colony of `p` under siege falls (0 when one is not attacked at all), skipping siege `except`. */
+function othersFall(v: View, p: number, except: number): number {
+  const s = v.state, war = s.war!, { faces, need } = odds(s);
+  let all = 1;
+  war.sieges.forEach((x, i) => {
+    if (i === except || x.owner !== p) return;
+    all *= attacked(x) ? 1 - holdChance(siegeGap(v, x), faces, need) : 0;
+  });
+  return all;
+}
+
+/** War strength at `cell` of the rest of this player's war hand, the card being placed left out once. */
+function handBesides(v: View, card: string, cell: number): number {
+  const s = v.state, hand = [...(s.war!.hands[v.player] ?? [])], at = hand.indexOf(card);
+  if (at >= 0) hand.splice(at, 1);
+  return hand.reduce((n, c) => n + Math.max(0, warStrength(s, c, cell)), 0);
+}
 
 interface Plan { militia: number; units: number; mercs: number; cubes: number[]; value: number }
 
@@ -48,7 +75,7 @@ export function planDefence(v: View, cards: string[], opts: { freeCubes: number;
   const foe = war.loyalist === null ? 0 : (war.hands[war.loyalist] ?? []).length * hiddenCard(v, war.loyalist) / Math.max(1, mine.length) * 0.5;
   const gaps = mine.map((i) => siegeGap(v, war.sieges[i]) + foe);
   const free = war.sieges.filter((x) => x.owner === me && !attacked(x)).length;
-  const strength = cards.reduce((n, c) => n + warStrength(s, c, 0), 0) + opts.freeCubes;
+  const strength = cards.reduce((n, c) => n + warStrength(s, c, 0), 0) + opts.freeCubes, stake = lastColonyStake(s, me);
   let best: Plan = { militia: 0, units: 0, mercs: 0, cubes: mine.map(() => 0), value: -Infinity };
   const maxPaid = opts.maxMilitia + opts.maxMercs;
   for (let set = 0; set < 1 << mine.length; set++) {
@@ -63,8 +90,8 @@ export function planDefence(v: View, cards: string[], opts: { freeCubes: number;
       let left = strength + paid;
       for (const k of [...chosen].sort((a, b) => h[a] - h[b])) { const n = Math.min(left, Math.max(0, Math.ceil(h[k]))); cubes[k] += n; h[k] -= n; left -= n; }
       const value = h.reduce((n, q) => n + per * holdChance(q, faces, need), 0) - bells * opts.bellCost - mer * opts.goldCost +
-        // At least one colony is needed to win at all.
-        (free ? 0 : 5 * (1 - h.reduce((n, q) => n * (1 - holdChance(q, faces, need)), 1)));
+        // At least one colony is needed to win at all, and to score anything (DD-147).
+        (free ? 0 : stake * (1 - h.reduce((n, q) => n * (1 - holdChance(q, faces, need)), 1)));
       if (value > best.value + 1e-9) best = { militia: bells, units: mil, mercs: mer, cubes, value };
       if (!chosen.length) break;
     }
@@ -84,14 +111,17 @@ export function deployGain(v: View, card: string, siege: number): number {
   const loyal = war.loyalist === me, { faces, need } = odds(s);
   const gap = siegeGap(v, x);
   if (loyalistColony(s, x)) {
-    if (loyal) return (holdChance(gap - p) - holdChance(gap)) * (sc.loyalistColony + sc.patriotColony * 0.3);
+    if (loyal) return (holdChance(gap - p) - holdChance(gap)) * (sc.loyalistColony + sc.patriotColony * 0.3 + lastColonyStake(s, me) * othersFall(v, me, siege));
     // Mine only if I bring the most: count my share against the strongest other patriot.
     const by: Record<number, number> = {};
     for (const [k, c] of Object.entries(x.stacks)) if (Number(k) !== x.owner) by[Number(k)] = c.reduce((n, y) => n + (y === '?' ? hiddenCard(v, Number(k)) : warStrength(s, y, x.cell)), 0);
     const mine = (by[me] ?? 0) + p, rival = Math.max(0, ...Object.entries(by).filter(([q]) => Number(q) !== me).map(([, n]) => n));
     // A tie is settled by a die.
     const share = mine > rival ? 1 : mine === rival ? 0.5 : 0.15;
-    return ((1 - holdChance(gap + p)) - (1 - holdChance(gap))) * (sc.patriotColony * share + sc.loyalistColony * 0.3) - 0.05;
+    // An empty loyalist colony falls only to several cards together: count this card's share of what the rest of the hand adds.
+    const more = handBesides(v, card, x.cell);
+    const one = holdChance(gap) - holdChance(gap + p), all = ((holdChance(gap) - holdChance(gap + p + more)) * p) / (p + more);
+    return Math.max(one, all) * (sc.patriotColony * share + sc.loyalistColony * 0.3) - 0.05;
   }
   if (loyal) {
     // A colony the loyalist helps to take is theirs only if their cards beat the King's army; a tie is a die (W-13).
@@ -99,6 +129,10 @@ export function deployGain(v: View, card: string, siege: number): number {
     const theirs = mine > st.ref ? sc.loyalistColony : mine === st.ref ? sc.loyalistColony / 2 : 0;
     return (holdChance(gap, faces, need) - holdChance(gap + p, faces, need)) * (theirs + sc.patriotColony * 0.3);
   }
-  const last = s.colonies.filter((c) => c.owner === me).length <= 1 ? 4 : 0;
-  return (holdChance(gap - p, faces, need) - holdChance(gap, faces, need)) * (sc.patriotColony + last);
+  // The last colony that may hold carries the whole score with it.
+  const worth = sc.patriotColony + lastColonyStake(s, me) * othersFall(v, me, siege);
+  // One card does little against a large army, though the whole hand together may save the colony: count this card's share of that too.
+  const more = handBesides(v, card, x.cell);
+  const one = holdChance(gap - p, faces, need) - holdChance(gap, faces, need), all = ((holdChance(gap - p - more, faces, need) - holdChance(gap, faces, need)) * p) / (p + more);
+  return Math.max(one, all) * worth;
 }

@@ -741,8 +741,8 @@
           <p>
             Everyone is a <b>patriot</b>, except in a game of <rv p="settings.war.loyalistFrom"></rv> or more players:
             there the player with the fewest 🔔 becomes the <b>loyalist</b>, unless every player has
-            <rv p="settings.war.bells"></rv> 🔔 or more; ties go to the one with fewer ✝️, then fewer 🟡. With no
-            loyalist, skip every rule about the loyalist below.
+            <rv p="settings.war.bells"></rv> 🔔 or more; ties go to the one with fewer ✝️, then fewer 🟡; if they are still
+            tied, there is no loyalist. With no loyalist, skip every rule about the loyalist below.
           </p>
 
           <h3>2. The King’s army</h3>
@@ -875,8 +875,12 @@
           </thead>
           <tbody>
             <tr>
-              <td>Each colony you hold, colonies taken in the war included</td>
+              <td>Each colony a patriot holds, colonies taken in the war included</td>
               <td class="num"><rv p="settings.score.patriotColony"></rv></td>
+            </tr>
+            <tr>
+              <td>Each colony the loyalist holds, colonies taken in the war included</td>
+              <td class="num"><rv p="settings.score.loyalistColony"></rv></td>
             </tr>
             <tr>
               <td>Every <rv p="settings.score.bellsPerPoint"></rv> unspent 🔔; the loyalist scores none</td>
@@ -927,7 +931,7 @@
           <ul>
             <li>
               Every action should add to your final score. Before you play a card, work out what it is worth in 🏅: a
-              colony held is <rv p="settings.score.patriotColony"></rv> 🏅, a building
+              colony held is <rv p="settings.score.patriotColony"></rv> 🏅 (the loyalist’s <rv p="settings.score.loyalistColony"></rv>), a building
               <rv p="settings.score.building"></rv> 🏅, every <rv p="settings.score.bellsPerPoint"></rv> unspent 🔔 and
               every <rv p="settings.score.goldPerPoint"></rv> 🟡 1 🏅.
             </li>

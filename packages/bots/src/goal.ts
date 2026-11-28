@@ -495,7 +495,14 @@ function warValue(x: Situation, c: Choice): number {
       const r = planDefence(v, hand, { freeCubes: 0, perBell, maxMilitia: 0, maxMercs: mercenaryMax(s, me), bellCost, goldCost });
       return -Math.abs((c.n as number) - r.plan.mercs);
     }
-    case 'deploy': return c.c === 'place' ? deployGain(v, c.card as string, c.siege as number) : 0;
+    case 'deploy': {
+      if (c.c !== 'place') return 0;
+      const gain = deployGain(v, c.card as string, c.siege as number);
+      if (war.loyalist === me) return gain;
+      // Follow the whole hand's plan: colonies it means to hold get the cards, those it gives up get none, so cards are not spread thin.
+      const r = planDefence(v, hand, { freeCubes: 0, perBell, maxMilitia: 0, maxMercs: 0, bellCost, goldCost }), k = r.mine.indexOf(c.siege as number);
+      return k < 0 ? gain : gain + (r.plan.cubes[k] > 0 ? 0.5 : -0.5);
+    }
     case 'betray': {
       if (c.c !== 'betray') return 0;
       const y = war.sieges[c.siege as number];

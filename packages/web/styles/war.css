@@ -18,6 +18,8 @@ body.war .hand,body.war .door,body.war #heaps,body.war .side,body.war .kingbox {
 .wtab .ok { font-style:normal;font-weight:800;color:#3f9a4a }
 .wtab:not(.on) .ok { color:#93e09c }
 .wtab .em { box-shadow:none }
+.wmk { display:inline-flex;animation:slate .4s var(--late,0s) both }
+@media (prefers-reduced-motion:reduce) { .wmk { animation:none } }
 /* The end of the game: the picture of the ending beside the result, the player's game in numbers and the standings. */
 .ending { position:fixed;inset:0;z-index:30;display:grid;place-items:center;background:#06181ad9 }
 .ending[hidden] { display:none }
