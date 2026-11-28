@@ -1,6 +1,6 @@
 /* The flow of the game: the player's choices go to the engine, then the others play until it is the player's turn again. */
 import type { Choice } from '@col/engine';
-import { D, P, RES, showSeat, W } from './data.ts';
+import { D, P, RES, showSeat } from './data.ts';
 import { bub } from './input.ts';
 import { Board } from './map/board.ts';
 import { paint } from './paint.ts';
@@ -13,7 +13,7 @@ import { tell } from './ui/notices.ts';
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 /** The fields of an option that the engine takes with each action. */
 const KEEP: Record<string, string[]> = { produce: ['cell', 'icon'], docks: ['cell'], work: ['building'], build: ['building'], customs: ['r'], smuggle: ['r'], exchange: ['other'], teach: ['building', 'target', 'from'], attack: ['token', 'mode', 'cell'], gift: ['settlement', 'r'], preach: ['settlement'], alliance: ['settlement'], recruit: ['n'] };
-const clean = (o: Opt): Choice => { const keep = KEEP[o.a] || []; return { c: 'play', card: o.card, a: o.a, ...Object.fromEntries(keep.map((k) => [k, o[k]])) }; };
+const clean = (o: Opt): Choice => { const keep = (KEEP[o.a] || []).filter((k) => o[k] !== undefined); return { c: 'play', card: o.card, a: o.a, ...Object.fromEntries(keep.map((k) => [k, o[k]])) }; };
 export async function commit(o: Opt, space: string) {
   if (Sim.busy) return;
   Sim.mark(); S.card = S.over = S.pickAt = null; U.peek = null; bub().hidden = true;
@@ -59,7 +59,13 @@ export async function settle() {
 }
 /** After each turn of the bots: what they did. */
 function note() { tell(false); paint(); Board.land(); }
-export const focus = () => { const x = D.war?.sieges[S.war]; if (x) Board.stage.look(x.cell + W); };
+/** Show the besieged colony above the war box. */
+export const focus = () => {
+  const x = D.war?.sieges[S.war]; if (!x) return;
+  Board.stage.look(x.cell);
+  // Once the war box is drawn, the colony moves to the middle of the map left above it.
+  requestAnimationFrame(() => { const top = document.getElementById('war')?.getBoundingClientRect().top ?? 0; if (top > 120) Board.stage.look(x.cell, (top + 60) / 2); });
+};
 export function read() { X.reports.shift()?.after?.(); if (X.reports.length) return paint(); tell(); if (!Sim.mine() && !D.over) return settle(); if (D.over && S.war < 0) { S.war = 0; S.view = 'map'; focus(); } paint(); }
 export function cargo(to: string, r: string) {
   const c = X.cargo; if (!c) return;

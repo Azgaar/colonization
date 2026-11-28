@@ -26,6 +26,7 @@
     ],
     "refuseRef": 1,
     "refuseRefSolo": 3,
+    "refuseRefTwo": 2,
     "refuseBells": 0,
     "payBells": 1
   },
@@ -72,10 +73,13 @@
   },
   "fathers": {
     "max": 4,
-    "salon": 5
+    "salon": 5,
+    "keepBells": false,
+    "rotate": false
   },
   "propaganda": {
-    "maxFathers": 2
+    "maxFathers": 2,
+    "anywhere": true
   },
   "hire": {
     "max": 2
@@ -104,7 +108,8 @@
     "giftBase": 3,
     "preachMin": 0,
     "afterAttack": 5,
-    "giftResource": "any"
+    "giftResource": "any",
+    "giftByPrice": true
   },
   "activation": {
     "giftMaxHostility": 2,
@@ -135,12 +140,14 @@
     "safe": true
   },
   "war": {
-    "bells": 15,
+    "bells": 20,
     "refStrength": 1,
     "hostileCubes": 1,
     "hostileFrom": 4,
-    "allyCubes": 3,
+    "allyCubes": 2,
     "mercenaryGold": 5,
+    "militiaCards": 18,
+    "mercenaryCards": 18,
     "diceCap": 10,
     "refStrengthIncludesTactic": true,
     "tokenBonus": 1,
@@ -149,11 +156,14 @@
   },
   "score": {
     "patriotColony": 6,
-    "loyalistColony": 3,
+    "loyalistColony": 6,
     "perBell": 1,
     "agentsPerPoint": 5,
-    "goldPerPoint": 10,
+    "goldPerPoint": 5,
     "building": 1,
-    "father": 1
+    "father": 1,
+    "fatherByPrice": false,
+    "bellsPerPoint": 2,
+    "destroyedScoresZero": true
   }
 }

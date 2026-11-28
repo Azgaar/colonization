@@ -76,10 +76,11 @@ describe('war planning', () => {
     s.revealed = s.revealed.map(() => true);
     s.colonies = land.map((cell) => ({ cell, owner: 0 }));
     s.players[0].inf = 'europe';
-    s.war = { loyalist: 1, tactic: 'gentlemans_war', pool: 16, order: [0, 1], spent: { 0: { bells: 0, gold: 0 } }, sieges: land.map((cell) => ({ owner: 0, cell, cubes: 8, loyalist: [], militia: 0, army: [], support: 0, betrayed: 0 })) };
-    s.pending = { kind: 'placeCards', player: 0, side: 'army', _cards: ['dragoon', 'dragoon', 'soldier'] };
+    s.war = { loyalist: 1, tactic: 'gentlemans_war', pool: 16, order: [0, 1], turn: [1, 0], hands: { 0: ['dragoon', 'dragoon', 'soldier'], 1: [] }, gained: { 0: [], 1: [] }, swapped: { 0: [], 1: [] }, supply: { militia: 18, mercenary: 18 }, sieges: land.map((cell, k) => ({ owner: 0, cell, slot: k + 1, cubes: 8, stacks: {}, betrayed: 0 })) };
+    s.pending = { kind: 'militia', player: 0 };
     const r = planDefence(viewFor(s, 0), ['dragoon', 'dragoon', 'soldier'], { freeCubes: 0, maxMilitia: 0, perBell: 1, maxMercs: 0, bellCost: 1, goldCost: 0.5 });
-    expect(new Set(r.assign.values()).size).toBe(1);
+    // One colony is brought up to holding for sure; the other gets what is left.
+    expect(Math.max(...r.plan.cubes)).toBe(7);
   });
 });
 
@@ -95,7 +96,7 @@ describe('lab', () => {
     r.parts.forEach((x, p) => expect(Object.values(x).reduce((a, b) => a + b, 0)).toBe(r.scores[p]));
     r.bells.forEach((b, p) => {
       const net = Object.entries(b).reduce((n, [k, v]) => n + (k.startsWith('+') ? v : -v), 0);
-      if (r.sides[p] === 'patriot') expect(r.parts[p].bells ?? 0).toBe(net);
+      if (r.sides[p] === 'patriot') expect(r.parts[p].bells ?? 0).toBe(Math.floor(net / def.settings.score.bellsPerPoint) * def.settings.score.perBell);
     });
     for (const f of Object.values(PER_GAME)) { const v = f(r); expect(v === null || Number.isFinite(v)).toBe(true); }
     expect(leaderWins(r, 99)).toBe(null);

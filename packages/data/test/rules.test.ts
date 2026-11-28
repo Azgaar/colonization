@@ -43,7 +43,7 @@ describe('adding and removing cards', () => {
 describe('sources and change lists', () => {
   it('maps values to sheet cells, and the stored map is up to date', () => {
     expect(sourceOf('agents.priest.price')).toEqual({ sheet: 'Agents', row: 14, column: 'H', header: 'price' });
-    expect(sourceOf('fathers.francis_drake.mods.0.add').header).toBe('effect');
+    expect(sourceOf('fathers.hernan_cortes.mods.0.add').header).toBe('effect');
     expect(sourceOf('settings.tax.track')).toEqual({ sheet: 'rules/settings.json', row: null, column: null, header: 'tax.track' });
     expect(compileMaster().sources).toEqual(sourceMap);
   });
@@ -69,14 +69,14 @@ describe('sources and change lists', () => {
 describe('apply and drop', () => {
   it('writes a change into the master: settings, printed values with their units, effects with a todo for the printed text', () => {
     const m = readMaster();
-    const left = applyToMaster(m, { id: 'x', why: '', conversion: 'direct', table: 'Priest 5, tax track, Drake +3', set: { 'settings.tax.refuseRef': 2, 'agents.priest.price': 5, 'fathers.francis_drake.mods.0.add': 3 } });
+    const left = applyToMaster(m, { id: 'x', why: '', conversion: 'direct', table: 'Priest 5, tax track, Cortés +3', set: { 'settings.tax.refuseRef': 2, 'agents.priest.price': 5, 'fathers.hernan_cortes.mods.0.add': 3 } });
     expect(m.settings.tax.refuseRef).toBe(2);
     expect(m.sheets.find((s) => s.sheet === 'Agents')!.rows.find((r) => r.nickname === 'Priest')!.price).toBe('5 🟡');
-    expect(left).toEqual(['fathers.francis_drake']);
-    expect(todo(m).map((t) => t.card)).toEqual(['father.francis_drake']);
+    expect(left).toEqual(['fathers.hernan_cortes']);
+    expect(todo(m).map((t) => t.card)).toEqual(['father.hernan_cortes']);
     const d = compileMaster(m).data!;
-    expect([d.agents.priest.price, (d.fathers.francis_drake.mods[0] as { add: number }).add, d.settings.tax.refuseRef]).toEqual([5, 3, 2]);
-    expect(machine(m).checked('father.francis_drake', 'x')).toBe(false);
+    expect([d.agents.priest.price, (d.fathers.hernan_cortes.mods[0] as { add: number }).add, d.settings.tax.refuseRef]).toEqual([5, 3, 2]);
+    expect(machine(m).checked('father.hernan_cortes', 'x')).toBe(false);
     expect(() => applyToMaster(m, { id: 'y', why: '', conversion: 'component', table: 'A second Minuit', components: ['1 Father card'], copy: { 'fathers.minuit_2': 'fathers.peter_minuit' } })).toThrow(/by hand/);
   });
   it('drops a change from its ruleset', () => {

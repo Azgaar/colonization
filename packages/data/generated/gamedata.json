@@ -1,6 +1,6 @@
 {
  "schema": 1,
- "sourceHash": "8db281e80a74a69a",
+ "sourceHash": "864dc7649f71dbaa",
  "resources": {
   "food": {
    "id": "food",
@@ -1376,6 +1376,11 @@
       "food"
      ],
      "add": 1
+    },
+    {
+     "mod": "combat",
+     "token": "infantry",
+     "add": 1
     }
    ]
   }
@@ -1620,8 +1625,7 @@
    "improvement": true,
    "requires": "warehouse",
    "work": {
-    "kind": "sell",
-    "amount": 2
+    "kind": "market"
    }
   },
   "shipyard": {
@@ -1719,7 +1723,7 @@
    "en": "Christopher Columbus",
    "flavor": "1451–1506. Инициатор открытия Америки",
    "category": "exploration",
-   "bells": 2,
+   "bells": 1,
    "mods": [
     {
      "mod": "onReveal",
@@ -1737,11 +1741,11 @@
    "en": "Jakob Fugger",
    "flavor": "1459–1525. Крупнейший банкир, финансировавший колонизацию",
    "category": "economy",
-   "bells": 3,
+   "bells": 2,
    "mods": [
     {
      "mod": "goldPerPoint",
-     "value": 7
+     "value": 3
     }
    ],
    "onGain": []
@@ -1752,11 +1756,10 @@
    "en": "Pedro Cabral",
    "flavor": "1467–1520. Первооткрыватель Бразилии",
    "category": "exploration",
-   "bells": 3,
+   "bells": 2,
    "mods": [
     {
-     "mod": "move",
-     "add": 2
+     "mod": "europeAnywhere"
     }
    ],
    "onGain": []
@@ -1783,11 +1786,11 @@
    "en": "Francisco Pizarro",
    "flavor": "1478–1541. Завоеватель Империи Инков",
    "category": "military",
-   "bells": 3,
+   "bells": 2,
    "mods": [
     {
-     "mod": "lootFactor",
-     "value": 2
+     "mod": "lootGold",
+     "add": 10
     }
    ],
    "onGain": []
@@ -1815,7 +1818,7 @@
    "en": "Hernan Cortes",
    "flavor": "1485–1547. Завоеватель Империи Ацтеков",
    "category": "military",
-   "bells": 2,
+   "bells": 1,
    "mods": [
     {
      "mod": "battle",
@@ -1847,7 +1850,7 @@
    "en": "Francisco de Orellana",
    "flavor": "1511–1546. Первооткрыватель Амазонки",
    "category": "exploration",
-   "bells": 2,
+   "bells": 1,
    "mods": [
     {
      "mod": "onReveal",
@@ -1862,16 +1865,15 @@
    "en": "Francis Drake",
    "flavor": "1542–1596. Исследователь и пират",
    "category": "military",
-   "bells": 3,
-   "mods": [
+   "bells": 2,
+   "mods": [],
+   "onGain": [
     {
-     "mod": "battle",
-     "add": 2,
-     "token": "ship",
-     "role": "attack"
+     "n": "damageShips",
+     "amount": 1,
+     "who": "away"
     }
-   ],
-   "onGain": []
+   ]
   },
   "walter_raleigh": {
    "id": "walter_raleigh",
@@ -1895,7 +1897,7 @@
    "en": "Henry Hudson",
    "flavor": "1565–1611. Исследователь северных морей",
    "category": "exploration",
-   "bells": 2,
+   "bells": 3,
    "mods": [],
    "onGain": [
     {
@@ -1925,14 +1927,14 @@
    "en": "John Smith",
    "flavor": "1580–1631. Один из основателей колонии Джеймстаун",
    "category": "diplomatic",
-   "bells": 3,
-   "mods": [
+   "bells": 2,
+   "mods": [],
+   "onGain": [
     {
-     "mod": "allianceMax",
-     "value": 3
+     "n": "allyFriendly",
+     "max": 2
     }
-   ],
-   "onGain": []
+   ]
   },
   "squanto": {
    "id": "squanto",
@@ -1940,17 +1942,16 @@
    "en": "Squanto",
    "flavor": "1585–1622. Индеец из племени патуксетов, помогший колонистам",
    "category": "diplomatic",
-   "bells": 3,
-   "mods": [
+   "bells": 2,
+   "mods": [],
+   "onGain": [
     {
-     "mod": "production",
-     "icons": [
-      "food"
-     ],
-     "add": 1
+     "n": "gain",
+     "wh": {
+      "food": 5
+     }
     }
-   ],
-   "onGain": []
+   ]
   },
   "john_rolfe": {
    "id": "john_rolfe",
@@ -1958,17 +1959,15 @@
    "en": "John Rolfe",
    "flavor": "1585–1622. Табачный плантатор в Виргинии, муж Покахонтас",
    "category": "economy",
-   "bells": 3,
-   "mods": [
+   "bells": 2,
+   "mods": [],
+   "onGain": [
     {
-     "mod": "production",
-     "icons": [
-      "crops"
-     ],
-     "add": 1
+     "n": "takeAgent",
+     "agent": "farmer",
+     "amount": 2
     }
-   ],
-   "onGain": []
+   ]
   },
   "thomas_hooker": {
    "id": "thomas_hooker",
@@ -1976,17 +1975,14 @@
    "en": "Thomas Hooker",
    "flavor": "1586–1647. Пуританин, основатель колонии Коннектикут",
    "category": "religious",
-   "bells": 3,
-   "mods": [
+   "bells": 2,
+   "mods": [],
+   "onGain": [
     {
-     "mod": "production",
-     "icons": [
-      "crosses"
-     ],
-     "add": 1
+     "n": "gain",
+     "crosses": 6
     }
-   ],
-   "onGain": []
+   ]
   },
   "peter_minuit": {
    "id": "peter_minuit",
@@ -1994,7 +1990,7 @@
    "en": "Peter Minuit",
    "flavor": "1589–1638. Губернатор Новых Нидерландов",
    "category": "diplomatic",
-   "bells": 2,
+   "bells": 1,
    "mods": [
     {
      "mod": "pointsPerAlliance",
@@ -2009,7 +2005,7 @@
    "en": "William Bradford",
    "flavor": "1590–1657. Отец-пилигрим, основатель колонии Плимут",
    "category": "religious",
-   "bells": 3,
+   "bells": 2,
    "mods": [],
    "onGain": [
     {
@@ -2024,7 +2020,7 @@
    "en": "Pocahontas",
    "flavor": "1596–1617. Дочь вождя поухатанов, помогшая англичанам",
    "category": "diplomatic",
-   "bells": 2,
+   "bells": 1,
    "mods": [
     {
      "mod": "nativeHostility",
@@ -2039,7 +2035,7 @@
    "en": "Roger Williams",
    "flavor": "1603–1683. Баптист, основатель колонии Род-Айленд",
    "category": "religious",
-   "bells": 2,
+   "bells": 1,
    "mods": [
     {
      "mod": "recruitTake",
@@ -2054,7 +2050,7 @@
    "en": "John Eliot",
    "flavor": "1604–1690. Переводчик Библии на язык алгонкинов",
    "category": "religious",
-   "bells": 2,
+   "bells": 1,
    "mods": [
     {
      "mod": "cost",
@@ -2073,7 +2069,7 @@
    "en": "Michiel de Ruyter",
    "flavor": "1607–1676. Адмирал, одержавший ряд крупных побед",
    "category": "military",
-   "bells": 2,
+   "bells": 1,
    "mods": [
     {
      "mod": "bombardAny"
@@ -2169,7 +2165,7 @@
    "en": "Thomas Jefferson",
    "flavor": "1743–1826. Автор Декларации Независимости, третий президент США",
    "category": "political",
-   "bells": 5,
+   "bells": 4,
    "mods": [
     {
      "mod": "fatherLimit",
@@ -2177,6 +2173,9 @@
     }
    ],
    "onGain": [
+    {
+     "n": "cheapestFather"
+    },
     {
      "n": "cheapestFather"
     }
@@ -2188,7 +2187,7 @@
    "en": "Olaudah Equiano",
    "flavor": "1745–1797. Бывший раб, один из лидеров движения за запрет рабства",
    "category": "political",
-   "bells": 2,
+   "bells": 1,
    "mods": [],
    "onGain": [
     {
@@ -2213,7 +2212,7 @@
     {
      "mod": "colonyDefence",
      "building": "fort",
-     "add": 2
+     "add": 1
     }
    ],
    "onGain": []
@@ -2224,7 +2223,7 @@
    "en": "Eli Whitney",
    "flavor": "1765–1825. Изобретатель хлопкового волокноотделителя",
    "category": "economy",
-   "bells": 3,
+   "bells": 2,
    "mods": [
     {
      "mod": "production",
@@ -2234,7 +2233,14 @@
      "add": 1
     }
    ],
-   "onGain": []
+   "onGain": [
+    {
+     "n": "freeBuilding",
+     "options": [
+      "blacksmith_shop"
+     ]
+    }
+   ]
   },
   "simon_bolivar": {
    "id": "simon_bolivar",
@@ -2257,7 +2263,7 @@
    "en": "Benedict Arnold",
    "flavor": "1741–1801. Генерал Континентальной армии, предавший патриотов",
    "category": "military",
-   "bells": 2,
+   "bells": 1,
    "mods": [
     {
      "mod": "betray",
@@ -2886,23 +2892,12 @@
        }
       },
       {
-       "id": "surrender",
-       "en": "Surrender",
-       "ru": "Сдаться",
-       "do": [
-        {
-         "n": "discardCards",
-         "amount": 1
-        }
-       ]
-      },
-      {
        "id": "flee",
        "en": "Flee",
        "ru": "Бежать",
        "do": [
         {
-         "n": "toEurope",
+         "n": "loseTopAgent",
          "skull": true
         }
        ]
@@ -2944,7 +2939,7 @@
        "ru": "Бежать",
        "do": [
         {
-         "n": "toEurope",
+         "n": "discardHand",
          "skull": true
         }
        ]
@@ -3120,10 +3115,7 @@
        "do": [
         {
          "n": "gain",
-         "crosses": 3
-        },
-        {
-         "n": "toEurope"
+         "crosses": 5
         }
        ]
       },
@@ -3542,7 +3534,7 @@
            "max": 4,
            "do": [
             {
-             "n": "toEurope",
+             "n": "loseTopAgent",
              "skull": true
             }
            ]
@@ -3600,7 +3592,7 @@
            "max": 1,
            "do": [
             {
-             "n": "toEurope",
+             "n": "loseTopAgent",
              "skull": true
             }
            ]
@@ -3789,7 +3781,7 @@
            "max": 1,
            "do": [
             {
-             "n": "toEurope",
+             "n": "loseTopAgent",
              "skull": true
             }
            ]
@@ -7765,6 +7757,7 @@
    ],
    "refuseRef": 1,
    "refuseRefSolo": 3,
+   "refuseRefTwo": 2,
    "refuseBells": 0,
    "payBells": 1
   },
@@ -7811,10 +7804,13 @@
   },
   "fathers": {
    "max": 4,
-   "salon": 5
+   "salon": 5,
+   "keepBells": false,
+   "rotate": false
   },
   "propaganda": {
-   "maxFathers": 2
+   "maxFathers": 2,
+   "anywhere": true
   },
   "hire": {
    "max": 2
@@ -7843,7 +7839,8 @@
    "giftBase": 3,
    "preachMin": 0,
    "afterAttack": 5,
-   "giftResource": "any"
+   "giftResource": "any",
+   "giftByPrice": true
   },
   "activation": {
    "giftMaxHostility": 2,
@@ -7874,12 +7871,14 @@
    "safe": true
   },
   "war": {
-   "bells": 15,
+   "bells": 20,
    "refStrength": 1,
    "hostileCubes": 1,
    "hostileFrom": 4,
-   "allyCubes": 3,
+   "allyCubes": 2,
    "mercenaryGold": 5,
+   "militiaCards": 18,
+   "mercenaryCards": 18,
    "diceCap": 10,
    "refStrengthIncludesTactic": true,
    "tokenBonus": 1,
@@ -7888,12 +7887,15 @@
   },
   "score": {
    "patriotColony": 6,
-   "loyalistColony": 3,
+   "loyalistColony": 6,
    "perBell": 1,
    "agentsPerPoint": 5,
-   "goldPerPoint": 10,
+   "goldPerPoint": 5,
    "building": 1,
-   "father": 1
+   "father": 1,
+   "fatherByPrice": false,
+   "bellsPerPoint": 2,
+   "destroyedScoresZero": true
   }
  }
 }

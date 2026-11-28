@@ -2,13 +2,13 @@ import type { ChoiceOption, Resource } from '@col/data';
 import { RESOURCES } from '@col/data';
 import type { Choice } from '@col/engine';
 import {
-  buildingYield, buildPrice, cardStrength, cellYield, fatherLimit, foundCost, map, nextU32, recruitCost, scorePlayer, seedRng, sellPrice, taxRate, util,
+  buildingYield, buildPrice, cardStrength, refuseCubes, cellYield, fatherLimit, foundCost, map, mercenaryMax, militiaMax, nextU32, recruitCost, scorePlayer, seedRng, sellPrice, siegeStrength, taxRate, util, warStrength,
 } from '@col/engine';
 import type { Bot } from './random.ts';
 import { firstStep, landPaths, shipPaths, type Paths } from './paths.ts';
 import { agentValue, buildingValue, fatherValue, giftGain, hireValue, lead, nodesValue, raidExposure, read, recruitPick, siteValue, warPoints, type Situation } from './value.ts';
 import { cardPower, outlook } from './outlook.ts';
-import { planAssault, planDefence } from './war.ts';
+import { deployGain, planDefence } from './war.ts';
 import { BASE, type Weights } from './weights.ts';
 
 /** A choice weighed: its score and why; the goal bot's own reason when `why` holds more (the search bot's), and for a move the cell the token heads for. */
@@ -102,7 +102,7 @@ function shipGoals(x: Situation, start: number, paths: Paths): Goal[] {
   }
   for (const [k, kind] of Object.entries(s.poi)) if (kind === 'wreck' && paths.dist[Number(k)] < Infinity) out.push({ name: 'wreck', value: w.poi, dist: paths.dist[Number(k)], extra: 0, to: Number(k) });
 
-  if (europe >= 0) {
+  if (europe >= 0 && !util.mods(s, me, 'europeAnywhere').length) {
     const held = cargoValue(x, pl.hold), there = europeValue(x);
     if (held + there > 0.3 && !map.inEurope(s, start)) out.push({ name: 'to Europe', value: held + there, dist: ed, extra: 1, to: europe });
     const goods = shippable(x).slice(0, util.holdFree(s, me));
@@ -161,13 +161,12 @@ function nativeValue(x: Situation, n: number): number {
   if (best > 0) v = Math.max(v, conquestValue(x, n, 1 + best));
   return v;
 }
-/** What a gift costs us: 1 goods, or our cheapest resource where any will do. */
-const giftCost = (x: Situation) => (x.s.def.settings.natives.giftResource === 'any' ? Math.min(...RESOURCES.filter((r) => x.s.players[x.me].wh[r] > 0).map((r) => x.res[r]), 9) : x.res.goods);
 const canGift = (x: Situation) => (x.s.def.settings.natives.giftResource === 'any' ? util.total(x.s.players[x.me].wh) > 0 : x.s.players[x.me].wh.goods >= 1);
-/** A gift: the raids it spares us, and a step towards an alliance, against the goods it costs. */
-function giftValue(x: Situation, n: number): number {
-  const z = x.s.settlements[n - 1];
-  return (z.ally === null && x.s.hostility[z.tribe] >= 2 ? 0.5 * allyValue(x) : 0) + giftGain(x, z.tribe) - giftCost(x) - (x.last ? 0.6 : 0.1);
+/** A gift: the raids it spares us, and a step towards an alliance, against the resource it costs; without a resource named, the best one we hold. */
+function giftValue(x: Situation, n: number, r?: Resource): number {
+  const z = x.s.settlements[n - 1], wh = x.s.players[x.me].wh;
+  if (!r) return Math.max(-9, ...(x.s.def.settings.natives.giftResource === 'any' ? RESOURCES.filter((k) => wh[k] > 0) : ['goods' as Resource]).map((k) => giftValue(x, n, k)));
+  return (z.ally === null && x.s.hostility[z.tribe] >= 2 ? 0.5 * allyValue(x) : 0) + giftGain(x, z.tribe, r) - x.res[r] - (x.last ? 0.6 : 0.1);
 }
 /** Raids a preaching may bring: hostility rises by 1, unless John Eliot keeps it calm. */
 const preachAnger = (x: Situation, tribe: string) => (x.s.players[x.me].fathers.includes('john_eliot') ? 0 : Math.max(0, raidExposure(x, tribe, x.s.hostility[tribe] + 1) - raidExposure(x)));
@@ -176,7 +175,9 @@ const preachValue = (x: Situation, cost: number) => x.w.native * 1.2 + (x.last ?
 function conquestValue(x: Situation, n: number, strength: number): number {
   const { s, w } = x, z = s.settlements[n - 1], t = s.def.tribes[z.tribe];
   const p = success(strength - z.pop - s.def.terrain[s.map.terrain[z.cell]!].defence);
-  const loot = z.pop === 1 ? (t.loot.gold ?? 0) * x.gold + (t.loot.res ? t.loot.amount! * x.res[t.loot.res] : 0) : ((t.loot.gold ?? 0) * x.gold * 0.5) / z.pop;
+  const f = util.mods(s, x.me, 'lootFactor').reduce((n, m) => Math.max(n, m.value), 1), bonus = util.mods(s, x.me, 'lootGold').reduce((n, m) => n + m.add, 0);
+  const gold = (t.loot.gold ?? 0) * f + bonus;
+  const loot = z.pop === 1 ? gold * x.gold + (t.loot.res ? t.loot.amount! * f * x.res[t.loot.res] : 0) : (gold * x.gold * 0.5) / z.pop;
   // An attack sets the tribe's hostility to the top, which may bring raids; taking the last of its people ends that settlement's raids for good.
   const after = raidExposure(x, z.tribe, s.def.settings.natives.afterAttack);
   const angry = (s.hostility[z.tribe] < 5 ? (x.colonies ? 0.4 : 0.15) : 0) + Math.max(0, after - raidExposure(x)) - (z.pop === 1 ? p * Math.max(0, after - raidExposure(x, z.tribe, s.def.settings.natives.afterAttack, undefined, 0, z.n)) : 0);
@@ -236,7 +237,7 @@ function scoreTurn(x: Situation): Considered[] {
       }
       case 'propaganda': {
         let bells = pl.bells, k = 0;
-        for (const f of [...s.salon].sort((a, b) => fatherValue(x, b) - fatherValue(x, a))) if (k < 2 && s.def.fathers[f].bells <= bells && fatherValue(x, f) > 0) { score += fatherValue(x, f); bells -= s.def.fathers[f].bells; k++; }
+        for (const f of [...s.salon].sort((a, b) => fatherValue(x, b) - fatherValue(x, a))) if (k < 2 && s.def.fathers[f].bells <= bells && fatherValue(x, f) > 0) { score += fatherValue(x, f); if (!s.def.settings.fathers.keepBells) bells -= s.def.fathers[f].bells; k++; }
         if (!k) score = -0.5;
         break;
       }
@@ -244,11 +245,12 @@ function scoreTurn(x: Situation): Considered[] {
       case 'build': score = buildingValue(x, c.building as string) - buildPrice(s, me, card, c.building as string) * 0.15; if (c.building !== x.target && !x.last && x.target && pl.wh.timber - buildPrice(s, me, card, c.building as string) < s.def.buildings[x.target].timber) score -= 0.2 + buildPrice(s, me, card, c.building as string) * w.timber; break;
       // Schooling swaps the agent played for the profession chosen (DD-75).
       case 'teach': score = w.teach * (agentValue(x, c.target as string) - agentValue(x, card)); break;
-      case 'customs': score = (sellPrice(s, me, card, c.r as Resource) - 0.5) * x.gold; break;
+      // A custom house of kind market (DD-100) sells what the warehouse can spare, as in Europe.
+      case 'customs': score = c.r ? (sellPrice(s, me, card, c.r as Resource) - 0.5) * x.gold : RESOURCES.reduce((v, r) => v + Math.max(0, sellPrice(s, me, card, r) * x.gold - x.res[r]) * pl.wh[r], 0) - 0.2; break;
       case 'smuggle': score = (s.price[c.r as Resource] - 1) * x.gold; break;
       case 'supply': score = 0.02 - (x.last ? 0 : x.res.food); break;
       case 'exchange': score = 0.02 - 0.1; break;
-      case 'gift': score = giftValue(x, c.settlement as number) + giftCost(x) - (c.r ? x.res[c.r as Resource] : x.res.goods); break;
+      case 'gift': score = giftValue(x, c.settlement as number, (c.r ?? 'goods') as Resource); break;
       case 'preach': { const z = s.settlements[(c.settlement as number) - 1]; score = preachValue(x, 0) - 0.12 * w.cross * util.combinedHostility(s, me, z.tribe) - preachAnger(x, z.tribe); break; }
       case 'alliance': score = allyValue(x); break;
       // Each extra look is a better pick.
@@ -366,7 +368,8 @@ function scoreSmall(x: Situation, c: Choice): number {
       const ship = shippable(x).slice(0, util.holdFree(s, me)).filter((q) => q === r).length;
       return n <= ship ? n * price(r) * x.gold : -1;
     }
-    case 'trade': return c.c === 'done' ? 0 : (c.n as number) * ((price(c.r as Resource) * x.gold) - (['timber', 'food'].includes(c.r as string) ? x.res[c.r as Resource] * 0.5 : 0)) + 0.01;
+    // From the warehouse (a custom house), each unit sold is a unit the colony no longer has.
+    case 'trade': return c.c === 'done' ? 0 : (c.n as number) * ((price(c.r as Resource) * x.gold) - (d.from === 'wh' ? x.res[c.r as Resource] : ['timber', 'food'].includes(c.r as string) ? x.res[c.r as Resource] * 0.5 : 0)) + 0.01;
     case 'hire': {
       if (c.c === 'done') return 0;
       if (c.c === 'refresh') return -0.15;
@@ -388,7 +391,7 @@ function scoreSmall(x: Situation, c: Choice): number {
     case 'payResource': return -x.res[c.r as Resource] - price(c.r as Resource) * 0.01;
     case 'tax': {
       const set = s.def.settings.tax, rate = taxRate(s);
-      const cubes = s.players.length === 1 ? set.refuseRefSolo : set.refuseRef;
+      const cubes = refuseCubes(s);
       // Gold spent is mercenaries not hired; cubes come down on all patriots.
       if (c.c === 'pay') return set.payBells * x.bell - rate * 0.1 - Math.max(0, warPoints(x) - warPoints(x, { gold: -rate })) * w.strength - (x.last ? 0 : rate * Math.max(0, x.gold - 0.1));
       return set.refuseBells * x.bell - cubes * x.ref;
@@ -403,6 +406,8 @@ function scoreSmall(x: Situation, c: Choice): number {
     case 'guide': return nodesValue(x, s.def[d.deck === 'ruin' ? 'ruins' : 'wrecks'][c.card as string].do);
     case 'colonyWater': return 0;
     case 'freeBuilding': return c.c === 'build' ? buildingValue(x, c.b as string) : 0;
+    // Hit the rival who leads.
+    case 'damageShip': return 0.01 * scorePlayer(s, c.target as number).score;
     case 'cheapBuild': return c.c === 'build' ? buildingValue(x, c.b as string) - 0.8 : 0;
     case 'freeColony': return c.c === 'cell' ? siteValue(x, c.cell as number) : 0;
     case 'convertCrosses': return (c.n as number) * (x.bell - w.cross);
@@ -469,30 +474,33 @@ function commitValue(x: Situation, c: Choice): number {
 }
 
 function warValue(x: Situation, c: Choice): number {
-  const { s, me, v } = x, d = s.pending!, set = s.def.settings;
-  const pl = s.players[me];
-  const goldCost = set.war.mercenaryGold / set.score.goldPerPoint, bellCost = set.score.perBell;
+  const { s, me, v } = x, d = s.pending!, set = s.def.settings, war = s.war!;
+  const hand = war.hands[me] ?? [];
+  const goldCost = set.war.mercenaryGold / set.score.goldPerPoint, bellCost = set.score.perBell / set.score.bellsPerPoint;
   const perBell = util.mods(s, me, 'militiaPerBell').reduce((n, m) => Math.max(n, m.value), 1);
-  const civ = x.cards.filter((k) => !util.isMilitary(s, k)).length;
-  const plan = (cards: string[], freeCubes: number, militia: boolean, mercs: boolean) =>
-    planDefence(v, cards, { freeCubes, perBell, maxMilitia: militia ? Math.min(civ, pl.bells * perBell) : 0, maxMercs: mercs ? Math.floor(pl.gold / set.war.mercenaryGold) : 0, bellCost, goldCost });
-  const own = util.mods(s, me, 'freeMilitia').reduce((n, m) => n + m.value, 0) + s.settlements.filter((z) => z.alive && z.ally === me).length * set.war.allyCubes;
   switch (d.kind) {
-    case 'placeCards': {
-      const cards = d._cards as string[];
-      if (d.side === 'loyalist') { const want = planAssault(v, cards)[0]; return want.c === c.c && want.siege === c.siege ? 1 : 0; }
-      const r = plan(cards, own, true, true), k = r.assign.get(0);
-      if (k === undefined) return c.c === 'place' ? 0.1 : 0.05;
-      return c.c === 'place' && c.siege === r.mine[k] ? 1 : 0;
+    case 'militia': {
+      const max = militiaMax(s, me), free = Math.min(max, util.mods(s, me, 'freeMilitia').reduce((n, m) => n + m.value, 0));
+      const r = planDefence(v, hand, { freeCubes: free, perBell, maxMilitia: max - free, maxMercs: mercenaryMax(s, me), bellCost, goldCost });
+      return -Math.abs((c.n as number) - Math.min(max, free + r.plan.units));
     }
-    case 'militia': return -Math.abs((c.n as number) - plan([], own, true, true).plan.militia);
-    case 'mercenaries': return -Math.abs((c.n as number) - plan([], d._cubes as number, false, true).plan.mercs);
-    case 'placeCubes': {
-      if (d.side === 'militia') return c.n as number;
-      const r = plan([], d._left as number, false, false), k = r.mine.indexOf(c.siege as number);
-      return -Math.abs((c.n as number) - r.plan.cubes[k]);
+    case 'mercenaries': {
+      if (war.loyalist === me) {
+        // Enough to beat the King's army at the cheapest patriot colony, if that is worth the gold.
+        const mine = hand.reduce((n, k) => n + warStrength(s, k, 0), 0);
+        const cheapest = Math.min(Infinity, ...war.sieges.filter((y) => y.owner !== me && y.cubes > 0).map((y) => siegeStrength(s, y).ref + 1));
+        const want = cheapest - mine;
+        return -Math.abs((c.n as number) - (want > 0 && want <= mercenaryMax(s, me) && want * goldCost < set.score.loyalistColony / 2 ? want : 0));
+      }
+      const r = planDefence(v, hand, { freeCubes: 0, perBell, maxMilitia: 0, maxMercs: mercenaryMax(s, me), bellCost, goldCost });
+      return -Math.abs((c.n as number) - r.plan.mercs);
     }
-    case 'betray': return c.c === 'betray' ? 1 + s.war!.sieges[c.siege as number].loyalist.length * 0.5 + s.war!.sieges[c.siege as number].cubes * 0.1 : 0;
+    case 'deploy': return c.c === 'place' ? deployGain(v, c.card as string, c.siege as number) : 0;
+    case 'betray': {
+      if (c.c !== 'betray') return 0;
+      const y = war.sieges[c.siege as number];
+      return 1 + (y.stacks[me]?.length ?? 0) * 0.5 + y.cubes * 0.1;
+    }
     default: return 0;
   }
 }

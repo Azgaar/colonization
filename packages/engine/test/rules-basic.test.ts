@@ -123,8 +123,8 @@ describe('Round', () => {
     expect(s.pending).toMatchObject({ kind: 'tax', player: 0 });
     act(s, { c: 'pay' });
     expect(P(s, 0).gold).toBe(4);
-    // Player 1 cannot pay and refuses automatically.
-    expect([P(s, 1).gold, P(s, 1).bells, s.ref]).toEqual([5, 0, 1]);
+    // Player 1 cannot pay and refuses automatically: 2 cubes in a 2-player game (DD-148).
+    expect([P(s, 1).gold, P(s, 1).bells, s.ref]).toEqual([5, 0, 2]);
     const solo = game(1);
     solo.round = 2;
     runTasks(solo, { t: 'taxPhase' });
@@ -474,7 +474,7 @@ describe('Colonies', () => {
     play(s, 'dragoon', 'attack');
     act(s, { c: 'done' });
     expect(s.colonies.length).toBe(1);
-    expect(P(s).inf).toBe('europe'); // no own colony to return to
+    expect(P(s).inf).toBe('ship'); // no own colony to return to: back aboard
   });
   it('[F-4] buildings and warehouse serve all colonies', () => {
     const s = game(1);
@@ -556,7 +556,7 @@ describe('Europe', () => {
     turn(s, 0, 'colonist', 'colonist');
     play(s, 'colonist', 'propaganda');
     act(s, { c: 'take', father: 'squanto' }, { c: 'take', father: 'peter_minuit' });
-    expect([P(s).fathers, P(s).bells, s.salon.length, s.pending!.kind]).toEqual([['squanto', 'peter_minuit'], 4, 5, 'turn']);
+    expect([P(s).fathers, P(s).bells, s.salon.length, s.pending!.kind]).toEqual([['squanto', 'peter_minuit'], 9 - s.def.fathers.squanto.bells - s.def.fathers.peter_minuit.bells, 5, 'turn']);
     father(s, 0, 'francis_drake', 'henry_hudson');
     turn(s, 0, 'colonist');
     expect(canPlay(s, 'colonist', 'propaganda')).toBe(false);

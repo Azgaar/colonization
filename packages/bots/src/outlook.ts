@@ -42,10 +42,15 @@ export function outlook(s: State, collections: string[][], p: number, loyalist: 
   const gold = Math.max(0, pl.gold + (o.gold ?? 0));
 
   if (p === loyalist) {
-    const army = power(p) + (o.strength ?? 0) + rounds;
+    // Braves fight for the loyalist too (DD-123).
+    const army = power(p) + s.settlements.filter((z) => z.alive && z.ally === p).length * set.war.allyCubes + (o.strength ?? 0) + rounds;
     const taken = targets ? Math.min(targets, army / Math.max(1, cubes * set.war.refStrength)) * 0.6 : 0;
     const own = mine.length + (o.colony !== undefined ? 1 : 0);
-    return { points: set.score.loyalistColony * (own + taken), qualifies: own > 0 ? 1 : Math.min(1, taken), progress: own > 0 ? 1 : 0 };
+    // The patriots may spare about a third of their strength against the loyalist's colonies.
+    const spare = s.players.reduce((k, _, q) => k + (q === p ? 0 : power(q)), 0) * 0.3;
+    const each = set.war.baseDefence + 1 + buildingDefence(s, p).reduce((k, b) => k + b.value, 0);
+    const kept = own ? own * holdChance(spare / own - each) : 0;
+    return { points: set.score.loyalistColony * (kept + taken), qualifies: own > 0 ? 1 : Math.min(1, taken), progress: own > 0 ? 1 : 0 };
   }
   const per = set.score.patriotColony + util.mods(s, p, 'pointsPerPatriotColony').reduce((k, m) => k + m.value, 0);
   const foe = loyalist === null ? 0 : power(loyalist) * 0.6;
@@ -81,7 +86,13 @@ export function outlook(s: State, collections: string[][], p: number, loyalist: 
       if (h === needs.length) { points += best - 6 * bq; qualifies += bq; }
     }
   }
-  return { points: points / NOISE.length, qualifies: qualifies / NOISE.length, progress };
+  // A share of the loyalist's colonies, taken with what this player can spare, split with the other patriots.
+  let raid = 0;
+  if (loyalist !== null) {
+    const theirs = s.colonies.filter((c) => c.owner === loyalist).length, each = set.war.baseDefence + 1 + buildingDefence(s, loyalist).reduce((k, b) => k + b.value, 0);
+    raid = theirs * (1 - holdChance(power(p) * 0.4 - each)) * per / Math.max(1, n - 2);
+  }
+  return { points: points / NOISE.length + raid * 0.5, qualifies: qualifies / NOISE.length, progress };
 }
 
 /** Expected final score of everybody, and how likely each may win at all. */
@@ -89,6 +100,7 @@ export function forecast(s: State, collections: string[][], loyalist: number | n
   return s.players.map((_, p) => {
     const f = outlook(s, collections, p, loyalist, rounds);
     const rest = scorePlayer(s, p).parts.filter((x) => x.label !== 'colonies' && x.label !== 'simon_bolivar' && !(p === loyalist && x.label === 'bells')).reduce((n, x) => n + x.value, 0);
-    return { ...f, points: rest + f.points };
+    // A nation that loses every colony scores nothing, so its other points count only as far as it keeps one.
+    return { ...f, points: (s.def.settings.score.destroyedScoresZero ? f.qualifies : 1) * rest + f.points };
   });
 }

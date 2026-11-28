@@ -16,5 +16,5 @@ export interface Report { html: string; big?: boolean; after?: (() => void) | nu
 /** Goods in the warehouse and the hold while cargo is being moved; `was` is the hold before. */
 export interface Cargo { wh: Record<string, number>; hold: Record<string, number>; was: Record<string, number> }
 /** Decision panels: reports still to read, cards picked, goods being moved or sold, and which decision the panel shows (`key`, to start it afresh). */
-export const X: { reports: Report[]; sel: number[]; cargo: Cargo | null; sell: Record<string, number> | null; key: string } =
-  { reports: [], sel: [], cargo: null, sell: null, key: '' };
+export const X: { reports: Report[]; sel: number[]; cargo: Cargo | null; sell: Record<string, number> | null; key: string; deploy: string | null; muster: number } =
+  { reports: [], sel: [], cargo: null, sell: null, key: '', deploy: null, muster: 0 };

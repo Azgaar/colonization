@@ -27,6 +27,8 @@ function says(n: Node): string {
     case 'damage': return `${n.amount} ${t('cards.damage')}${skull}`;
     case 'hostilityNearest': return `${n.add > 0 ? '+' : '−'}${Math.abs(n.add)} ${icon('hostility', 18)} <small>${t('cards.nearest_settlement')}</small>`;
     case 'discardCards': return t('cards.discard', { n: n.amount });
+    case 'loseTopAgent': return t('cards.lose_top_agent') + skull;
+    case 'discardHand': return t('cards.discard_hand') + skull;
     case 'pierLeftmost': return t('cards.first_agent');
     case 'drawPoi': return t('cards.draw_another');
     case 'guide': return t('cards.look_cards', { look: n.look });

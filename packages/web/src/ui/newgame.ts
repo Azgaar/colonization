@@ -24,9 +24,10 @@ const stars = (n: number) => `<span class="stars" title="${t('newgame.difficulty
 const hardness = (n: number) => pick(n <= 1 ? msg('newgame.regular_game') : n === 2 ? msg('newgame.little_harder') : n === 3 ? msg('newgame.hard2') : msg('newgame.experienced_governors'));
 /** Keep the rivals to the number of players, each with a nation of its own. */
 function fit() {
-  const used = new Set([form.nation]);
-  form.rivals = form.rivals.filter((r) => r.nation !== form.nation && !used.has(r.nation) && used.add(r.nation)).slice(0, form.n - 1);
-  for (const k of NATIONS) { if (form.rivals.length >= form.n - 1) break; if (!used.has(k)) { used.add(k); form.rivals.push({ nation: k, bot: PERSONALITY_NAMES[form.rivals.length % 4], who: 'normal' }); } }
+  // Two nations share each colour, and never play together (DD-124).
+  const colour = (k: string) => D.nations[k]?.color ?? k, used = new Set([colour(form.nation)]);
+  form.rivals = form.rivals.filter((r) => !used.has(colour(r.nation)) && used.add(colour(r.nation))).slice(0, form.n - 1);
+  for (const k of NATIONS) { if (form.rivals.length >= form.n - 1) break; if (!used.has(colour(k))) { used.add(colour(k)); form.rivals.push({ nation: k, bot: PERSONALITY_NAMES[form.rivals.length % 4], who: 'normal' }); } }
 }
 /** Open the screen, starting from the last game's setup; the design bench passes the rules to play. */
 export function openNewGame(ruleset = 'board') {
@@ -45,8 +46,8 @@ const heroHtml = () => {
 <div class="deck"><h4>${t('newgame.starting_agents')}${deck.length < 5 ? `<small>${t('newgame.four_agents')}</small>` : ''}</h4><div class="ags">${agents}</div></div>`;
 };
 const rivalsHtml = () => {
-  const taken = new Set([form.nation, ...form.rivals.map((r) => r.nation)]);
-  const rows = form.rivals.map((r, i) => `<div class="rv">${crest(r.nation, 34)}<select data-ng-rival="${i}">${byStars().filter((n) => n === r.nation || !taken.has(n)).map((n) => `<option value="${n}"${n === r.nation ? ' selected' : ''}>${name(n)}</option>`).join('')}</select><select data-ng-who="${i}">${Object.entries(WHO).map(([k, n]) => `<option value="${k}"${k === r.who ? ' selected' : ''}>${pick(n)}</option>`).join('')}</select>${r.who === 'person' ? '<span></span>' : `<select data-ng-bot="${i}" title="${t(`bot.${r.bot}_about`)}">${PERSONALITY_NAMES.map((p) => `<option value="${p}"${p === r.bot ? ' selected' : ''}>${t(`bot.${p}`)}</option>`).join('')}</select>`}</div>`).join('');
+  const taken = new Set([form.nation, ...form.rivals.map((r) => r.nation)].map((n) => D.nations[n]?.color ?? n));
+  const rows = form.rivals.map((r, i) => `<div class="rv">${crest(r.nation, 34)}<select data-ng-rival="${i}">${byStars().filter((n) => n === r.nation || !taken.has(D.nations[n]?.color ?? n)).map((n) => `<option value="${n}"${n === r.nation ? ' selected' : ''}>${name(n)}</option>`).join('')}</select><select data-ng-who="${i}">${Object.entries(WHO).map(([k, n]) => `<option value="${k}"${k === r.who ? ' selected' : ''}>${pick(n)}</option>`).join('')}</select>${r.who === 'person' ? '<span></span>' : `<select data-ng-bot="${i}" title="${t(`bot.${r.bot}_about`)}">${PERSONALITY_NAMES.map((p) => `<option value="${p}"${p === r.bot ? ' selected' : ''}>${t(`bot.${p}`)}</option>`).join('')}</select>`}</div>`).join('');
   return `<h4>${t('newgame.rivals')}</h4>${rows || `<p class="note">${t('newgame.no_rivals')}</p>`}`;
 };
 const playersNote = () => (form.n === 1 ? t('newgame.alone_against') : form.rivals.some((r) => r.who === 'person') ? t('newgame.several_people') : t('newgame.rivals_played'));

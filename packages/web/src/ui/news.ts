@@ -42,7 +42,7 @@ export function doing(p: number, l: Entry[]): string {
     case 'propaganda': what = `${t('news.won_over')} ${has('father').map((x) => pick(D.fathers[x.father])).join(', ')}`; break;
     case 'found': what = t('news.founded_colony'); break;
     case 'trade': what = `${t('news.sold')} ${has('sell').map((x) => goods(x.n, x.r)).join(' ')}${paid(p, l)}`; break;
-    case 'customs': what = `${t('news.sold')} ${goods(1, play.r)} ${t('news.at_customs')}${paid(p, l)}`; break;
+    case 'customs': what = `${t('news.sold')} ${play.r ? goods(1, play.r) : has('sell').map((x) => goods(x.n, x.r)).join(' ')} ${t('news.at_customs')}${paid(p, l)}`; break;
     case 'smuggle': what = `${t('news.smuggled')} ${goods(1, play.r)}${paid(p, l)}`; break;
     case 'moveShip': case 'moveInfantry': {
       const steps = has('step'), last = steps.at(-1), extra: string[] = [];

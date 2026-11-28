@@ -1,6 +1,6 @@
 /* Notices: what happened, read from the game's log. Each shows once as a toast and stays in the Chronicle, on the page of its round.
  * Read again from the log every time, so they survive a reload, an undo and a change of language. */
-import { art, D, pick, t } from '../data.ts';
+import { art, D, me, pick, t } from '../data.ts';
 import { icon } from '../icons.ts';
 import { Places } from '../places.ts';
 import { Sim, type Entry } from '../sim.ts';
@@ -33,7 +33,7 @@ export function lines(l: Entry[]) {
     if (x.e === 'buildingLost') add(x.p, `− ${pick(D.buildings[x.building])}`);
     if (x.e === 'damage') add(x.p, t('reports.ship_damaged'));
     if (x.e === 'sell') add(x.p, `${t('reports.sold')} ${x.n} ${icon(x.r, 16)}`);
-    if (x.e === 'raid' || x.e === 'activate') { const v = D.settlements.find((q) => q.n === x.settlement); if (!v || (x.e === 'activate' && x.hostility >= 4)) continue; tribes.push({ v, x, p: x.p!, what: x.e === 'raid' ? t('reports.raid') : x.hostility <= 2 ? t('reports.bring_1') : t('reports.stay_calm') }); }
+    if (x.e === 'raid' || x.e === 'activate') { const v = D.settlements.find((q) => q.n === x.settlement); if (!v || (x.e === 'activate' && x.hostility >= 4)) continue; tribes.push({ v, x, p: x.p!, what: x.e === 'raid' ? t(x.stopped ? 'reports.raid_stopped' : 'reports.raid') : x.hostility <= 2 ? t('reports.bring_1') : t('reports.stay_calm') }); }
   }
   return { by, tribes, ref };
 }
@@ -50,7 +50,8 @@ const going = (k: Part['kind'], live: Live) => (k === 'turn' ? live.pending !== 
 function single(x: Entry, at: number): Omit<Note, 'key'>[] {
   if (x.e === 'combat') {
     const d = foe(x), head = d ? t(x.hits ? 'notes.won' : 'notes.lost', { a: name(x.p!), d }) : `${name(x.p!)} ${x.hits ? t('reports.wins_battle') : t('reports.attacks_vain')}`;
-    return [{ at, who: x.p, pic: art.agent(x.a[0]), ms: 10000, tone: x.hits ? 'good' : 'bad', cell: x.cell, html: `<b>${head}</b>${bar(x.attack, 'atk')}${bar(x.defence, 'def')}<small>${x.dice.length ? `${dice(x.dice)} ` : ''}${x.hits ? t('reports.hits', { hits: x.hits }) : t('reports.no_success')}</small>` }];
+    // A fight the player was in has its own screen; the Chronicle still keeps it.
+    return [{ at, who: x.p, pic: art.agent(x.a[0]), ms: 10000, tone: x.hits ? 'good' : 'bad', cell: x.cell, ...(x.p === me || x.defender === me ? { only: 'page' as const } : {}), html: `<b>${head}</b>${bar(x.attack, 'atk')}${bar(x.defence, 'def')}<small>${x.dice.length ? `${dice(x.dice)} ` : ''}${x.hits ? t('reports.hits', { hits: x.hits }) : t('reports.no_success')}</small>` }];
   }
   if (x.e === 'plunder') return [{ at, who: x.p, tone: 'bad', html: `<b>${name(x.p!)}</b>${typeof x.from === 'number' ? t('notes.plunder', { from: name(x.from) }) : t('reports.takes')} ${icon(x.r, 18)}` }];
   if (x.e === 'toEurope') return [{ at, who: x.p, html: `<b>${name(x.p!)}</b>${t(x.token)} ${t('reports.sent_europe')}` }];
@@ -76,7 +77,7 @@ function whole(g: Part): Omit<Note, 'key'>[] {
   // What an event did is told once its card is read.
   const { by, tribes, ref } = lines(g.l.slice(1)), head = `<b>${pick(D.names.events[id])}</b>`, pic = `art/event/${id}.webp`, out: Omit<Note, 'key'>[] = [];
   for (const [p, xs] of by) out.push({ at, who: p, pic, html: `${head}${name(p)}: ${xs.join(', ')}` });
-  for (const { v, x, p, what } of tribes) out.push({ at, who: p, pic: art.tribe(v.tribe), tone: x.e === 'raid' ? 'bad' : '', cell: v.cell, html: `${head}${pick(D.names.tribes[v.tribe])} ${what} ${name(p)}` });
+  for (const { v, x, p, what } of tribes) out.push({ at, who: p, pic: art.tribe(v.tribe), tone: x.e === 'raid' && !x.stopped ? 'bad' : '', cell: v.cell, html: `${head}${pick(D.names.tribes[v.tribe])} ${what} ${name(p)}` });
   if (ref) out.push({ at, pic, tone: 'bad', html: `${head}${t('ref')} ${Places.plus(ref, 'ref', 16)}` });
   // An event that did nothing is not news when it happens, but the Chronicle keeps it.
   if (!out.length) out.push({ at, pic, only: 'page', html: `${head}${t('notes.no_effect')}` });

@@ -36,6 +36,8 @@ export const isOpen = (s: State, c: number) => s.map.frag[c] < 0 || s.revealed[s
 export const isWater = (s: State, c: number) => isOpen(s, c) && s.map.terrain[c] === 'ocean';
 export const isLand = (s: State, c: number) => isOpen(s, c) && s.map.terrain[c] !== 'ocean';
 export const inEurope = (s: State, c: number) => s.map.zone[c] === 'europe';
+/** A player's ship is in Europe, or counts as there wherever it is (Pedro Cabral). */
+export const shipInEurope = (s: State, p: number) => inEurope(s, s.players[p].ship) || mods(s, p, 'europeAnywhere').length > 0;
 
 export function tokenAt(s: State, c: number): { p: number; kind: 'ship' | 'infantry' } | null {
   for (let p = 0; p < s.players.length; p++) {

@@ -12,6 +12,7 @@ import { loadRuleset, getPath, type GameDef } from '../packages/data/src/index.t
 import texts from '../packages/data/generated/texts.json' with { type: 'json' };
 import en from '../packages/web/locales/en.json' with { type: 'json' };
 import { SHAPES } from '../packages/web/src/shapes.ts';
+import { COLONIAL } from '../packages/web/src/colonial.ts';
 import { describe, RES } from './describe.ts';
 import { ornamentsCss } from './ornaments.ts';
 import rulings from './rulings.json' with { type: 'json' };
@@ -27,6 +28,8 @@ const EDU = ['👒', '📖', '🎓'];
 const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 const name = (x: { en: string; ru: string }, l: Lang) => esc(cap(l === 'ru' ? x.ru : x.en));
+/** A nation by its colony's name, as in the game. */
+const nation = (n: GameDef['nations'][string], l: Lang) => (l === 'ru' ? name(n, l) : esc(COLONIAL[n.id] ?? n.en));
 const L = (l: Lang, e: string, r: string) => (l === 'ru' ? r : e);
 const year = (round: number) => S.rounds.firstYear + (round - 1) * S.rounds.yearStep;
 const count = <T>(o: Record<string, T>, f: (x: T) => boolean = () => true) => Object.values(o).filter(f).length;
@@ -104,7 +107,13 @@ const VALUES: Record<string, () => string | number> = {
   'tax.round4': () => S.tax.track[3]!,
   'hostility.calm': () => S.activation.giftMaxHostility + 1,
   'hostility.raidFrom': () => S.activation.raidMinHostility,
+  'fathers.points': () => scoringFathers('en').join(' and '),
+  'fathers.points.ru': () => scoringFathers('ru').join(' и '),
 };
+/** The Founding Fathers who add points of their own at the end. */
+function scoringFathers(l: Lang) { return Object.values(R.fathers).filter((f) => f.mods.some((m) => m.mod === 'pointsPerAlliance' || m.mod === 'pointsPerPatriotColony')).map((f) => cap(l === 'ru' ? f.ru : f.en)); }
+// The scoring table gives one value for a colony, the loyalist's and the patriots' alike.
+if (S.score.loyalistColony !== S.score.patriotColony) throw new Error('rulebook: the scoring table assumes a colony scores the same for the loyalist and the patriots');
 function value(p: string): string {
   if (VALUES[p]) return String(VALUES[p]!());
   let v: unknown;
@@ -141,8 +150,8 @@ const cube = (id: string, l: Lang, word = true) => { const [c, e, r] = CUBE[id]!
 
 const TABLES: Record<string, (l: Lang) => string> = {
   resources: (l) => {
-    const from: Record<string, [string, string]> = { food: ['Ocean', 'Океан'], timber: ['Forest', 'Лес'], crops: ['Grassland; fur in forest and tundra', 'Луг; мех в лесу и тундре'], goods: ['Crops, in a workshop', 'Из сырья в мастерской'], silver: ['Mountains', 'Горы'] };
-    return `<table class="res"><thead><tr><th>${L(l, 'Resource', 'Ресурс')}</th><th>${L(l, 'Cube', 'Кубик')}</th><th>${L(l, 'From', 'Откуда')}</th><th class="num">${L(l, 'Start price', 'Начальная цена')}</th></tr></thead><tbody>${Object.values(R.resources).map((r) => `<tr><td class="nw">${RES[r.id]} <b>${name(r, l)}</b></td><td class="nw">${cube(r.id, l)}</td><td>${L(l, ...(from[r.id] ?? ['', '']))}</td><td class="num">${r.price} 🟡</td></tr>`).join('')}</tbody></table>`;
+    const from: Record<string, [string, string]> = { food: ['Ocean', 'Океан'], timber: ['Forest', 'Лес'], crops: ['Grassland; fur in forest, tundra', 'Луг; мех в лесу, тундре'], goods: ['Crops in a blacksmith shop', 'Сырьё в мастерской'], silver: ['Mountains', 'Горы'] };
+    return `<table class="res"><thead><tr><th>${L(l, 'Resource', 'Ресурс')}</th><th>${L(l, 'From', 'Откуда')}</th><th class="num">${L(l, 'Price', 'Цена')}</th></tr></thead><tbody>${Object.values(R.resources).map((r) => `<tr><td class="nw">${cube(r.id, l, false)}${RES[r.id]} <b>${name(r, l)}</b></td><td class="nw">${L(l, ...(from[r.id] ?? ['', '']))}</td><td class="num">${r.price} 🟡</td></tr>`).join('')}</tbody></table>`;
   },
   terrain: (l) => { const give: Record<string, string> = { food: '🟦', timber: '🟫', crops: '🟩', silver: '⬜' }; return `<table class="terrain"><thead><tr><th>${L(l, 'Terrain', 'Местность')}</th><th>${L(l, 'Gives', 'Даёт')}</th><th>${L(l, 'To enter', 'Вход')}</th><th>${L(l, 'Defence', 'Защита')}</th></tr></thead><tbody>${Object.values(R.terrain).map((t) => `<tr><td><b>${name(t, l)}</b></td><td>${t.yields.map((y) => give[y] ?? y).join(' ') || '—'}</td><td>${t.move === 'all' ? L(l, 'all 💨 left, at least 1', 'все оставшиеся 💨, не меньше 1') : `${t.move} 💨`}</td><td>${t.defence ? `+${t.defence} 🗡️` : '—'}</td></tr>`).join('')}</tbody></table>`; },
   components: (l) => { const li = (n: string | number, e: string, r: string) => `<li><b>${n}</b> ${L(l, e, r)}</li>`; return `<ul class="components">${[
@@ -157,9 +166,11 @@ const TABLES: Record<string, (l: Lang) => string> = {
     li(count(R.wrecks), 'wreck cards', 'карт кораблекрушений'),
     li(count(R.tactics), 'King’s tactic cards', 'карт тактики Короля'),
     li(sum(R.tribes, (t) => t.copies), `tribe cards (${count(R.tribes)} tribes) with settlement markers`, `карт племён (${count(R.tribes)} племён) с маркерами поселений`),
-    li(count(R.nations), 'nation boards, each with a ⛵ ship, a ♟️ pawn and colony markers in its colour', 'планшетов наций, у каждой ⛵ корабль, ♟️ пешка и маркеры колоний своего цвета'),
+    li(count(R.nations), `nation boards with ${S.colony.max} colony slots each, and for each nation a ⛵ ship, a ♟️ pawn and colony markers in its colour; every colour has two nations`, `планшетов наций, на каждом ${S.colony.max} ячейки колоний, и у каждой нации ⛵ корабль, ♟️ пешка и маркеры колоний своего цвета; у каждого цвета две нации`),
+    li(S.natives.maxSettlements + S.war.militiaCards + S.war.mercenaryCards, `war cards with the agents’ back: ${S.natives.maxSettlements} Braves, ${S.war.militiaCards} Militia and ${S.war.mercenaryCards} Mercenaries`, `военных карт с рубашкой агентов: ${S.natives.maxSettlements} воинов, ${S.war.militiaCards} ополченцев и ${S.war.mercenaryCards} наёмников`),
+    li(count(R.nations) / 2 * (S.players.max - 1) * S.colony.max, 'two-sided nation tokens for the war, the two nations of one colour on each', 'двусторонних жетонов наций для войны, на каждом две нации одного цвета'),
     `<li>${L(l, 'The Europe board: the round, tax and price tracks, the pier, the salon and the barracks', 'Планшет Европы: треки тура, налога и цен, причал, салон и казармы')}</li>`,
-    `<li>${L(l, `Resource cubes in five colours: ${cube('food', l, false)}blue food, ${cube('timber', l, false)}brown timber, ${cube('crops', l, false)}green crops, ${cube('goods', l, false)}orange goods, ${cube('silver', l, false)}light grey silver; red cubes 🟥 for the Royal Army; black cubes ⬛ for population, fighters and markers`, `Кубики ресурсов пяти цветов: ${cube('food', l, false)}синие — еда, ${cube('timber', l, false)}коричневые — древесина, ${cube('crops', l, false)}зелёные — сырьё, ${cube('goods', l, false)}оранжевые — товары, ${cube('silver', l, false)}светло-серые — серебро; красные кубики 🟥 для королевской армии; чёрные кубики ⬛ для населения, бойцов и отметок`)}</li>`,
+    `<li>${L(l, `Resource cubes in five colours: ${cube('food', l, false)}blue food, ${cube('timber', l, false)}brown timber, ${cube('crops', l, false)}green crops, ${cube('goods', l, false)}orange goods, ${cube('silver', l, false)}light grey silver; red cubes 🟥 for the Royal Army; black cubes ⬛ for population and markers`, `Кубики ресурсов пяти цветов: ${cube('food', l, false)}синие — еда, ${cube('timber', l, false)}коричневые — древесина, ${cube('crops', l, false)}зелёные — сырьё, ${cube('goods', l, false)}оранжевые — товары, ${cube('silver', l, false)}светло-серые — серебро; красные кубики 🟥 для королевской армии; чёрные кубики ⬛ для населения и отметок`)}</li>`,
     `<li>${L(l, 'Gold 🟡, bell 🔔 and cross ✝️ tokens; six dice 🎲', 'Жетоны золота 🟡, колоколов 🔔 и крестов ✝️; шесть кубиков 🎲')}</li>`,
   ].join('')}</ul>`; },
   /** The table at setup: the Europe ring, the open sea ring, the map's tiles face down. */
@@ -167,15 +178,18 @@ const TABLES: Record<string, (l: Lang) => string> = {
     const e = S.ring.europe, o = S.ring.openSea, t = S.map.size, n = t * 3 + 2 * (e + o), c: string[] = [], g: string[] = [];
     for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) { const d = Math.min(x, y, n - 1 - x, n - 1 - y); c.push(`<rect x="${x}" y="${y}" width="1" height="1" class="${d < e ? 'eu' : d < e + o ? 'sea' : 'tile'}"/>`); }
     for (let i = 0; i <= t; i++) { const p = e + o + i * 3; g.push(`M${p} ${e + o}V${n - e - o}M${e + o} ${p}H${n - e - o}`); }
-    return `<figure class="map"><svg viewBox="-.1 -.1 ${n + 0.2} ${n + 0.2}">${c.join('')}<path class="grid" d="${g.join('')}"/><path class="north" d="M${n / 2} ${e + o + 0.5}l-.7 1.3h1.4Z"/></svg><figcaption><span><i class="k eu"></i>${L(l, 'Europe', 'Европа')}</span><span><i class="k sea"></i>${L(l, 'open sea', 'открытое море')}</span><span><i class="k tile"></i>${L(l, `${t * t} tiles face down`, `${t * t} фрагментов рубашкой вверх`)}</span></figcaption></figure>`;
+    // Every tile carries the same arrow: they are laid all pointing one way.
+    const arrows: string[] = [];
+    for (let i = 0; i < t; i++) for (let j = 0; j < t; j++) { const x = e + o + i * 3 + 1.5, y = e + o + j * 3 + 1.5; arrows.push(`M${x} ${y - 0.95}l.7.8h-.42v.95h-.56v-.95h-.42Z`); }
+    return `<figure class="map"><svg viewBox="-.1 -.1 ${n + 0.2} ${n + 0.2}">${c.join('')}<path class="grid" d="${g.join('')}"/><path class="north" d="${arrows.join('')}"/></svg><figcaption><span><i class="k eu"></i>${L(l, 'Europe', 'Европа')}</span><span><i class="k sea"></i>${L(l, 'open sea', 'открытое море')}</span><span><i class="k tile"></i>${L(l, `${t * t} tiles face down, arrows one way`, `${t * t} фрагментов рубашкой вверх, стрелки в одну сторону`)}</span></figcaption></figure>`;
   },
   nations: (l) => `<div class="cards two">${Object.values(R.nations).sort((a, b) => a.stars - b.stars || a.en.localeCompare(b.en)).map((n) => {
     const own = n.deck.map((id) => R.agents[id]!).find((a) => a.unique);
     const deck = n.deck.map((id) => R.agents[id]!).filter((a) => !a.unique).map((a) => name(a, l)).join(', ');
-    return `<div class="entry nation">${img(`${ART}/nation/${n.id}.webp`, 'art')}<div><h4><span>${emblem(n)} ${name(n, l)}</span><small class="stars" title="${n.stars}">${'★'.repeat(n.stars)}<i>${'★'.repeat(5 - n.stars)}</i></small></h4><p><b>${L(l, 'Starting agents', 'Стартовые агенты')}:</b> ${own ? `${name(own, l)}, ` : ''}${deck}.</p>${own ? `<p class="own">${img(agentArt(own.base))}<span><b>${name(own, l)}</b> ${EDU[own.edu]}, ${L(l, 'the nation’s unique agent', 'уникальный агент нации')}: ${stop(l === 'ru' ? PRINTED[`agent.${own.base}`] ?? '' : D.talent(own.mods))}</span></p>` : ''}</div></div>`;
+    return `<div class="entry nation">${img(`${ART}/nation/${n.id}.webp`, 'art')}<div><h4><span>${emblem(n)} ${nation(n, l)}</span><small class="stars" title="${n.stars}">${'★'.repeat(n.stars)}<i>${'★'.repeat(5 - n.stars)}</i></small></h4><p><b>${L(l, 'Starting agents', 'Стартовые агенты')}:</b> ${own ? `${name(own, l)}, ` : ''}${deck}.</p>${own ? `<p class="own">${img(agentArt(own.base))}<span><b>${name(own, l)}</b> ${EDU[own.edu]}, ${L(l, 'the nation’s unique agent', 'уникальный агент нации')}: ${stop(l === 'ru' ? PRINTED[`agent.${own.base}`] ?? '' : D.talent(own.mods))}</span></p>` : ''}</div></div>`;
   }).join('')}</div>`,
   agents: (l) => `<div class="cards">${Object.values(R.agents).filter((a) => a.kind === 'common').sort((a, b) => (a.price ?? 0) - (b.price ?? 0) || name(a, l).localeCompare(name(b, l), l)).map((a) => agentEntry(a, l, `${a.price} 🟡 · ${copies(a.copies, l)}`)).join('')}</div>`,
-  nationAgents: (l) => `<div class="cards">${Object.values(R.agents).filter((a) => a.unique).sort((a, b) => name(a, l).localeCompare(name(b, l), l)).map((a) => agentEntry(a, l, name(R.nations[a.nation!]!, l))).join('')}</div>`,
+  nationAgents: (l) => `<div class="cards">${Object.values(R.agents).filter((a) => a.unique).sort((a, b) => name(a, l).localeCompare(name(b, l), l)).map((a) => agentEntry(a, l, nation(R.nations[a.nation!]!, l))).join('')}</div>`,
   nativeAgents: (l) => `<div class="cards">${Object.values(R.agents).filter((a) => a.kind === 'native').map((a) => agentEntry(a, l, copies(a.copies, l))).join('')}</div>`,
   buildings: (l) => `<div class="cards">${Object.values(R.buildings).sort((a, b) => Number(a.improvement) - Number(b.improvement) || a.timber - b.timber).map((b) => entry(img(buildingArt(b.id), 'art'), name(b, l), `${b.timber} 🟫 · ${b.work?.kind === 'teach' ? (b.edu ? `${L(l, 'student', 'ученик')} ${EDU[b.edu]}` : L(l, 'any student', 'любой ученик')) : b.work ? `${L(l, 'worker', 'работник')} ${EDU[b.edu]}` : L(l, 'no worker', 'без работника')}`, `<p>${l === 'ru' ? PRINTED[`building.${b.id}`] ?? '' : `${D.work(b)}.`}</p>${b.requires ? `<p class="req">${L(l, 'Needs', 'Требует')}: ${name(R.buildings[b.requires]!, l)}. ${L(l, 'Only one', 'Только одна')}.</p>` : ''}${ruling(`building.${b.id}`, l)}`, b.improvement ? 'imp' : '')).join('')}</div>`,
   fathers: (l) => `<div class="cards">${Object.values(R.fathers).sort((a, b) => a.bells - b.bells || name(a, l).localeCompare(name(b, l), l)).map((f) => entry(img(fatherArt(f.id)), name(f, l), `${f.bells} 🔔`, `${flavor(f as Card, l, 'father')}<p>${stop(l === 'ru' ? PRINTED[`father.${f.id}`] ?? '' : esc(EN[`father.${f.id}`] ?? ''))}</p>${ruling(`father.${f.id}`, l)}`)).join('')}</div>`,
@@ -200,8 +214,9 @@ function poiCards(o: GameDef['ruins'], kind: 'ruin' | 'wreck', l: Lang): string 
 function build(l: Lang) {
   const src = readFileSync(at(`src/${l}.html`), 'utf8');
   let out = src
-    .replace(/<rv-table of="([\w.]+)"><\/rv-table>/g, (_, k: string) => { if (!TABLES[k]) throw new Error(`<rv-table of="${k}">: no such table`); return TABLES[k]!(l); })
-    .replace(/<rv p="([\w.]+)"><\/rv>/g, (_, p: string) => `<span class="rv">${esc(value(p))}</span>`);
+    .replace(/<rv-table\s+of="([\w.]+)"\s*><\/rv-table>/g, (_, k: string) => { if (!TABLES[k]) throw new Error(`<rv-table of="${k}">: no such table`); return TABLES[k]!(l); })
+    // Tags may wrap over lines when the source is reflowed.
+    .replace(/<rv\s+p="([\w.]+)"\s*><\/rv>/g, (_, p: string) => `<span class="rv">${esc(value(p))}</span>`);
   const left = /<rv[\s>-]/.exec(out);
   if (left) throw new Error(`${l}: an <rv> was not filled near "${out.slice(left.index, left.index + 60)}"`);
   // Each part after the first starts a page (data-part names it in the contents); then the ornaments' stylesheet.

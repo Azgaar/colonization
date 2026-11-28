@@ -1,0 +1,147 @@
+/* Battles and sieges (DD-123): a panel over the map, a hanging banner for each side with its cards under it, the chance or the dice between, the hand below. */
+.siege { width:min(980px,94vw);max-height:calc(100vh - 40px);overflow:auto;padding:16px 22px 18px;border-radius:22px;background:#0c2c31;box-shadow:0 0 0 1.5px #edb44333,0 20px 60px #000c;color:var(--bone) }
+.siege h2 { display:flex;align-items:center;justify-content:center;gap:12px;margin:0 0 12px;font:800 25px/1.1 var(--sc);text-align:center }
+.sduel { display:grid;grid-template-columns:1fr minmax(220px,280px) 1fr;gap:16px;align-items:start }
+.sside { display:flex;flex-direction:column;align-items:center;gap:10px }
+.srow { display:flex;justify-content:center;gap:6px;max-width:330px;min-height:8px }
+/* Many cards overlap like a fan in hand instead of wrapping. */
+.srow:has(> :nth-child(5)) { gap:0 } .srow:has(> :nth-child(5)) > * + * { margin-left:-14px } .srow:has(> :nth-child(7)) > * + * { margin-left:-26px }
+
+/* The banner: the side's colour, its crest, its name, its strength and what makes it. Always the same size. */
+.sban { position:relative;width:216px;height:322px;padding:12px 12px 34px;display:flex;flex-direction:column;align-items:center;text-align:center;background:linear-gradient(var(--c),color-mix(in srgb,var(--c) 55%,#06181d));clip-path:polygon(0 0,100% 0,100% calc(100% - 28px),50% 100%,0 calc(100% - 28px)) }
+.sban::before { content:"";position:absolute;inset:5px 5px 0;border:1.5px solid #f7f1e155;border-bottom:0;pointer-events:none }
+.sban > * { flex:none }
+.sban h3 { margin:6px 0 0;font:800 18px/1.1 var(--sc);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap }
+.sbn { display:flex;align-items:center;justify-content:center;gap:2px;margin:0 0 4px;font:800 42px/1.05 var(--sc) }
+.sbn em { font-style:normal;font-size:24px;color:var(--hot) }
+.sbn svg { margin-left:4px;opacity:.85 }
+.sban ul { list-style:none;margin:0;padding:0;width:100%;font-size:13.5px;line-height:1.2;text-align:left;overflow:hidden }
+.sban li { display:flex;justify-content:space-between;gap:8px;padding:1px 4px;border-top:1px solid #f7f1e122 }
+.sban li span { overflow:hidden;text-overflow:ellipsis;white-space:nowrap }
+.sban li b { font:800 14px var(--sc);white-space:nowrap }
+.sban li.hid { color:var(--hot) }
+/* The King's tactic among his lines, by its name, with his crown. */
+.sban li.tac span { display:flex;align-items:center;gap:4px;fill:var(--ochre) }
+.sban li.tac svg { flex:none }
+/* What was known, then, once the cards have turned, what they showed. */
+.sbody { display:grid;width:100% }
+.sbody > * { grid-area:1/1;display:flex;flex-direction:column;align-items:center }
+.sold { animation:sold .3s var(--late,0s) both }
+@keyframes sold { to { opacity:0;visibility:hidden } }
+.screst { flex:none;width:50px;height:50px;border-radius:50%;box-shadow:0 0 0 2px var(--ochre),0 2px 6px #0008 }
+/* Several patriots attacking one loyalist colony: their emblems together. */
+.smany { display:flex;justify-content:center;height:50px;align-items:center }
+.smany .em + .em { margin-left:-12px }
+img.screst { object-fit:cover }
+
+/* Between the banners: the chance, as a range while cards are hidden, then the dice and the outcome. */
+.smid { display:flex;flex-direction:column;align-items:center;gap:12px;padding-top:58px;text-align:center }
+.sodds { display:flex;flex-direction:column;align-items:center;gap:8px }
+.siege :is(.smid,.bts) button { padding:8px 18px;border-radius:11px;background:#ffffff1f;font:700 17px var(--ui) }
+.siege :is(.smid,.bts) button:hover { background:#ffffff38 }
+.siege :is(.smid,.bts) .go { background:var(--bone);color:var(--ink);font-weight:800 }
+.siege :is(.smid,.bts) .go:hover { background:#fff }
+.sodds b { font:800 42px/1 var(--sc);color:var(--ochre) }
+.sodds small { font-size:22px }
+.sband { position:relative;display:block;width:190px;height:8px;border-radius:4px;background:#ffffff1f }
+.sband i { position:absolute;top:0;bottom:0;border-radius:4px;background:var(--ochre) }
+.swhat { margin-top:-2px;font-size:13.5px;opacity:.75 }
+.slate { display:flex;flex-direction:column;align-items:center;gap:12px;animation:slate .4s var(--late,0s) both }
+.slate .dice { flex-wrap:wrap;justify-content:center;max-width:270px;gap:4px }
+.slate .dice i { width:32px;height:32px;line-height:32px;font-size:19px;border-radius:7px }
+.sverd { font:800 25px/1.12 var(--sc);text-wrap:balance }
+.sverd.good { color:#93e09c } .sverd.bad { color:#ff9a82 }
+@keyframes slate { from { opacity:0;transform:translateY(6px) } }
+.shand { display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:14px;padding-top:14px;border-top:1px solid #ffffff14 }
+.siege .bts { display:flex;justify-content:center;gap:10px;margin-top:14px }
+
+/* An agent as in the hand: the picture, the name on a light ribbon, its strength with the sword. */
+.siege .scard { position:relative;flex:none;width:var(--w);height:calc(var(--w)*1.4);padding:0;border-radius:10px;overflow:hidden;background:var(--bone);color:var(--ink);box-shadow:0 4px 12px #000a;text-align:left }
+.scard img { position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 22% }
+.scard .rib { position:absolute;left:0;right:0;top:0;padding:3px 5px 2px;background:#f7f1e1e8;font:800 max(10px,calc(var(--w)*.135)) var(--sc);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;box-shadow:0 2px 5px #0005 }
+.scard .spw { position:absolute;right:4px;bottom:4px;display:flex;align-items:center;gap:1px;padding:1px 5px 1px 7px;border-radius:99px;background:var(--ochre);color:var(--ink);font:800 max(12px,calc(var(--w)*.16)) var(--sc);box-shadow:0 2px 4px #0008 }
+.scard .sct { position:absolute;left:4px;bottom:4px;padding:0 6px;border-radius:99px;background:#0f3436e6;color:var(--bone);font:800 13px var(--sc);font-style:normal }
+.siege button.scard { cursor:pointer;transition:transform .15s,box-shadow .15s }
+.siege button.scard:hover { transform:translateY(-3px);background:var(--bone) }
+.siege .scard.sel { transform:translateY(-8px);box-shadow:0 0 0 4px var(--hot),0 8px 18px #000c }
+/* Face down: the back of the agent deck, with its owner's token. */
+.siege .scard.sback { overflow:visible;background:radial-gradient(circle at 50% 50%,#edb44333 0 22%,transparent 23%),repeating-linear-gradient(45deg,#174a4a 0 6px,#123c3d 6px 12px);box-shadow:inset 0 0 0 3px var(--bone),0 4px 12px #000a }
+.sback::after { content:"";position:absolute;left:50%;top:50%;width:16px;height:16px;margin:-8px 0 0 -8px;background:var(--ochre);clip-path:polygon(50% 0,59% 41%,100% 50%,59% 59%,50% 100%,41% 59%,0 50%,41% 41%) }
+.stok { position:absolute;left:-5px;top:-5px;z-index:2;line-height:0 }
+.sflip { position:relative;flex:none;width:var(--w);height:calc(var(--w)*1.4);perspective:600px }
+.sflip .in { position:absolute;inset:0;transform-style:preserve-3d }
+.sflip .scard { position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden }
+.sflip .face { transform:rotateY(180deg) }
+.sflip.open .in { transform:rotateY(180deg) }
+.sflip.turn .in { animation:sturn .55s calc(.35s + var(--i)*.26s) ease-in-out both }
+@keyframes sturn { from { transform:none } to { transform:rotateY(180deg) } }
+@media (prefers-reduced-motion:reduce) { .sflip.turn .in { animation:none;transform:rotateY(180deg) } .slate { animation:none } .sold { animation:none;display:none } }
+
+/* The front lines, as on the table: each player's board with a slot for each colony; on a slot the redcoats and attackers above, the strengths between, the defenders below. */
+.siege.front { width:min(1240px,96vw) }
+.sboards { display:flex;flex-wrap:wrap;justify-content:center;align-items:stretch;gap:8px }
+.sboard { display:flex;flex-direction:column;border-radius:14px;overflow:hidden;background:color-mix(in srgb,var(--c) 16%,#0c2c31);box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--c) 60%,transparent) }
+.sboard header { display:flex;align-items:center;gap:7px;padding:5px 10px 5px 6px;background:color-mix(in srgb,var(--c) 62%,#0c2c31) }
+.sboard header b { font:800 15px var(--sc);white-space:nowrap }
+.sboard header small { margin-left:auto;padding:1px 8px;border-radius:99px;background:#0005;font:700 12px var(--ui) }
+.sslots { flex:1;display:flex;gap:5px;padding:5px }
+.siege .slot { flex:none;width:106px;display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 4px 7px;border-radius:10px;background:#0003;color:inherit;text-align:center;cursor:default }
+.siege .slot.can { cursor:pointer;background:#ffffff0f;box-shadow:0 0 0 2px #edb44399 }
+.siege .slot.can:hover { background:#ffffff1c;box-shadow:0 0 0 3px var(--hot) }
+.sname { max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:800 13px/1.15 var(--sc);letter-spacing:-.01em }
+.szone { display:flex;flex-direction:column;align-items:center;gap:4px;min-height:54px }
+.szone.up { flex:1;justify-content:flex-end }
+.sfan { display:flex;justify-content:center }
+.sfan > * + * { margin-left:-16px }
+/* A long stack overlaps more, to stay inside its slot. */
+.sfan:has(> :nth-child(4)) > * + * { margin-left:-24px }
+.sfan:has(> :nth-child(6)) > * + * { margin-left:-29px }
+.sred { display:flex;align-items:flex-end }
+.sred svg + svg { margin-left:-9px }
+.sred b { margin-left:4px;font:800 16px/1 var(--sc);color:#ff9a82 }
+.svs { display:flex;align-items:center;justify-content:center;gap:7px;width:100%;padding:3px 0;border-block:1px solid #ffffff17;font:800 19px var(--sc) }
+.svs svg { opacity:.55 }
+.svs .a { color:#ff9a82 }
+.svs em { font-style:normal;font-size:14px;color:var(--hot) }
+/* The King's tactic, under the colonies while cards are placed. */
+.siege p.stac { display:flex;align-items:center;gap:6px;justify-content:center;margin:10px auto 0;max-width:760px;font-size:14px;line-height:1.3;opacity:.85;fill:var(--ochre) }
+.siege p.stac svg { flex:none }
+
+/* The muster: the offer being chosen lit, with its stepper and its button; beside it, your army as it will be; under them what the others raised. */
+.siege.muster { width:min(920px,94vw) }
+.mgrid { display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:14px }
+.moffers { display:flex;flex-direction:column;gap:10px }
+.moffer { display:flex;gap:14px;padding:12px;border-radius:16px;background:#ffffff0a;opacity:.6 }
+.moffer.on { opacity:1;background:#ffffff14;box-shadow:0 0 0 2px #edb44366 }
+.moffer > div { flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:8px }
+.moffer h3 { display:flex;align-items:center;gap:10px;width:100%;margin:0;font:800 19px/1.1 var(--sc) }
+.moffer p { margin:0;font-size:14px;line-height:1.35 }
+.moffer p svg,.mcost svg { vertical-align:-3px }
+.shave { display:inline-flex;align-items:center;gap:3px;margin-left:auto;padding:2px 9px;border-radius:99px;background:#ffffff14;font:800 15px var(--sc) }
+.mstep { display:flex;align-items:center;gap:8px;width:100% }
+.siege .mstep button { width:34px;height:34px;border-radius:50%;background:#ffffff1f;font:800 20px/1 var(--ui) }
+.siege .mstep button:hover:not(:disabled) { background:#ffffff38 }
+.siege .mstep button:disabled { opacity:.3;cursor:default }
+.mstep b { min-width:30px;text-align:center;font:800 28px/1 var(--ui) }
+.mcost { margin-left:auto;display:inline-flex;align-items:center;gap:3px;font:800 18px var(--sc) }
+.siege .moffer .go { padding:8px 18px;border-radius:11px;background:var(--bone);color:var(--ink);font:800 16px var(--ui) }
+.siege .moffer .go:hover { background:#fff }
+.mgot { color:var(--ochre);font-weight:700 }
+.marmy { display:flex;flex-direction:column;padding:12px;border-radius:16px;background:#0003 }
+.marmy h3 { display:flex;align-items:center;gap:10px;margin:0 0 10px;font:800 19px var(--sc) }
+.marmy .sbn { margin:0 0 0 auto;font-size:30px }
+.marmy h3 em { font:800 18px var(--sc);font-style:normal;color:#93e09c }
+.mcards { flex:1;display:flex;flex-wrap:wrap;align-content:center;justify-content:center;gap:8px }
+.siege .scard.out { opacity:.35;filter:grayscale(1) }
+.siege .scard.new { box-shadow:0 0 0 3px #93e09c,0 4px 12px #000a }
+.sothers { display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px;margin-top:12px }
+.sothers > small { font-size:13.5px;opacity:.7 }
+.sother { display:flex;align-items:center;gap:6px;padding:5px 9px;border-radius:14px;background:#ffffff0a }
+
+/* While a fight is on screen, its hand is the one to pick from. */
+body:has(.step .siege) .hand { display:none }
+/* The war, after it is fought: the same fight in the war box, colony by colony. */
+.warbox:has(.siege) { width:min(980px,94vw);padding:16px 22px 14px }
+.warbox:has(.siege.front) { width:min(1240px,96vw) }
+.warbox .siege { width:auto;max-height:none;overflow:visible;padding:0;background:none;box-shadow:none }
+@media (max-width:760px) { .sduel { grid-template-columns:1fr } .smid { padding-top:0 } .mgrid { grid-template-columns:1fr } }

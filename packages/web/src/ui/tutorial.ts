@@ -1,6 +1,7 @@
 /* The tutorial (FR-U-20): part of every new game until the player turns it off (in Options, or by ending it). A coach gives one step at a time to seat 0,
  * points at what to use, and moves on by itself once the game shows the step done. Every step can be skipped; the game itself is an ordinary one. */
 import type { State } from '@col/engine';
+import { refuseCubes } from '@col/engine';
 import { $, D, me, msg, pick, t, type Text } from '../data.ts';
 import { icon } from '../icons.ts';
 import { paint } from '../paint.ts';
@@ -15,7 +16,7 @@ const mine = (s: State, e: string) => s.log.some((x) => x.e === e && x.p === 0);
 /** The steps for this game: its nation, solo or not, and the numbers of the rules being played. */
 function steps(): Step[] {
   const s = D.settings, sc = s.score, ic = (n: string) => icon(n, 17), m = s.move, solo = Sim.s.players.length === 1;
-  const nation = D.names.nations[Sim.s.players[0].nation] ?? ['', ''], rr = solo ? s.tax.refuseRefSolo : s.tax.refuseRef;
+  const nation = D.names.nations[Sim.s.players[0].nation] ?? ['', ''], rr = refuseCubes(Sim.s);
   return [
     { title: msg('tutorial.welcome_governor'), text: msg('tutorial.welcome', { nation: pick(nation), goal: solo ? t('tutorial.goal_solo') : t('tutorial.goal_vp', { vp: ic('vp') }) }) },
     { title: msg('tutorial.start'), text: msg('tutorial.outlined_edge'), done: (x) => x.players[0].ship >= 0 },
@@ -29,7 +30,7 @@ function steps(): Step[] {
     { title: msg('tutorial.end_round'), text: msg('tutorial.done_want', { size: s.hand.size }), done: (x) => x.round >= 2, hi: '.acts .pass' },
     { title: msg('tutorial.king_s'), text: msg('tutorial.tax', { gold: ic('gold'), pay: s.tax.payBells ? t('tutorial.tax_pay', { n: s.tax.payBells, bells: ic('bells') }) : '', bells: s.tax.refuseBells ? t('tutorial.tax_bells', { n: s.tax.refuseBells, bells: ic('bells') }) : '', n: rr, king: ic('king') }), done: (x) => mine(x, 'tax'), hi: '.king' },
     { title: msg('guide.war_independence'), text: msg('tutorial.war', { who: t(solo ? 'tutorial.you_reach' : 'tutorial.someone_reaches'), n: s.war.bells, bells: ic('bells'), max: s.rounds.max, loyalist: solo || s.war.loyalistFrom > Sim.s.players.length ? '' : t('tutorial.loyalist'), king: ic('king'), whose: t(solo ? 'tutorial.your_colonies' : 'tutorial.their_colonies'), power: ic('power') }), hi: '.king' },
-    { title: msg('tutorial.win'), text: msg('tutorial.score', { rule: t(solo ? 'tutorial.rule_solo' : 'tutorial.rule'), vp: ic('vp'), colony: sc.patriotColony, bell: sc.perBell, bells: ic('bells'), building: sc.building, father: sc.father, per: sc.goldPerPoint, gold: ic('gold'), agents: sc.agentsPerPoint, ally: solo || s.war.loyalistFrom > Sim.s.players.length ? '' : t('tutorial.ally', { n: sc.loyalistColony }) }), hi: '#court' },
+    { title: msg('tutorial.win'), text: msg('tutorial.score', { rule: t(solo ? 'tutorial.rule_solo' : 'tutorial.rule'), vp: ic('vp'), colony: sc.patriotColony, bell: sc.perBell, bpp: sc.bellsPerPoint, bells: ic('bells'), building: sc.building, father: sc.father, per: sc.goldPerPoint, gold: ic('gold'), agents: sc.agentsPerPoint, ally: solo || s.war.loyalistFrom > Sim.s.players.length ? '' : t('tutorial.ally', { n: sc.loyalistColony }) }), hi: '#court' },
     { title: msg('tutorial.over'), text: msg('tutorial.know_enough') },
   ];
 }

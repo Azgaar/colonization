@@ -1,0 +1,2 @@
+/** In English a nation goes by its colony's name (the game and the rulebook); Russian keeps the spreadsheet's. */
+export const COLONIAL: Record<string, string> = { french: 'New France', english: 'New England', dutch: 'New Netherland', spanish: 'New Spain', portuguese: 'Portuguese Brazil', swedish: 'New Sweden', danish: 'Danish West Indies', russian: 'Russian America', curonian: 'New Courland', scottish: 'Nova Scotia' };

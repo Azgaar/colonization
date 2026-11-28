@@ -1,0 +1,634 @@
+<!doctype html>
+<!--
+  PROTOTYPE — throwaway. Five variants of the war and battle interface, switchable with ?variant=A..E and ?screen=battle|troops|placing|siege.
+  Run: pnpm web, then open http://localhost:8765/prototype/war-ui.html
+  Mock data only, nothing reaches the engine. Delete once a variant is chosen and folded into packages/web/src/ui.
+-->
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prototype: war and battle UI</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya+SC:wght@500;700;800&family=Alegreya+Sans:wght@400;500;700;800&family=Cormorant+SC:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap">
+<style>
+:root { --deep:#0f3436; --bone:#f7f1e1; --ink:#1c2a2a; --scarlet:#c94a36; --ochre:#edb443; --sc:"Alegreya SC",Georgia,serif; --ui:"Alegreya Sans","Gill Sans",sans-serif; --cg:"Cormorant Garamond",Georgia,serif; --cs:"Cormorant SC",Georgia,serif }
+* { box-sizing:border-box }
+html,body { height:100%;margin:0 }
+body { font:500 17px/1.3 var(--ui);color:var(--bone);background:#12466a;overflow:hidden }
+button { font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer }
+:focus-visible { outline:3px solid var(--ochre);outline-offset:2px }
+#app { position:fixed;inset:0;overflow:auto }
+.emb { display:inline-grid;place-items:center;width:var(--s,34px);height:var(--s,34px);border-radius:50%;background:var(--c);box-shadow:0 0 0 2px #f7f1e1cc,0 2px 6px #0006;flex:none }
+.emb img { width:62%;height:62%;object-fit:contain }
+.die { display:inline-grid;place-items:center;width:30px;height:30px;border-radius:7px;background:#f4ecd8;color:#2a2118;font:800 17px var(--sc);box-shadow:inset 0 -2px 0 #0002 }
+.die.hit { background:var(--scarlet);color:#fff }
+
+/* ---------- the prototype's own switcher: not part of any design ---------- */
+#proto { position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:99;display:flex;align-items:center;gap:6px;padding:6px;border-radius:99px;background:#fff;color:#111;font:600 14px/1 system-ui,sans-serif;box-shadow:0 6px 24px #0007 }
+#proto button { padding:8px 12px;border-radius:99px;white-space:nowrap }
+#proto button:hover { background:#eee }
+#proto .on { background:#111;color:#fff }
+#proto .on:hover { background:#111 }
+#proto .lab { padding:0 10px;min-width:210px;text-align:center }
+#proto .sep { width:1px;height:22px;background:#ddd;margin:0 4px }
+
+/* ========== A — The war table ========== */
+.vA { min-height:100%;display:flex;flex-direction:column;justify-content:center;padding:28px 34px 96px;background:radial-gradient(ellipse at 50% 40%,#355a44 0,#22402f 55%,#162b20 100%);position:relative }
+.vA::before { content:"";position:fixed;inset:0;pointer-events:none;box-shadow:inset 0 0 0 14px #4a2c19,inset 0 0 0 17px #b88a45,inset 0 0 140px #0009 }
+.vA h1 { margin:0 0 4px;font:700 34px/1 var(--sc);color:#f3e3b5 }
+.vA .sub { color:#d9c79a;margin:0 0 22px }
+.vA .row { display:flex;gap:22px;align-items:flex-end;flex-wrap:wrap }
+.vA .card { position:relative;width:118px;height:168px;border-radius:9px;background:#f3ead3 center/cover;box-shadow:0 3px 0 #0003,0 8px 18px #0006;border:3px solid #f3ead3;transition:transform .15s }
+.vA .card .nm { position:absolute;left:0;right:0;bottom:0;padding:5px 6px 6px;background:linear-gradient(#0000,#000c);font:700 15px var(--sc);border-radius:0 0 6px 6px }
+.vA .card .pw { position:absolute;top:-10px;right:-10px;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:#b88a45;color:#21140b;font:800 17px var(--sc);box-shadow:0 2px 4px #0006 }
+.vA .card.back { background:repeating-linear-gradient(45deg,#7d2318 0 6px,#8f2a1d 6px 12px);border-color:#e6d3a3 }
+.vA .card.sel { transform:translateY(-16px);border-color:#ffd666;box-shadow:0 0 0 3px #ffd666,0 14px 24px #0008 }
+.vA .card.swapped { opacity:.35;filter:grayscale(1) }
+.vA .card.played { border-color:#b88a45;box-shadow:0 0 0 3px #b88a45,0 8px 18px #0006 }
+.vA .card.played::after { content:'Played';position:absolute;left:50%;top:-12px;transform:translateX(-50%);padding:1px 8px;border-radius:99px;background:#b88a45;color:#21140b;font:800 12px var(--ui) }
+.vA .gap { width:2px;align-self:stretch;background:#e7d39f55 }
+.vA .small .card { width:92px;height:130px }
+.vA .sg { display:grid;grid-template-columns:1fr 330px;gap:22px;align-items:start }
+.vA .sg .boards { flex-direction:column }
+.vA .sg .tray { position:static }
+.vA .line { height:2px;margin:26px 0;background:repeating-linear-gradient(90deg,#e7d39f 0 14px,transparent 14px 24px);opacity:.6 }
+.vA .puck { width:120px;height:120px;border-radius:50%;display:grid;place-items:center;text-align:center;background:radial-gradient(circle at 35% 30%,#f9e7b0,#b88a45 70%);color:#2a1a0d;box-shadow:0 6px 14px #0008 }
+.vA .puck b { display:block;font:800 46px/1 var(--sc) }
+.vA .puck small { font:700 14px var(--ui) }
+.vA .puck.foe { background:radial-gradient(circle at 35% 30%,#f2a08d,#a7311f 70%);color:#fff }
+.vA .plaque { display:flex;gap:12px;align-items:center;padding:10px 16px;border-radius:10px;background:#2b1a0f;border:2px solid #b88a45;box-shadow:0 4px 10px #0007 }
+.vA .plaque b { font:700 20px var(--sc);color:#f3e3b5 }
+.vA .chip { display:inline-flex;gap:6px;align-items:center;padding:4px 10px;border-radius:99px;background:#0004;color:#f3e3b5;font-weight:700 }
+.vA .seal { width:112px;height:112px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#d3523d,#8f2216 70%);color:#fff;font:800 20px var(--sc);box-shadow:0 0 0 5px #8f221655,0 8px 16px #0008;text-align:center }
+.vA .boards { display:flex;gap:20px;flex-wrap:wrap }
+.vA .board { flex:1;min-width:300px;padding:12px;border-radius:12px;background:linear-gradient(#e8d8b0,#d7c08e);color:#2a1a0d;box-shadow:0 8px 20px #0008 }
+.vA .board header { display:flex;gap:10px;align-items:center;margin-bottom:10px;font:700 19px var(--sc) }
+.vA .board header small { margin-left:auto;font:600 13px var(--ui);opacity:.75 }
+.vA .slots { display:grid;grid-template-columns:repeat(3,1fr);gap:8px }
+.vA .slot { min-height:160px;border-radius:9px;border:2px dashed #8b6b3a;padding:8px;display:flex;flex-direction:column;gap:6px;text-align:left;background:#fff3 }
+.vA .slot.can { border-style:solid;border-color:#2b6b45;background:#2b6b4522;cursor:pointer }
+.vA .slot.can:hover { background:#2b6b4540 }
+.vA .slot.empty { opacity:.45 }
+.vA .slot h4 { margin:0;font:700 15px var(--sc) }
+.vA .slot .n { font:800 13px var(--sc);opacity:.6 }
+.vA .cubes { display:flex;flex-wrap:wrap;gap:3px }
+.vA .cube { width:11px;height:11px;background:#b8241a;box-shadow:inset -2px -2px 0 #0003 }
+.vA .stk { display:flex;align-items:center;gap:6px;font-weight:700;font-size:14px }
+.vA .stk i { display:inline-block;width:24px;height:32px;border-radius:3px;background:repeating-linear-gradient(45deg,#7d2318 0 4px,#8f2a1d 4px 8px);box-shadow:3px -3px 0 #e6d3a3,4px -4px 0 #7d2318 }
+.vA .stk.mine i { background:#f3ead3 center/cover;box-shadow:3px -3px 0 #e6d3a3 }
+.vA .odds { margin-top:auto;font:800 14px var(--sc) }
+.vA .stamp { margin-top:auto;align-self:flex-start;padding:2px 10px;border:3px solid;border-radius:5px;font:800 17px var(--sc);transform:rotate(-6deg) }
+.vA .stamp.hold { color:#1f6a3a } .vA .stamp.lost { color:#a7311f } .vA .stamp.taken { color:#6a3ba1 }
+.vA .purse { display:flex;gap:16px;align-items:center;padding:16px 20px;border-radius:14px;background:#2b1a0f;border:2px solid #b88a45;min-width:430px }
+.vA .purse b.big { font:800 40px/1 var(--sc);color:#f3e3b5;min-width:44px;text-align:center }
+.vA .step { width:42px;height:42px;border-radius:50%;background:#b88a45;color:#2a1a0d;font:800 24px/1 var(--sc) }
+.vA .pile { width:92px;height:128px;border-radius:8px;background:#f3ead3 center/cover;box-shadow:2px 2px 0 #e6d3a3,4px 4px 0 #cdb98a,6px 6px 0 #e6d3a3,8px 10px 16px #0008;display:flex;align-items:flex-end;justify-content:center;padding-bottom:6px;font:800 15px var(--sc);color:#fff;text-shadow:0 1px 3px #000 }
+.vA .tray { position:fixed;right:30px;top:90px;width:330px;padding:16px;border-radius:12px;background:#2b1a0f;border:2px solid #b88a45;box-shadow:0 10px 30px #000a }
+.vA .tray h3 { margin:0 0 8px;font:700 22px var(--sc);color:#f3e3b5 }
+.vA .tray .ln { display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px dotted #b88a4566 }
+.vA .btn { padding:10px 18px;border-radius:99px;background:#b88a45;color:#21140b;font:800 16px var(--sc) }
+.vA .btn.ghost { background:transparent;color:#f3e3b5;box-shadow:inset 0 0 0 2px #b88a45 }
+
+/* ========== B — Order of battle (the ledger) ========== */
+.vB { min-height:100%;padding:34px 0 100px;background:#5b4632 radial-gradient(ellipse at 50% 0,#7a5f43,#3e2f21);display:flex;justify-content:center }
+.vB .page { width:min(1040px,94vw);padding:40px 56px 48px;background:#efe4c8 linear-gradient(90deg,#0000 74px,#b0402a55 74px 75px,#0000 76px);color:#2a2118;font:500 19px/1.35 var(--cg);box-shadow:0 2px 0 #d9c9a3,0 18px 40px #000a;position:relative }
+.vB h1 { margin:0;font:700 40px/1.05 var(--cs);letter-spacing:.01em }
+.vB .dateline { font-style:italic;color:#6b5a44;margin:4px 0 26px }
+.vB h2 { margin:28px 0 8px;font:700 24px var(--cs) }
+.vB table { width:100%;border-collapse:collapse }
+.vB th { text-align:left;font:600 16px var(--cs);color:#6b5a44;border-bottom:1.5px solid #2a2118;padding:6px 8px }
+.vB td { padding:7px 8px;border-bottom:1px solid #2a211833;vertical-align:middle }
+.vB td.n, .vB th.n { text-align:right;font-variant-numeric:tabular-nums;font-weight:700 }
+.vB tr.total td { border-bottom:3px double #2a2118;font-weight:700;font-size:21px }
+.vB .red { color:#9b2a1e }
+.vB .green { color:#2f5d34 }
+.vB .acct { display:grid;grid-template-columns:1fr 1fr;gap:40px }
+.vB .cb { display:flex;align-items:center;gap:12px;width:100%;padding:6px 8px;border-bottom:1px solid #2a211822;text-align:left }
+.vB .cb:hover { background:#2a21110d }
+.vB .box { width:20px;height:20px;border:2px solid #2a2118;border-radius:3px;display:grid;place-items:center;font:700 16px/1 var(--ui);flex:none }
+.vB .cb.on .box { background:#2a2118;color:#efe4c8 }
+.vB .cb img { width:38px;height:38px;border-radius:50%;object-fit:cover;object-position:50% 20%;filter:sepia(.5);border:1px solid #2a211855 }
+.vB .cb .add { margin-left:auto;font-weight:700 }
+.vB .note { font-style:italic;color:#4a3d2c }
+.vB .order { margin-top:24px;display:flex;gap:16px;align-items:center }
+.vB .wax { padding:12px 22px;border-radius:40px 46px 42px 44px;background:radial-gradient(circle at 40% 30%,#c0392b,#7b1d14);color:#f8e6d0;font:700 19px var(--cs);box-shadow:0 3px 8px #0005 }
+.vB .plain { font:600 18px var(--cs);text-decoration:underline;text-underline-offset:4px }
+.vB .qty { display:inline-flex;align-items:center;gap:8px }
+.vB .qty button { width:28px;height:28px;border:1.5px solid #2a2118;border-radius:50%;font:700 18px/1 var(--ui) }
+.vB .qty b { min-width:26px;text-align:center;font-size:22px }
+.vB .roll { display:flex;flex-direction:column;gap:2px }
+.vB .roll button { display:flex;align-items:center;gap:10px;padding:5px 8px;border-radius:4px;text-align:left }
+.vB .roll button.on { background:#2a2118;color:#efe4c8 }
+.vB .roll .ct { margin-left:auto;font-weight:700 }
+.vB .grid2 { display:grid;grid-template-columns:230px 1fr;gap:30px }
+.vB .place { font:700 16px var(--cs);padding:3px 12px;border:1.5px solid #2a2118;border-radius:20px }
+.vB .place:disabled { opacity:.3;cursor:default }
+.vB tr.lock td { background:#2a21110d }
+.vB .grp td { font:700 17px var(--cs);color:#6b5a44;padding-top:16px;border-bottom:1px solid #2a2118 }
+.vB .disp p { margin:0 0 14px;max-width:70ch }
+.vB .disp .die { width:24px;height:24px;font-size:14px;border:1px solid #2a211855 }
+.vB .verdict { font:700 19px var(--cs) }
+
+/* ========== C — The scale ========== */
+.vC { min-height:100%;padding:24px 28px 96px;background:radial-gradient(ellipse at 50% 30%,#1d5052,#0f3436 60%,#0a2526);display:grid;grid-template-columns:250px 1fr 290px;gap:24px }
+.vC h1 { grid-column:1/-1;margin:0;font:700 30px var(--sc);color:#f3e3b5;display:flex;align-items:baseline;gap:16px }
+.vC h1 small { font:500 17px var(--ui);color:#cfd8cf }
+.vC .rail, .vC .side { display:flex;flex-direction:column;gap:8px }
+.vC .rail button { display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:10px 12px;border-radius:12px;background:#ffffff0d;text-align:left }
+.vC .rail button.on { background:#f7f1e1;color:var(--ink) }
+.vC .rail button.off { opacity:.4 }
+.vC .rail b { font:700 16px var(--sc);display:block }
+.vC .rail small { opacity:.75 }
+.vC .tilt { width:34px;height:4px;border-radius:2px;background:currentColor;opacity:.7 }
+.vC .stage { display:flex;flex-direction:column;align-items:center;gap:14px }
+.vC svg.scale { width:100%;max-width:680px;overflow:visible }
+.vC .beam { transition:transform .5s cubic-bezier(.3,1.4,.5,1);transform-origin:340px 120px }
+.vC .tot { font:800 54px var(--sc);fill:#f7f1e1 }
+.vC .lbl { font:700 16px var(--sc);fill:#f3e3b5 }
+.vC .wt { font:700 13px var(--ui);fill:#1c2a2a }
+.vC .verdict { font:700 22px var(--sc);color:#f3e3b5;text-align:center }
+.vC .verdict small { display:block;font:500 16px var(--ui);color:#cfd8cf }
+.vC .side h3 { margin:6px 0 2px;font:700 18px var(--sc);color:#f3e3b5 }
+.vC .hc { display:grid;grid-template-columns:44px 1fr auto;gap:10px;align-items:center;padding:6px 10px 6px 6px;border-radius:10px;background:#ffffff0d;text-align:left }
+.vC .hc img { width:44px;height:44px;border-radius:8px;object-fit:cover;object-position:50% 20% }
+.vC .hc.on { background:#edb443;color:var(--ink) }
+.vC .hc.used { opacity:.35 }
+.vC .hc em { font-style:normal;font:800 18px var(--sc) }
+.vC .go { margin-top:6px;padding:12px;border-radius:12px;background:#c94a36;color:#fff;font:800 18px var(--sc);text-align:center }
+.vC .ghost { padding:10px;border-radius:12px;box-shadow:inset 0 0 0 2px #f7f1e155;text-align:center;font:700 16px var(--sc) }
+.vC input[type=range] { width:100%;accent-color:#edb443 }
+.vC .meter { display:flex;justify-content:space-between;font-weight:700 }
+.vC .dice { display:flex;gap:6px;justify-content:center }
+
+/* ========== D — On the map ========== */
+.vD { position:fixed;inset:0;background:#12466a }
+.vD svg.map { position:absolute;inset:0;width:100%;height:100% }
+.vD .isle { fill:#5f8f4e;stroke:#e8d9a8;stroke-width:3;vector-effect:non-scaling-stroke;filter:drop-shadow(0 0 10px #8fd0e0) }
+.vD .isle.b { fill:#7c9a59 }
+.vD .wave { fill:none;stroke:#ffffff22;stroke-width:2 }
+.vD .pin { position:absolute;transform:translate(-50%,-100%);display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center }
+.vD .badge { display:flex;align-items:center;gap:8px;padding:5px 10px 5px 5px;border-radius:99px;background:#0f3436eb;box-shadow:0 4px 12px #0007;white-space:nowrap;font-weight:700 }
+.vD .badge.can { box-shadow:0 0 0 3px #edb443,0 4px 12px #0007;cursor:pointer }
+.vD .badge.off { opacity:.55 }
+.vD .badge .k { display:inline-flex;align-items:center;gap:3px;font:800 15px var(--sc) }
+.vD .badge .r { color:#ff9a82 } .vD .badge .g { color:#93e09c } .vD .badge .q { color:#f3e3b5 }
+.vD .flag { width:14px;height:14px;transform:rotate(45deg);background:var(--c);border:2px solid #f7f1e1 }
+.vD .pop { position:absolute;width:300px;padding:14px;border-radius:14px;background:#f7f1e1;color:var(--ink);box-shadow:0 10px 28px #0008 }
+.vD .pop h3 { margin:0 0 6px;font:700 20px var(--sc);display:flex;gap:8px;align-items:center }
+.vD .pop .ln { display:flex;justify-content:space-between;padding:2px 0;font-size:15px }
+.vD .pop hr { border:0;border-top:1px solid #1c2a2a33;margin:6px 0 }
+.vD .dock { position:absolute;left:50%;bottom:78px;transform:translateX(-50%);display:flex;align-items:flex-end;gap:8px;padding:10px 14px;border-radius:18px;background:#0f3436eb;box-shadow:0 8px 26px #0009;max-width:96vw }
+.vD .mini { position:relative;width:70px;height:96px;border-radius:8px;background:#ddd center/cover;box-shadow:0 2px 6px #0007;transition:transform .12s }
+.vD .mini span { position:absolute;left:0;right:0;bottom:0;padding:2px 4px;font:700 11px var(--sc);background:#000a;border-radius:0 0 8px 8px }
+.vD .mini b { position:absolute;top:-8px;right:-8px;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:#edb443;color:var(--ink);font:800 13px var(--sc) }
+.vD .mini.sel { transform:translateY(-12px);box-shadow:0 0 0 3px #edb443,0 8px 14px #0009 }
+.vD .mini.used { opacity:.3 }
+.vD .dock .act { align-self:center;margin-left:8px;padding:10px 16px;border-radius:99px;background:#f7f1e1;color:var(--ink);font:800 15px var(--sc);white-space:nowrap }
+.vD .dock .act.red { background:#c94a36;color:#fff }
+.vD .hud { display:flex;align-items:center;gap:14px;padding:0 6px }
+.vD .hud .big { font:800 40px/1 var(--sc) }
+.vD .bar { width:220px;height:10px;border-radius:5px;background:#c94a36;overflow:hidden }
+.vD .bar i { display:block;height:100%;background:#93e09c }
+.vD .drawer { position:absolute;right:16px;top:16px;bottom:16px;width:360px;padding:20px;border-radius:18px;background:#f7f1e1;color:var(--ink);box-shadow:0 10px 30px #0009;display:flex;flex-direction:column;gap:14px;overflow:auto }
+.vD .drawer h2 { margin:0;font:700 26px var(--sc) }
+.vD .stepper { display:grid;grid-template-columns:1fr auto auto auto;gap:10px;align-items:center;padding:12px;border-radius:12px;background:#1c2a2a0d }
+.vD .stepper button { width:34px;height:34px;border-radius:50%;background:#1c2a2a;color:#f7f1e1;font:800 20px/1 var(--sc) }
+.vD .stepper b { font:800 26px var(--sc);min-width:28px;text-align:center }
+.vD .topbar { position:absolute;left:16px;top:16px;padding:10px 16px;border-radius:14px;background:#0f3436eb;font:700 18px var(--sc);display:flex;gap:12px;align-items:center }
+.vD .arrow { stroke:#edb443;stroke-width:5;fill:none;stroke-dasharray:12 9 }
+
+/* ========== E — The siege, in the game's own style ========== */
+.vE { min-height:100%;padding:22px 30px 104px;position:relative;color:var(--bone);background:#06181d }
+.vE::before { content:"";position:fixed;inset:0;background:linear-gradient(#0c2c31e6,#06181df5),url(/art/event/seven_years_war.webp) center/cover;z-index:0 }
+.vE > * { position:relative;z-index:1 }
+.vE h1 { margin:0;text-align:center;font:800 32px/1.1 var(--sc) }
+.vE .sub { margin:6px auto 0;text-align:center;max-width:62ch;opacity:.8 }
+.vE .duel { display:grid;grid-template-columns:1fr minmax(280px,330px) 1fr;gap:26px;align-items:start;margin-top:20px }
+.vE .side { display:flex;flex-direction:column;align-items:center;gap:12px }
+.vE .banner { position:relative;width:270px;height:340px;padding:22px 18px 52px;text-align:center;background:linear-gradient(var(--c),color-mix(in srgb,var(--c) 55%,#06181d));clip-path:polygon(0 0,100% 0,100% calc(100% - 36px),50% 100%,0 calc(100% - 36px)) }
+.vE .banner::before { content:"";position:absolute;inset:6px 6px 0;border:1.5px solid #f7f1e155;border-bottom:0;pointer-events:none }
+.vE .banner .emb { --s:64px }
+.vE .crown { display:inline-grid;place-items:center;width:64px;height:64px;border-radius:50%;background:#7a1d22;box-shadow:0 0 0 2px var(--ochre);font-size:32px;color:var(--ochre) }
+.vE .banner h2 { margin:10px 0 0;font:800 23px/1.1 var(--sc) }
+.vE .banner .num { margin:8px 0 6px;font:800 76px/1 var(--sc) }
+.vE .banner .num em { font-style:normal;font-size:40px;color:var(--hot);margin-left:4px }
+.vE .banner ul { list-style:none;margin:0;padding:0;font-size:15px;text-align:left }
+.vE .banner li { display:flex;justify-content:space-between;gap:10px;padding:3px 6px;border-top:1px solid #f7f1e122 }
+.vE .banner li b { font:800 15px var(--sc) }
+.vE .banner li.hid { color:var(--hot) }
+.vE .ranks { display:flex;gap:8px;justify-content:center;flex-wrap:wrap;min-height:20px }
+.vE .cap { font-size:14px;opacity:.75;text-align:center }
+.vE .center { text-align:center;padding-top:40px;display:flex;flex-direction:column;align-items:center;gap:12px }
+.vE .center .big { font:800 52px/1 var(--sc);color:var(--ochre) }
+.vE .center .big small { font-size:28px }
+.vE .center p { margin:0;max-width:30ch;opacity:.9 }
+.vE .band { position:relative;width:240px;height:10px;border-radius:5px;background:#ffffff1f }
+.vE .band i { position:absolute;top:0;bottom:0;border-radius:5px;background:var(--ochre);min-width:4px }
+.vE .bandlab { display:flex;justify-content:space-between;width:240px;font-size:13px;opacity:.75 }
+.vE .dice { display:flex;gap:6px;justify-content:center;flex-wrap:wrap;max-width:280px }
+.vE .verdict { font:800 40px/1 var(--sc);color:var(--hot) }
+.vE .verdict.bad { color:#ff9a82 } .vE .verdict.good { color:#93e09c }
+.vE .go { padding:12px 34px;border-radius:99px;background:var(--scarlet);color:#fff;font:800 19px var(--sc);box-shadow:0 6px 16px #0008 }
+.vE .go:hover { filter:brightness(1.1) }
+.vE .soft { padding:10px 22px;border-radius:99px;background:#ffffff17;font:800 16px var(--sc) }
+.vE .soft:hover { background:#ffffff2b }
+.vE .row { display:flex;gap:10px;justify-content:center }
+/* Cards, as in the hand: the picture, the name on a light ribbon, the strength in an ochre disc. */
+.vE .gc { position:relative;flex:none;width:var(--w,104px);height:calc(var(--w,104px)*1.4);border-radius:12px;overflow:hidden;background:var(--bone);color:var(--ink);box-shadow:0 6px 16px #000a;text-align:left }
+.vE .gc img { position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 25% }
+.vE .gc .rib { position:absolute;left:0;right:0;top:0;padding:4px 6px 3px;background:#f7f1e1e8;font:800 calc(var(--w,104px)*.14) var(--sc);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;box-shadow:0 2px 6px #0005 }
+.vE .gc .pw { position:absolute;right:5px;bottom:5px;min-width:calc(var(--w,104px)*.27);height:calc(var(--w,104px)*.27);padding:0 4px;border-radius:99px;display:grid;place-items:center;background:var(--ochre);font:800 calc(var(--w,104px)*.16) var(--sc);box-shadow:0 2px 5px #0008 }
+.vE .gc .n { position:absolute;left:5px;bottom:5px;padding:1px 7px;border-radius:99px;background:#0f3436e6;color:var(--bone);font:800 14px var(--sc) }
+.vE button.gc { cursor:pointer;transition:transform .15s }
+.vE button.gc:hover { transform:translateY(-4px) }
+.vE .gc.sel { transform:translateY(-12px);box-shadow:0 0 0 4px var(--hot),0 10px 22px #000c }
+.vE .gc.used { opacity:.35;filter:grayscale(.8) }
+.vE .gc.bk { background:radial-gradient(circle at 50% 50%,#edb44333 0 22%,transparent 23%),repeating-linear-gradient(45deg,#174a4a 0 6px,#123c3d 6px 12px);box-shadow:inset 0 0 0 3px var(--bone),0 6px 16px #000a }
+.vE .gc.bk::after { content:"";position:absolute;left:50%;top:50%;width:22px;height:22px;margin:-11px 0 0 -11px;background:var(--ochre);clip-path:polygon(50% 0,59% 41%,100% 50%,59% 59%,50% 100%,41% 59%,0 50%,41% 41%) }
+.vE .gc.bk .q { position:absolute;right:6px;bottom:5px;font:800 16px var(--sc);color:var(--hot) }
+.vE .tok { position:absolute;left:-6px;top:-6px;z-index:2 }
+.vE .fl { position:relative;flex:none;width:var(--w);height:calc(var(--w)*1.4);perspective:700px }
+.vE .fl .in { position:absolute;inset:0;transform-style:preserve-3d;transition:transform .55s ease-in-out }
+.vE .fl.open .in { transform:rotateY(180deg) }
+.vE .fl .gc { position:absolute;inset:0;backface-visibility:hidden }
+.vE .fl .gc.face { transform:rotateY(180deg) }
+.vE .fl .tok { z-index:3 }
+@media (prefers-reduced-motion:reduce) { .vE .fl .in { transition:none } }
+.vE .hand { display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:22px }
+/* The front lines: one lane per colony, the enemy above, the strengths in the middle, your cards below. */
+.vE .lanes { display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:18px }
+.vE .lane { display:grid;grid-template-rows:auto 150px auto 110px auto;border-radius:16px;background:#0c2c31f2;box-shadow:0 10px 26px #0009;text-align:center;overflow:hidden }
+.vE .lane.can { cursor:pointer;box-shadow:0 0 0 2px #edb44399,0 10px 26px #0009 }
+.vE .lane.can:hover { box-shadow:0 0 0 3px var(--hot),0 10px 26px #0009 }
+.vE .lane.lock { box-shadow:0 0 0 3px var(--hot),0 10px 26px #0009 }
+.vE .lane.off { opacity:.5 }
+.vE .lane header { padding:10px 8px 8px;display:flex;flex-direction:column;align-items:center;gap:4px;background:color-mix(in srgb,var(--c) 45%,#0c2c31) }
+.vE .lane header b { font:800 18px var(--sc) }
+.vE .lane header small { opacity:.8 }
+.vE .zone { padding:10px 6px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font-size:14px }
+.vE .fan { display:flex;justify-content:center }
+.vE .fan > * + * { margin-left:-26px }
+.vE .men { display:flex;flex-wrap:wrap;gap:2px;justify-content:center;max-width:120px }
+.vE .men i { width:9px;height:9px;background:#c4262c;box-shadow:inset -2px -2px 0 #0004 }
+.vE .mid { padding:8px 6px;border-block:1px solid #f7f1e11f;display:flex;flex-direction:column;align-items:center;gap:5px }
+.vE .mid .vs { font:800 22px var(--sc) }
+.vE .mid .vs .g { color:#93e09c } .vE .mid .vs .r { color:#ff9a82 } .vE .mid .vs em { font-style:normal;color:var(--hot) }
+.vE .mid .band, .vE .mid .bandlab { width:84% }
+.vE .lane footer { padding:8px;font:800 15px var(--sc);color:var(--ochre) }
+/* The muster: two counters, your ranks, and what the others raised in the open. */
+.vE .musters { display:flex;gap:22px;justify-content:center;margin-top:20px;flex-wrap:wrap }
+.vE .counter { width:300px;padding:18px 20px;border-radius:18px;background:#0c2c31f2;box-shadow:0 10px 26px #0009;text-align:center }
+.vE .counter h2 { margin:0;font:800 22px var(--sc) }
+.vE .counter .num { font:800 72px/1.05 var(--sc) }
+.vE .counter .st { display:flex;justify-content:center;gap:14px }
+.vE .counter .st button { width:44px;height:44px;border-radius:50%;background:#ffffff17;font:800 26px/1 var(--sc) }
+.vE .counter .st button:hover { background:#ffffff2b }
+.vE .counter p { margin:10px 0 0;font-size:15px;opacity:.85 }
+.vE .others { display:flex;gap:16px;justify-content:center;margin-top:22px;flex-wrap:wrap }
+.vE .other { display:flex;gap:10px;align-items:center;padding:10px 14px;border-radius:16px;background:#0c2c31d9 }
+.vE .other b { font:800 16px var(--sc) }
+</style></head>
+<body><div id="app"></div><nav id="proto" aria-label="Prototype switcher"></nav>
+<script>
+/* ---------- mock data, shared by every variant ---------- */
+const NAT = { fr: { n: 'New France', c: '#233e8b', e: 'french' }, en: { n: 'New England', c: '#9b1212', e: 'english' }, es: { n: 'New Spain', c: '#623b72', e: 'spanish' } };
+const AG = { soldier: ['Soldier', 2, 'soldier'], dragoon: ['Dragoon', 3, 'dragoon'], captain: ['Captain', 3, 'captain'], colonist: ['Colonist', 0, 'colonist'], preacher: ['Preacher', 0, 'preacher'], sailor: ['Sailor', 0, 'sailor'], brave: ['Brave', 2, 'brave'], militia: ['Militia', 1, 'colonist'], mercenary: ['Mercenary', 1, 'soldier'] };
+const nm = (k) => AG[k][0], pw = (k) => AG[k][1], art = (k) => `/art/agent/${AG[k][2]}.webp`;
+const emb = (k, s = 34) => `<span class="emb" style="--c:${NAT[k].c};--s:${s}px"><img src="/art/emblem/${NAT[k].e}.svg" alt=""></span>`;
+const dice = (d, faces = [5, 6]) => d.map((v) => `<span class="die${faces.includes(v) ? ' hit' : ''}">${v}</span>`).join(' ');
+const hold = (gap) => (gap <= 0 ? 100 : Math.round(100 * (2 / 3) ** Math.min(gap, 10)));
+
+const BATTLE = { target: 'Boston', foe: 'en', base: [['Your soldier, played', 3]], def: [['Colony', 1], ['Hills', 1], ['Stockade', 1], ['Their cards', 2]], hand: ['dragoon', 'soldier', 'colonist', 'sailor'], pool: [6, 2, 5, 1, 3, 4, 2, 6, 1, 3] };
+const START = ['soldier', 'soldier', 'captain', 'brave', 'colonist', 'colonist', 'preacher', 'sailor'];
+const CIVS = ['sailor', 'preacher', 'colonist', 'colonist'];
+const SIEGES = [
+  { id: 'pr', owner: 'fr', name: 'Port-Royal', slot: 1, cubes: 7, fixed: [['Colony', 1], ['Forest', 1], ['Stockade', 1], ['Ship', 1]], foes: { en: 2 }, x: 24, y: 52 },
+  { id: 'ac', owner: 'fr', name: 'Acadia', slot: 2, cubes: 6, fixed: [['Colony', 1], ['Stockade', 1]], foes: {}, x: 33, y: 70 },
+  { id: 'sa', owner: 'es', name: 'San Agustín', slot: 1, cubes: 7, fixed: [['Colony', 1], ['Grassland', 0]], foes: { en: 3 }, x: 53, y: 80, other: true },
+  { id: 'bo', owner: 'en', name: 'Boston', slot: 1, cubes: 0, fixed: [['Colony', 1], ['Hills', 1], ['Fort', 2]], foes: { es: 1 }, guard: 1, x: 64, y: 32 },
+  { id: 'pl', owner: 'en', name: 'Plymouth', slot: 2, cubes: 0, fixed: [['Colony', 1]], foes: {}, guard: 0, x: 74, y: 52 },
+];
+const RESULTS = [
+  { name: 'Port-Royal', owner: 'fr', atk: [['Royal Army, 7 cubes', 7], ['Loyalist cards', 4]], def: [['Colony', 1], ['Forest', 1], ['Stockade', 1], ['Ship', 1], ['Your cards', 6]], dice: [4], kind: 'hold', verdict: 'Holds' },
+  { name: 'Acadia', owner: 'fr', atk: [['Royal Army, 6 cubes', 6]], def: [['Colony', 1], ['Stockade', 1]], dice: [1, 3, 5, 2], kind: 'lost', verdict: 'Lost to the King' },
+  { name: 'San Agustín', owner: 'es', atk: [['Royal Army, 7 cubes', 7], ['Loyalist cards', 8]], def: [['Colony', 1], ['Their cards', 5]], dice: [2, 6, 4, 3, 1, 1, 5, 2, 3], kind: 'taken', verdict: 'Taken by New England' },
+  { name: 'Boston', owner: 'en', atk: [['Patriot cards', 3]], def: [['Colony', 1], ['Hills', 1], ['Fort', 2], ['Guard', 2]], dice: [], kind: 'hold', verdict: 'Holds' },
+  { name: 'Plymouth', owner: 'en', atk: [['Your cards', 5]], def: [['Colony', 1]], dice: [6, 2, 3, 1], kind: 'taken', verdict: 'Taken by New France' },
+];
+
+/* ---------- state ---------- */
+const q = new URLSearchParams(location.search);
+const V = ['A', 'B', 'C', 'D', 'E'], NAMES = { A: 'The war table', B: 'Order of battle', C: 'The scale', D: 'On the map', E: 'The siege (chosen)' };
+const SCREENS = [['battle', 'Battle'], ['troops', 'Raising troops'], ['placing', 'Placing cards'], ['siege', 'The sieges']];
+const S = { shown: {}, bshown: false, v: V.includes(q.get('variant')) ? q.get('variant') : 'E', sc: SCREENS.some(([k]) => k === q.get('screen')) ? q.get('screen') : 'battle', pick: new Set(), rolled: null, mil: 2, merc: 1, card: null, placed: {}, lock: null, focus: 'pr', res: 0 };
+const sum = (l) => l.reduce((n, x) => n + (typeof x[1] === 'number' ? x[1] : 0), 0);
+const bAtk = () => sum(BATTLE.base) + [...S.pick].reduce((n, i) => n + 1 + pw(BATTLE.hand[i]), 0), bDef = () => sum(BATTLE.def);
+const bDice = () => BATTLE.pool.slice(0, Math.max(0, Math.min(10, bAtk() - bDef())));
+const bChance = () => 100 - hold(bAtk() - bDef());
+/** The war hand after swaps and purchases, minus what was placed. */
+function hand() {
+  const h = START.slice();
+  for (const c of CIVS.slice(0, S.mil)) h.splice(h.lastIndexOf(c), 1);
+  h.push(...Array(S.mil).fill('militia'), ...Array(S.merc).fill('mercenary'));
+  for (const c of Object.values(S.placed).flat()) h.splice(h.indexOf(c), 1);
+  return h;
+}
+const kinds = (h) => [...new Set(h)].map((k) => [k, h.filter((x) => x === k).length]);
+const mine = (x) => S.placed[x.id] ?? [];
+const canPlace = (x) => !x.other && (!S.lock || S.lock === x.id);
+/** What I know of a siege: the attack I can see, the hidden cards, the defence I can see. */
+function sv(x) {
+  const my = sum(mine(x).map((k) => [k, pw(k)])), hid = Object.values(x.foes).reduce((a, b) => a + b, 0) + (x.owner === 'en' ? x.guard : 0);
+  if (x.owner === 'fr') return { atk: x.cubes, def: sum(x.fixed) + my, hid, gap: x.cubes - sum(x.fixed) - my, fall: false };
+  if (x.owner === 'en') return { atk: my, def: sum(x.fixed), hid, gap: my - sum(x.fixed), fall: true };
+  return { atk: x.cubes, def: sum(x.fixed), hid, gap: x.cubes - sum(x.fixed), fall: false };
+}
+const pct = (x) => { const s = sv(x); return s.fall ? 100 - hold(s.gap) : hold(s.gap); };
+const sel = (k) => S.card === k || (!S.card && hand()[0] === k);
+const cur = () => S.card && hand().includes(S.card) ? S.card : hand()[0];
+
+/* ================= A — The war table ================= */
+const A = {
+  card: (k, attrs = '', extra = '') => `<button class="card${extra}" style="background-image:url(${art(k)})" ${attrs}><span class="pw">${pw(k)}</span><span class="nm">${nm(k)}</span></button>`,
+  battle() {
+    const a = bAtk(), d = bDef();
+    return `<div class="vA"><h1>Attack on ${BATTLE.target}</h1><p class="sub">Add agents from your hand: each brings 1 plus its strength. Their top card stays hidden until the dice.</p>
+<div class="row"><div class="plaque">${emb('en')}<div><b>${BATTLE.target}</b><div>${BATTLE.def.map(([l, v]) => `<span class="chip">${l} +${v}</span>`).join(' ')}</div></div></div><span class="card back" style="width:84px;height:120px"></span><div style="margin-left:auto" class="puck foe"><div><b>${d}</b><small>defence</small></div></div></div>
+<div class="line"></div>
+<div class="row"><div class="puck"><div><b>${a}</b><small>your attack</small></div></div>${A.card('soldier', 'disabled', ' played')}<span class="gap"></span>${BATTLE.hand.map((k, i) => A.card(k, `data-a="bpick" data-i="${i}"`, S.pick.has(i) ? ' sel' : '')).join('')}
+<div style="margin-left:auto;text-align:center"><button class="seal" data-a="roll">Attack</button><p style="margin:10px 0 0;color:#f3e3b5;font-weight:700">${a > d ? `${a - d} dice, ${bChance()}% to win` : 'Not stronger yet'}</p></div></div>
+${S.rolled ? `<div class="tray"><h3>${S.rolled.filter((v) => v >= 5).length ? 'Victory' : 'Repulsed'}</h3><p>${dice(S.rolled)}</p><p>${S.rolled.filter((v) => v >= 5).length} hits: take that many resources or buildings.</p><button class="btn" data-a="unroll">Close</button></div>` : ''}</div>`;
+  },
+  troops() {
+    const h = hand();
+    return `<div class="vA"><h1>Raise your troops</h1><p class="sub">Your whole agent pool is in hand. Swap agents without strength for militia, or pay gold for mercenaries.</p>
+<div class="row" style="gap:28px;align-items:center"><div class="purse"><span class="pile" style="background-image:url(${art('militia')})">Militia</span><div style="flex:1"><b style="font:700 20px var(--sc);color:#f3e3b5">Militia</b><div>1 bell each, ${18 - S.mil} in the box</div><div style="opacity:.8">${18 - S.mil} 🔔 left</div></div><button class="step" data-a="mil-">−</button><b class="big">${S.mil}</b><button class="step" data-a="mil+">+</button></div>
+<div class="purse"><span class="pile" style="background-image:url(${art('mercenary')})">Mercenary</span><div style="flex:1"><b style="font:700 20px var(--sc);color:#f3e3b5">Mercenaries</b><div>5 gold each, ${18 - S.merc} in the box</div><div style="opacity:.8">${15 - S.merc * 5} gold left</div></div><button class="step" data-a="merc-">−</button><b class="big">${S.merc}</b><button class="step" data-a="merc+">+</button></div></div>
+<div class="line"></div><div class="row small" style="gap:12px">${h.map((k) => A.card(k, 'disabled')).join('')}${CIVS.slice(0, S.mil).map((k) => A.card(k, 'disabled', ' swapped')).join('')}</div>
+<p style="margin-top:24px"><button class="btn">Ready</button></p></div>`;
+  },
+  board(n) {
+    const own = SIEGES.filter((x) => x.owner === n);
+    return `<div class="board"><header>${emb(n, 30)}${NAT[n].n}<small>${n === 'en' ? 'Loyalist' : n === 'fr' ? 'You' : 'Patriot'}</small></header><div class="slots">${[1, 2, 3].map((k) => {
+      const x = own.find((y) => y.slot === k);
+      if (!x) return `<div class="slot empty"><span class="n">${k}</span><span>No colony</span></div>`;
+      const s = sv(x), can = canPlace(x);
+      return `<button class="slot${can ? ' can' : ''}" ${can ? `data-a="place" data-s="${x.id}"` : 'disabled'}><span class="n">${k}</span><h4>${x.name}</h4>
+${x.cubes ? `<div class="cubes">${'<i class="cube"></i>'.repeat(x.cubes)}</div>` : ''}
+${Object.entries(x.foes).map(([q2, c]) => `<span class="stk">${emb(q2, 20)}<i></i>×${c}</span>`).join('')}
+${x.owner === 'en' && x.guard ? `<span class="stk"><i></i>guard ×${x.guard}</span>` : ''}
+${mine(x).length ? `<span class="stk mine"><i style="background-image:url(${art(mine(x)[0])})"></i>yours ×${mine(x).length}</span>` : ''}
+${x.other ? '' : `<span class="odds">${s.fall ? 'Falls' : 'Holds'} ${pct(x)}%${s.hid ? ' + hidden' : ''}</span>`}</button>`;
+    }).join('')}</div></div>`;
+  },
+  placing() {
+    const h = hand(), c = cur();
+    return `<div class="vA"><h1>Place your cards</h1><p class="sub">${S.lock ? `Add more to ${SIEGES.find((x) => x.id === S.lock).name}, or end your turn.` : 'Pick a card, then a slot: your own to defend, the loyalist’s to attack.'}</p>
+<div class="boards">${['fr', 'en', 'es'].map(A.board).join('')}</div>
+<div class="line"></div><div class="row" style="gap:14px">${kinds(h).map(([k, n]) => A.card(k, `data-a="card" data-k="${k}"`, k === c ? ' sel' : '').replace('</button>', n > 1 ? `<span class="chip" style="position:absolute;left:6px;top:6px">×${n}</span></button>` : '</button>')).join('')}
+<div style="margin-left:auto;display:flex;gap:10px">${S.lock ? '<button class="btn" data-a="end">End turn</button>' : '<button class="btn ghost" data-a="pass">Pass for good</button>'}</div></div></div>`;
+  },
+  siege() {
+    const r = RESULTS[S.res];
+    const stamp = (i) => `<span class="stamp ${RESULTS[i].kind}">${RESULTS[i].verdict}</span>`;
+    return `<div class="vA"><h1>The sieges</h1><p class="sub">Every slot is turned face up. Pick one to see how it went.</p>
+<div class="sg"><div class="boards">${['fr', 'en', 'es'].map((n) => `<div class="board"><header>${emb(n, 30)}${NAT[n].n}</header><div class="slots">${[1, 2, 3].map((k) => { const i = RESULTS.findIndex((x) => x.owner === n && SIEGES.find((y) => y.name === x.name)?.slot === k); return i < 0 ? '<div class="slot empty">No colony</div>' : `<button class="slot can" data-a="res" data-i="${i}"><h4>${RESULTS[i].name}</h4><span>${sum(RESULTS[i].def)} against ${sum(RESULTS[i].atk)}</span>${stamp(i)}</button>`; }).join('')}</div></div>`).join('')}</div>
+<div class="tray"><h3>${r.name}</h3>${r.def.map(([l, v]) => `<div class="ln"><span>${l}</span><b>+${v}</b></div>`).join('')}<div class="ln"><b>Defence</b><b>${sum(r.def)}</b></div><br>${r.atk.map(([l, v]) => `<div class="ln"><span>${l}</span><b>+${v}</b></div>`).join('')}<div class="ln"><b>Attack</b><b>${sum(r.atk)}</b></div><p>${r.dice.length ? dice(r.dice) : 'No dice: the colony is stronger.'}</p>${stamp(S.res)}</div></div></div>`;
+  },
+};
+
+/* ================= B — Order of battle ================= */
+const B = {
+  wrap: (title, date, body) => `<div class="vB"><div class="page"><h1>${title}</h1><div class="dateline">${date}</div>${body}</div></div>`,
+  battle() {
+    const a = bAtk(), d = bDef();
+    const lines = [...BATTLE.base, ...[...S.pick].map((i) => [nm(BATTLE.hand[i]), 1 + pw(BATTLE.hand[i])])];
+    return B.wrap(`Attack on ${BATTLE.target}`, 'New France against New England, 1700', `<div class="acct"><div><h2>Our attack</h2><table>${lines.map(([l, v]) => `<tr><td>${l}</td><td class="n">${v}</td></tr>`).join('')}<tr class="total"><td>Total</td><td class="n">${a}</td></tr></table></div>
+<div><h2>Their defence</h2><table>${BATTLE.def.map(([l, v]) => `<tr><td>${l}</td><td class="n">${v}</td></tr>`).join('')}<tr><td class="note">One card, unseen</td><td class="n">?</td></tr><tr class="total"><td>Total known</td><td class="n">${d}</td></tr></table></div></div>
+<h2>Reinforce with</h2>${BATTLE.hand.map((k, i) => `<button class="cb${S.pick.has(i) ? ' on' : ''}" data-a="bpick" data-i="${i}"><span class="box">${S.pick.has(i) ? '✓' : ''}</span><img src="${art(k)}" alt="">${nm(k)}<span class="add">+${1 + pw(k)}</span></button>`).join('')}
+<p class="note" style="margin-top:16px">${a > d ? `We roll ${a - d} dice; one 5 or 6 carries the day. Chance ${bChance()}%.` : 'We are not yet stronger: no dice would be rolled.'}</p>
+${S.rolled ? `<p><b>Rolled:</b> ${dice(S.rolled)} <span class="verdict ${S.rolled.some((v) => v >= 5) ? 'green' : 'red'}">${S.rolled.some((v) => v >= 5) ? '— the attack succeeds' : '— repulsed'}</span></p>` : ''}
+<div class="order"><button class="wax" data-a="roll">Order the attack</button><button class="plain" data-a="unroll">Hold back</button></div>`);
+  },
+  troops() {
+    return B.wrap('Requisition', 'Raising troops for the war', `<table><tr><th>Item</th><th>Terms</th><th class="n">Quantity</th><th class="n">Cost</th><th class="n">Left after</th></tr>
+<tr><td><b>Militia</b></td><td>Swap an agent without strength; worth 1</td><td class="n"><span class="qty"><button data-a="mil-">−</button><b>${S.mil}</b><button data-a="mil+">+</button></span></td><td class="n">${S.mil} 🔔</td><td class="n">${18 - S.mil} 🔔</td></tr>
+<tr><td><b>Mercenaries</b></td><td>5 gold each; worth 1</td><td class="n"><span class="qty"><button data-a="merc-">−</button><b>${S.merc}</b><button data-a="merc+">+</button></span></td><td class="n">${S.merc * 5} gold</td><td class="n">${15 - S.merc * 5} gold</td></tr>
+<tr><td><b>Braves</b></td><td>One for each allied settlement; worth 2</td><td class="n"><b>1</b></td><td class="n">free</td><td class="n"></td></tr>
+<tr class="total"><td colspan="2">Strength in hand</td><td class="n" colspan="3">${hand().reduce((n, k) => n + pw(k), 0)}</td></tr></table>
+<h2>Muster roll</h2><p>${kinds(hand()).map(([k, n]) => `${nm(k)}${n > 1 ? ` ×${n}` : ''}`).join(', ')}.${S.mil ? ` <span class="note">Set aside: ${CIVS.slice(0, S.mil).map(nm).join(', ')}.</span>` : ''}</p>
+<div class="order"><button class="wax">Muster</button></div>`);
+  },
+  placing() {
+    const c = cur(), groups = [['fr', 'Our colonies'], ['en', 'The loyalist’s colonies'], ['es', 'Other patriots']];
+    return B.wrap('Order of battle', S.lock ? `Adding to ${SIEGES.find((x) => x.id === S.lock).name} this turn` : 'Your turn: one or more cards on one colony', `<div class="grid2"><div><h2>Muster roll</h2><div class="roll">${kinds(hand()).map(([k, n]) => `<button class="${k === c ? 'on' : ''}" data-a="card" data-k="${k}">${nm(k)} <small>+${pw(k)}</small><span class="ct">${n}</span></button>`).join('')}</div>
+<div class="order">${S.lock ? '<button class="wax" data-a="end">End turn</button>' : '<button class="plain" data-a="pass">Pass for good</button>'}</div></div>
+<table><tr><th>Colony</th><th class="n">Royal Army</th><th class="n">Face down</th><th class="n">Ours</th><th class="n">Defence</th><th class="n">Attack</th><th class="n">Odds</th><th></th></tr>
+${groups.map(([n, g]) => `<tr class="grp"><td colspan="8">${g}</td></tr>${SIEGES.filter((x) => x.owner === n).map((x) => { const s = sv(x); return `<tr class="${S.lock === x.id ? 'lock' : ''}"><td>${x.name} <small class="note">${x.slot}</small></td><td class="n red">${x.cubes || ''}</td><td class="n">${s.hid || ''}</td><td class="n">${mine(x).length || ''}</td><td class="n green">${s.def}</td><td class="n red">${s.atk}${s.hid ? '+' : ''}</td><td class="n">${x.other ? '' : `${pct(x)}% ${s.fall ? 'fall' : 'hold'}`}</td><td><button class="place" data-a="place" data-s="${x.id}" ${canPlace(x) ? '' : 'disabled'}>${x.owner === 'fr' ? 'Defend' : 'Attack'}</button></td></tr>`; }).join('')}`).join('')}</table></div>`);
+  },
+  siege() {
+    return B.wrap('Dispatch from the front', 'The sieges, as they fell', `<div class="disp">${RESULTS.map((r) => `<p><b>${r.name}</b> (${NAT[r.owner].n}). ${r.atk.map(([l, v]) => `${l} ${v}`).join(', ')}, ${sum(r.atk)} in all, against ${r.def.map(([l, v]) => `${l.toLowerCase()} ${v}`).join(', ')}: ${sum(r.def)}. ${r.dice.length ? `Dice ${dice(r.dice)}.` : 'No dice were rolled.'} <span class="verdict ${r.kind === 'hold' ? 'green' : 'red'}">${r.verdict}.</span></p>`).join('')}</div>
+<table><tr><th>Final count</th><th class="n">Colonies</th></tr><tr><td>New France</td><td class="n">2</td></tr><tr><td>New England</td><td class="n">3</td></tr><tr><td>New Spain</td><td class="n">0</td></tr></table>`);
+  },
+};
+
+/* ================= C — The scale ================= */
+const C = {
+  scale(left, right, lw, rw, cap = '') {
+    const gap = sum(rw) - sum(lw), ang = Math.max(-14, Math.min(14, gap * 2.2));
+    const pan = (x, items, col) => items.map(([l, v], i) => `<g transform="translate(${x - 70},${178 + i * 25})"><rect width="140" height="22" rx="5" fill="${col}"/><text class="wt" x="8" y="16">${l}</text><text class="wt" x="132" y="16" text-anchor="end">${typeof v === 'number' ? `+${v}` : v}</text></g>`).join('');
+    return `<svg class="scale" viewBox="0 -10 680 380" aria-label="Defence ${sum(lw)} against attack ${sum(rw)}"><path d="M340 120 L318 350 L362 350Z" fill="#c9a24a" opacity=".7"/><rect x="290" y="346" width="100" height="10" rx="4" fill="#c9a24a"/>
+<g class="beam" style="transform:rotate(${ang}deg)"><rect x="60" y="114" width="560" height="10" rx="5" fill="#e8cf8d"/><circle cx="340" cy="119" r="12" fill="#c9a24a"/>
+<g><path d="M110 124 L50 176 M110 124 L170 176" stroke="#e8cf8d"/>${pan(110, lw, '#93e09c')}<text class="lbl" x="110" y="40" text-anchor="middle">${left}</text><text class="tot" x="110" y="98" text-anchor="middle">${sum(lw)}</text></g>
+<g><path d="M570 124 L510 176 M570 124 L630 176" stroke="#e8cf8d"/>${pan(570, rw, '#ff9a82')}<text class="lbl" x="570" y="40" text-anchor="middle">${right}</text><text class="tot" x="570" y="98" text-anchor="middle">${sum(rw)}</text></g></g></svg>${cap}`;
+  },
+  hc: (k, n, on, attrs) => `<button class="hc${on ? ' on' : ''}" ${attrs}><img src="${art(k)}" alt=""><span>${nm(k)}${n > 1 ? ` ×${n}` : ''}</span><em>+${pw(k)}</em></button>`,
+  battle() {
+    const lw = BATTLE.def, rw = [...BATTLE.base, ...[...S.pick].map((i) => [nm(BATTLE.hand[i]), 1 + pw(BATTLE.hand[i])])], a = bAtk(), d = bDef();
+    return `<div class="vC"><h1>Attack on ${BATTLE.target}<small>Tip the scale: each card adds 1 plus its strength</small></h1>
+<div class="rail"><button class="on">${emb('fr', 28)}<span><b>Your attack</b><small>Soldier played</small></span></button><button>${emb('en', 28)}<span><b>${BATTLE.target}</b><small>One card unseen</small></span></button></div>
+<div class="stage">${C.scale(BATTLE.target, 'Your attack', lw, rw)}<div class="verdict">${a > d ? `${bChance()}% to win` : 'Not stronger: the attack fails'}<small>${a > d ? `${a - d} dice, any 5 or 6 wins` : 'Add cards to tip the scale'}</small></div>${S.rolled ? `<div class="dice">${dice(S.rolled)}</div>` : ''}</div>
+<div class="side"><h3>Add from your hand</h3>${BATTLE.hand.map((k, i) => C.hc(k, 1, S.pick.has(i), `data-a="bpick" data-i="${i}"`).replace(`+${pw(k)}<`, `+${1 + pw(k)}<`)).join('')}<button class="go" data-a="roll">Attack</button><button class="ghost" data-a="unroll">Reset</button></div></div>`;
+  },
+  troops() {
+    const x = SIEGES[0], s = sv(x), str = hand().reduce((n, k) => n + pw(k), 0);
+    return `<div class="vC"><h1>Raise your troops<small>Weigh what you have against the Royal Army</small></h1>
+<div class="rail">${SIEGES.filter((y) => y.owner === 'fr').map((y) => `<button class="${y.id === 'pr' ? 'on' : ''}">${emb('fr', 28)}<span><b>${y.name}</b><small>${y.cubes} cubes</small></span></button>`).join('')}</div>
+<div class="stage">${C.scale('Your strength in hand', 'Royal Army on Port-Royal', [['Colony and buildings', s.def], ['Cards in hand', str]], [['Cubes', x.cubes], ['Loyalist cards', 2]])}<div class="verdict">${str + s.def} against ${x.cubes}+<small>Everything in hand, if it all went to Port-Royal</small></div></div>
+<div class="side"><h3>Militia</h3><div class="meter"><span>${S.mil} cards</span><span>−${S.mil} 🔔</span></div><input type="range" min="0" max="4" value="${S.mil}" data-a="milr"><h3>Mercenaries</h3><div class="meter"><span>${S.merc} cards</span><span>−${S.merc * 5} gold</span></div><input type="range" min="0" max="3" value="${S.merc}" data-a="mercr"><h3>Hand</h3>${kinds(hand()).map(([k, n]) => C.hc(k, n, false, 'disabled')).join('')}<button class="go">Ready</button></div></div>`;
+  },
+  placing() {
+    const x = SIEGES.find((y) => y.id === S.focus), s = sv(x), c = cur();
+    const my = mine(x).map((k) => [nm(k), pw(k)]), hidden = s.hid ? [[`${s.hid} face down`, '?']] : [];
+    const lw = x.owner === 'fr' ? [...x.fixed, ...my] : x.fixed, rw = x.owner === 'fr' ? [['Cubes', x.cubes], ...hidden] : [...my, ...hidden];
+    return `<div class="vC"><h1>Place your cards<small>${S.lock ? `Adding to ${SIEGES.find((y) => y.id === S.lock).name}` : 'Choose a colony, then cards'}</small></h1>
+<div class="rail">${SIEGES.map((y) => `<button class="${y.id === S.focus ? 'on' : ''}${y.other ? ' off' : ''}" data-a="focus" data-s="${y.id}">${emb(y.owner, 28)}<span><b>${y.name}</b><small>${y.other ? 'Another patriot' : `${pct(y)}% ${sv(y).fall ? 'to fall' : 'to hold'}`}</small></span><i class="tilt" style="transform:rotate(${Math.max(-30, Math.min(30, sv(y).gap * 4))}deg)"></i></button>`).join('')}</div>
+<div class="stage">${C.scale(x.name, x.owner === 'fr' ? 'Royal Army' : 'Your attack', lw, rw)}<div class="verdict">${x.other ? 'You cannot place on another patriot’s colony' : `${pct(x)}% ${s.fall ? 'to fall' : 'to hold'}`}<small>${s.hid ? `${s.hid} face-down card${s.hid > 1 ? 's' : ''} not counted` : 'No hidden cards here'}</small></div></div>
+<div class="side"><h3>Your hand</h3>${kinds(hand()).map(([k, n]) => C.hc(k, n, k === c, `data-a="card" data-k="${k}"`)).join('')}<button class="go" data-a="place" data-s="${x.id}" ${canPlace(x) ? '' : 'disabled style="opacity:.4"'}>Place ${nm(c)} here</button>${S.lock ? '<button class="ghost" data-a="end">End turn</button>' : '<button class="ghost" data-a="pass">Pass for good</button>'}</div></div>`;
+  },
+  siege() {
+    const r = RESULTS[S.res];
+    return `<div class="vC"><h1>The sieges<small>${S.res + 1} of ${RESULTS.length}</small></h1>
+<div class="rail">${RESULTS.map((y, i) => `<button class="${i === S.res ? 'on' : ''}" data-a="res" data-i="${i}">${emb(y.owner, 28)}<span><b>${y.name}</b><small>${y.verdict}</small></span></button>`).join('')}</div>
+<div class="stage">${C.scale(r.name, r.owner === 'en' ? 'Patriots' : 'King and loyalist', r.def, r.atk)}<div class="dice">${r.dice.length ? dice(r.dice) : ''}</div><div class="verdict">${r.verdict}<small>${r.dice.length ? `${r.dice.length} dice` : 'No dice: the colony is stronger'}</small></div></div>
+<div class="side"><button class="go" data-a="next">Next siege</button></div></div>`;
+  },
+};
+
+/* ================= D — On the map ================= */
+const D = {
+  map(extra = '') {
+    return `<svg class="map" viewBox="0 0 100 100" preserveAspectRatio="none"><path class="isle" d="M10 40 C14 28 30 30 34 38 C40 46 38 62 34 76 C30 86 18 84 14 72 C10 62 6 52 10 40Z"/><path class="isle b" d="M44 70 C50 64 62 68 64 76 C66 86 56 92 48 88 C42 84 40 76 44 70Z"/><path class="isle" d="M56 22 C64 14 80 18 84 28 C88 40 86 58 78 64 C70 68 62 58 60 48 C58 38 52 30 56 22Z"/><path class="wave" d="M4 18 q3 -2 6 0 t6 0M40 50 q3 -2 6 0 t6 0M86 82 q3 -2 6 0 t6 0"/>${extra}</svg>`;
+  },
+  pin: (x, html) => `<div class="pin" style="left:${x.x}%;top:${x.y}%">${html}<span class="flag" style="--c:${NAT[x.owner].c}"></span></div>`,
+  mini: (k, n, cls, attrs) => `<button class="mini${cls}" style="background-image:url(${art(k)})" ${attrs}><span>${nm(k)}</span><b>${n > 1 ? `×${n}` : pw(k)}</b></button>`,
+  battle() {
+    const a = bAtk(), d = bDef(), bo = SIEGES.find((x) => x.id === 'bo');
+    return `<div class="vD">${D.map('<path class="arrow" d="M30 44 Q48 26 62 32" vector-effect="non-scaling-stroke"/>')}<div class="topbar">${emb('fr', 26)} Your soldier attacks ${BATTLE.target} ${emb('en', 26)}</div>
+${D.pin(bo, `<div class="badge"><span class="k g">${d}</span><span class="k q">+1 card unseen</span></div>`)}
+<div class="dock"><div class="hud"><span class="big" style="color:#ff9a82">${a}</span><div><div class="bar"><i style="width:${(d / (a + d)) * 100}%"></i></div><small>${a > d ? `${a - d} dice, ${bChance()}% to win` : 'Not stronger yet'}</small></div><span class="big" style="color:#93e09c">${d}</span></div>${BATTLE.hand.map((k, i) => D.mini(k, 1, S.pick.has(i) ? ' sel' : '', `data-a="bpick" data-i="${i}"`).replace(`<b>${pw(k)}</b>`, `<b>+${1 + pw(k)}</b>`)).join('')}<button class="act red" data-a="roll">Attack</button></div>
+${S.rolled ? `<div class="pop" style="left:calc(${bo.x}% + 20px);top:calc(${bo.y}% - 10px)"><h3>${S.rolled.some((v) => v >= 5) ? 'Boston is hit' : 'Repulsed'}</h3>${dice(S.rolled)}<hr><button data-a="unroll"><u>Close</u></button></div>` : ''}</div>`;
+  },
+  troops() {
+    return `<div class="vD">${D.map()}${SIEGES.map((x) => D.pin(x, `<div class="badge${x.owner === 'fr' ? '' : ' off'}">${emb(x.owner, 24)}<span class="k r">${x.cubes || ''}</span></div>`)).join('')}
+<div class="drawer"><h2>Raise your troops</h2><p style="margin:0">The Royal Army is on the map. Swap agents without strength for militia, or pay gold for mercenaries.</p>
+<div class="stepper"><span><b style="font:700 18px var(--sc);min-width:0;text-align:left">Militia</b><br><small>1 🔔 each · ${18 - S.mil} 🔔 left</small></span><button data-a="mil-">−</button><b>${S.mil}</b><button data-a="mil+">+</button></div>
+<div class="stepper"><span><b style="font:700 18px var(--sc);min-width:0;text-align:left">Mercenaries</b><br><small>5 gold each · ${15 - S.merc * 5} left</small></span><button data-a="merc-">−</button><b>${S.merc}</b><button data-a="merc+">+</button></div>
+<div style="display:flex;flex-wrap:wrap;gap:6px">${kinds(hand()).map(([k, n]) => D.mini(k, n, '', 'disabled')).join('')}</div><button class="act" style="margin-top:auto;padding:12px;border-radius:12px;background:#1c2a2a;color:#f7f1e1;font:800 17px var(--sc)">Ready</button></div></div>`;
+  },
+  placing() {
+    const c = cur(), f = SIEGES.find((x) => x.id === S.focus), s = sv(f);
+    return `<div class="vD">${D.map()}<div class="topbar">${S.lock ? `Adding to ${SIEGES.find((x) => x.id === S.lock).name}` : 'Your turn: cards on one colony'}</div>
+${SIEGES.map((x) => { const v = sv(x), can = canPlace(x); return D.pin(x, `<button class="badge${can ? ' can' : ' off'}" ${can ? `data-a="place" data-s="${x.id}"` : ''} data-f="${x.id}">${emb(x.owner, 24)}<b style="font:700 14px var(--sc)">${x.name}</b>${x.cubes ? `<span class="k r">${x.cubes}▪</span>` : ''}${v.hid ? `<span class="k q">${v.hid}🂠</span>` : ''}${mine(x).length ? `<span class="k g">+${mine(x).length}</span>` : ''}${x.other ? '' : `<span class="k ${v.fall ? 'r' : 'g'}">${pct(x)}%</span>`}</button>`); }).join('')}
+<div class="pop" style="left:calc(${f.x}% + 26px);top:calc(${f.y}% - 30px)"><h3>${emb(f.owner, 24)}${f.name}</h3>${f.fixed.map(([l, v]) => `<div class="ln"><span>${l}</span><b>+${v}</b></div>`).join('')}${mine(f).map((k) => `<div class="ln"><span>${nm(k)}</span><b>+${pw(k)}</b></div>`).join('')}<hr><div class="ln"><span>Royal Army</span><b>${f.cubes}</b></div><div class="ln"><span>Face-down cards</span><b>${s.hid}</b></div></div>
+<div class="dock">${kinds(hand()).map(([k, n]) => D.mini(k, n, k === c ? ' sel' : '', `data-a="card" data-k="${k}"`)).join('')}${S.lock ? '<button class="act" data-a="end">End turn</button>' : '<button class="act" data-a="pass">Pass for good</button>'}</div></div>`;
+  },
+  siege() {
+    const r = RESULTS[S.res], x = SIEGES.find((y) => y.name === r.name);
+    const col = { hold: 'g', lost: 'r', taken: 'q' };
+    return `<div class="vD">${D.map()}${RESULTS.map((y, i) => D.pin(SIEGES.find((z) => z.name === y.name), `<button class="badge" data-a="res" data-i="${i}">${emb(y.owner, 24)}<b style="font:700 14px var(--sc)">${y.name}</b><span class="k ${col[y.kind]}">${y.verdict}</span></button>`)).join('')}
+<div class="pop" style="left:calc(${x.x}% + 26px);top:calc(${x.y}% - 20px)"><h3>${emb(r.owner, 24)}${r.name}</h3><div class="ln"><span>Defence</span><b>${sum(r.def)}</b></div><div class="ln"><span>Attack</span><b>${sum(r.atk)}</b></div><hr>${r.dice.length ? dice(r.dice) : 'No dice'}<hr><b>${r.verdict}</b></div>
+<div class="dock">${RESULTS.map((y, i) => `<button class="act${i === S.res ? ' red' : ''}" data-a="res" data-i="${i}">${y.name}</button>`).join('')}</div></div>`;
+  },
+};
+
+/* ================= E — The siege, in the game's own style ================= */
+/* Strength each hidden card may add: in a battle 1 for being played plus 0 to 3; in a siege only 0 to 3. */
+const chanceWin = (gap) => (gap <= 0 ? 0 : Math.round(100 * (1 - (2 / 3) ** Math.min(gap, 10))));
+const BTL = { colony: 'Boston', foe: 'en', parts: [['Colony', 1], ['Hills', 1], ['Stockade', 1]], cards: ['soldier', 'colonist'], played: 'soldier', hand: ['dragoon', 'soldier', 'colonist', 'sailor'], pool: [6, 2, 5, 1, 3, 4, 2, 6, 1, 3] };
+const SG = [
+  { name: 'Port-Royal', slot: 1, def: { who: 'fr', parts: [['Colony', 1], ['Forest', 1], ['Stockade', 1], ['Ship next to it', 1]], cards: [['fr', 'soldier'], ['fr', 'militia'], ['fr', 'brave'], ['fr', 'mercenary']] }, atk: { who: 'king', parts: [['Royal Army, 7 cubes', 7]], cards: [['en', 'soldier'], ['en', 'brave']] }, dice: [4], verdict: ['Port-Royal holds', 'good'] },
+  { name: 'Acadia', slot: 2, def: { who: 'fr', parts: [['Colony', 1], ['Stockade', 1]], cards: [] }, atk: { who: 'king', parts: [['Royal Army, 6 cubes', 6]], cards: [] }, dice: [1, 3, 5, 2], verdict: ['Lost to the King', 'bad'] },
+  { name: 'San Agustín', slot: 1, def: { who: 'es', parts: [['Colony', 1]], cards: [['es', 'dragoon'], ['es', 'soldier']] }, atk: { who: 'king', parts: [['Royal Army, 7 cubes', 7]], cards: [['en', 'captain'], ['en', 'dragoon'], ['en', 'soldier']] }, dice: [2, 6, 4, 3, 1, 1, 5, 2, 3], verdict: ['Taken by New England', 'bad'] },
+  { name: 'Boston', slot: 1, def: { who: 'en', parts: [['Colony', 1], ['Hills', 1], ['Fort', 2]], cards: [['en', 'soldier']] }, atk: { who: 'patriots', parts: [], cards: [['es', 'captain']] }, dice: [], verdict: ['Boston holds', 'good'] },
+  { name: 'Plymouth', slot: 2, def: { who: 'en', parts: [['Colony', 1]], cards: [] }, atk: { who: 'patriots', parts: [], cards: [['fr', 'soldier'], ['fr', 'soldier'], ['fr', 'militia']] }, dice: [6, 2, 3, 1], verdict: ['Taken by New France', 'good'] },
+];
+const E = {
+  card: (k, o = {}) => `<${o.btn ? 'button' : 'div'} class="gc${o.cls ?? ''}" style="--w:${o.w ?? 104}px" ${o.attrs ?? ''}><img src="${art(k)}" alt=""><span class="rib">${nm(k)}</span><b class="pw">${o.add ?? pw(k)}</b>${o.n > 1 ? `<span class="n">×${o.n}</span>` : ''}</${o.btn ? 'button' : 'div'}>`,
+  back: (p, w = 72) => `<div class="gc bk" style="--w:${w}px">${p ? `<span class="tok">${emb(p, 24)}</span>` : ''}<span class="q">?</span></div>`,
+  /** A face-down card that turns over when revealed. */
+  flip: (p, k, w, open, add) => `<div class="fl${open ? ' open' : ''}" style="--w:${w}px" data-flip><div class="in">${E.back(p, w)}${E.card(k, { w, cls: ' face', add })}</div></div>`,
+  banner: (who, title, num, hidden, lines) => `<div class="banner" style="--c:${NAT[who]?.c ?? '#7a1d22'}">${NAT[who] ? emb(who) : who === 'king' ? '<span class="crown">♛</span>' : '<span class="crown" style="background:#233e8b">★</span>'}<h2>${title}</h2><div class="num">${num}${hidden ? '<em>+ ?</em>' : ''}</div><ul>${lines.map(([l, v, c]) => `<li class="${c ?? ''}"><span>${l}</span><b>${v}</b></li>`).join('')}</ul></div>`,
+  band: (lo, hi, what, pct = true) => `<div class="band"><i style="left:${lo}%;width:${Math.max(hi - lo, 1)}%"></i></div><div class="bandlab"><span>${what}</span><span>${pct ? (lo === hi ? `${lo}%` : `${lo}–${hi}%`) : ''}</span></div>`,
+  battle() {
+    const sel = [...S.pick].map((i) => BTL.hand[i]), agents = [BTL.played, ...sel], mine = agents.reduce((n, k) => n + pw(k), 0);
+    const known = sum(BTL.parts), h = BTL.cards.length, open = !!S.bshown, theirs = BTL.cards.reduce((n, k) => n + pw(k), 0), real = known + theirs;
+    const lo = chanceWin(mine - known - 3 * h), hi = chanceWin(mine - known);
+    const d = open ? BTL.pool.slice(0, Math.max(0, Math.min(10, mine - real))) : [], won = d.some((v) => v >= 5);
+    return `<div class="vE"><h1>The siege of ${BTL.colony}</h1><p class="sub">Add agents from your hand: each brings its strength. New England defends with ${h} agents face down, each adding 0 to 3; they turn over when you attack.</p>
+<div class="duel"><div class="side">${E.banner('fr', 'New France', mine, false, [['Agents', `+${mine}`]])}<div class="ranks">${agents.map((k) => E.card(k, { w: 66 })).join('')}</div><span class="cap">Your attack</span></div>
+<div class="center">${open
+    ? `<div class="dice">${d.length ? dice(d) : ''}</div><div class="verdict ${won ? 'good' : 'bad'}">${d.length ? (won ? 'Victory' : 'Repulsed') : 'Too strong'}</div><p>${d.length ? `${d.length} dice: ${won ? 'each 5 or 6 takes a resource or a building' : 'no 5 or 6'}` : `${BTL.colony} was stronger: no dice were rolled`}</p><button class="soft" data-a="breset">Try again</button>`
+    : `<div class="big">${lo === hi ? `${hi}%` : `${lo}–${hi}<small>%</small>`}</div>${E.band(lo, hi, 'Chance to win', false)}<p>${hi === 0 ? 'Even if their agents are weak, you are not stronger.' : lo === 0 ? 'Strong enough only if their agents are weak.' : 'Stronger whatever their agents are.'}</p><button class="go" data-a="battack">Attack</button>`}</div>
+<div class="side">${E.banner('en', BTL.colony, open ? real : known, !open, [...BTL.parts.map(([l, v]) => [l, `+${v}`]), open ? ['Agents', `+${theirs}`] : ['Agents', `+0–${3 * h}`, 'hid']])}<div class="ranks">${BTL.cards.map((k) => E.flip('en', k, 66, open)).join('')}</div><span class="cap">${open ? 'Their agents, turned over' : 'Their agents, face down'}</span></div></div>
+<div class="hand">${BTL.hand.map((k, i) => E.card(k, { btn: true, cls: S.pick.has(i) ? (open ? ' used' : ' sel') : '', attrs: `data-a="bpick" data-i="${i}"${open ? ' disabled' : ''}` })).join('')}</div></div>`;
+  },
+  troops() {
+    const h = hand();
+    return `<div class="vE"><h1>The muster</h1><p class="sub">Your whole agent pool is in hand. What each player raises is open: everyone sees it.</p>
+<div class="musters"><div class="counter"><h2>Militia</h2><div class="num">${S.mil}</div><div class="st"><button data-a="mil-" aria-label="One less">−</button><button data-a="mil+" aria-label="One more">+</button></div><p>Swap an agent without strength, 1 🔔 each. ${18 - S.mil} 🔔 left, ${18 - S.mil} cards in the box.</p></div>
+<div class="counter"><h2>Mercenaries</h2><div class="num">${S.merc}</div><div class="st"><button data-a="merc-" aria-label="One less">−</button><button data-a="merc+" aria-label="One more">+</button></div><p>5 gold each. ${15 - S.merc * 5} gold left, ${18 - S.merc - 2} cards in the box.</p></div></div>
+<div class="hand">${kinds(h).map(([k, n]) => E.card(k, { w: 92, n })).join('')}${CIVS.slice(0, S.mil).map((k) => E.card(k, { w: 92, cls: ' used' })).join('')}</div>
+<div class="others"><div class="other">${emb('en', 30)}<div><b>New England</b><br><small>loyalist</small></div>${E.card('brave', { w: 52 })}${E.card('mercenary', { w: 52, n: 2 })}</div><div class="other">${emb('es', 30)}<div><b>New Spain</b><br><small>patriot</small></div>${E.card('militia', { w: 52, n: 3 })}</div></div>
+<div class="row" style="margin-top:22px"><button class="go">To the front</button></div></div>`;
+  },
+  placing() {
+    const c = cur();
+    const lane = (x) => {
+      const s = sv(x), can = canPlace(x), my = mine(x), foes = Object.entries(x.foes), guard = x.owner === 'en' ? x.guard : 0;
+      const backs = (p, n) => Array.from({ length: n }, () => E.back(p, 46)).join('');
+      // What the hidden cards may add: 0 to 3 each.
+      let lo, hi, what;
+      if (x.owner === 'en') { const others = foes.reduce((n, [, k]) => n + k, 0); lo = 100 - hold(s.atk - s.def - 3 * guard); hi = 100 - hold(s.atk + 3 * others - s.def); what = 'To fall'; }
+      else { lo = hold(s.atk + 3 * s.hid - s.def); hi = hold(s.atk - s.def); what = 'To hold'; }
+      return `<button class="lane${can ? ' can' : ''}${x.other ? ' off' : ''}${S.lock === x.id ? ' lock' : ''}" style="--c:${NAT[x.owner].c}" ${can ? `data-a="place" data-s="${x.id}"` : 'disabled'}><header>${emb(x.owner, 34)}<b>${x.name}</b><small>${NAT[x.owner].n}, colony ${x.slot}</small></header>
+<div class="zone">${x.cubes ? `<div class="men">${'<i></i>'.repeat(x.cubes)}</div><span>Royal Army ${x.cubes}</span>` : ''}${foes.map(([p, n]) => `<div class="fan">${backs(p, n)}</div><span>${NAT[p].n}, ${n} face down</span>`).join('')}${x.owner === 'en' && my.length ? `<div class="fan">${my.map((k) => E.card(k, { w: 46 })).join('')}</div><span>Your attack</span>` : ''}${!x.cubes && !foes.length && !(x.owner === 'en' && my.length) ? '<span style="opacity:.6">Nobody attacks yet</span>' : ''}</div>
+<div class="mid">${x.other ? '<span style="opacity:.7">Another patriot’s colony</span>' : `<span class="vs"><span class="g">${s.def}${guard ? '<em>+?</em>' : ''}</span> against <span class="r">${s.atk}${(x.owner === 'en' ? foes.length : s.hid) ? '<em>+?</em>' : ''}</span></span>${E.band(Math.min(lo, hi), Math.max(lo, hi), what)}`}</div>
+<div class="zone">${x.owner === 'en' ? (guard ? `<div class="fan">${backs('en', guard)}</div><span>Guard, face down</span>` : '<span style="opacity:.6">No guard</span>') : my.length ? `<div class="fan">${my.map((k) => E.card(k, { w: 46 })).join('')}</div><span>Your defence</span>` : `<span style="opacity:.6">${x.other ? '' : 'No cards yet'}</span>`}</div>
+<footer>${x.other ? '' : S.lock === x.id ? 'Placing here' : x.owner === 'fr' ? 'Defend' : 'Attack'}</footer></button>`;
+    };
+    return `<div class="vE"><h1>The front lines</h1><p class="sub">${S.lock ? `Add more cards to ${SIEGES.find((x) => x.id === S.lock).name}, or end your turn.` : 'Pick a card, then a colony: your own to defend, the loyalist’s to attack. Others see how many cards you place, not which.'}</p>
+<div class="lanes">${SIEGES.map(lane).join('')}</div>
+<div class="hand">${kinds(hand()).map(([k, n]) => E.card(k, { btn: true, w: 92, n, cls: k === c ? ' sel' : '', attrs: `data-a="card" data-k="${k}"` })).join('')}</div>
+<div class="row" style="margin-top:18px">${S.lock ? '<button class="go" data-a="end">End turn</button>' : '<button class="soft" data-a="pass">Pass for good</button>'}</div></div>`;
+  },
+  siege() {
+    const r = SG[S.res], open = !!S.shown[S.res];
+    const side = (x, title) => {
+      const vis = x.cards.filter(([p]) => p === 'fr'), hid = x.cards.filter(([p]) => p !== 'fr');
+      const total = sum(x.parts) + (open ? x.cards : vis).reduce((n, [, k]) => n + pw(k), 0);
+      const agents = (open ? x.cards : vis).reduce((n, [, k]) => n + pw(k), 0);
+      const lines = [...x.parts.map(([l, v]) => [l, `+${v}`]), ...(!x.cards.length ? [] : !open && hid.length ? [['Agents', `+${agents}–${agents + 3 * hid.length}`, 'hid']] : [['Agents', `+${agents}`]])];
+      return `<div class="side">${E.banner(x.who, title, total, !open && hid.length > 0, lines)}<div class="ranks">${x.cards.map(([p, k]) => (p === 'fr' ? E.card(k, { w: 62 }) : E.flip(p, k, 62, open))).join('')}</div></div>`;
+    };
+    const dTitle = NAT[r.def.who].n, aTitle = r.atk.who === 'king' ? 'The King' : 'The patriots';
+    const hidD = r.def.cards.filter(([p]) => p !== 'fr').length, hidA = r.atk.cards.filter(([p]) => p !== 'fr').length;
+    const kd = sum(r.def.cards.filter(([p]) => p === 'fr').map(([, k]) => [k, pw(k)])) + sum(r.def.parts), ka = sum(r.atk.cards.filter(([p]) => p === 'fr').map(([, k]) => [k, pw(k)])) + sum(r.atk.parts);
+    const lo = hold(ka + 3 * hidA - kd), hi = hold(ka - kd - 3 * hidD);
+    return `<div class="vE"><h1>The siege of ${r.name}</h1><p class="sub">Siege ${S.res + 1} of ${SG.length}. ${hidD + hidA ? 'The cards lie face down until you turn them over.' : 'Every card here is yours: nothing to turn over.'}</p>
+<div class="duel">${side(r.def, dTitle)}
+<div class="center">${open
+    ? `<div class="dice">${r.dice.length ? dice(r.dice) : ''}</div><div class="verdict ${r.verdict[1]}">${r.verdict[0]}</div><p>${r.dice.length ? `${r.dice.length} dice; one 5 or 6 is enough` : 'The colony was stronger: no dice'}</p>`
+    : `<div class="big">${Math.min(lo, hi) === Math.max(lo, hi) ? `${hi}%` : `${Math.min(lo, hi)}–${Math.max(lo, hi)}<small>%</small>`}</div>${E.band(Math.min(lo, hi), Math.max(lo, hi), `Chance ${r.name} holds`, false)}<button class="go" data-a="reveal">${hidD + hidA ? 'Turn the cards over' : 'Roll'}</button>`}
+<div class="row"><button class="soft" data-a="prev">Previous</button><button class="soft" data-a="next">Next siege</button></div></div>
+${side(r.atk, aTitle)}</div></div>`;
+  },
+};
+
+/* ---------- wiring ---------- */
+const VARS = { A, B, C, D, E };
+function render() {
+  document.getElementById('app').innerHTML = VARS[S.v][S.sc]();
+  const i = V.indexOf(S.v);
+  document.getElementById('proto').innerHTML = `<button data-p="prev" aria-label="Previous variant">◀</button><span class="lab">${S.v} — ${NAMES[S.v]}</span><button data-p="next" aria-label="Next variant">▶</button><span class="sep"></span>${SCREENS.map(([k, l]) => `<button class="${k === S.sc ? 'on' : ''}" data-p="screen" data-k="${k}">${l}</button>`).join('')}`;
+  const u = new URL(location); u.searchParams.set('variant', S.v); u.searchParams.set('screen', S.sc); history.replaceState(null, '', u);
+}
+const go = (d) => { S.v = V[(V.indexOf(S.v) + d + V.length) % V.length]; render(); };
+document.addEventListener('click', (e) => {
+  const p = e.target.closest('[data-p]');
+  if (p) { if (p.dataset.p === 'prev') go(-1); else if (p.dataset.p === 'next') go(1); else { S.sc = p.dataset.k; render(); } return; }
+  const t = e.target.closest('[data-a]'); if (!t || t.disabled) return;
+  const a = t.dataset.a, i = Number(t.dataset.i);
+  if (a === 'bpick') { S.pick.has(i) ? S.pick.delete(i) : S.pick.add(i); S.rolled = null; }
+  else if (a === 'roll') S.rolled = bDice().length ? bDice() : [];
+  else if (a === 'unroll') { S.rolled = null; S.pick.clear(); }
+  else if (a === 'mil+') S.mil = Math.min(4, S.mil + 1); else if (a === 'mil-') S.mil = Math.max(0, S.mil - 1);
+  else if (a === 'merc+') S.merc = Math.min(3, S.merc + 1); else if (a === 'merc-') S.merc = Math.max(0, S.merc - 1);
+  else if (a === 'card') S.card = t.dataset.k;
+  else if (a === 'focus') S.focus = t.dataset.s;
+  else if (a === 'place') { const k = cur(); if (!k) return; (S.placed[t.dataset.s] ??= []).push(k); S.lock = t.dataset.s; S.focus = t.dataset.s; }
+  else if (a === 'end') S.lock = null;
+  else if (a === 'pass') { S.placed = {}; S.lock = null; }
+  else if (a === 'battack' || a === 'reveal') {
+    const cards = [...document.querySelectorAll('[data-flip]:not(.open)')];
+    cards.forEach((el, k) => setTimeout(() => el.classList.add('open'), k * 260));
+    t.disabled = true;
+    setTimeout(() => { if (a === 'battack') S.bshown = true; else S.shown[S.res] = true; render(); }, cards.length * 260 + (cards.length ? 450 : 0));
+    return;
+  }
+  else if (a === 'breset') { S.bshown = false; S.pick.clear(); }
+  else if (a === 'res') S.res = i;
+  else if (a === 'next') S.res = (S.res + 1) % RESULTS.length; else if (a === 'prev') S.res = (S.res - 1 + RESULTS.length) % RESULTS.length;
+  render();
+});
+document.addEventListener('input', (e) => { const a = e.target.dataset?.a; if (a === 'milr') S.mil = +e.target.value; if (a === 'mercr') S.merc = +e.target.value; if (a) render(); });
+document.addEventListener('keydown', (e) => { if (e.target.closest('input,textarea,[contenteditable]')) return; if (e.key === 'ArrowLeft') go(-1); if (e.key === 'ArrowRight') go(1); const n = Number(e.key); if (n >= 1 && n <= 4) { S.sc = SCREENS[n - 1][0]; render(); } });
+render();
+</script></body></html>

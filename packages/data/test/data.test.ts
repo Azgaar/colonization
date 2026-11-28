@@ -72,8 +72,8 @@ describe('rulesets', () => {
     expect(compileRuleset(gameData, { id: 'old', title: '', base: 'pc', overrides: [] }).rulesetHash).toBe(loadRuleset('board').rulesetHash);
   });
   it('overrides numbers, lists and card values', () => {
-    const d = compileRuleset(gameData, rs({ set: { 'agents.priest.price': 5, 'settings.tax.track': [0, 0], 'fathers.francis_drake.mods.0.add': 3 } }, true));
-    expect([d.agents.priest.price, d.settings.tax.track, (d.fathers.francis_drake.mods[0] as { add: number }).add]).toEqual([5, [0, 0], 3]);
+    const d = compileRuleset(gameData, rs({ set: { 'agents.priest.price': 5, 'settings.tax.track': [0, 0], 'fathers.hernan_cortes.mods.0.add': 3 } }, true));
+    expect([d.agents.priest.price, d.settings.tax.track, (d.fathers.hernan_cortes.mods[0] as { add: number }).add]).toEqual([5, [0, 0], 3]);
     expect(gameData.agents.priest.price).toBe(6);
     expect(Object.isFrozen(d.settings.tax)).toBe(true);
     expect(d.rulesetHash).not.toBe(loadRuleset('board').rulesetHash);

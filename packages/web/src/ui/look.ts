@@ -11,7 +11,7 @@ import { goods } from './goods.ts';
 function dealings(hostility: number, ally: number | null) {
   const n = D.settings.natives, hit = D.settings.combat.successFaces.length / 6, more = Math.round((1 - (1 - hit) ** n.giftDice) * 100), rows: string[] = [];
   // A gift costs 1 resource of any kind (DD-78); without dice its result is fixed (DD-86).
-  if (hostility > 0) rows.push(`<b>${pick(ACT.gift)}</b> ${Places.plus(-1, 'goods', 15)}: ${icon('hostility', 14)} ${n.giftDice ? `−${n.giftBase}…−${n.giftBase + n.giftDice}, ${t('look.for_or', { more, v: n.giftBase + 1 })}` : `−${n.giftBase}`}`);
+  if (hostility > 0) rows.push(`<b>${pick(ACT.gift)}</b> ${Places.plus(-1, 'goods', 15)}: ${icon('hostility', 14)} ${n.giftByPrice ? t('look.gift_price') : n.giftDice ? `−${n.giftBase}…−${n.giftBase + n.giftDice}, ${t('look.for_or', { more, v: n.giftBase + 1 })}` : `−${n.giftBase}`}`);
   rows.push(`<b>${pick(ACT.preach)}</b> ${hostility ? Places.plus(-hostility, 'crosses', 15) : t('places.free')}: ${t('look.native_agent')}`);
   if (ally === null) rows.push(`<b>${pick(ACT.alliance)}</b> ${hostility <= n.allianceMax ? t('look.educated_agent') : t('look.hostility_less', { allianceMax: n.allianceMax })}`);
   return `<ul class="deals">${rows.map((r) => `<li>${r}</li>`).join('')}</ul>`;

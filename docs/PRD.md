@@ -2,8 +2,8 @@
 
 |                     |                                                                                                                                       |
 | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| Status              | Draft 4, designer answers included                                                                                                    |
-| Date                | 2026-11-25                                                                                                                            |
+| Status              | Closed: v1 done, remaining items not required (section 15)                                                                            |
+| Date                | 2026-11-28                                                                                                                            |
 | Sources             | `Колонизация.docx`, `rules/` (the master of the rules, from `Colonization.xlsx` as of 2026-11-25 14:12), `assets/`                    |
 | Companion documents | [rules-spec.md](rules-spec.md) · [data-spec.md](data-spec.md) · [ai-and-testlab.md](ai-and-testlab.md) · [decisions.md](decisions.md) |
 
@@ -100,7 +100,7 @@ AI opponents are the exception: they replace human players and are not a rule. S
 
 One paragraph for orientation; the rules are in [rules-spec.md](rules-spec.md).
 
-1–5 governors explore a hidden 12×12 map, found up to three colonies, and play agent cards from a personal deck. Each turn is one card and one action: move, found, attack, trade, hire, recruit Fathers, repair, produce, build, supply, exchange. Each of up to 10 rounds ends with an event and a tax that can be paid or refused. Refusal strengthens the Royal Expeditionary Force (REF, КЭК). When someone reaches 15 bells or round 10 ends, the War of Independence is resolved once: the least rebellious player joins the King, the others defend their colonies, and surviving colonies plus assets are scored.
+1–5 governors explore a hidden 12×12 map, found up to three colonies, and play agent cards from a personal deck. Each turn is one card and one action: move, found, attack, trade, hire, recruit Fathers, repair, produce, build, supply, exchange. Each of up to 10 rounds ends with an event and a tax that can be paid or refused. Refusal strengthens the Royal Expeditionary Force (REF, КЭК). When someone reaches 20 bells or round 10 ends, the War of Independence is resolved once: the least rebellious player joins the King, the others defend their colonies, and surviving colonies plus assets are scored.
 
 ## 7. Functional requirements
 
@@ -142,7 +142,6 @@ Priority: **M** must (v1), **S** should (v1 if cheap), **C** could (later). Mile
 | FR-R-4 | Editor panel with search, default vs current value, validation and reset                                               | M   | M4        |
 | FR-R-5 | Export the change list in terms of sheet, row and column so it can be applied to the workbook                          | M   | M4        |
 | FR-R-6 | Changing a ruleset mid-game is allowed only in sandbox mode                                                            | S   | M4        |
-
 | FR-R-7 | Every override carries a conversion label and its table wording; unlabelled or non-convertible overrides run only in sandbox mode | M | M1 |
 | FR-R-8 | Conversion report: what a ruleset changes against the rules, with label, components needed and where each value is printed | M | M4 |
 | FR-R-9 | Apply a change to the rules or drop it, recorded in the decision log | S | M4 |
@@ -353,3 +352,16 @@ Good tests here check observable behaviour: given a state and a choice, these op
 4. No known mismatch between `board` and the rules document and spreadsheet.
 5. A printing list with component counts exists.
 6. Every change applied to the rules is convertible and has a recorded status.
+
+## 15. Closing (2026-11-28)
+
+The PRD is closed. M0–M5 are built as their status lines in section 11 say, and the board game has taken its rule changes: 45 have been applied to `rules/` from lab evidence and play, each logged in [decisions.md](decisions.md) (DD-49 onwards).
+
+Left undone, and not needed for v1:
+
+- M2 exit criteria and success criterion 1: bots are not yet as strong as the designer, and hypotheses have no full verdicts. Balance comes later, by the designer's choice.
+- The M4 tweak-test-export cycle by the designer unaided: the tools exist; it is the designer's to do.
+- Identical results in a browser and the command line (M1): not checked.
+- The desktop package (M5).
+
+Open rule questions and proposals are tracked in [decisions.md](decisions.md#open), not here.

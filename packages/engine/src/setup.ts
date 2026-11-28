@@ -11,11 +11,20 @@ export interface GameConfig { def: GameDef; seed: string; nations: string[]; log
 const copies = <T extends { id: string; copies?: number }>(m: Record<string, T>, ok: (x: T) => boolean = () => true) =>
   Object.values(m).filter(ok).flatMap((x) => Array.from({ length: x.copies ?? 1 }, () => x.id));
 
+/** The first `n` nations of a list, skipping any whose colour is already taken: two nations share each colour (DD-124). */
+export function nationsApart(def: GameDef, list: string[], n: number): string[] {
+  const out: string[] = [], colours = new Set<string>();
+  for (const k of list) if (out.length < n && !colours.has(def.nations[k].color)) { colours.add(def.nations[k].color); out.push(k); }
+  return out;
+}
+
 export function createGame({ def, seed, nations, logging = true }: GameConfig): State {
   const { players, map } = def.settings;
   if (nations.length < players.min || nations.length > players.max) throw new Error(`${players.min} to ${players.max} players are needed`);
   if (new Set(nations).size !== nations.length) throw new Error('each nation can be played once');
   for (const n of nations) if (!def.nations[n]) throw new Error(`unknown nation "${n}"`);
+  // Two nations share each colour, and their pieces and war tokens with it (DD-124).
+  if (new Set(nations.map((n) => def.nations[n].color)).size !== nations.length) throw new Error('two players cannot have nations of one colour');
 
   const s = {
     def, seed, rng: seedRng(seed), round: 1, first: 0, current: 0, revealed: Array(map.size ** 2).fill(false), poi: {}, settlements: [], hostility: {},

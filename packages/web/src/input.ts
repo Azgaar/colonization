@@ -12,6 +12,7 @@ import { S, U, X } from './state.ts';
 import { deciding, paintStep, pickedCards } from './ui/decisions.ts';
 import { peek } from './ui/fans.ts';
 import { setTutorial } from './ui/tutorial.ts';
+import { reveal, showFront } from './ui/war.ts';
 /* ---- lifting, hovering, dropping ---- */
 /** An agent pressed in the hand; `on` once it is dragged. */
 let press: { card: string; x: number; y: number; on: boolean } | null = null, ghost: HTMLElement | null = null;
@@ -80,12 +81,15 @@ document.addEventListener('click', async (e: MouseEvent) => {
   else if ((x = q('[data-cargo]'))) cargo(x.dataset.cargo!, x.dataset.r ?? '');
   else if ((x = q('[data-sell]'))) { const r = x.dataset.sell!, sell = X.sell!; if (r === 'ok') { Sim.mark(); for (const k of RES) if (sell[k] > 0) { const n = sell[k]; if (Sim.kind() === 'trade') Sim.apply({ c: 'sell', r: k, n }); } if (Sim.kind() === 'trade') Sim.apply({ c: 'done' }); X.sell = null; settle(); } else { sell[r] += +x.dataset.n!; paintStep(); } }
   else if ((x = q('[data-sel]'))) { const v = x.dataset.sel!; if (v === 'ok' || v === 'top') { const k = Sim.kind(), cards = pickedCards(); Sim.mark(); for (const card of cards) if (Sim.kind() === k) Sim.apply({ c: k === 'commit' ? 'add' : 'discard', card }); if (Sim.kind() === k && D.pending?.player === me) Sim.apply({ c: k === 'commit' ? (v === 'top' ? 'top' : 'done') : 'keep' }); X.sel = []; settle(); } else { const i = +v; X.sel = X.sel.includes(i) ? X.sel.filter((n) => n !== i) : [...X.sel, i]; paintStep(); } }
-  else if (q('[data-rest]')) { Sim.mark(); while (Sim.kind() === 'placeCards' && Sim.apply({ c: 'keep', card: Sim.pending()!._cards[0] })); settle(); }
+  else if ((x = q('[data-deploy]'))) { X.deploy = x.dataset.deploy!; paintStep(); }
+  else if ((x = q('[data-muster]'))) { X.muster += +x.dataset.muster!; paintStep(); }
   else if (q('[data-undo]')) { Sim.undo(); clearNews(); S.card = null; S.war = -1; paint(); Board.land(); }
   else if (q('[data-pass]')) { Sim.mark(); S.card = null; Sim.apply({ c: 'pass' }); settle(); }
   else if (q('[data-recruit]')) { Sim.mark(); S.card = null; Sim.apply({ c: 'recruit' }); settle(); }
   else if (q('[data-peace]')) { S.war = -1; paint(); }
-  else if ((x = q('[data-war]'))) { if (D.over) { S.war = +x.dataset.war!; S.view = 'map'; S.look = null; U.king = false; focus(); paint(); } }
+  else if (q('[data-reveal]')) { reveal(); paint(); }
+  else if (q('[data-front]')) { if (D.over && D.war) { showFront(true); if (S.war < 0 || S.war >= D.war.sieges.length) S.war = 0; S.view = 'map'; S.look = null; U.king = false; focus(); paint(); } }
+  else if ((x = q('[data-war]'))) { if (D.over) { showFront(false); S.war = +x.dataset.war!; S.view = 'map'; S.look = null; U.king = false; focus(); paint(); } }
   else if ((x = q('[data-lang]'))) { document.documentElement.lang = Options.lang = x.dataset.lang!; keepOptions(); Sim.refresh(); paint(); }
   else if ((x = q('[data-grid]'))) { Board.grid = !!x.dataset.grid; paint(); }
   else if ((x = q('[data-follow]'))) { Board.view.auto = x.dataset.follow ? 1 : 0; keepOptions(); Board.look(); Board.land(); paint(); }

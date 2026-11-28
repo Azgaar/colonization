@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { map, attackOptions, buildingDefence, cardStrength, cellYield, cellYields, combatStrength, findLoyalist, legal, rebelOrder, scorePlayer, siegeStrength, workableCells } from '../src/index.ts';
+import { map, attackOptions, buildingDefence, cardStrength, cellYield, cellYields, combatStrength, deployTargets, findLoyalist, legal, rebelOrder, scorePlayer, siegeStrength, viewFor, workableCells } from '../src/index.ts';
 import { push, run } from '../src/core.ts';
 import { act, at, boardWith, build, canPlay, colony, def, defWith, event, father, game, opt, P, play, poi, rig, runTasks, settle, stock, total, turn, world } from './h.ts';
 
@@ -69,7 +69,7 @@ describe('Combat', () => {
       P(t, 1).hand = [];
       rig(t, d, 1, 1);
       act(t, { c: 'done' });
-      expect(P(t, 1).inf === 'europe').toBe(won);
+      expect(P(t, 1).inf === 'ship').toBe(won); // a beaten pawn goes aboard its ship
     }
     const cap = defWith({ 'settings.combat.diceCap': 1 });
     const t = duel(2, cap);
@@ -79,13 +79,13 @@ describe('Combat', () => {
     act(t, { c: 'done' });
     expect((t.log.find((e) => e.e === 'combat')!.dice as number[]).length).toBe(1);
   });
-  it('[C-6] a beaten land token goes to Europe', () => {
+  it('[C-6] a beaten pawn goes back aboard its ship', () => {
     const s = duel();
     turn(s, 0, 'dragoon', 'farmer');
     play(s, 'dragoon', 'attack');
     rig(s, 5, 5, 5, 5);
     act(s, { c: 'done' });
-    expect(P(s, 1).inf).toBe('europe');
+    expect(P(s, 1).inf).toBe('ship');
     expect(P(s).inf).toBe(at(5, 5));
   });
   it('[C-7] ship battles: damage, looting, retreat', () => {
@@ -353,12 +353,13 @@ describe('Colony actions', () => {
   it('[R-11] custom house', () => {
     const s = farm();
     build(s, 0, 'warehouse', 'custom_house');
-    P(s).wh = stock({ goods: 2 });
+    P(s).wh = stock({ goods: 2, timber: 3 });
     turn(s, 0, 'negotiant_dutch', 'smuggler');
     expect(canPlay(s, 'smuggler', 'customs')).toBe(false);
-    play(s, 'negotiant_dutch', 'customs', { r: 'goods' });
-    // Two goods (DD-79), each at the price of the moment: 5 + 1, then 4 + 1.
-    expect([P(s).gold, s.price.goods]).toEqual([11, 3]);
+    play(s, 'negotiant_dutch', 'customs');
+    // As in Europe (DD-100): any resources and amounts from the warehouse, at the price before the sale, the demand counted after it.
+    act(s, { c: 'sell', r: 'goods', n: 2 }, { c: 'sell', r: 'timber', n: 1 });
+    expect([P(s).gold, s.price.goods, P(s).wh.timber]).toEqual([2 * 6 + 2, 3, 2]);
   });
   it('[R-12] supply', () => {
     const s = farm();
@@ -446,11 +447,14 @@ describe('Natives', () => {
   });
   it('[N-5] gift', () => {
     const s = village({ hostility: 5 });
-    P(s).wh = stock({ goods: 2 });
+    P(s).wh = stock({ goods: 1, food: 1 });
+    s.price.goods = 4;
     turn(s, 0, 'colonist', 'colonist');
-    // No dice: hostility falls by 3 (DD-86).
-    play(s, 'colonist', 'gift');
-    expect([s.hostility.sioux, P(s).wh.goods]).toEqual([2, 1]);
+    // No dice: hostility falls by the Europe price of what is given (DD-101).
+    play(s, 'colonist', 'gift', { r: 'food' });
+    expect(s.hostility.sioux).toBe(5 - s.price.food);
+    play(s, 'colonist', 'gift', { r: 'goods' });
+    expect([s.hostility.sioux, P(s).wh.goods]).toEqual([Math.max(0, 5 - s.price.food - 4), 0]);
   });
   it('[N-6] preach', () => {
     const s = village({ hostility: 3, pop: 1 });
@@ -501,13 +505,12 @@ describe('Natives', () => {
     expect([canPlay(s, 'colonist', 'alliance'), canPlay(s, 'politician', 'alliance'), canPlay(s, 'scout', 'alliance')]).toEqual([false, true, true]);
     s.hostility.sioux = 2;
     expect(canPlay(s, 'scout', 'alliance')).toBe(false);
-    father(s, 0, 'john_smith');
-    s.hostility.sioux = 3;
+    s.hostility.sioux = 1;
     play(s, 'scout', 'alliance');
     expect(s.settlements[0].ally).toBe(0);
     turn(s, 0, 'scout', 'colonist');
     expect(canPlay(s, 'scout', 'alliance')).toBe(false);
-    runTasks(s, { t: 'node', node: { n: 'hostilityAll', add: 1 }, p: 0 });
+    runTasks(s, { t: 'node', node: { n: 'hostilityAll', add: 3 }, p: 0 });
     expect(s.settlements[0].ally).toBe(null);
   });
   it('[N-10] native agents are limited', () => {
@@ -548,8 +551,10 @@ describe('Natives', () => {
     expect(P(s).wh.silver).toBe(0);
     P(s).wh = stock({ silver: 3 });
     build(s, 0, 'stockade', 'fort');
+    s.logging = true;
     runTasks(s, { t: 'raid', n: 1 });
     expect(P(s).wh.silver).toBe(3);
+    expect(s.log.filter((e) => e.e === 'raid').at(-1)).toMatchObject({ stopped: true }); // the table is told the stockade held
   });
   it('[N-13] Pocahontas lowers hostility for her owner only', () => {
     const s = village({ hostility: 4 }, 2);
@@ -579,11 +584,11 @@ describe('Founding Father rules', () => {
     P(s).bells = 12;
     turn(s, 0, 'colonist', 'colonist');
     play(s, 'colonist', 'propaganda');
+    // Jefferson brings the two cheapest (DD-129), the second one alone at 1 🔔: the limit of six is reached, so the action ends.
     act(s, { c: 'take', father: 'thomas_jefferson' }, { c: 'take', father: 'peter_minuit' });
-    expect(P(s).fathers.length).toBe(5);
-    expect(s.pending).toMatchObject({ kind: 'propaganda' });
-    act(s, { c: 'take', father: 'squanto' });
+    expect(P(s).fathers).toContain('pocahontas');
     expect(P(s).fathers.length).toBe(6);
+    expect(s.pending?.kind).not.toBe('propaganda');
     expect(s.salon.length).toBe(5);
   });
   const gain = (s: ReturnType<typeof game>, f: string) => {
@@ -627,11 +632,10 @@ describe('Founding Father rules', () => {
     const s = game(1);
     world(s, { [at(5, 5)]: 'grassland', [at(5, 6)]: 'forest' });
     colony(s, 0, at(5, 5));
-    father(s, 0, 'john_rolfe', 'squanto');
-    s.map.bonus[at(5, 6)] = 'crops';
+    father(s, 0, 'eli_whitney');
     const y = (cell: number, icon: 'crops' | 'food') => cellYield(s, 0, 'colonist', cell, icon)!.total;
-    // John Rolfe adds to all crops, fur in the forest too (DD-76); Squanto to fish (DD-65).
-    expect([y(at(5, 5), 'crops'), y(at(5, 6), 'crops'), y(at(4, 4), 'food')]).toEqual([2, 2, 2]);
+    // Whitney adds to goods only.
+    expect([y(at(5, 5), 'crops'), y(at(4, 4), 'food')]).toEqual([1, 1]);
   });
   it('[B-6] Champlain founds anywhere legal, within the limit', () => {
     const s = game(2);
@@ -650,7 +654,7 @@ describe('Founding Father rules', () => {
     gain(s, 'squanto');
     expect(legal(s).map((c) => c.father).sort()).toEqual(['peter_minuit', 'pocahontas']);
   });
-  it('[B-8] Kosciuszko adds to the stockade or the fort, not both', () => {
+  it('[B-8] Kosciuszko adds +1 for the stockade and +1 more for the fort', () => {
     const s = game(1);
     father(s, 0, 'thaddeus_kosciuszko');
     const d = () => buildingDefence(s, 0).reduce((n, x) => n + x.value, 0);
@@ -671,7 +675,7 @@ describe('Founding Father rules', () => {
     s.stack = [];
     push(s, { t: 'warStart', reason: 'bells' });
     run(s);
-    while (!s.over) { expect(s.pending!.kind).not.toBe('betray'); act(s, legal(s).find((c) => c.n === 0 || c.c === 'keep')!); }
+    while (!s.over) { expect(s.pending!.kind).not.toBe('betray'); act(s, legal(s).find((c) => c.n === 0 || c.c === 'pass')!); }
   });
   it('[B-10] removed cards go where they belong', () => {
     const s = game(1);
@@ -833,12 +837,14 @@ describe('Ruin and wreck rules', () => {
   it('[X-5] a scout ignores skulls', () => {
     const s = game(1);
     P(s).hand = [];
+    P(s).deck = ['colonist', 'colonist', 'farmer', 'farmer', 'fisherman'];
+    const owned = () => P(s).deck.length + P(s).discard.length, n = owned();
     poi(s, 'ruin', 'natives_ambush', 'scout');
     opt(s, 'flee');
-    expect(P(s).inf).not.toBe('europe');
+    expect(owned()).toBe(n);
     poi(s, 'ruin', 'natives_ambush');
     opt(s, 'flee');
-    expect(P(s).inf).toBe('europe');
+    expect(owned()).toBe(n - 1);
     poi(s, 'wreck', 'pirate_ambush', 'scout');
     opt(s, 'surrender');
     expect(P(s).damage).toBe(0);
@@ -882,15 +888,16 @@ describe('War', () => {
     return s;
   }
   function start(s: ReturnType<typeof game>) { s.pending = null; s.stack = []; s.over = null; push(s, { t: 'warStart', reason: 'bells' }); run(s); return s; }
-  const keepAll = (s: ReturnType<typeof game>) => { while (s.pending?.kind === 'placeCards' && s.pending.side === 'loyalist') act(s, { c: 'keep' }); return s; };
+  /** Buy no militia and no mercenaries, up to the placing of cards. */
+  const noBuys = (s: ReturnType<typeof game>) => { while (s.pending?.kind === 'militia' || s.pending?.kind === 'mercenaries') act(s, { c: s.pending.kind, n: 0 }); return s; };
   const passAll = (s: ReturnType<typeof game>) => {
     let n = 0;
-    while (!s.over && n++ < 200) { const o = legal(s); act(s, o.find((c) => c.c === 'keep' || c.c === 'skip' || c.n === 0) ?? o[0]); }
+    while (!s.over && n++ < 200) { const o = legal(s); act(s, o.find((c) => c.c === 'pass' || c.c === 'done' || c.c === 'skip' || c.n === 0) ?? o[0]); }
     return s;
   };
-  it('[W-1] starts at 15 bells or after round 10', () => {
+  it('[W-1] starts at 20 bells or after round 10', () => {
     const s = eve();
-    P(s).bells = 15;
+    P(s).bells = s.def.settings.war.bells;
     s.pending = null;
     s.stack = [];
     push(s, { t: 'roundEnd' });
@@ -918,13 +925,13 @@ describe('War', () => {
     P(s, 2).crosses = 1;
     P(s, 2).gold = 1;
     expect(findLoyalist(s)).toBe(0);
-    for (const p of s.players) p.bells = 15;
+    for (const p of s.players) p.bells = s.def.settings.war.bells;
     expect(findLoyalist(s)).toBe(null);
     expect(findLoyalist(eve(1))).toBe(null);
   });
-  it('[W-2] no loyalist with 2 players (DD-58): the King attacks both colonies', () => {
+  it('[W-2] no loyalist with 2 players (DD-58): the King attacks both colonies, the most rebellious plays first', () => {
     const s = start(eve(2, 'gentlemans_war', def));
-    expect(s.war!.loyalist).toBe(null);
+    expect([s.war!.loyalist, s.war!.turn]).toEqual([null, [0, 1]]);
     expect(s.war!.sieges.map((x) => x.owner)).toEqual([0, 1]);
     expect(findLoyalist(eve(3, 'gentlemans_war', def))).toBe(2);
   });
@@ -939,57 +946,70 @@ describe('War', () => {
     start(s);
     expect(s.war!.pool).toBe(3 + 1 + 4);
   });
-  it('[W-5] cubes are dealt one per colony from the most rebellious', () => {
+  it('[W-5] cubes are shared out evenly, the rest from the most rebellious, colony 1 first', () => {
     const s = eve(3);
     colony(s, 0, at(5, 9));
-    s.ref = 4;
+    s.ref = 5;
     start(s);
-    expect(s.war!.sieges.map((x) => [x.owner, x.cell, x.cubes])).toEqual([[0, at(5, 5), 2], [0, at(5, 9), 1], [1, at(9, 9), 1]]);
-    expect(rebelOrder(s)).toEqual([0, 1, 2]);
+    expect(s.war!.sieges.map((x) => [x.owner, x.slot, x.cubes])).toEqual([[0, 1, 2], [0, 2, 2], [1, 1, 1]]);
+    expect([rebelOrder(s), s.war!.turn]).toEqual([[0, 1, 2], [2, 0, 1]]);
   });
-  it('[W-6] the loyalist places any agents face down', () => {
-    const s = eve(2);
-    s.ref = 1;
-    start(s);
-    expect(s.pending).toMatchObject({ kind: 'placeCards', player: 1, side: 'loyalist' });
-    act(s, { c: 'place', card: 'captain', siege: 0 }, { c: 'place', card: 'colonist', siege: 0 });
-    keepAll(s);
-    expect(s.war!.sieges[0].loyalist).toEqual(['captain', 'colonist']);
-  });
-  it('[W-7] patriots muster army, militia, mercenaries and allies', () => {
+  it('[W-6] raising troops: the whole pool in hand, braves for everyone, militia for patriots, mercenaries for anyone', () => {
     const s = eve(2);
     s.ref = 1;
     P(s).gold = 11;
+    P(s, 1).gold = 5;
     settle(s, 'sioux', at(5, 9), { hostility: 0, ally: 0 });
-    keepAll(start(s));
-    expect(legal(s).map((c) => c.c)).toEqual(['place', 'keep']);
-    act(s, { c: 'place', card: 'captain' }, { c: 'place', card: 'soldier' });
-    expect(legal(s).length).toBe(3); // two civilians
-    act(s, { c: 'militia', n: 2 });
-    expect(legal(s).length).toBe(3);
-    act(s, { c: 'mercenaries', n: 2 });
-    const x = s.war!.sieges[0];
-    expect([x.army, x.support]).toEqual([['captain', 'soldier'], 2 + 2 + 3]);
-    expect([P(s).bells, P(s).gold]).toEqual([8, 1]);
+    settle(s, 'aztec', at(9, 5), { hostility: 0, ally: 1 });
+    start(s);
+    // The loyalist first: a brave, then mercenaries; no militia.
+    expect(s.pending).toMatchObject({ kind: 'mercenaries', player: 1 });
+    act(s, { c: 'mercenaries', n: 1 });
+    expect(s.war!.gained[1]).toEqual(['brave', 'mercenary']);
+    expect(s.pending).toMatchObject({ kind: 'militia', player: 0 });
+    expect(legal(s).length).toBe(3); // two agents without 🗡️
+    act(s, { c: 'militia', n: 2 }, { c: 'mercenaries', n: 2 });
+    expect(s.war!.hands[0]).toEqual(['captain', 'soldier', 'brave', 'militia', 'militia', 'mercenary', 'mercenary']);
+    expect([s.war!.swapped[0], P(s).bells, P(s).gold, s.war!.supply]).toEqual([['colonist', 'colonist'], 8, 1, { militia: 16, mercenary: 15 }]);
+    // War cards and swapped agents all count as agents (DD-123).
+    expect(scorePlayer(s, 0).parts).toContainEqual({ label: 'agents', value: Math.floor((4 + 5) / s.def.settings.score.agentsPerPoint) });
+  });
+  it('[W-7] placing: several cards on one slot a turn, clockwise from the loyalist, face down, until all pass', () => {
+    const s = noBuys(start(eve(2)));
+    s.ref = 1;
+    expect(s.pending).toMatchObject({ kind: 'deploy', player: 1 });
+    expect(legal(s).filter((c) => c.c === 'place' && c.card === 'captain').map((c) => c.siege)).toEqual([0, 1]);
+    act(s, { c: 'place', card: 'captain', siege: 0 });
+    // The same turn goes on at the same slot only.
+    expect(legal(s).map((c) => c.siege ?? c.c)).toEqual([0, 0, 'done']);
+    act(s, { c: 'place', card: 'colonist', siege: 0 }, { c: 'done' });
+    expect(s.pending).toMatchObject({ kind: 'deploy', player: 0 });
+    act(s, { c: 'place', card: 'soldier', siege: 1 }, { c: 'done' });
+    const v = viewFor(s, 0).state.war!;
+    expect([v.sieges[0].stacks[1], v.sieges[1].stacks[0], v.hands[1]]).toEqual([['?', '?'], ['soldier'], ['?', '?']]);
+    act(s, { c: 'pass' }, { c: 'pass' });
+    expect([s.war!.sieges[0].stacks, s.war!.sieges[1].stacks]).toEqual([{ 1: ['captain', 'colonist'] }, { 0: ['soldier'] }]);
+    // A patriot never places on another patriot's colony.
+    const t = eve(3);
+    colony(t, 2, at(5, 9));
+    start(t);
+    expect(deployTargets(t, 0).map((i) => t.war!.sieges[i].owner)).toEqual([0, 2]);
   });
   it('[W-8] Washington and Revere', () => {
     const s = eve(2);
     s.ref = 1;
     father(s, 0, 'george_washington', 'paul_revere');
-    keepAll(start(s));
-    act(s, { c: 'keep' }, { c: 'keep' });
-    expect(legal(s).length).toBe(2);
-    act(s, { c: 'militia', n: 1 });
-    if (!s.over) passAll(s);
-    expect(s.war!.sieges[0].support).toBe(2 + 4);
+    P(s).discard = Array(8).fill('colonist');
+    start(s);
+    // Revere's 4 swaps are free, then Washington's are 2 for each bell.
+    expect(legal(s).map((c) => c.bells)).toEqual([0, 0, 0, 0, 0, 1, 1, 2, 2]);
   });
   it('[W-9] attack strength', () => {
     const s = eve(2);
     s.ref = 3;
     start(s);
-    s.war!.sieges[0].loyalist = ['captain', 'colonist', 'corsair'];
-    s.war!.sieges[0].militia = 2;
-    expect(siegeStrength(s, s.war!.sieges[0]).attack.total).toBe(3 + 3 + 2 + 2);
+    s.war!.sieges[0].stacks = { 1: ['captain', 'colonist', 'corsair', 'brave', 'militia', 'mercenary'] };
+    expect(siegeStrength(s, s.war!.sieges[0]).attack.total).toBe(3 + 3 + 2 + s.def.settings.war.allyCubes + 1 + 1);
   });
   it('[W-10] defence strength', () => {
     const s = eve(2);
@@ -999,9 +1019,8 @@ describe('War', () => {
     P(s).ship = at(4, 4);
     s.ref = 1;
     start(s);
-    s.war!.sieges[0].army = ['soldier', 'cannoneer'];
-    s.war!.sieges[0].support = 3;
-    expect(siegeStrength(s, s.war!.sieges[0]).defence.total).toBe(1 + 1 + 1 + 2 + 3 + 3);
+    s.war!.sieges[0].stacks = { 0: ['soldier', 'cannoneer', 'militia'] };
+    expect(siegeStrength(s, s.war!.sieges[0]).defence.total).toBe(1 + 1 + 1 + 2 + 2 + 1 + 1);
   });
   it('[W-11] colonies not attacked are kept', () => {
     const s = passAll(start(eve(2)));
@@ -1009,78 +1028,87 @@ describe('War', () => {
     expect(s.war!.sieges[0].dice).toBeUndefined();
   });
   it('[W-12] dice decide when the attack is stronger', () => {
-    const run2 = (dice: number[], ref: number) => { const s = eve(1); s.ref = ref; start(s); while (!s.over) { rig(s, ...dice); const o = legal(s); act(s, o.find((c) => c.c === 'keep' || c.n === 0) ?? o[0]); } return s.war!.sieges[0]; };
+    const run2 = (dice: number[], ref: number) => { const s = eve(1); s.ref = ref; start(s); while (!s.over) { rig(s, ...dice); const o = legal(s); act(s, o.find((c) => c.c === 'pass' || c.n === 0) ?? o[0]); } return s.war!.sieges[0]; };
     expect(run2([1, 2, 3], 4)).toMatchObject({ attack: 4, defence: 1, fell: false });
     expect(run2([1, 2, 5], 4)).toMatchObject({ fell: true });
     expect(run2([], 20).dice!.length).toBe(10);
-    const s = eve(1);
-    s.ref = 1;
-    start(s);
-    act(s, { c: 'place', card: 'captain' }, { c: 'keep' }, { c: 'militia', n: 0 });
+    const s = noBuys(start(Object.assign(eve(1), { ref: 1 })));
+    act(s, { c: 'place', card: 'captain', siege: 0 }, { c: 'done' }, { c: 'pass' });
     expect(s.war!.sieges[0]).toMatchObject({ dice: [], fell: false });
   });
-  it('[W-13] the loyalist takes a colony if at least as strong as the REF', () => {
-    for (const [cards, taken] of [[['captain'], 1], [['soldier'], 1], [['colonist'], null]] as const) {
+  it('[W-13] a fallen colony: the loyalist takes it if stronger than the King; a tie is a die each; else it is lost', () => {
+    const fall = (card: string, ...tie: number[]) => {
       const s = eve(2);
       s.ref = 2;
-      P(s, 1).discard = [...cards];
+      P(s, 1).discard = [card];
       P(s).discard = ['colonist', 'colonist'];
-      start(s);
-      act(s, { c: 'place', card: cards[0] });
-      while (!s.over) { rig(s, 5, 5, 5, 5); act(s, legal(s).find((c) => c.n === 0 || c.c === 'keep')!); }
+      noBuys(start(s));
+      act(s, { c: 'place', card, siege: 0 });
+      const gap = siegeStrength(s, s.war!.sieges[0]).attack.total - 1;
+      while (!s.over) { rig(s, ...Array(gap).fill(5), ...tie); act(s, legal(s).find((c) => c.c === 'pass' || c.c === 'done' || c.n === 0)!); }
       expect(s.war!.sieges[0].fell).toBe(true);
-      expect(s.war!.sieges[0].takenBy).toBe(taken);
-    }
+      return s.war!.sieges[0].takenBy;
+    };
+    expect(fall('captain')).toBe(1);
+    expect(fall('soldier', 6, 2)).toBe(1);
+    expect(fall('soldier', 2, 6)).toBe(null);
+    expect(fall('colonist')).toBe(null);
+    // A colony the King takes scores for nobody.
+    const s = passAll(start(Object.assign(eve(2), { ref: 0 })));
+    s.war!.sieges[0].fell = true;
+    expect([scorePlayer(s, 0).colonies, scorePlayer(s, 1).colonies]).toEqual([0, 1]);
   });
   it('[W-14] loyalist militia needs a loyalist', () => {
     const s = eve(2, 'loyalist_militia');
     P(s, 1).crosses = 4;
-    s.ref = 1;
-    keepAll(start(s));
-    expect(s.war!.sieges[0].militia).toBe(4);
+    start(s);
+    expect([s.war!.gained[1].length, s.war!.supply.militia]).toEqual([4, s.def.settings.war.militiaCards - 4]);
     const solo = eve(1, 'loyalist_militia');
     P(solo).crosses = 4;
-    expect(passAll(start(solo)).war!.sieges[0].militia).toBe(0);
+    expect(start(solo).war!.gained[0]).toEqual([]);
   });
-  it('[W-15] sieges follow the rebel order', () => {
+  it('[W-15] cubes go to the most rebellious first; the order of the sieges changes no result', () => {
     const s = eve(3);
     P(s, 1).bells = 14;
-    s.ref = 2;
+    s.ref = 3;
     passAll(start(s));
-    expect(s.war!.sieges.map((x) => x.owner)).toEqual([1, 0]);
+    expect(s.war!.sieges.map((x) => [x.owner, x.cubes])).toEqual([[1, 2], [0, 1]]);
   });
   it('[W-20] colonies and bells by side', () => {
     const s = eve(2);
     passAll(start(s));
-    expect(scorePlayer(s, 0).parts).toEqual(expect.arrayContaining([{ label: 'colonies', value: 6 }, { label: 'bells', value: 10 }]));
-    expect(scorePlayer(s, 1).parts).toEqual([{ label: 'colonies', value: 3 }]);
+    expect(scorePlayer(s, 0).parts).toEqual(expect.arrayContaining([{ label: 'colonies', value: 6 }, { label: 'bells', value: 10 / s.def.settings.score.bellsPerPoint }]));
+    expect(scorePlayer(s, 1).parts).toEqual([{ label: 'colonies', value: 6 }]); // DD-104
     s.war!.sieges[0].fell = true;
     s.war!.sieges[0].takenBy = 1;
     expect(scorePlayer(s, 0).colonies).toBe(0);
-    expect(scorePlayer(s, 1).parts[0].value).toBe(6);
+    expect(scorePlayer(s, 1).parts[0].value).toBe(12);
   });
   it('[W-21] points for everything else, rounded down', () => {
     const s = game(1);
-    Object.assign(P(s), { gold: 19, deck: Array(9).fill('colonist'), hand: [], discard: [] });
+    Object.assign(P(s), { gold: 9, deck: Array(9).fill('colonist'), hand: [], discard: [] });
     build(s, 0, 'docks', 'chapel');
     father(s, 0, 'squanto');
     expect(scorePlayer(s, 0).parts).toEqual([{ label: 'agents', value: 1 }, { label: 'gold', value: 1 }, { label: 'buildings', value: 2 }, { label: 'fathers', value: 1 }]);
     P(s).fathers = ['jakob_fugger'];
-    expect(scorePlayer(s, 0).parts).toContainEqual({ label: 'gold', value: 2 });
+    expect(scorePlayer(s, 0).parts).toContainEqual({ label: 'gold', value: 3 });
   });
   it('[W-22] the winner holds a colony; ties go by gold, then agents', () => {
     const s = eve(2);
     s.colonies = s.colonies.filter((c) => c.owner === 1);
+    P(s).gold = 30;
     passAll(start(s));
     expect(s.over!.winners).toEqual([1]);
+    // A nation with no colony is destroyed: nothing scores, not even its gold (DD-147).
+    expect(s.over!.players[0]).toMatchObject({ score: 0, parts: [], qualifies: false });
     const t = eve(3);
-    for (const p of t.players) p.bells = 15;
+    for (const p of t.players) p.bells = t.def.settings.war.bells;
     colony(t, 2, at(5, 9));
     P(t, 1).gold = 4;
     passAll(start(t));
     expect(t.over!.winners).toEqual([1]);
     const u = eve(3);
-    for (const p of u.players) p.bells = 15;
+    for (const p of u.players) p.bells = u.def.settings.war.bells;
     colony(u, 2, at(5, 9));
     expect(passAll(start(u)).over!.winners).toEqual([0, 1, 2]);
   });
@@ -1089,6 +1117,23 @@ describe('War', () => {
     s.colonies = [];
     expect(passAll(start(s)).over!.winners).toEqual([]);
     expect(passAll(start(eve(1))).over!.winners).toEqual([0]);
+  });
+  it('[W-24] patriots may take a loyalist colony: the strongest there, a tie by a die each', () => {
+    const s = noBuys(start(eve(2)));
+    act(s, { c: 'place', card: 'colonist', siege: 1 }, { c: 'done' });
+    act(s, { c: 'place', card: 'captain', siege: 1 }, { c: 'place', card: 'soldier', siege: 1 }, { c: 'done' });
+    rig(s, 5, 5, 5, 5);
+    passAll(s);
+    expect([s.war!.sieges[1].fell, s.war!.sieges[1].takenBy]).toEqual([true, 0]);
+    expect([scorePlayer(s, 0).colonies, scorePlayer(s, 1).colonies]).toEqual([2, 0]);
+    const t = eve(3);
+    colony(t, 2, at(5, 9));
+    P(t, 2).discard = [];
+    noBuys(start(t));
+    act(t, { c: 'place', card: 'soldier', siege: 2 }, { c: 'done' }, { c: 'place', card: 'soldier', siege: 2 }, { c: 'done' });
+    rig(t, 5, 5, 5, 2, 6);
+    passAll(t);
+    expect([t.war!.sieges[2].owner, t.war!.sieges[2].takenBy]).toEqual([2, 1]);
   });
 });
 
@@ -1125,8 +1170,8 @@ describe('settings without a rule of their own', () => {
   it('REF strength with or without the tactic', () => {
     const ref = (d?: ReturnType<typeof defWith>) => {
       const s = d ? game(1, d) : game(1);
-      s.war = { loyalist: null, tactic: 'ships_of_the_line', pool: 2, order: [0], sieges: [], spent: {} };
-      return siegeStrength(s, { owner: 0, cell: at(5, 5), cubes: 2, loyalist: [], militia: 0, army: [], support: 0, betrayed: 0 }).ref;
+      s.war = { loyalist: null, tactic: 'ships_of_the_line', pool: 2, order: [0], turn: [0], sieges: [], hands: {}, gained: {}, swapped: {}, supply: { militia: 0, mercenary: 0 } };
+      return siegeStrength(s, { owner: 0, cell: at(5, 5), slot: 1, cubes: 2, stacks: {}, betrayed: 0 }).ref;
     };
     // 2 cubes at strength 1 (DD-49): 2 without the tactic, 6 with Ships of the Line's bonus.
     expect([ref(), ref(defWith({ 'settings.war.refStrengthIncludesTactic': false }))]).toEqual([6, 2]);

@@ -1,6 +1,7 @@
 /** What the interface shows, taken from a game state. The caller sees only what seat `me` may know. */
-import { actionsFor, buildingDefence, buildPrice, buildingYield, cellYield, combatStrength, docksYields, findLoyalist, map, recruitCost, scorePlayer, sellPrice, siegeStrength, taxRate, util, workableCells, year, type State } from '@col/engine';
-import type { GameDef, Icon, TerrainId } from '@col/data';
+import { actionsFor, buildingDefence, buildPrice, buildingYield, cellYield, combatStrength, docksYields, findLoyalist, map, WAR_CARDS, recruitCost, scorePlayer, sellPrice, siegeStrength, taxRate, util, viewFor, workableCells, year, type State } from '@col/engine';
+import type { AgentDef, GameDef, Icon, TerrainId } from '@col/data';
+import { COLONIAL } from './colonial.ts';
 
 const ICONS: Icon[] = ['food', 'timber', 'crops', 'silver'];
 /** A name in both languages: English first, Russian second. */
@@ -8,15 +9,18 @@ export type Pair = [string, string];
 /** A record built from keys, keeping the value type (unlike Object.fromEntries). */
 export const record = <V>(keys: Iterable<string>, f: (k: string) => V): Record<string, V> => { const o: Record<string, V> = {}; for (const k of keys) o[k] = f(k); return o; };
 const named = (m: Record<string, { ru: string; en: string }>) => record(Object.keys(m), (k): Pair => [m[k].en, m[k].ru]);
-/** In English a nation goes by its colony's name; Russian keeps the spreadsheet's. */
-const COLONIAL: Record<string, string> = { french: 'New France', english: 'New England', dutch: 'New Netherland', spanish: 'New Spain', portuguese: 'Portuguese Brazil', swedish: 'New Sweden', danish: 'Danish West Indies', russian: 'Russian America', curonian: 'New Courland', scottish: 'New Caledonia' };
+const WAR_NAMES: Record<string, Pair> = { brave: ['Brave', 'Воин'], militia: ['Militia', 'Ополчение'], mercenary: ['Mercenary', 'Наёмник'] };
 const flavor = (m: Record<string, { flavor?: string }>) => record(Object.keys(m).filter((k) => m[k].flavor), (k) => m[k].flavor!);
 
 export function exportRules(def: GameDef) {
   return {
     track: def.settings.tax.track, settings: def.settings, tacticEffects: record(Object.keys(def.tactics), (id) => def.tactics[id].effect),
     terrainYields: record(Object.keys(def.terrain), (id) => def.terrain[id as TerrainId].yields),
-    agents: record(Object.keys(def.agents), (id) => { const a = def.agents[id]; return { base: a.base, en: a.en, ru: a.ru, edu: a.edu, price: a.price, unique: a.unique, mods: a.mods }; }),
+    agents: {
+      ...record(Object.keys(def.agents), (id) => { const a = def.agents[id]; return { base: a.base, en: a.en, ru: a.ru, edu: a.edu, price: a.price, unique: a.unique, mods: a.mods }; }),
+      // War cards (DD-123): shown like agents, with their 🗡️ as a combat bonus.
+      ...record(WAR_CARDS, (id) => ({ base: id, en: WAR_NAMES[id][0], ru: WAR_NAMES[id][1], edu: 0 as AgentDef['edu'], price: null, unique: false, mods: [{ mod: 'combat', token: 'infantry', add: id === 'brave' ? def.settings.war.allyCubes : 1 }] as AgentDef['mods'] })),
+    },
     buildings: record(Object.keys(def.buildings), (id) => { const b = def.buildings[id]; return { en: b.en, ru: b.ru, timber: b.timber, edu: b.edu, requires: b.requires, improvement: b.improvement, work: b.work, storage: b.storage, defence: b.defence }; }),
     fathers: record(Object.keys(def.fathers), (id) => { const f = def.fathers[id]; return { en: f.en, ru: f.ru, bells: f.bells }; }),
     /** Each nation: how hard it is (stars), its starting agents, its colour. */
@@ -29,6 +33,12 @@ export function exportRules(def: GameDef) {
 function byName(def: GameDef, cards: string[]) {
   const ru = typeof document !== 'undefined' && document.documentElement.lang === 'ru', name = (c: string) => (ru ? def.agents[c].ru : def.agents[c].en);
   return cards.slice().sort((a, b) => name(a).localeCompare(name(b), ru ? 'ru' : 'en') || a.localeCompare(b));
+}
+/** The war as seat `me` sees it: other players' cards stay face down until the sieges, so their strength is not counted (DD-123). */
+function warOf(full: State, me: number) {
+  if (!full.war) return null;
+  const s = full.over ? full : viewFor(full, me).state, w = s.war!;
+  return { loyalist: w.loyalist, tactic: w.tactic, pool: w.pool, result: full.over, hand: w.hands[me] ?? [], gained: w.gained, supply: w.supply, sieges: w.sieges.map((x) => ({ ...x, counter: x.owner === w.loyalist, ...siegeStrength(s, x), dice: x.dice })) };
 }
 export function exportState(s: State, me: number) {
   const def = s.def, pl = s.players[me], cards = [...new Set(pl.hand)], mine = s.pending?.player === me && s.pending.kind === 'turn';
@@ -48,7 +58,7 @@ export function exportState(s: State, me: number) {
     settlements: s.settlements.map((x) => ({ ...x, hostility: s.hostility[x.tribe], loot: def.tribes[x.tribe].loot, terrain: s.map.terrain[x.cell] })),
     players: s.players.map((p, i) => ({
       ...structuredClone(p), hand: i === me ? byName(def, p.hand) : p.hand.length, deck: i === me ? byName(def, p.deck) : p.deck.length, discard: p.discard.slice(),
-      agents: util.collection(p).length, score: scorePlayer(s, i).score, parts: scorePlayer(s, i).parts, color: def.nations[p.nation].color,
+      agents: util.collection(p).length + (s.war?.gained[i]?.length ?? 0), score: scorePlayer(s, i).score, parts: scorePlayer(s, i).parts, color: def.nations[p.nation].color,
     })),
     price: { ...s.price }, demand: { ...s.demand }, pier: s.pier.map((x) => [x[0], x.length] as [string, number]), salon: s.salon.slice(), ref: s.ref, left: { ...s.buildingsLeft }, cap: util.warehouseCap(s, me), loyal: findLoyalist(s),
     recruit: recruitCost(s), agentsLeft: s.agentDeck.length + s.agentDiscard.length, event: s.event,
@@ -59,7 +69,7 @@ export function exportState(s: State, me: number) {
     docks: record(cards, (c) => docksYields(s, me, c).map((y) => ({ cell: y.cell, n: y.total })).sort((a, b) => b.n - a.n)),
     yields: record(cards, yields), land: yields(plain),
     move: s.move, combat: s.combat ? { ...s.combat, strength: combatStrength(s, s.combat) } : null,
-    war: s.war ? { loyalist: s.war.loyalist, tactic: s.war.tactic, pool: s.war.pool, result: s.over, sieges: s.war.sieges.map((x) => ({ ...x, ...siegeStrength(s, x), dice: x.dice })) } : null,
+    war: warOf(s, me),
     log: s.log.slice(-60), over: s.over,
   };
 }

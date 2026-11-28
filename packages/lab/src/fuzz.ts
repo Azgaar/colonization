@@ -4,7 +4,7 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { isMainThread, parentPort, Worker, workerData } from 'node:worker_threads';
 import { fileURLToPath } from 'node:url';
 import { loadRuleset } from '@col/data';
-import { choiceKey, replay } from '@col/engine';
+import { choiceKey, nationsApart, replay } from '@col/engine';
 import { randomBot } from '@col/bots';
 import { GameFailure, playGame } from './play.ts';
 
@@ -19,7 +19,7 @@ function work(job: Job): Report {
     const seed = `fuzz-${i}`, n = (i % 5) + 1;
     // One game in four starts rich, to reach every building and Father.
     const eager = i % 2 === 1, rich = i % 8 === 3 || i % 8 === 6;
-    const nations = Array.from({ length: n }, (_, k) => all[(i * 3 + k * 7) % all.length]).filter((x, k, a) => a.indexOf(x) === k);
+    const nations = nationsApart(def, Array.from({ length: all.length }, (_, k) => all[(i * 3 + k * 7) % all.length]), n);
     try {
       const { state, choices } = playGame({ def, seed, nations, bots: nations.map((_, p) => randomBot(`${seed}-${p}`, eager)), check: true, fastView: i % 10 !== 0, rich, logging: true, onDecision: (s) => bump(r.kinds, s.pending!.kind) });
       for (const e of state.log) {

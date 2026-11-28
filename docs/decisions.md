@@ -8,20 +8,12 @@ Questions and candidates awaiting the designer. Candidates are the overrides of 
 
 | # | Item | Note |
 |---|---|---|
-| O-1 | Candidate `events-1-cube`: five event cards add 1 cube instead of 2 | Moves the loyalist only 4–9 points; kept for tuning one player count |
-| O-2 | Early endings: 56–67% of games end before round 8 at 4–5 players | Find where the racing player's bells come from before choosing a fix |
+| O-2 | Early endings: 56–67% of games end before round 8 at 4–5 players | Find where the racing player's bells come from before choosing a fix. Bots that judge their chance of being the loyalist honestly (low early, since only one can be) lean loyalist on 1% of turns, not 73%: they all race for bells, games last 6.8 rounds, not 9.1, and every war starts by bells, not half; the loyalist wins about 5% either way |
 | O-3 | 5 players may overshoot: loyalist wins 6% | Event cards can tune it later |
 | O-4 | Tuned bots still let the loyalist win 29–49% at 3–5 players | Retune the bots under the new war first |
 | O-5 | Dead cards: school (before DD-75), slave, smuggler | May be the bots, not the cards |
 | O-6 | Town hall, stockade, work action, alliances look dominated | Recheck after the war changes |
 | O-7 | Bots move one token per action | Lab numbers understate DD-73 |
-| O-8 | Candidate `chapel-2-church-4`: chapel 2 ✝️, church 4 | ✝️ gained 0.17 → 1.2 a player; chapel built 9% → 18% (round 6), its owners still 2.6 below the mean; recruits 0.01 → 0.1, preaching 0.15 → 0.5 a game |
-| O-9 | Candidate `crosses-every-round`: chapel and church are not worked but give their ✝️ at every round's end | Chapel built 72% (round 4.4), ✝️ 7.1 a player, preaching 2.2 and recruits 0.4 a game, mean score 20.9 → 19.8. With 2/4 (package `crosses-every-round-2-4`): chapel 89%, 14 ✝️ a player but 9 left unspent. One more marker step a round |
-| O-10 | Candidates `goods-6`, `goods-7`: goods start at 6 or 7 on a price track to 10 | Goods made 0.44 → 1.16 a game at 7; blacksmith shop 26% → 29%, factory 0 → 3%. Component change: a longer market track |
-| O-11 | Candidates `gift-fixed-1/2/3`: a gift lowers hostility by 1, 2 or 3, no dice (today 1 + a die in 3 for each of 3 dice: 2 on average) | Gifts about 0.55 a game whatever the value: bots give when a token is next to a village. At 3, alliances 0.33 → 0.41 a game; raids 4.2 → 4.0 |
-| O-12 | Candidate `upgrade-in-place`: an upgrade takes the slot of the building under it | Fort built 6% → 15%, university 13% → 15%; buildings at the end 4.8 → 4.9; mean score 20.6 → 20.8 |
-| O-13 | Candidate `raids-at-5`: raids only at hostility 5 | Measured before the stockade change (DD-77): raids 7.6 → 3.8 |
-| O-14 | Candidate `shipyard-repairs`: a damaged ship may return to its owner's colony fully repaired | Shipyard owners 1.9 → 0.3 below the mean (win rate ×0.5 → ×0.8), built 22% → 23%. The risk is small: 0.55 damages a player a game, nearly all from events (2.0 a game) and wrecks (0.2); ships attack ships 0.01 times a game, and half the players are never damaged |
 
 ## Where the board stands
 
@@ -140,8 +132,68 @@ Questions and candidates awaiting the designer. Candidates are the overrides of 
 | DD-91 | Dropped `goods-7`: Blacksmith shop built by 16% and barely worked, factory never: 1 🌿 (price 3) for 1 📦 (price 5) is worth little; a higher goods price and a longer track give goods a reason |
 | DD-92 | Dropped `upgrade-in-place`: An upgrade (factory, newspaper, church, fort) stops the effect of the building under it, yet both take a slot of the 6 |
 | DD-93 | No upgrade logic (DD-84 withdrawn): an improvement is a second building beside its basic one, with its own slot and 1 🏅 like any building; defences add up. Fort +2 (+3 with the stockade). A Father's bonus for a building (Kościuszko) counts once, the best |
+| DD-94 | Dropped `goods-as-tools`: Bots value 1 gold at about 0.15 points and 1 goods at 0.36, timber at 0.6–0.9: goods have no use but a sale, so manufacturing never pays; as tools they feed the buildings that score |
+| DD-95 | Dropped `goods-as-tools-3`: Bots value 1 gold at about 0.15 points and 1 goods at 0.36, timber at 0.6–0.9: goods have no use but a sale, so manufacturing never pays; as tools they feed the buildings that score |
+| DD-96 | Kościuszko: +1 for the stockade and +1 more for the fort (+2 with both, was +1 or +2); his bonus stays under Siege Artillery, which takes away only the buildings' own defence |
+| DD-97 | Applied `gold-5`: Scoring: 1 🏅 for every 5 💰 (not 10) |
+| DD-98 | Dropped `gold-7`: Gold scores little (10 a point at the end) and bots value it at about 0.15 points, so selling and manufacturing rarely pay |
+| DD-99 | Jakob Fugger: 1 🏅 for every 3 💰 (was 7, against 10), so he keeps his edge over the new 5 (DD-97) |
+| DD-100 | Custom house sells like the Europe market, from the warehouse and with no ship: any resources, any amounts, Europe's prices, demand after the sale (replaces DD-79's up to 2 of one resource) |
+| DD-101 | Gift: hostility falls by the Europe price of the resource given (goods calm more than food), no dice; replaces the fixed 3 (DD-86) |
+| DD-102 | A pawn is never alone in Europe: a beaten pawn, an attacking pawn with no colony, or a pawn a card sends back goes aboard its own ship, wherever the ship is; cargo that no longer fits the hold is discarded. Was: the pawn waited in Europe for its ship. Conversion: direct (rulebook wording) |
+| DD-103 | Applied `counter-sieges`: War: after the Royal Army is placed, place war cards one at a time, the loyalist first, then the patriots by bells; you may stop. The loyalist joins any patriot siege or guards their own colonies; a patriot defends their own or besieges a loyalist colony (cards, militia, mercenaries). A loyalist colony that falls (board dice) is scored by the patriot with the most strength there; tied patriots roll a die |
+| DD-104 | Applied `loyalist-colony-6`: Scoring: each loyalist colony 6 🏅, as a patriot colony (not 3) |
+| DD-105 | Applied `war-20-bells`: The war starts when a player reaches 20 🔔 (not 15) |
+| DD-106 | Applied `bells-2-per-point`: At the end, patriots score 1 🏅 per 2 unspent 🔔 (not 1 🏅 per 🔔) |
+| DD-107 | Applied `fathers-cheaper-low`: New price in 🔔: Francisco Pizarro 2, Francis Drake 2, Squanto 2, Thomas Hooker 2, John Smith 2, Pedro Cabral 2, Eli Whitney 2, John Rolfe 2, Benedict Arnold 1, Thomas Jefferson 4, Christopher Columbus 1, Michiel de Ruyter 1, William Bradford 2, Roger Williams 1, Olaudah Equiano 1, Francisco de Orellana 1, Pocahontas 1, John Eliot 1, Hernan Cortes 1, Peter Minuit 1 |
+| DD-108 | Applied `propaganda-anywhere`: Propaganda: the ship doesn't need to be in Europe |
+| DD-109 | Applied `hooker-crosses`: Thomas Hooker: take 6 ✝️ (instead of → +1 ✝️) |
+| DD-110 | Applied `whitney-workshop`: Eli Whitney: also get a blacksmith's shop free, if you can (keeps → +1 📦) |
+| DD-111 | Applied `squanto-harvest`: Squanto: take 5 🐟 into your warehouse, enough for a colony (instead of → +1 🐟) |
+| DD-112 | Dropped `rolfe-trade`: Rolfe: each resource sold brings +1 🟡 — the designer found it odd; replaced by `rolfe-farmers` |
+| DD-113 | Dropped `cabral-brazilwood`: Cabral: 3 🪵 on gain; replaced by `cabral-europe` (the ship counts as in Europe) |
+| DD-114 | Dropped `drake-treasure`: Drake: 6 🟡 on gain — not liked; replaced by `drake-corsair` or `drake-king` |
+| DD-115 | Dropped `drake-corsair`: Drake: a corsair on gain; replaced by damaging rival ships (`drake-ships-away`, `drake-ship-one`) |
+| DD-116 | Dropped `drake-king`: Drake: −3 🟥 from the King's army — unique, but Drake served the King |
+| DD-117 | Dropped `champlain-no-food`: Champlain: all colonies without 🐟 — too much; replaced by `champlain-next-colony` (only the next one) |
+| DD-118 | Applied `rolfe-farmers`: John Rolfe: put 2 planters into your discard, from the deck or the common discard (instead of → +1 🌿) |
+| DD-119 | Applied `cabral-europe`: Pedro Cabral: your ship always counts as in Europe: trade, hire, repair and taking on your pawn from Europe wherever it is, events that hit ships away from Europe pass it by, and it cannot be attacked (instead of +2 💨) |
+| DD-120 | Applied `drake-ships-away`: Francis Drake: every other player's ship not in Europe takes 1 damage (instead of ship attack +2 🗡️) |
+| DD-121 | Dropped `drake-ship-one`: Alternative to drake-ships-away: one rival ship of your choice away from Europe takes 1 damage, 49% |
+| DD-122 | Dropped `champlain-next-colony`: Champlain is taken 73–76% at 4–6 🔔 and his takers score about +5.5 and win 1.8×. Only the next colony free, at 3 🔔: 60%, takers +3.5 and 1.35×; at 4 🔔: 56%, +5.3 |
+| DD-123 | Applied by the designer (was O-16): the war is fought with cards on the colony slots of the nation boards, no player cubes. Royal Army shared by formula; Braves (🗡️ 2) per ally for every player, the loyalist too; patriots swap agents without 🗡️ for Militia (1 🔔, 🗡️ 1); anyone buys Mercenaries (5 🟡, 🗡️ 1); placing face down, several cards a turn, until all pass; nation tokens on enemy slots; patriots never help each other; ties for a patriot colony by die against the King; a colony the King takes scores for nobody; war cards count as agents. `war.allyCubes` 3 → 2, `war.militiaCards` and `war.mercenaryCards` 18 added. Conversion: component (colony slots, 6 Braves, 18 Militia, 18 Mercenaries, 60 two-sided nation tokens). Rulebook, rulings, rules-spec, engine, bots and screen all play it; `war.counterSieges` removed. Placeholder art: militia and mercenaries show the colonist and the soldier |
+| DD-124 | Applied by the designer (was O-17): two players never take nations of one colour (5 colours, 2 nations each). Conversion: direct (rulebook wording). The engine refuses such a game; the new-game screen and the lab pick nations apart |
+| DD-125 | Applied `hudson-3`: Henry Hudson costs 3 🔔 (not 2) |
+| DD-126 | Applied `fugger-cheaper`: Jakob Fugger costs 2 🔔 (not 3) |
+| DD-127 | Applied `pizarro-loot`: Francisco Pizarro: +10 🟡 for each native settlement you destroy (instead of double loot) |
+| DD-128 | Applied `indian-power`: Indian agent card: +1 🗡️ on land |
+| DD-129 | Applied `jefferson-two`: Thomas Jefferson: take the two cheapest Fathers free, one after the other; you may have 6 Fathers |
+| DD-130 | Applied `smith-allies`: John Smith: ally at once with every revealed settlement with no ally at hostility 0–2 to you (instead of alliances up to hostility 3) |
+| DD-131 | Dropped `fathers-cheaper`: Every Father 1 🔔 cheaper, at least 1 (after DD-107) |
+| DD-132 | Dropped `fathers-cheaper-2`: Every Father 2 🔔 cheaper, at least 1 (after DD-107) |
+| DD-133 | Dropped `fathers-keep-bells`: Bots take 1.2 Fathers a game of the 8 they see: a patriot's 🔔 score 1 🏅 each at the end, so a Father costing 2–5 🔔 and scoring 1 🏅 costs points unless its effect is strong |
+| DD-134 | Dropped `war-25-bells`: At 20 🔔 games last only 7.5 rounds and 99% of wars still start by bells |
+| DD-135 | Dropped `bells-5-per-point`: A patriot's unspent 🔔 score 1 🏅 each, so spending them on Fathers or militia costs points, and the bell leader's 20+ 🔔 are most of the winning score |
+| DD-136 | Dropped `events-1-cube`: Five event cards add 2 cubes per player, card or unit; with cube strength 1 and no refusal bell the Royal Army still takes most colonies (loyalist wins 45-69% at 4 players) |
+| DD-137 | Dropped `raids-at-5`: Raids start at hostility 4 of 5, so one hostile neighbour raids every activation |
+| DD-138 | Dropped `crosses-every-round`: Players gain 0.14 ✝️ a game: a chapel must be worked for 1 ✝️ while a recruit costs the round number |
+| DD-139 | Dropped `shipyard-repairs-on-build`: A second way to repair: a player whose ship is damaged can build the shipyard to repair it at once, wherever it is |
+| DD-140 | Dropped `town-hall-higher`: Every bot builds a town hall by round 3–4 and races for bells; most starting agents (📖) can work it |
+| DD-141 | Dropped `father-scores-price`: A Father costs 2–5 🔔 (2–5 🏅 for a patriot) and scores 1 🏅; scoring its price makes the purchase neutral, so the effect is the gain |
+| DD-142 | Dropped `newspaper-per-player`: AI games, 2 players (40 games, two seeds): the newspaper is unique and makes 2 🔔 a card (3 with a politician); bots build it in rounds 3 to 4, the player who has it wins the bell race and chooses when the war comes, the other is shut out for the rest of the game |
+| DD-143 | Dropped `newspaper-needs-crops`: The newspaper turns any spare card into 2 🔔 with no other cost, so the bell race is won by building it first; a crop per print ties the bells to the economy, as the workshop ties goods to crops |
+| DD-144 | Dropped `newspaper-dearer`: The newspaper costs 4 🟫, which a slave on a bonus forest makes in two cards; at 6 🟫 it comes later, after the colonies, instead of in round 2 to 4 |
+| DD-145 | Dropped `salon-rotates`: Fathers stay in the salon until taken, so the weak ones fill its 5 places: a game shows about 14 of the 34, and half of them are never taken |
+| DD-146 | Dropped `fugger-per-2`: Players end with about 8 🟡. At 2 🔔 (DD-124) Fugger is taken 46% of the time; with 1 🏅 per 2 🟡 too: 62% |
 
 Questions Q1–Q21 are answered in DD-11 to DD-67.
+
+## Decided by the designer (2026-11-28)
+
+| # | Decision |
+|---|---|
+| DD-147 | Applied `destroyed-scores-zero`: A nation with no colony after the war is destroyed and scores 0 🏅 |
+| DD-148 | Applied `tax-two-2`: Tax refusal in a 2-player game adds 2 🟥 (not 1) |
 
 ## Source edits still to make
 

@@ -29,3 +29,5 @@
 .toast .fparts i { padding:2px 5px;font-size:13px }
 .toast .fparts em { font-size:13px }
 .toast .dice i { width:18px;height:18px;line-height:18px;font-size:12.500px }
+/* A fight or the muster on screen covers the notices' corner: they wait under it until it closes. */
+body:has(.step .siege) .toasts { visibility:hidden }

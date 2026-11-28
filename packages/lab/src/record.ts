@@ -58,7 +58,7 @@ export function record(s: State, choices: Choice[], names: string[], ruleset: st
     qualifies: s.over!.players.map((p) => p.qualifies), loyalist: s.war!.loyalist, tactic: s.war!.tactic, pool: s.war!.pool, refBy: {},
     foundRounds: s.players.map(() => []), scoreByRound: [], priceEnd: { ...s.price }, gold: maps(), bells: maps(), crosses: maps(), tax: [], actions: maps(), hired: maps(),
     fathers: s.players.map((p) => [...p.fathers]), buildings: s.players.map((p) => [...p.buildings]), agents: s.players.map((p) => [...p.hand, ...p.deck, ...p.discard].sort()),
-    sieges: s.war!.sieges.map((x) => ({ owner: x.owner, cubes: x.cubes, attack: x.attack ?? 0, defence: x.defence ?? 0, dice: x.dice?.length ?? 0, fell: !!x.fell, takenBy: x.takenBy ?? null, loyalist: x.loyalist.length })),
+    sieges: s.war!.sieges.map((x) => ({ owner: x.owner, cubes: x.cubes, attack: x.attack ?? 0, defence: x.defence ?? 0, dice: x.dice?.length ?? 0, fell: !!x.fell, takenBy: x.takenBy ?? null, loyalist: s.war!.loyalist === null || s.war!.loyalist === x.owner ? 0 : (x.stacks[s.war!.loyalist]?.length ?? 0) })),
     attacks: [], settlements: { total: s.settlements.length, gone: s.settlements.filter((x) => !x.alive).length, allied: s.settlements.filter((x) => x.alive && x.ally !== null).length, hostile: s.settlements.filter((x) => x.alive && s.hostility[x.tribe] >= 4).length },
     frags: s.revealed.filter(Boolean).length, events: [], poi: {}, raids: 0, gifts: 0, passesWithCards: 0, peak: {}, sold: {}, produced: maps(), coastal: s.players.map(() => 0),
     ...(seen ? { offered: seen.offered, decisions: seen.decisions, forced: seen.forced } : {}),
@@ -84,7 +84,7 @@ export function record(s: State, choices: Choice[], names: string[], ruleset: st
       case 'combat': { const a = e.attack as { total: number }, d = e.defence as { total: number }; r.attacks.push({ kind: target, p, round, gap: a.total - d.total, hits: e.hits as number }); break; }
       case 'event': if (e.id) r.events.push(e.id as string); break;
       case 'poi': bump(r.poi, `${e.deck}.${e.card}`); break;
-      case 'raid': r.raids++; break;
+      case 'raid': if (!e.stopped) r.raids++; break;
       case 'activate': if ((e.hostility as number) <= 2) r.gifts++; break;
       case 'sell': bump(r.sold, e.r as string, e.n as number); break;
     }

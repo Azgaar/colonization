@@ -18,9 +18,11 @@ const ordinal = (n: number) => t('ending.place', { n });
 const BUILDING = '<svg class="ic" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M2 21V11l5-3.500V11l5-3.500V11l5-3.500V4h3v17Z" fill="currentColor"/></svg>';
 /** An alliance with a village: its tipi. */
 const TIPI = '<svg class="ic" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 3 3.500 21h17Z" fill="currentColor"/><path d="M12 13l-2.500 8h5Z" fill="#0f3436"/><path d="M10 3l2 3 2-3" stroke="currentColor" stroke-width="1.500" fill="none"/></svg>';
+/** Founding Fathers, for their column: the quill that signed the declaration (the icons have none). */
+const QUILL = '<svg class="ic" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M20.5 2.500C13 4 8.500 9 6.500 16l-2 5.500 1.200.500 2.600-5C15.500 16 19.500 10 20.500 2.500Z" fill="currentColor"/><path d="M8.600 16.500 15 8" stroke="#0f3436" stroke-width="1.300" stroke-linecap="round"/></svg>';
 /** Where points come from, in the order of the standings' columns, each with its sign. A Father's own bonus (Bolívar) gets his portrait. */
 const ORDER = ['colonies', 'bells', 'agents', 'gold', 'buildings', 'fathers', 'alliances'];
-const sign = (l: string) => (l === 'buildings' ? BUILDING : l === 'colonies' ? icon('colony', 18) : l === 'agents' ? icon('population', 18) : l === 'alliances' ? TIPI : D.fathers[l] ? `<img class="efather" src="${art.father(l)}" alt="">` : icon(l === 'fathers' ? 'father' : l, 18));
+const sign = (l: string) => (l === 'buildings' ? BUILDING : l === 'colonies' ? icon('colony', 18) : l === 'agents' ? icon('population', 18) : l === 'alliances' ? TIPI : D.fathers[l] ? `<img class="efather" src="${art.father(l)}" alt="">` : l === 'fathers' ? QUILL : icon(l, 18));
 /** The player's game as a history: everyone's score round by round (the player's line in front), the war at the end,
  * and under the rounds what the player did in them: colonies founded, buildings built, Fathers won. */
 function history(p: number) {
@@ -48,9 +50,9 @@ function history(p: number) {
 function standings(ranked: NonNullable<typeof D.over>['players']) {
   const over = D.over!, labels = [...new Set(ranked.flatMap((x) => x.parts.map((q) => q.label)))].sort((a, b) => (ORDER.indexOf(a) + 1 || 99) - (ORDER.indexOf(b) + 1 || 99));
   const val = (x: (typeof ranked)[number], l: string) => x.parts.find((q) => q.label === l)?.value ?? 0, best = labels.map((l) => Math.max(...ranked.map((x) => val(x, l))));
-  const cols = `grid-template-columns:30px minmax(0,1fr) repeat(${labels.length},40px) 64px`;
+  const cols = `grid-template-columns:28px minmax(0,1fr) repeat(${labels.length},34px) 52px`;
   const head = `<li class="ehead" style="${cols}"><span></span><span></span>${labels.map((l) => `<span title="${named(l)}">${sign(l)}</span>`).join('')}<span>${icon('vp', 20)}</span></li>`;
-  return `<ol class="erank">${head}${ranked.map((x) => `<li class="${x.qualifies ? '' : 'out'}${x.player === me ? ' me' : ''}" style="${cols}"><span class="eem">${Places.em(x.player, 28)}${x.side === 'loyalist' ? `<span class="loy" title="${t('loyalist')}">${icon('king', 11)}</span>` : ''}</span><b>${Places.name(x.player)}${over.winners.includes(x.player) ? ` <span title="${t('ending.winner')}">${icon('winner', 17)}</span>` : ''}</b>${labels.map((l, q) => { const v = val(x, l); return `<span class="${v && v === best[q] ? 'best' : ''}">${v || '–'}</span>`; }).join('')}<strong>${x.score}</strong></li>`).join('')}</ol>`;
+  return `<ol class="erank">${head}${ranked.map((x) => `<li class="${x.qualifies ? '' : 'out'}${x.player === me ? ' me' : ''}" style="${cols}"><span class="eem">${Places.em(x.player, 28)}${x.side === 'loyalist' ? `<span class="loy" title="${t('loyalist')}">${icon('king', 11)}</span>` : ''}</span><b><span class="enm">${Places.name(x.player)}</span>${over.winners.includes(x.player) ? ` <span title="${t('ending.winner')}">${icon('winner', 17)}</span>` : ''}</b>${labels.map((l, q) => { const v = val(x, l); return `<span class="${v && v === best[q] ? 'best' : ''}">${v || '–'}</span>`; }).join('')}<strong>${x.score}</strong></li>`).join('')}</ol>`;
 }
 /** Shown once the sieges are told (the war box's last step). */
 export function ending() {
@@ -66,5 +68,5 @@ export function ending() {
 <div class="escore"><strong>${r.score}${icon('vp', 30)}</strong><span>${ordinal(place)} ${t('ending.of', { length: ranked.length })}<small>${D.year}, ${t('ending.rounds', { round: D.round })}</small></span></div>
 ${history(me)}
 ${standings(ranked)}
-<div class="eacts"><button data-war="0">${t('ending.review_war')}</button><button class="go" data-t-open="main">${t('top.main_menu')}</button></div></div></div>`;
+<div class="eacts"><button data-front>${t('ending.review_war')}</button><button class="go" data-t-open="main">${t('top.main_menu')}</button></div></div></div>`;
 }

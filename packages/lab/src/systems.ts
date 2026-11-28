@@ -4,7 +4,7 @@
  */
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { loadRuleset } from '@col/data';
-import { choiceKey, replay } from '@col/engine';
+import { choiceKey, nationsApart, replay } from '@col/engine';
 import { goalBot, PERSONALITIES, randomBot, type Bot, type Personality } from '@col/bots';
 import { playGame } from './play.ts';
 import { record, type GameRecord } from './record.ts';
@@ -16,7 +16,7 @@ const bump = (o: Record<string, number>, k: string, n = 1) => { o[k] = (o[k] ?? 
 const rs: GameRecord[] = [];
 let failures = 0, replays = 0;
 for (let i = 0; i < games; i++) {
-  const n = (i % 5) + 1, nations = Array.from({ length: n }, (_, k) => all[(i * 3 + k * 7) % 10]).filter((x, k, a) => a.indexOf(x) === k);
+  const n = (i % 5) + 1, nations = nationsApart(def, Array.from({ length: all.length }, (_, k) => all[(i * 3 + k * 7) % all.length]), n);
   // Goal-driven bots, with one random seat now and then for what they avoid.
   const bots: Bot[] = nations.map((_, p) => (i % 4 === 3 && p === 0 ? randomBot(`s${i}`, true) : goalBot(`s${i}-${p}`, PERSONALITIES[names[(i + p) % names.length]], names[(i + p) % names.length])));
   try {

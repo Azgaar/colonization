@@ -3,7 +3,7 @@ import { RESOURCES } from '@col/data';
 import type { Choice, Move, State } from './types.ts';
 import { always, ask, decision, log, push, task } from './core.ts';
 import { cardHas, coloniesOf, holdFree, holdUsed, mods, stockKinds, total, turnOrder, warehouseCap } from './util.ts';
-import { adjacent, canInfantryEnter, canShipEnter, enterCost, explorable, inEurope, nb, reveal } from './map.ts';
+import { adjacent, canInfantryEnter, canShipEnter, enterCost, explorable, nb, reveal, shipInEurope } from './map.ts';
 
 /** One move action: its points are shared by the ship and the pawn, in any order. `token` is the one moving now; 'switch' hands the points left to the other. */
 export function startMove(s: State, p: number, token: 'ship' | 'infantry', card: string) {
@@ -46,7 +46,7 @@ function tokenOptions(s: State, m: Move, token: 'ship' | 'infantry'): Choice[] {
     if (m.points >= set.explore) for (const f of explorable(s, pl.ship)) out.push({ c: 'explore', frag: f });
     disembark();
     if (canBoard && pl.inf !== 'ship' &&
-      (pl.inf === 'europe' ? inEurope(s, pl.ship) : adjacent(s, pl.inf, pl.ship))) out.push({ c: 'embark' });
+      (pl.inf === 'europe' ? shipInEurope(s, m.player) : adjacent(s, pl.inf, pl.ship))) out.push({ c: 'embark' });
     if (m.points >= set.cargo && total(pl.hold) + total(pl.wh) > 0 && nextToOwnColony(s, m.player, pl.ship) &&
       (total(pl.hold) > 0 || holdFree(s, m.player) > 0)) out.push({ c: 'cargo' });
   } else if (pl.inf === 'ship') disembark();

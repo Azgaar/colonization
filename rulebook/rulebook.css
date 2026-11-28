@@ -112,6 +112,9 @@ h3 + p { break-after: avoid; }
 
 /* The map at setup. */
 figure.map { margin: 0 auto 2mm; max-width: 40mm; }
+/* The map scheme sits on the right of the setup step that lays the map. */
+.steps > li > figure.map { float: right; width: 31mm; margin: .5mm 0 1mm 3mm; }
+.steps > li:has(> figure.map)::after { content: ""; display: block; clear: both; }
 .map svg { display: block; width: 100%; }
 .map rect { stroke: var(--paper); stroke-width: .05; }
 .map .eu, .k.eu { fill: #e1cb98; background: #e1cb98; }
@@ -167,9 +170,6 @@ body { counter-reset: chapter; }
 
 /* A drop cap where a chapter opens with prose. */
 .chapter:not(.ref) > .cols > p:first-child::first-letter { float: left; font: 800 25pt/.82 var(--sc); color: var(--teal); padding: 1mm 1.3mm 0 0; }
-
-/* An anchor closes each chapter of the rules. */
-.chapter:not(.ref) > :last-child::after { content: ""; display: block; height: 4.5mm; margin: 2mm auto 0; max-width: 30mm; background: var(--orn-anchor) center / contain no-repeat; column-span: all; }
 
 /* Box emblems. */
 .example::before, .remember::before, .detail::before { padding-left: 4.6mm; background: left center / 3.6mm no-repeat; }

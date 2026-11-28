@@ -124,18 +124,17 @@
       "copies": 1,
       "nickname": "custom house",
       "name": "таможня",
-      "effect": "→ продажа до 2 единиц ресурса",
+      "effect": "→ продажа любых ресурсов со склада, как в Европе",
       "education": "📖",
       "requires": "склад",
       "price": "3 🪵",
       "image": "custom house.png",
       "$fx": {
         "work": {
-          "kind": "sell",
-          "amount": 2
+          "kind": "market"
         }
       },
-      "$checked": "a72e89d9a6"
+      "$checked": "6823139895"
     },
     {
       "copies": 1,

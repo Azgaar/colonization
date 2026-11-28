@@ -8,7 +8,7 @@ import {
   drawAgent, drawCard, fillPier, fillSalon, gainNative, has, mods, reducePopulation, removeOne, retire, setHostility, stockKinds,
   takeFromPier, total, turnOrder, uniq,
 } from './util.ts';
-import { adjacent, colonyProblem, inEurope } from './map.ts';
+import { adjacent, colonyProblem, shipInEurope } from './map.ts';
 import { attackOptions, startAttack } from './combat.ts';
 import { buildingYield, cellYields, docksYields, store } from './production.ts';
 import { canMove, startMove } from './moves.ts';
@@ -71,7 +71,7 @@ decision('tax', {
     const set = s.def.settings.tax;
     log(s, { e: 'tax', p: d.player, pay: c.c === 'pay', rate: taxRate(s) });
     if (c.c === 'pay') { addGold(s, d.player, -taxRate(s), 'tax'); return addBells(s, d.player, set.payBells, 'tax'); }
-    addRef(s, s.players.length === 1 ? set.refuseRefSolo : set.refuseRef, 'tax');
+    addRef(s, refuseCubes(s), 'tax');
     addBells(s, d.player, set.refuseBells, 'tax');
   },
 });
@@ -82,7 +82,8 @@ export function crossIncome(s: State, p: number): number {
 }
 task('roundEnd', (s) => {
   for (const p of turnOrder(s)) { const n = crossIncome(s, p); if (n) addCrosses(s, p, n, 'income'); }
-  const { war, rounds } = s.def.settings;
+  const { war, rounds, fathers } = s.def.settings;
+  if (fathers.rotate && s.salon.length) { s.fatherDiscard.push(s.salon.shift()!); fillSalon(s); }
   const bells = s.players.some((p) => p.bells >= war.bells);
   if (bells || s.round >= rounds.max) return push(s, { t: 'warStart', reason: bells ? 'bells' : 'rounds' });
   s.round++;
@@ -113,8 +114,10 @@ export function addBuilding(s: State, p: number, b: string) {
   const pl = s.players[p];
   if (s.def.settings.damage.repairOnBuild && building(s, b).work?.kind === 'repair' && pl.damage) { pl.damage = 0; log(s, { e: 'repaired', p }); }
 }
+/** Cubes a tax refusal adds to the barracks: more in the games with no loyalist. */
+export const refuseCubes = (s: State) => { const t = s.def.settings.tax, n = s.players.length; return n === 1 ? t.refuseRefSolo : n === 2 ? t.refuseRefTwo : t.refuseRef; };
 export function foundCost(s: State, p: number): { resource: Resource; value: number } | null {
-  if (coloniesOf(s, p).length === 0) return null;
+  if (coloniesOf(s, p).length === 0 || (s.players[p].freeFound ?? 0) > 0) return null;
   const alt = mods(s, p, 'foundCost')[0];
   return alt ? { resource: alt.resource, value: alt.value } : s.def.settings.colony.foundCost;
 }
@@ -177,10 +180,10 @@ export function actionsFor(s: State, p: number, card: string): { action: string;
   const atk = attackOptions(s, p, card);
   add('attack', cardHas(s, card, 'combat') ? (atk.length ? null : 'no target in reach') : 'needs an agent with 🗡️', atk.map(({ token, mode, cell }) => ({ token, mode, cell })));
 
-  const eu = inEurope(s, pl.ship) ? null : 'the ship must be in Europe';
+  const eu = shipInEurope(s, p) ? null : 'the ship must be in Europe';
   add('trade', eu ?? (total(pl.hold) ? null : 'the hold is empty'));
   add('hire', eu ?? (s.pier.length ? null : 'the pier is empty'));
-  add('propaganda', eu ?? (pl.fathers.length >= fatherLimit(s, p) ? 'the limit of Founding Fathers is reached'
+  add('propaganda', (s.def.settings.propaganda.anywhere ? null : eu) ?? (pl.fathers.length >= fatherLimit(s, p) ? 'the limit of Founding Fathers is reached'
     : s.salon.some((f) => s.def.fathers[f].bells <= pl.bells) ? null : 'not enough bells'));
   add('repair', eu ?? (pl.damage ? null : 'the ship is not damaged'));
   const yard = pl.buildings.find((b) => building(s, b).work?.kind === 'repair');
@@ -190,8 +193,10 @@ export function actionsFor(s: State, p: number, card: string): { action: string;
   const buildable = Object.keys(s.def.buildings).filter((b) => !canOwnBuilding(s, p, b) && buildPrice(s, p, card, b) <= pl.wh.timber);
   add('build', noColony ?? (buildable.length ? null : 'nothing affordable to build'), buildable.map((b) => ({ building: b })));
 
-  const customs = pl.buildings.find((b) => building(s, b).work?.kind === 'sell');
-  add('customs', !customs ? 'needs a custom house' : a.edu < building(s, customs).edu ? 'not enough education' : total(pl.wh) ? null : 'the warehouse is empty', stockKinds(pl.wh).map((r) => ({ r })));
+  // A custom house sells one resource (kind sell), or like the Europe market, anything in the warehouse (kind market, DD-100).
+  const customs = pl.buildings.find((b) => ['sell', 'market'].includes(building(s, b).work?.kind ?? ''));
+  const market = customs && building(s, customs).work?.kind === 'market';
+  add('customs', !customs ? 'needs a custom house' : a.edu < building(s, customs).edu ? 'not enough education' : total(pl.wh) ? null : 'the warehouse is empty', market ? [{}] : stockKinds(pl.wh).map((r) => ({ r })));
   if (cardHas(s, card, 'smuggle')) add('smuggle', noColony ?? (total(pl.wh) ? null : 'the warehouse is empty'), stockKinds(pl.wh).map((r) => ({ r })));
 
   if (set.crosses.recruitAction) {
@@ -265,8 +270,9 @@ const actions: Record<string, (s: State, p: number, c: any) => void> = {
   moveShip: (s, p, c) => startMove(s, p, 'ship', c.card),
   moveInfantry: (s, p, c) => startMove(s, p, 'infantry', c.card),
   found(s, p) {
-    const cost = foundCost(s, p);
-    if (cost) s.players[p].wh[cost.resource] -= cost.value;
+    const pl = s.players[p], cost = foundCost(s, p);
+    if (cost) pl.wh[cost.resource] -= cost.value;
+    else if (pl.freeFound && coloniesOf(s, p).length) pl.freeFound--;
     foundColony(s, p, s.players[p].inf as number);
   },
   attack: (s, p, c) => startAttack(s, p, c),
@@ -289,6 +295,7 @@ const actions: Record<string, (s: State, p: number, c: any) => void> = {
     }
   },
   customs(s, p, c) {
+    if (c.r === undefined) return push(s, { t: 'trade', p, card: c.card, done: [], sold: {}, from: 'wh' });
     // Up to the building's amount of the resource chosen, each at the price of the moment.
     const w = s.players[p].buildings.map((b) => building(s, b).work).find((x) => x?.kind === 'sell');
     const n = Math.min(w?.kind === 'sell' ? w.amount : 1, s.players[p].wh[c.r as Resource]);
@@ -317,9 +324,11 @@ const actions: Record<string, (s: State, p: number, c: any) => void> = {
   },
   gift(s, p, c) {
     const x = s.settlements[c.settlement - 1], set = s.def.settings;
-    s.players[p].wh[(c.r ?? 'goods') as Resource]--;
-    const hits = dice(s, set.natives.giftDice).filter((d) => set.combat.successFaces.includes(d)).length;
-    setHostility(s, x.tribe, s.hostility[x.tribe] - set.natives.giftBase - hits);
+    const r = (c.r ?? 'goods') as Resource;
+    s.players[p].wh[r]--;
+    // By price (DD-101): hostility falls by the resource's Europe price, so goods calm more than food. Otherwise the fixed part and the dice.
+    const hits = set.natives.giftByPrice ? 0 : dice(s, set.natives.giftDice).filter((d) => set.combat.successFaces.includes(d)).length;
+    setHostility(s, x.tribe, s.hostility[x.tribe] - (set.natives.giftByPrice ? s.price[r] : set.natives.giftBase) - hits);
     log(s, { e: 'gift', p, settlement: x.n, hits });
   },
   preach(s, p, c) {
@@ -356,13 +365,15 @@ decision('discardHand', {
 });
 
 task('trade', (s, t) => {
-  if (stockKinds(s.players[t.p].hold).some((r) => !t.done.includes(r))) ask(s, { kind: 'trade', player: t.p, card: t.card, done: t.done, sold: t.sold });
+  const from = t.from ?? 'hold';
+  if (stockKinds(s.players[t.p][from as 'hold' | 'wh']).some((r) => !t.done.includes(r))) ask(s, { kind: 'trade', player: t.p, card: t.card, done: t.done, sold: t.sold, from });
   else finishTrade(s, t.sold);
 });
 function finishTrade(s: State, sold: Partial<Record<Resource, number>>) { for (const [r, n] of Object.entries(sold)) demand(s, r as Resource, n!); }
 decision('trade', {
   options(s, d) {
-    const hold = s.players[d.player].hold;
+    // The Europe market sells from the hold; a custom house (DD-100) from the warehouse.
+    const hold = s.players[d.player][(d.from ?? 'hold') as 'hold' | 'wh'];
     const out: Choice[] = [];
     for (const r of stockKinds(hold)) if (!(d.done as string[]).includes(r)) for (let n = 1; n <= hold[r]; n++) out.push({ c: 'sell', r, n });
     return [...out, { c: 'done' }];
@@ -370,10 +381,10 @@ decision('trade', {
   resolve(s, d, c) {
     if (c.c === 'done') return finishTrade(s, d.sold);
     const r = c.r as Resource;
-    s.players[d.player].hold[r] -= c.n;
-    addGold(s, d.player, c.n * sellPrice(s, d.player, d.card, r), 'trade');
+    s.players[d.player][(d.from ?? 'hold') as 'hold' | 'wh'][r] -= c.n;
+    addGold(s, d.player, c.n * sellPrice(s, d.player, d.card, r), d.from === 'wh' ? 'customs' : 'trade');
     log(s, { e: 'sell', p: d.player, r, n: c.n, price: sellPrice(s, d.player, d.card, r) });
-    push(s, { t: 'trade', p: d.player, card: d.card, done: [...d.done, r], sold: { ...d.sold, [r]: c.n } });
+    push(s, { t: 'trade', p: d.player, card: d.card, done: [...d.done, r], sold: { ...d.sold, [r]: c.n }, from: d.from });
   },
 });
 
@@ -416,7 +427,7 @@ decision('propaganda', {
   options: (s, d) => [...s.salon.filter((f) => s.def.fathers[f].bells <= s.players[d.player].bells).map((father) => ({ c: 'take', father })), ...((d.n as number) > 0 ? [{ c: 'done' }] : [])],
   resolve(s, d, c) {
     if (c.c === 'done') return fillSalon(s);
-    addBells(s, d.player, -s.def.fathers[c.father].bells, 'fathers');
+    if (!s.def.settings.fathers.keepBells) addBells(s, d.player, -s.def.fathers[c.father].bells, 'fathers');
     push(s, d.n + 1 < s.def.settings.propaganda.maxFathers ? { t: 'propaganda', p: d.player, n: d.n + 1 } : { t: 'fillSalon' });
     gainFather(s, d.player, c.father);
   },

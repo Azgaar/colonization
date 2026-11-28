@@ -9,6 +9,8 @@ body.shaded .shade { opacity:.72;visibility:visible }
 .rc.ruin { --a:#6a4a2a }
 .rc.wreck { --a:#1c4a68 }
 .rc.war { --a:#7c2419 }
+/* The war's pictures are tall scenes: the King on his throne, the two armies; their middle tells them. */
+.rc.war .pic[src*="role/"] { object-position:50% 62% }
 .rc.tax { --a:#8a6420 }
 .rc .in { position:relative;flex:1;min-width:0;display:flex;flex-direction:column;align-items:stretch;border-radius:12px;overflow:hidden auto;padding:10px 10px 0;background:#f8f0dc;background-image:radial-gradient(130% 80% at 50% 0,#fffaf0 0,#f8f0dc 55%,#efe2c3 100%) }
 .rc:has(.opts) .pic { aspect-ratio:16/9 }

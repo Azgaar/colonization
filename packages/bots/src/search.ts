@@ -66,10 +66,14 @@ export function determinize(v: View, rng: Rng): State {
   const tribes = copies(def.tribes);
   s.tribeDeck = deal(rng, minus(tribes, s.settlements.map((x) => x.tribe)), s.tribeDeck.length, tribes);
 
-  // Loyalist cards in the sieges come from the loyalist's collection, each at most once.
-  if (war && war.loyalist !== null && war.loyalist !== me) {
-    const pool = shuffle(rng, [...(v.collections[war.loyalist] ?? [])]);
-    for (const x of war.sieges) x.loyalist = x.loyalist.map((c) => (c === '?' ? pool.pop() ?? 'colonist' : c));
+  // Other players' face-down war cards, on the slots and in hand, come from their agents and the war cards they took, each at most once.
+  if (war) for (const k of Object.keys(war.hands)) {
+    const q = Number(k);
+    if (q === me) continue;
+    const pool = shuffle(rng, [...(v.collections[q] ?? []), ...(war.gained[q] ?? [])]);
+    const fill = (c: string) => (c === '?' ? pool.pop() ?? 'colonist' : c);
+    for (const x of war.sieges) if (x.stacks[q]) x.stacks[q] = x.stacks[q].map(fill);
+    war.hands[q] = war.hands[q].map(fill);
   }
   // Secret fields the engine needs to go on: what others gave in a joint event is unknown, so nothing.
   const d = s.pending;

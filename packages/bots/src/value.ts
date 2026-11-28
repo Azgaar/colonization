@@ -1,7 +1,7 @@
 import type { Icon, Node, Resource } from '@col/data';
 import { RESOURCES } from '@col/data';
 import type { State, View } from '@col/engine';
-import { foundCost, map, recruitCost, util } from '@col/engine';
+import { canOwnBuilding, fatherLimit, refuseCubes, foundCost, map, recruitCost, util } from '@col/engine';
 import { cardPower, expectedLoyalist, forecast, outlook, type Change } from './outlook.ts';
 import type { Weights } from './weights.ts';
 
@@ -30,7 +30,6 @@ function leaning(v: View, w: Weights, left: number): number {
   const s = v.state, me = v.player, n = s.players.length;
   if (n === 1 || w.loyal <= -1) return 0;
   const bells = s.players.map((p) => p.bells);
-  const gap = bells[me] - Math.min(...bells.filter((_, i) => i !== me));
   const rounds = left - 1;
   const other = expectedLoyalist(s, me, false);
   const pat = outlook(s, v.collections, me, other === me ? null : other, rounds);
@@ -39,8 +38,10 @@ function leaning(v: View, w: Weights, left: number): number {
   const asPatriot = (pat.points + bells[me] + rounds * 2) * (0.15 + 0.85 * pat.qualifies);
   const asLoyalist = loy.points * (0.15 + 0.85 * loy.qualifies) + 3 * loy.qualifies;
   const want = (asLoyalist * (1 + Math.max(-0.9, w.loyal))) / Math.max(0.1, asPatriot + asLoyalist);
-  // Others may be ahead in having fewer bells; Fathers can still be bought to get rid of some.
-  const can = gap <= 0 ? 1 : Math.max(0, 1 - gap / (2 + 2 * rounds));
+  // Only one player becomes the loyalist, and everyone may be trying: the chance of ending with the fewest bells.
+  // Each rival is below us by the end with a chance that follows the bell gap, blurred by the rounds left, so early in the game it is about one in the number of players.
+  const blur = 0.8 + 0.6 * Math.max(0, rounds);
+  const can = bells.reduce((p, b, i) => (i === me ? p : p / (1 + Math.exp(-(b - bells[me]) / blur))), 1);
   const x = want * can;
   return x > 0.5 ? Math.min(1, 0.5 + x * 0.5) : 0;
 }
@@ -58,7 +59,7 @@ export function read(v: View, w: Weights): Situation {
     if (s.map.zone[c] === 'map' && map.isLand(s, c) && map.colonyProblem(s, c) === null) { const t = map.tokenAt(s, c); if (!t || t.p === me) sites.push(c); }
   const cost = foundCost(s, me);
   const canFound = colonies < set.colony.max && (!cost || pl.wh[cost.resource] >= cost.value);
-  const bell = w.bell * (1 - loyal) - w.shun * loyal;
+  const bell = w.bell * (1 - loyal) * set.score.perBell / set.score.bellsPerPoint - w.shun * loyal;
   const loyalist = expectedLoyalist(s, me, loyal > 0.4);
   const x: Situation = {
     v, s, me, w, cards: v.collections[me] ?? util.collection(pl), left, last, loyal, loyalist, bell, gold: w.gold, strength: 0, ref: 0, res: {} as Record<Resource, number>,
@@ -71,9 +72,11 @@ export function read(v: View, w: Weights): Situation {
   // The war is near: arm before it comes.
   if (loyal < 0.5 && top >= set.war.bells * 0.5 && colonies) x.strength *= 1 + 0.8 * (1 - outlook(s, v.collections, me, loyalist, left - 1).qualifies);
   x.ref = loyal > 0.4 ? -0.3 : Math.max(1.2 * Math.max(0.2, mineShare), (here - warPoints(x, { ref: 4 })) / 4) * w.ref;
-  x.gold = Math.max(0.1, last ? 0.1 + x.strength * 0.15 : w.gold, (x.strength / s.def.settings.war.mercenaryGold) * 1.2);
+  // Gold is worth at least what it scores at the end (score.goldPerPoint); the weights were tuned at 10 gold a point.
+  const end = 1 / set.score.goldPerPoint, scale = 10 * end;
+  x.gold = Math.max(end, last ? end + x.strength * 0.15 : w.gold * scale, (x.strength / s.def.settings.war.mercenaryGold) * 1.2);
   // Gold that will pay a tax saves the cubes of a refusal.
-  const tax = s.def.settings.tax, refuse = (s.players.length === 1 ? tax.refuseRefSolo : tax.refuseRef) * x.ref + (tax.payBells - tax.refuseBells) * bell;
+  const tax = s.def.settings.tax, refuse = refuseCubes(s) * x.ref + (tax.payBells - tax.refuseBells) * bell;
   for (let r = s.round, sum = 0; r <= Math.min(set.rounds.max, s.round + left - 1); r++) {
     const rate = tax.track[r - 1];
     sum += rate;
@@ -102,6 +105,11 @@ export function read(v: View, w: Weights): Situation {
     // Goods buy gifts that calm a tribe about to raid us.
     if (s.def.settings.natives.giftResource === 'goods' && pl.wh.goods < 1) x.res.goods = Math.max(x.res.goods, 0.8 * bestGift(x));
   } else if (pl.wh.timber < build) x.res.timber = 0.3;
+  // 🔔 also buy Fathers: with room for one, a 🔔 is worth part of what the best one on show gives per 🔔 (at 2 🔔 a 🏅, DD-106, only the bell leader still made them).
+  if (!last && loyal < 0.5 && pl.fathers.length < fatherLimit(s, me) && s.salon.length) {
+    const per = Math.max(0, ...s.salon.map((f) => (fatherValue(x, f) + (set.fathers.keepBells ? 0 : s.def.fathers[f].bells * x.bell)) / Math.max(1, s.def.fathers[f].bells)));
+    x.bell = Math.max(x.bell, (1 - loyal) * 0.6 * per);
+  }
   return x;
 }
 
@@ -134,8 +142,8 @@ export function raidExposure(x: Situation, tribe?: string, h?: number, site?: nu
 }
 /** Raids a gift would spare us: hostility falls by 1 and by each success of 3 dice, about 2 in all. */
 /** How much hostility a gift takes away on average: the fixed part and the dice that succeed. */
-export const giftDrop = (s: State) => { const n = s.def.settings.natives; return n.giftBase + (n.giftDice * s.def.settings.combat.successFaces.length) / 6; };
-export const giftGain = (x: Situation, tribe: string) => Math.max(0, raidExposure(x) - raidExposure(x, tribe, Math.max(0, Math.round(x.s.hostility[tribe] - giftDrop(x.s)))));
+export const giftDrop = (s: State, r: Resource = 'goods') => { const n = s.def.settings.natives; return n.giftByPrice ? s.price[r] : n.giftBase + (n.giftDice * s.def.settings.combat.successFaces.length) / 6; };
+export const giftGain = (x: Situation, tribe: string, r: Resource = 'goods') => Math.max(0, raidExposure(x) - raidExposure(x, tribe, Math.max(0, Math.round(x.s.hostility[tribe] - giftDrop(x.s, r)))));
 const bestGift = (x: Situation) => Math.max(0, ...x.s.settlements.filter((z) => z.alive).map((z) => giftGain(x, z.tribe)));
 
 /* ---- Crosses and the buildings that make things ---- */
@@ -175,7 +183,8 @@ export function buildingValue(x: Situation, b: string): number {
     chapel: () => (s.def.settings.crosses.everyRound ? crossGain(x, 'chapel') : workGain(x, 'chapel')),
     school: () => schoolGain(x, 'school') * w.teach,
     stockade: () => defenceGain(x, 'stockade') + (s.def.settings.raid.stoppedBy === 'stockade' ? raidExposure(x) : 0),
-    custom_house: () => 0.15 * left * w.trade,
+    // Given one at round 3, a bot sells about 19 🟡 with it over the game, roughly 3.5 🟡 a round.
+    custom_house: () => (s.def.buildings.custom_house?.work?.kind === 'market' ? 3.5 / s.def.settings.score.goldPerPoint : 0.15) * left * w.trade,
     // About 0.6 damages a player a game (0.07 a round): a refuge by the colony saves the voyage home, and the repair actions when the shipyard repairs at once.
     shipyard: () => 0.07 * Math.max(0, left) * (s.def.settings.damage.shipyardRepairs ? 2.5 : 1) + (s.def.settings.damage.repairOnBuild ? x.s.players[x.me].damage * 0.8 : 0),
     factory: () => Math.max(0, workGain(x, 'factory') - workGain(x, 'blacksmith_shop')),
@@ -187,7 +196,12 @@ export function buildingValue(x: Situation, b: string): number {
     fort: () => defenceGain(x, 'fort') + (s.def.settings.raid.stoppedBy === 'fort' ? raidExposure(x) : 0),
     university: () => schoolGain(x, 'university') * w.teach,
   };
-  return w.building + (extra[b]?.() ?? 0);
+  // A basic building also opens the way to its unique upgrade (the warehouse to the custom house): half of what that upgrade would add, while one is left,
+  // shared with the rivals who could already build it.
+  const pl = s.players[x.me], rivals = s.players.filter((q, i) => i !== x.me && q.buildings.includes(b)).length;
+  const next = Object.values(s.def.buildings).filter((u) => u.requires === b && s.buildingsLeft[u.id] > 0 && !util.has(pl, u.id) && pl.buildings.length < s.def.settings.buildings.max - 1);
+  const opens = Math.max(0, ...next.map((u) => (0.5 * (extra[u.id]?.() ?? 0)) / (1 + rivals)));
+  return w.building + (extra[b]?.() ?? 0) + (util.has(pl, b) ? 0 : opens);
 }
 /** What a defence building is worth: the war points it adds to every colony's defence, as the forecast of the war sees them. Small but not nothing before the first colony. */
 function defenceGain(x: Situation, b: string): number {
@@ -283,20 +297,51 @@ export function fatherValue(x: Situation, f: string): number {
   const pat = 1 - x.loyal, allies = s.settlements.filter((z) => z.alive && z.ally === me).length;
   const own = Math.max(1, x.colonies);
   const t: Record<string, () => number> = {
-    christopher_columbus: () => 0.15 * left * w.explore, jakob_fugger: () => pl.gold * 0.045, pedro_cabral: () => 0.1 * left,
-    ponce_de_leon: () => 1.4 * w.hire, francisco_pizarro: () => 0.4 * w.native, bartolome_de_las_casas: () => 0.25 * left * w.native, hernan_cortes: () => 0.2 * left * w.native,
-    juan_de_sepulveda: () => 0.6, francisco_de_orellana: () => 0.25 * left * w.explore, francis_drake: () => 0.2 * w.raid, walter_raleigh: () => 1 * w.hire,
-    henry_hudson: () => agentValue(x, 'captain'), samuel_de_champlain: () => (x.sites.length && x.colonies < s.def.settings.colony.max ? Math.max(0.5, warPoints(x, { colony: 0.5 }) - warPoints(x)) * w.colony + (x.colonies ? 1.5 : 4) : 0),
-    john_smith: () => 0.3 * w.alliance, squanto: () => 0.1 * left, john_rolfe: () => 0.1 * left, thomas_hooker: () => left * w.cross * (util.has(pl, 'chapel') ? 1.5 : 0),
+    christopher_columbus: () => 0.15 * left * w.explore,
+    // Read from the card's data, so a changed effect is valued as it is.
+    thomas_hooker: () => fxValue(x, f), eli_whitney: () => fxValue(x, f), john_rolfe: () => fxValue(x, f), squanto: () => fxValue(x, f), pedro_cabral: () => fxValue(x, f), francis_drake: () => fxValue(x, f), jakob_fugger: () => pl.gold * Math.max(0, 1 / (s.def.fathers.jakob_fugger!.mods.find((m) => m.mod === 'goldPerPoint')?.value ?? s.def.settings.score.goldPerPoint) - 1 / s.def.settings.score.goldPerPoint), 
+    ponce_de_leon: () => 1.4 * w.hire, francisco_pizarro: () => (s.def.fathers[f].mods.some((m) => m.mod === 'lootGold') ? fxValue(x, f) : 0.4 * w.native), bartolome_de_las_casas: () => 0.25 * left * w.native, hernan_cortes: () => 0.2 * left * w.native,
+    juan_de_sepulveda: () => 0.6, francisco_de_orellana: () => 0.25 * left * w.explore, walter_raleigh: () => 1 * w.hire,
+    henry_hudson: () => agentValue(x, 'captain'), samuel_de_champlain: () => !s.def.fathers[f].onGain.some((n) => n.n === 'freeColony') ? fxValue(x, f) : (x.sites.length && x.colonies < s.def.settings.colony.max ? Math.max(0.5, warPoints(x, { colony: 0.5 }) - warPoints(x)) * w.colony + (x.colonies ? 1.5 : 4) : 0),
+    john_smith: () => (s.def.fathers[f].onGain.length ? fxValue(x, f) : 0.3 * w.alliance),
     peter_minuit: () => allies + 0.2 * w.alliance, william_bradford: () => Math.min(5, pl.crosses) * Math.max(0, x.bell), pocahontas: () => 0.3 * w.alliance, roger_williams: () => left * w.cross * 0.5,
     john_eliot: () => 0.2 * left * w.native, michiel_de_ruyter: () => 0.2 * w.raid,
     robert_de_la_salle: () => ((!util.has(pl, 'stockade') || !util.has(pl, 'fort')) && pl.buildings.length < 6 ? buildingValue(x, 'stockade') : 0),
     william_penn: () => (x.colonies < 3 ? 0.8 : 0), benjamin_franklin: () => 2 * Math.max(0, x.bell) * left * 2.5 * (util.has(pl, 'town_hall') ? 1 : 0.2),
-    george_washington: () => pat * x.strength * Math.min(4, pl.bells / 2), paul_revere: () => pat * 4 * x.strength, thomas_jefferson: () => 1.5,
+    george_washington: () => pat * x.strength * Math.min(4, pl.bells / 2), paul_revere: () => pat * 4 * x.strength, thomas_jefferson: () => {
+      // The cheapest Fathers on show come free, as many as his card says.
+      const k = s.def.fathers[f].onGain.filter((n) => n.n === 'cheapestFather').length;
+      const cheap = s.salon.filter((c) => c !== f).sort((a, b) => s.def.fathers[a].bells - s.def.fathers[b].bells).slice(0, k);
+      return 0.5 + cheap.reduce((n, c) => n + Math.max(0, fatherValue(x, c) + s.def.fathers[c].bells * x.bell), 0);
+    },
     olaudah_equiano: () => x.cards.filter((c) => s.def.agents[c].base === 'slave').length * 0.6, thaddeus_kosciuszko: () => pat * own * x.strength * (util.has(pl, 'fort') ? 2 : util.has(pl, 'stockade') ? 1 : 0),
-    eli_whitney: () => (util.has(pl, 'blacksmith_shop') ? 0.15 * left * w.trade : 0), simon_bolivar: () => pat * own * 3 * 0.6, benedict_arnold: () => x.loyal * 3 * x.strength,
+    simon_bolivar: () => pat * own * 3 * 0.6, benedict_arnold: () => x.loyal * 3 * x.strength,
   };
-  return (s.def.settings.score.father + (t[f]?.() ?? 0)) * w.father - s.def.fathers[f].bells * x.bell;
+  const set = s.def.settings, price = s.def.fathers[f].bells;
+  return ((set.score.fatherByPrice ? price : set.score.father) + (t[f]?.() ?? 0)) * w.father - (set.fathers.keepBells ? 0 : price * x.bell);
+}
+
+/** Worth of a Father's effects read from its data: what it gives at once and what its lasting bonuses bring over the rounds left. */
+function fxValue(x: Situation, f: string): number {
+  const { s, w, me } = x, pl = s.players[me], def = s.def.fathers[f], left = x.left - (x.last ? 0.5 : 0);
+  let v = 0;
+  for (const n of def.onGain) {
+    if (n.n === 'takeAgent') v += agentValue(x, n.agent) * n.amount;
+    else if (n.n === 'freeBuilding') v += Math.max(0, ...n.options.filter((b) => !canOwnBuilding(s, me, b) && pl.buildings.length < s.def.settings.buildings.max).map((b) => buildingValue(x, b)));
+    else v += nodesValue(x, [n]);
+  }
+  // A production bonus needs something that makes that resource: ✝️ a chapel, 📦 a blacksmith's shop.
+  const makes = (i: string) => (i === 'crosses' ? util.has(pl, 'chapel') || util.has(pl, 'church') : i === 'goods' ? util.has(pl, 'blacksmith_shop') || util.has(pl, 'factory') : true);
+  for (const m of def.mods) {
+    if (m.mod === 'production') v += 0.1 * left * m.add * ((m.icons ?? []).every(makes) ? (m.icons?.includes('crosses') ? 15 * w.cross : 1) : 0);
+    else if (m.mod === 'move') v += 0.05 * left * m.add;
+    else if (m.mod === 'battle' && m.token === 'ship') v += 0.1 * m.add * w.raid;
+    else if (m.mod === 'sellPrice') v += 1.2 * left * m.add * x.gold;
+    // No more trips to Europe to sell and hire.
+    else if (m.mod === 'europeAnywhere') v += 0.5 * left * w.trade;
+    else if (m.mod === 'lootGold') v += 0.1 * left * m.add * x.gold * w.native;
+  }
+  return v;
 }
 
 /** Rough worth of one-off effects, averaging dice. */
@@ -315,11 +360,17 @@ export function nodesValue(x: Situation, list: Node[]): number {
     case 'hostilityNearest': v -= 0.15 * n.add; break;
     case 'pierLeftmost': v += s.pier[0] ? agentValue(x, s.pier[0][0]) : 0; break;
     case 'takeAgent': v += 0.5 * n.amount; break;
+    // Hurting a rival's ship is worth about half a point to us.
+    case 'damageShips': { const away = s.players.filter((pl, q) => q !== me && !map.shipInEurope(s, q)).length; v += 0.5 * n.amount * (n.who === 'away' ? away : Math.min(1, away)); break; }
+    case 'allyFriendly': v += s.settlements.filter((z) => z.alive && z.ally === null && map.isOpen(s, z.cell) && util.combinedHostility(s, me, z.tribe) <= n.max).length * 1.5 * w.alliance; break;
+    case 'nextColonyFree': { const c = s.def.settings.colony.foundCost; v += x.colonies < s.def.settings.colony.max && x.sites.length ? c.value * x.res[c.resource] + 0.5 : 0; break; }
     case 'drawPoi': case 'guide': v += 0.8; break;
     case 'revealAdjacent': v += 0.8 * w.explore; break;
     case 'ref': v -= (n.add ?? 0) * x.ref; break;
     case 'dropHold': v -= RESOURCES.reduce((k, r) => k + s.players[me].hold[r] * x.gold * s.price[r], 0); break;
     case 'discardCards': v -= 0.6 * n.amount; break;
+    case 'loseTopAgent': v -= n.skull && s.move?.scout ? 0 : 1.2; break;
+    case 'discardHand': v -= n.skull && s.move?.scout ? 0 : 0.6 * s.players[me].hand.length; break;
     case 'toColonyWater': v += 0.1; break;
     default: break;
   }

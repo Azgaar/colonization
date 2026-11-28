@@ -82,12 +82,12 @@
       "copies": 1,
       "nickname": "Loyalist Militia",
       "name": "Ополчение лоялистов",
-      "effect": "Лоялист получает 1 ⬛ для распределения за каждую единицу ✝️.",
+      "effect": "Лоялист получает 1 карту ополчения за каждый ✝️.",
       "$fx": {
         "t": "militiaPerCross",
         "value": 1
       },
-      "$checked": "875a341bde"
+      "$checked": "f078292fea"
     },
     {
       "copies": 1,

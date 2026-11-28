@@ -23,7 +23,7 @@ function sections(): Section[] {
       msg('guide.draw_up', { size: s.hand.size }),
       msg('guide.turn_player'),
       msg('guide.top_event'),
-      msg('guide.tax', { track: tax.join(', '), gold: ic('gold'), pay: s.tax.payBells ? t('guide.tax_pay', { n: s.tax.payBells, bells: ic('bells') }) : '', n: s.tax.refuseRef, solo: s.tax.refuseRefSolo, bells: s.tax.refuseBells ? t('guide.tax_bells', { n: s.tax.refuseBells, bells: ic('bells') }) : '' }),
+      msg('guide.tax', { track: tax.join(', '), gold: ic('gold'), pay: s.tax.payBells ? t('guide.tax_pay', { n: s.tax.payBells, bells: ic('bells') }) : '', n: s.tax.refuseRef, solo: s.tax.refuseRefSolo, two: s.tax.refuseRefTwo, bells: s.tax.refuseBells ? t('guide.tax_bells', { n: s.tax.refuseBells, bells: ic('bells') }) : '' }),
       msg('guide.recruit_play', { crosses: ic('crosses') }),
     ] },
     { id: 'agents', title: msg('top.agents'), items: [
@@ -76,14 +76,14 @@ function sections(): Section[] {
       msg('guide.patriots_defend', { bells: ic('bells'), mercenaryGold: s.war.mercenaryGold, gold: ic('gold'), allyCubes: s.war.allyCubes }),
     ] },
     { id: 'score', title: msg('guide.scoring'), items: [
-      msg('guide.patriot_per', { patriotColony: s.score.patriotColony, vp: ic('vp'), perBell: s.score.perBell, bells: ic('bells'), loyalistColony: s.score.loyalistColony }),
-      msg('guide.everybody_1', { vp: ic('vp'), agentsPerPoint: s.score.agentsPerPoint, goldPerPoint: s.score.goldPerPoint, gold: ic('gold'), building: s.score.building, father: s.score.father }),
+      msg('guide.patriot_per', { patriotColony: s.score.patriotColony, vp: ic('vp'), perBell: s.score.perBell, bellsPerPoint: s.score.bellsPerPoint, bells: ic('bells') }),
+      msg('guide.everybody_1', { vp: ic('vp'), agentsPerPoint: s.score.agentsPerPoint, goldPerPoint: s.score.goldPerPoint, gold: ic('gold'), building: s.score.building, fathers: s.score.father }),
       msg('guide.ties_go'),
     ] },
     { id: 'icons', title: msg('guide.icons'), items: [
       msg('guide.food_timber', { food: ic('food'), timber: ic('timber'), crops: ic('crops'), goods: ic('goods'), silver: ic('silver') }),
       msg('guide.gold_bells', { gold: ic('gold'), bells: ic('bells'), crosses: ic('crosses'), king: ic('king'), vp: ic('vp') }),
-      msg('guide.ship_infantry', { ship: ic('ship'), pawn: ic('pawn'), anger: ic('hostility') }),
+      msg('guide.ship_infantry', { ship: ic('ship'), pawn: ic('pawn'), hostility: ic('hostility') }),
     ] },
   ];
 }

@@ -2,6 +2,7 @@
  * The emblem files keep their drawings in different places of a 512-unit square, so each is placed by where its drawing is:
  * centred, and as large as the others whatever its size. The disc's rim grows with the disc, so a small badge keeps its emblem. */
 import { art, D } from './data.ts';
+import { SHAPES } from './shapes.ts';
 
 /** Where each emblem's drawing is inside its 512-unit square: left, top, right, bottom (measured from the pictures in a browser). */
 const BOX: Record<string, [number, number, number, number]> = {
@@ -25,3 +26,12 @@ export function emblemDisc(n: string, x: number, y: number, s: number, color = D
 export const emblem = (n: string, s = 34, color?: string) => `<svg class="em" width="${s}" height="${s}" viewBox="0 0 ${s} ${s}" aria-hidden="true">${emblemDisc(n, 0, 0, s, color)}</svg>`;
 /** A player's badge, in the player's colour. */
 export const playerEmblem = (p: number, s = 34) => emblem(D.players[p]!.nation, s, D.players[p]!.color);
+/** The sides that are not a nation: the King (a gold crown on crimson) and the patriots together (their people in white on blue). */
+const SEALS = { king: { color: '#7a1d22', shape: 'king' }, patriots: { color: '#2b4a6b', shape: 'population' } } as const;
+/** The King's or the patriots' seal, built as a nation's emblem (same disc, cloth, rim and gloss), so it sits beside them as one of them. */
+export function sealDisc(side: keyof typeof SEALS, x: number, y: number, s: number) {
+  const r = s / 2, w = rim(s), cx = x + r, cy = y + r, k = s * FILL, sh = SEALS[side];
+  return `<g><circle cx="${f(cx)}" cy="${f(cy)}" r="${f(r - w / 2)}" fill="${sh.color}"/><circle cx="${f(cx)}" cy="${f(cy)}" r="${f(r - w / 2)}" fill="url(#weave)" stroke="#fff" stroke-width="${f(w)}"/>${s >= 48 ? `<circle cx="${f(cx)}" cy="${f(cy)}" r="${f(r - w)}" fill="url(#gloss)" opacity=".35"/>` : ''}<svg x="${f(cx - k / 2)}" y="${f(cy - k / 2)}" width="${f(k)}" height="${f(k)}" viewBox="0 0 24 24" color="#fff"${s >= 20 ? ' filter="url(#lift)"' : ''}>${SHAPES[sh.shape]}</svg></g>`;
+}
+/** The seal as a badge in the page, `s` pixels across, the same size and place as a nation's. */
+export const seal = (side: keyof typeof SEALS, s = 34) => `<svg class="em" width="${s}" height="${s}" viewBox="0 0 ${s} ${s}" aria-hidden="true">${sealDisc(side, 0, 0, s)}</svg>`;

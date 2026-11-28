@@ -34,7 +34,12 @@ export function stage(el: HTMLElement, { zoom = 1, center = null, min = 0.45, ma
     for (const p of planes) p.style.transform = tf;
     onMove?.();
   };
-  const look = (c: number) => { const [a, b] = at(c), r = R(); x = r.width / 2 - (a + 32) * z; y = r.height / 2 - (b + 32) * z; put(); };
+  /** Centre a cell; with `sy`, then move it to that height on the screen (as a drag from the centre would), to keep it clear of a box below. */
+  const look = (c: number, sy?: number) => {
+    const [a, b] = at(c), r = R(); x = r.width / 2 - (a + 32) * z; y = r.height / 2 - (b + 32) * z; put();
+    if (sy === undefined) return;
+    const cx = r.left + r.width / 2, [, b0] = un(cx, r.top + r.height / 2), [, b1] = un(cx, sy); y += b1 - b0; put();
+  };
   el.addEventListener('wheel', (e) => { e.preventDefault(); zoomAt(Math.min(max, Math.max(lo(), z * Math.exp(-e.deltaY * 0.0015))), e.clientX, e.clientY); }, { passive: false });
   el.addEventListener('pointerdown', (e) => { const [a, b] = un(e.clientX, e.clientY); drag = [a - x, b - y, e.clientX, e.clientY]; moved = 0; });
   window.addEventListener('pointermove', (e) => { if (!drag) return; moved = Math.max(moved, Math.abs(e.clientX - drag[2]) + Math.abs(e.clientY - drag[3])); if (moved > 5) { const [a, b] = un(e.clientX, e.clientY); x = a - drag[0]; y = b - drag[1]; put(); } });

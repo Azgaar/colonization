@@ -35,7 +35,11 @@ export type Mod =
   | { mod: 'colonyDefence'; building: string; add: number }
   | { mod: 'militiaPerBell'; value: number } | { mod: 'freeMilitia'; value: number }
   | { mod: 'goldPerPoint'; value: number } | { mod: 'pointsPerAlliance'; value: number }
-  | { mod: 'pointsPerPatriotColony'; value: number } | { mod: 'betray'; add: number };
+  | { mod: 'pointsPerPatriotColony'; value: number } | { mod: 'betray'; add: number }
+  /** The ship counts as in Europe for trade, hire and repair, wherever it is. */
+  | { mod: 'europeAnywhere' }
+  /** Gold for each native settlement the player destroys. */
+  | { mod: 'lootGold'; add: number };
 
 export interface Cost {
   gold?: number; bells?: number; crosses?: number; cards?: number;
@@ -55,6 +59,7 @@ export type Node =
   | { n: 'lose'; gold?: number; bells?: number; crosses?: number }
   | { n: 'endMove' } | { n: 'moves'; add: number }
   | { n: 'toEurope'; skull?: boolean } | { n: 'toColonyWater' }
+  | { n: 'loseTopAgent'; skull?: boolean } | { n: 'discardHand'; skull?: boolean }
   | { n: 'damage'; amount: number; skull?: boolean }
   | { n: 'dropHold' }
   | { n: 'choice'; id: string; options: ChoiceOption[] }
@@ -74,6 +79,12 @@ export type Node =
   | { n: 'convertCrosses'; max: number }
   | { n: 'cheapestFather' }
   | { n: 'replaceAgents'; agent: string }
+  /** Damage rivals' ships that are not in Europe: one chosen rival, or every rival away. */
+  | { n: 'damageShips'; amount: number; who: 'one' | 'away' }
+  /** The player's next colony costs nothing. */
+  | { n: 'nextColonyFree' }
+  /** Ally with every revealed settlement that has no ally and is at most this hostile to the player. */
+  | { n: 'allyFriendly'; max: number }
   // Events
   | { n: 'price'; res: Resource[]; add: number } | { n: 'priceReset'; res: Resource[] }
   | { n: 'gainIfStock'; res: Resource; bells: number }
@@ -121,6 +132,8 @@ export type BuildingWork =
   | { kind: 'ocean'; add: number }
   | { kind: 'teach'; maxEdu: Education }
   | { kind: 'sell'; amount: number }
+  /** Sells from the warehouse as the Europe market does from the hold: any resources, any amounts, at Europe's prices. */
+  | { kind: 'market' }
   | { kind: 'repair' };
 export interface FatherDef extends Named { /** Russian lore line: years of life and who they were. */ flavor?: string; category: string; bells: number; mods: Mod[]; onGain: Node[] }
 /** `flavor` is the Russian story line printed above the effects. */
@@ -141,7 +154,12 @@ export interface Settings {
   players: { min: number; max: number };
   hand: { size: number };
   rounds: { max: number; firstYear: number; yearStep: number };
-  tax: { track: number[]; refuseRef: number; refuseRefSolo: number; refuseBells: number; payBells: number };
+  tax: {
+    track: number[]; refuseRef: number; refuseRefSolo: number;
+    /** Cubes a refusal adds in a 2-player game, which has no loyalist either. */
+    refuseRefTwo: number;
+    refuseBells: number; payBells: number;
+  };
   map: { size: number };
   ring: { openSea: number; europe: number };
   move: { points: number; explore: number; cargo: number };
@@ -160,8 +178,18 @@ export interface Settings {
     onEdge: boolean;
   };
   buildings: { max: number };
-  fathers: { max: number; salon: number };
-  propaganda: { maxFathers: number };
+  fathers: {
+    max: number; salon: number;
+    /** On: a Father's price is the 🔔 you need to take it; you keep them. Off: you pay them, as printed. */
+    keepBells: boolean;
+    /** On: at the end of each round the oldest Father in the salon is discarded and a new one drawn. Off: they stay until taken, as printed. */
+    rotate: boolean;
+  };
+  propaganda: {
+    maxFathers: number;
+    /** On: Fathers are won over from anywhere, without the ship in Europe. Off: the ship must be in Europe, as printed. */
+    anywhere: boolean;
+  };
   hire: { max: number };
   pier: { slots: number };
   market: { maxPrice: number };
@@ -175,7 +203,9 @@ export interface Settings {
   collection: { min: number };
   natives: { maxSettlements: number; maxHostility: number; allianceMax: number; allianceBreak: number; giftDice: number; giftBase: number; preachMin: number; afterAttack: number;
     /** What a gift costs: 1 goods, or 1 resource of any kind. */
-    giftResource: 'goods' | 'any' };
+    giftResource: 'goods' | 'any';
+    /** On: a gift lowers hostility by the Europe price of the resource given, not by giftBase and dice. */
+    giftByPrice: boolean };
   activation: { giftMaxHostility: number; raidMinHostility: number; gift: number };
   raid: { resources: number;
     /** The building whose owner is never raided. */
@@ -187,13 +217,24 @@ export interface Settings {
   };
   europe: { safe: boolean };
   war: {
-    bells: number; refStrength: number; hostileCubes: number; hostileFrom: number; allyCubes: number; mercenaryGold: number;
+    bells: number; refStrength: number; hostileCubes: number; hostileFrom: number;
+    /** 🗡️ of the Brave card each allied settlement gives in the war, to every player (DD-123). */
+    allyCubes: number; mercenaryGold: number;
+    /** Militia and Mercenary cards in the box (DD-123): when a pile runs out, nobody can buy more. */
+    militiaCards: number; mercenaryCards: number;
     diceCap: number; refStrengthIncludesTactic: boolean;
     tokenBonus: number; baseDefence: number;
     /** Fewest players with a loyalist in the war (W-2). Solo never has one. */
     loyalistFrom: number;
   };
-  score: { patriotColony: number; loyalistColony: number; perBell: number; agentsPerPoint: number; goldPerPoint: number; building: number; father: number };
+  score: { patriotColony: number; loyalistColony: number; perBell: number; agentsPerPoint: number; goldPerPoint: number; building: number; father: number;
+    /** On: each Father scores its price in 🔔 as 🏅. Off: each scores `father`, as printed. */
+    fatherByPrice: boolean;
+    /** Unspent 🔔 that make one `perBell` score at the end; 1 as printed. */
+    bellsPerPoint: number;
+    /** On: a nation with no colony after the war is destroyed and scores 0. Off: it scores its points but cannot win, as printed. */
+    destroyedScoresZero: boolean;
+  };
 }
 
 export interface GameData {

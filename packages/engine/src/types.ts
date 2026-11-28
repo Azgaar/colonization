@@ -25,6 +25,8 @@ export interface Player {
   inf: number | 'ship' | 'europe';
   buildings: string[]; fathers: string[];
   passed: boolean;
+  /** Colonies the player may still found at no cost (Champlain). */
+  freeFound?: number;
 }
 
 export interface Colony { cell: number; owner: number }
@@ -40,14 +42,32 @@ export interface Combat {
   top: string | null;
 }
 
+/** One colony slot in the war (DD-123): the King's cubes and every player's face-down stack of cards there. */
 export interface Siege {
-  owner: number; cell: number; cubes: number; loyalist: string[]; militia: number; army: string[]; support: number; betrayed: number;
+  owner: number; cell: number;
+  /** The colony's number on its owner's nation board, 1 to 3, in founding order. */
+  slot: number;
+  cubes: number;
+  /** Cards by player: the owner's defend (or guard) the colony, any other player's attack it. Face down until the sieges. */
+  stacks: Record<number, string[]>;
+  betrayed: number;
   attack?: number; defence?: number; dice?: number[]; fell?: boolean; takenBy?: number | null;
 }
 export interface War {
-  loyalist: number | null; tactic: string; pool: number; order: number[]; sieges: Siege[];
-  /** Bells and gold spent in secret, taken when the sieges begin. */
-  spent: Record<number, { bells: number; gold: number }>;
+  loyalist: number | null; tactic: string; pool: number;
+  /** Players from most to least rebellious: the order the Royal Army is shared out in. */
+  order: number[];
+  /** Clockwise from the loyalist (or, with none, from the player with the most bells): the order players raise troops and place cards. */
+  turn: number[];
+  sieges: Siege[];
+  /** Each player's cards for the war, their whole agent pool and their war cards; a placed card leaves it. Secret from the others. */
+  hands: Record<number, string[]>;
+  /** War cards each player took (`brave`, `militia`, `mercenary`): public, and counted as agents at the end. */
+  gained: Record<number, string[]>;
+  /** Agents swapped for militia: set aside, still in the player's agent pool. */
+  swapped: Record<number, string[]>;
+  /** Militia and Mercenary cards left in the box. */
+  supply: { militia: number; mercenary: number };
 }
 
 export interface Task { t: string; [k: string]: unknown }

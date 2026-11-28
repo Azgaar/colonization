@@ -2,18 +2,19 @@
 import { existsSync, readFileSync } from 'node:fs';
 import type { GameDef } from '@col/data';
 import type { Choice, View } from '@col/engine';
-import { fatherLimit, taxRate, year } from '@col/engine';
+import { cellYield, fatherLimit, taxRate, year } from '@col/engine';
+import type { Icon } from '@col/data';
 
 const RULEBOOK = 'rulebook/dist/en.html';
 /** Words for the rulebook's icons, which are drawn as pictures. */
-const ICON: Record<string, string> = { cap: 'higher-education', book: 'basic-education', move: 'movement', sword: 'strength', ref: 'Royal-Army', vp: 'VP', die: 'die', hut: 'settlement', people: 'population', cube: 'cube', bar: 'bar' };
+const ICON: Record<string, string> = { eduHigher: 'higher-education', eduBasic: 'basic-education', eduNone: 'no-education', cap: 'higher-education', book: 'basic-education', move: 'movement', sword: 'strength', ref: 'Royal-Army', vp: 'VP', die: 'die', hut: 'settlement', people: 'population', cube: 'cube', bar: 'bar' };
 
 /** The English rulebook as plain text, icons as [words]. Built by `pnpm rulebook`. */
 export function rulebookText(file = RULEBOOK): string {
   if (!existsSync(file)) throw new Error(`${file} is missing: run pnpm rulebook first`);
   return readFileSync(file, 'utf8')
     .replace(/<(style|script|head)[\s\S]*?<\/\1>/gi, ' ')
-    .replace(/<svg class="ic ic-([a-z0-9-]+)"[\s\S]*?<\/svg>/g, (_, k: string) => ` [${ICON[k] ?? k}] `)
+    .replace(/<svg class="ic ic-([A-Za-z0-9-]+)"[\s\S]*?<\/svg>/g, (_, k: string) => ` [${ICON[k] ?? k}] `)
     .replace(/<svg[\s\S]*?<\/svg>/gi, ' ')
     .replace(/<br\s*\/?>/gi, '\n').replace(/<\/(p|h\d|li|tr|div|section|h4)>/gi, '\n').replace(/<\/t[dh]>/gi, ' | ')
     .replace(/<[^>]+>/g, ' ')
@@ -73,6 +74,7 @@ export function mapText(v: View): string {
 }
 const MAP_KEY = 'Map key, 3 characters a cell. 1st: E Europe, ~ water, F forest, G grassland, M mountains, D desert, T tundra, ? unexplored. 2nd: C your colony, a digit another player\'s colony, V native settlement, r ruin, w wreck. 3rd: S/I your ship/infantry, s/i another player\'s. Cells move to all 8 neighbours.';
 
+const EDU = ['no education', 'basic education', 'higher education'];
 const stock = (x: Record<string, number>) => Object.entries(x).filter(([, n]) => n).map(([k, n]) => `${n} ${k}`).join(', ') || 'nothing';
 const names = (def: GameDef, ids: string[]) => ids.map((id) => nameOf(def, id) ?? id).join(', ') || 'none';
 const where = (v: View, x: number | string) => (typeof x !== 'number' ? (x === 'ship' ? 'aboard the ship' : x) : x < 0 ? 'not placed yet' : v.state.map.zone[x] === 'europe' ? `Europe (${at(v, x)})` : at(v, x));
@@ -80,7 +82,7 @@ const where = (v: View, x: number | string) => (typeof x !== 'number' ? (x === '
 /** Everything this seat may know, as text. */
 export function viewText(v: View, map = true): string {
   const s = v.state, def = s.def, me = v.player, out: string[] = [];
-  out.push(`Round ${s.round} of ${def.settings.rounds.max} (${year(s)}). First player P${s.first}. Tax this round ${taxRate(s)} gold. Royal Army (REF) ${s.ref}.${s.event ? ` Event: ${nameOf(def, s.event)}.` : ''}`);
+  out.push(`Round ${s.round} of ${def.settings.rounds.max} (${year(s)}). First player P${s.first}. Tax this round ${taxRate(s)} gold. Royal Army (REF) ${s.ref}.${s.event ? ` Event: ${nameOf(def, s.event)}.` : ''}${s.players.length < 3 ? ` ${s.players.length} players: there is no loyalist; every patriot defends against the Royal Army alone.` : ''}`);
   out.push(`Market prices: ${Object.entries(s.price).map(([r, p]) => `${r} ${p}`).join(', ')}. Demand: ${stock(s.demand)}.`);
   s.players.forEach((p, i) => {
     const head = i === me ? `YOU are P${i} (${nameOf(def, p.nation)})` : `P${i} (${nameOf(def, p.nation)})`;
@@ -88,7 +90,7 @@ export function viewText(v: View, map = true): string {
     out.push(`  Warehouse: ${stock(p.wh)}. Ship: ${where(v, p.ship)} (damage ${p.damage}), hold: ${stock(p.hold)}. Infantry: ${where(v, p.inf)}.`);
     out.push(`  Buildings: ${names(def, p.buildings)}. Fathers: ${names(def, p.fathers)} (limit ${fatherLimit(s, i)}).`);
     if (i === me) {
-      out.push(`  Hand: ${p.hand.map((c) => `${nameOf(def, c)} (${c})`).join(', ') || 'empty'}.${p.inPlay ? ` In play: ${nameOf(def, p.inPlay)}.` : ''}`);
+      out.push(`  Hand: ${p.hand.map((c) => `${nameOf(def, c)} (${c}, ${EDU[def.agents[c]?.edu ?? 0]})`).join(', ') || 'empty'}.${p.inPlay ? ` In play: ${nameOf(def, p.inPlay)}.` : ''}`);
       out.push(`  Deck (${p.deck.length}, order unknown): ${names(def, p.deck)}. Discard: ${names(def, p.discard)}.`);
     } else out.push(`  Agents (${v.collections[i].length}): ${names(def, v.collections[i])}. In hand: ${p.hand.length}.`);
   });
@@ -120,10 +122,15 @@ function json(v: View, x: unknown): string {
 const CELLS = new Set(['cell', 'from', 'to', 'at']);
 /** One legal choice as a readable line. */
 export function choiceText(v: View, c: Choice): string {
-  const s = v.state, parts: string[] = [c.c === 'pass' && s.pending?.kind === 'turn' ? `pass (end your round now: no more actions until next round, with ${s.players[v.player].hand.length} cards in hand)` : c.c];
+  const s = v.state, parts: string[] = [c.c === 'pass' && s.pending?.kind === 'turn' ? `pass (stop: ${s.players[v.player].hand.length} cards unplayed)` : c.c];
   for (const [k, val] of Object.entries(c)) {
     if (k === 'c') continue;
-    if (CELLS.has(k) && typeof val === 'number') parts.push(`${k} ${cellText(v, val)}`);
+    // The engine lists one cell per result (the warehouse is shared), so say what it makes and that the cell is only an example.
+    if (k === 'cell' && (c.a === 'produce' || c.a === 'docks') && typeof val === 'number' && typeof c.card === 'string') {
+      const icon = (c.icon ?? 'food') as Icon, y = cellYield(s, v.player, c.card, val, icon, c.a === 'docks' ? 1 : 0);
+      parts.push(`makes ${y?.total ?? '?'} ${icon} (for example at ${cellText(v, val)}; the same at any cell with this result)`);
+    } else if (k === 'icon' && c.a === 'produce') continue;
+    else if (CELLS.has(k) && typeof val === 'number') parts.push(`${k} ${cellText(v, val)}`);
     else if (k === 'settlement' && typeof val === 'number') { const st = s.settlements.find((x) => x.n === val); parts.push(st ? `settlement ${nameOf(s.def, st.tribe)} at ${at(v, st.cell)}` : `settlement ${val}`); }
     else if (k === 'siege' && typeof val === 'number') { const x = s.war?.sieges[val]; parts.push(x ? `siege ${val} (${x.owner === v.player ? 'your' : `P${x.owner}'s`} colony at ${at(v, x.cell)})` : `siege ${val}`); }
     else if (k === 'a') parts.push(String(val));

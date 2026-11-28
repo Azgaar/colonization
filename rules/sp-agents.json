@@ -619,7 +619,7 @@
       "e": 8,
       "nickname": "Indian",
       "name": "Индеец",
-      "effect": "производство: +1 🐟",
+      "effect": "атака и защита пешки: +1 🗡️\nпроизводство: +1 🐟",
       "education": "👒",
       "price": "👒",
       "image": "Indian.jpeg,50,70,100",
@@ -630,9 +630,14 @@
             "food"
           ],
           "add": 1
+        },
+        {
+          "mod": "combat",
+          "token": "infantry",
+          "add": 1
         }
       ],
-      "$checked": "b3ba236b92"
+      "$checked": "33a91175f8"
     }
   ]
 }

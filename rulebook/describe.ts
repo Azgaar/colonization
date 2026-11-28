@@ -50,8 +50,9 @@ export function describe(R: GameDef) {
     if (w?.kind === 'ocean') return `Work an ocean cell: ${sign(w.add)} 🐟`;
     if (w?.kind === 'produce') return `${w.consumes ? `${w.consumes.amount} ${RES[w.consumes.res]} → ` : '→ '}${w.amount} ${ICON[w.icon] ?? RES[w.icon] ?? w.icon}`;
     if (w?.kind === 'teach') return `Retrain the agent played here, ${b.edu ? 'one with 📖 or more' : 'any agent'}, into any ${w.maxEdu === 2 ? '🎓' : '📖'} profession`;
+    if (w?.kind === 'market') return 'Sell any resources from the warehouse, as much as you like, at the Europe market price: no ship needed';
     if (w?.kind === 'sell') return w.amount > 1 ? `Sell up to ${w.amount} of one resource from the warehouse at the market price` : 'Sell 1 resource from the warehouse at the market price';
-    if (w?.kind === 'repair') return 'Repair the ship fully while it lies next to your colony';
+    if (w?.kind === 'repair') return `Repair the ship fully while it lies next to your colony${S.damage.shipyardRepairs ? '; a damaged ship may come back to your colony instead of Europe, fully repaired' : ''}${S.damage.repairOnBuild ? '; building it repairs your ship at once' : ''}`;
     return '';
   }
 
@@ -72,6 +73,8 @@ export function describe(R: GameDef) {
       case 'damage': return `${plural(n.amount, 'damage', 'damage')}${skull}`;
       case 'hostilityNearest': return `${sign(n.add)} 💢 at the nearest settlement`;
       case 'discardCards': return `discard ${plural(n.amount, 'card')}`;
+      case 'loseTopAgent': return `remove the top agent of your deck${skull}`;
+      case 'discardHand': return `discard your hand${skull}`;
       case 'pierLeftmost': return 'put the leftmost agent of the pier into your discard';
       case 'drawPoi': return 'resolve another card of this deck';
       case 'guide': return `look at the top ${n.look} cards of this deck, resolve one and discard the other`;
@@ -162,7 +165,7 @@ export function describe(R: GameDef) {
       case 'cubes': return `Add ${e.add} 🟥 before they are dealt.`;
       case 'successFrom': return `Every ${list(e.faces.map(String))} on the dice is a success.`;
       case 'noBuildings': return 'Patriots do not add their stockade or fort to the defence.';
-      case 'militiaPerCross': return `The loyalist gets ${e.value} militia ⬛ for each of their ✝️ to place at patriot colonies.`;
+      case 'militiaPerCross': return `The loyalist gets ${e.value} Militia card for each of their ✝️.`;
       case 'minSuccesses': return `A colony falls only to ${e.value} successes or more.`;
       case 'none': return 'No effect.';
       default: return String(e.t);

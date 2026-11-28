@@ -18,7 +18,7 @@
       "type": "exploration",
       "description": "1451–1506. Инициатор открытия Америки",
       "effect": "+1 🌿 в трюм корабля за открытие фрагмента карты с клетками суши",
-      "price": "2 🔔",
+      "price": "1 🔔",
       "image": "christopher columbus.png,50,40,100",
       "$fx": {
         "mods": [
@@ -40,19 +40,19 @@
       "name": "Якоб Фуггер",
       "type": "economy",
       "description": "1459–1525. Крупнейший банкир, финансировавший колонизацию",
-      "effect": "Финал: +1 ПО за каждые 7 🟡 (вместо 10 🟡)",
-      "price": "3 🔔",
+      "effect": "Финал: +1 ПО за каждые 3 🟡 (вместо 5 🟡)",
+      "price": "2 🔔",
       "image": "jakob fugger.png,50,40,100",
       "$fx": {
         "mods": [
           {
             "mod": "goldPerPoint",
-            "value": 7
+            "value": 3
           }
         ],
         "onGain": []
       },
-      "$checked": "c93db9fb31"
+      "$checked": "71185c6821"
     },
     {
       "copies": 1,
@@ -60,19 +60,18 @@
       "name": "Педру Кабрал",
       "type": "exploration",
       "description": "1467–1520. Первооткрыватель Бразилии",
-      "effect": "Движение: +2 💨",
-      "price": "3 🔔",
+      "effect": "Ваш корабль всегда считается находящимся в Европе",
+      "price": "2 🔔",
       "image": "pedro cabral.png,50,125,100",
       "$fx": {
         "mods": [
           {
-            "mod": "move",
-            "add": 2
+            "mod": "europeAnywhere"
           }
         ],
         "onGain": []
       },
-      "$checked": "7c6a39c057"
+      "$checked": "a45d7577f9"
     },
     {
       "copies": 1,
@@ -101,19 +100,19 @@
       "name": "Франсиско Писарро",
       "type": "military",
       "description": "1478–1541. Завоеватель Империи Инков",
-      "effect": "Уничтожение поселения индейцев приносит двойную награду",
-      "price": "3 🔔",
+      "effect": "+10 🟡 за каждое уничтоженное вами поселение индейцев",
+      "price": "2 🔔",
       "image": "francisco pizarro.png,50,0,100",
       "$fx": {
         "mods": [
           {
-            "mod": "lootFactor",
-            "value": 2
+            "mod": "lootGold",
+            "add": 10
           }
         ],
         "onGain": []
       },
-      "$checked": "7522623af5"
+      "$checked": "33471187d3"
     },
     {
       "copies": 1,
@@ -144,7 +143,7 @@
       "type": "military",
       "description": "1485–1547. Завоеватель Империи Ацтеков",
       "effect": "+2 🗡️ против индейцев",
-      "price": "2 🔔",
+      "price": "1 🔔",
       "image": "hernan cortes.png,50,70,100",
       "$fx": {
         "mods": [
@@ -186,7 +185,7 @@
       "type": "exploration",
       "description": "1511–1546. Первооткрыватель Амазонки",
       "effect": "+2 🟡 за открытие фрагмента карты",
-      "price": "2 🔔",
+      "price": "1 🔔",
       "image": "francisco de orellana.png,50,100,100",
       "$fx": {
         "mods": [
@@ -205,21 +204,20 @@
       "name": "Фрэнсис Дрейк",
       "type": "military",
       "description": "1542–1596. Исследователь и пират",
-      "effect": "атака корабля +2 🗡️",
-      "price": "3 🔔",
+      "effect": "Корабль каждого другого игрока не в Европе получает 1 повреждение",
+      "price": "2 🔔",
       "image": "francis drake.png,50,10,100",
       "$fx": {
-        "mods": [
+        "mods": [],
+        "onGain": [
           {
-            "mod": "battle",
-            "add": 2,
-            "token": "ship",
-            "role": "attack"
+            "n": "damageShips",
+            "amount": 1,
+            "who": "away"
           }
-        ],
-        "onGain": []
+        ]
       },
-      "$checked": "ae9c38e031"
+      "$checked": "8d3eab42ff"
     },
     {
       "copies": 1,
@@ -249,7 +247,7 @@
       "type": "exploration",
       "description": "1565–1611. Исследователь северных морей",
       "effect": "Положи в свой сброс агента <i>капитан</i> из колоды или общего сброса",
-      "price": "2 🔔",
+      "price": "3 🔔",
       "image": "henry hudson.png,50,120,100",
       "$fx": {
         "mods": [],
@@ -288,19 +286,19 @@
       "name": "Джон Смит",
       "type": "diplomatic",
       "description": "1580–1631. Один из основателей колонии Джеймстаун",
-      "effect": "Союз с индейским поселением можно заключать при враждебности 3 и ниже",
-      "price": "3 🔔",
+      "effect": "Сразу заключи союз с каждым открытым поселением индейцев без союзника, враждебность которого к вам 0–2",
+      "price": "2 🔔",
       "image": "john smith.png,50,80,100",
       "$fx": {
-        "mods": [
+        "mods": [],
+        "onGain": [
           {
-            "mod": "allianceMax",
-            "value": 3
+            "n": "allyFriendly",
+            "max": 2
           }
-        ],
-        "onGain": []
+        ]
       },
-      "$checked": "88e755b58d"
+      "$checked": "40d62a398b"
     },
     {
       "copies": 1,
@@ -308,22 +306,21 @@
       "name": "Скванто",
       "type": "diplomatic",
       "description": "1585–1622. Индеец из племени патуксетов, помогший колонистам",
-      "effect": "→ +1 🐟",
-      "price": "3 🔔",
+      "effect": "Возьми 5 🐟 на склад",
+      "price": "2 🔔",
       "image": "squanto.png,50,140,100",
       "$fx": {
-        "mods": [
+        "mods": [],
+        "onGain": [
           {
-            "mod": "production",
-            "icons": [
-              "food"
-            ],
-            "add": 1
+            "n": "gain",
+            "wh": {
+              "food": 5
+            }
           }
-        ],
-        "onGain": []
+        ]
       },
-      "$checked": "b29f2eb1cb"
+      "$checked": "d522b36890"
     },
     {
       "copies": 1,
@@ -331,22 +328,20 @@
       "name": "Джон Рольф",
       "type": "economy",
       "description": "1585–1622. Табачный плантатор в Виргинии, муж Покахонтас",
-      "effect": "→ +1 🌿",
-      "price": "3 🔔",
+      "effect": "Положи в свой сброс 2 агента <i>земледелец</i> из колоды или общего сброса",
+      "price": "2 🔔",
       "image": "john rolfe.png,50,20,100",
       "$fx": {
-        "mods": [
+        "mods": [],
+        "onGain": [
           {
-            "mod": "production",
-            "icons": [
-              "crops"
-            ],
-            "add": 1
+            "n": "takeAgent",
+            "agent": "farmer",
+            "amount": 2
           }
-        ],
-        "onGain": []
+        ]
       },
-      "$checked": "efbd7a62f9"
+      "$checked": "2226eb2a79"
     },
     {
       "copies": 1,
@@ -354,22 +349,19 @@
       "name": "Томас Гукер",
       "type": "religious",
       "description": "1586–1647. Пуританин, основатель колонии Коннектикут",
-      "effect": "→ +1 ✝️",
-      "price": "3 🔔",
+      "effect": "Возьми 6 ✝️",
+      "price": "2 🔔",
       "image": "thomas hooker.png",
       "$fx": {
-        "mods": [
+        "mods": [],
+        "onGain": [
           {
-            "mod": "production",
-            "icons": [
-              "crosses"
-            ],
-            "add": 1
+            "n": "gain",
+            "crosses": 6
           }
-        ],
-        "onGain": []
+        ]
       },
-      "$checked": "080cf24d66"
+      "$checked": "b3246cc1ff"
     },
     {
       "copies": 1,
@@ -378,7 +370,7 @@
       "type": "diplomatic",
       "description": "1589–1638. Губернатор Новых Нидерландов",
       "effect": "Финал: +1 ПО за каждое союзное поселение индейцев",
-      "price": "2 🔔",
+      "price": "1 🔔",
       "image": "peter minuit.png,50,40,100",
       "$fx": {
         "mods": [
@@ -398,7 +390,7 @@
       "type": "religious",
       "description": "1590–1657. Отец-пилигрим, основатель колонии Плимут",
       "effect": "При получении обменяй запас ✝️ (но не больше 5) на 🔔 по курсу 1 к 1",
-      "price": "3 🔔",
+      "price": "2 🔔",
       "image": "william bradford.png,50,140,100",
       "$fx": {
         "mods": [],
@@ -418,7 +410,7 @@
       "type": "diplomatic",
       "description": "1596–1617. Дочь вождя поухатанов, помогшая англичанам",
       "effect": "Враждебность индейцев по отношению к вам всегда на 1 ниже",
-      "price": "2 🔔",
+      "price": "1 🔔",
       "image": "pocahontas.png,50,100,100",
       "$fx": {
         "mods": [
@@ -438,7 +430,7 @@
       "type": "religious",
       "description": "1603–1683. Баптист, основатель колонии Род-Айленд",
       "effect": "При вербовке за ✝️ возьми до 2 из просмотренных агентов",
-      "price": "2 🔔",
+      "price": "1 🔔",
       "image": "roger williams.png,50,150,100",
       "$fx": {
         "mods": [
@@ -458,7 +450,7 @@
       "type": "religious",
       "description": "1604–1690. Переводчик Библии на язык алгонкинов",
       "effect": "Действие <i>проповедь</i> стоит -2 ✝️ и не повышает враждебность индейцев",
-      "price": "2 🔔",
+      "price": "1 🔔",
       "image": "john eliot.png,50,100,100",
       "$fx": {
         "mods": [
@@ -482,7 +474,7 @@
       "type": "military",
       "description": "1607–1676. Адмирал, одержавший ряд крупных побед",
       "effect": "Любой 🗡️ агент может проводить <i>обстрел</i> с корабля",
-      "price": "2 🔔",
+      "price": "1 🔔",
       "image": "michiel de ruyter.png,50,150,100",
       "$fx": {
         "mods": [
@@ -607,8 +599,8 @@
       "name": "Томас Джефферсон",
       "type": "political",
       "description": "1743–1826. Автор Декларации Независимости, третий президент США",
-      "effect": "Бесплатно получи отца-основателя с наименьшей ценой в 🔔. Можешь иметь 6 Отцов-Основателей.",
-      "price": "5 🔔",
+      "effect": "Бесплатно получи двух отцов-основателей с наименьшей ценой в 🔔, одного за другим. Можешь иметь 6 Отцов-Основателей.",
+      "price": "4 🔔",
       "image": "thomas jefferson.png,50,30,100",
       "$fx": {
         "mods": [
@@ -620,10 +612,13 @@
         "onGain": [
           {
             "n": "cheapestFather"
+          },
+          {
+            "n": "cheapestFather"
           }
         ]
       },
-      "$checked": "77bf8b6757"
+      "$checked": "0cfa353dbc"
     },
     {
       "copies": 1,
@@ -632,7 +627,7 @@
       "type": "political",
       "description": "1745–1797. Бывший раб, один из лидеров движения за запрет рабства",
       "effect": "Удали всех агентов <i>раб</i> из своей колоды и за каждого возьми нового агента с верха колоды",
-      "price": "2 🔔",
+      "price": "1 🔔",
       "image": "olaudah equiano.png,50,156,100",
       "$fx": {
         "mods": [],
@@ -651,7 +646,7 @@
       "name": "Тадеуш Костюшко",
       "type": "military",
       "description": "1746–1817. Военный инженер, генерал Армии США",
-      "effect": "+1 🗡️ колонии за <i>частокол</i> или +2 🗡️ за <i>форт</i>",
+      "effect": "+1 🗡️ колонии за <i>частокол</i> и ещё +1 🗡️ за <i>форт</i>, даже при осадной артиллерии",
       "price": "3 🔔",
       "image": "thaddeus kosciuszko.png,50,30,100",
       "$fx": {
@@ -664,12 +659,12 @@
           {
             "mod": "colonyDefence",
             "building": "fort",
-            "add": 2
+            "add": 1
           }
         ],
         "onGain": []
       },
-      "$checked": "4ce8594107"
+      "$checked": "0a2bd66ac8"
     },
     {
       "copies": 1,
@@ -677,8 +672,8 @@
       "name": "Илай Витни",
       "type": "economy",
       "description": "1765–1825. Изобретатель хлопкового волокноотделителя",
-      "effect": "→ +1 📦",
-      "price": "3 🔔",
+      "effect": "Бесплатно получи <i>кузницу</i> (если возможно). → +1 📦",
+      "price": "2 🔔",
       "image": "eli whitney.png,50,0,100",
       "$fx": {
         "mods": [
@@ -690,9 +685,16 @@
             "add": 1
           }
         ],
-        "onGain": []
+        "onGain": [
+          {
+            "n": "freeBuilding",
+            "options": [
+              "blacksmith_shop"
+            ]
+          }
+        ]
       },
-      "$checked": "af3c2dd035"
+      "$checked": "5cb3b29ddd"
     },
     {
       "copies": 1,
@@ -721,7 +723,7 @@
       "type": "military",
       "description": "1741–1801. Генерал Континентальной армии, предавший патриотов",
       "effect": "Лоялист: понизь защиту одной колонии патриотов на -3 🗡️ после выставления обороны",
-      "price": "2 🔔",
+      "price": "1 🔔",
       "image": "edward colston.png,50,30,100",
       "$fx": {
         "mods": [

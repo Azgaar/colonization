@@ -8,8 +8,8 @@ import {
   combinedHostility, commonAvailable, drawAgent, drawCard, fillSalon, isMilitary, reducePopulation, removeOne, retire, setHostility,
   takeCommon, takeFromPier, total, turnOrder, uniq,
 } from './util.ts';
-import { colonyProblem, colonyWater, distance, explorable, inEurope, nearestColony, reveal, tokenAt } from './map.ts';
-import { loseBuilding, shipToEurope } from './combat.ts';
+import { colonyProblem, colonyWater, distance, explorable, isOpen, nearestColony, reveal, shipInEurope, tokenAt } from './map.ts';
+import { loseBuilding, pawnAboard, shipToEurope } from './combat.ts';
 import { tokenStops } from './moves.ts';
 import { addBuilding, canOwnBuilding, foundColony, gainFather, refreshPier, removeAgent } from './turn.ts';
 
@@ -142,11 +142,13 @@ const nodes: { [K in Node['n']]: Fn<K> } = {
   moves(s, n) { if (s.move && !s.move.ended) s.move.points += n.add; },
   toEurope(s, n, { p }) {
     if (scoutIgnores(s, n)) return;
-    if (s.move?.token === 'infantry') { s.players[p].inf = 'europe'; tokenStops(s, p, 'infantry'); log(s, { e: 'toEurope', p, token: 'infantry' }); }
+    if (s.move?.token === 'infantry') { tokenStops(s, p, 'infantry'); pawnAboard(s, p); log(s, { e: 'routed', p }); }
     else shipToEurope(s, p);
   },
   toColonyWater(s, _, { p }) { if (s.move) s.move.ended = true; ask(s, { kind: 'colonyWater', player: p }); },
   damage(s, n, { p }) { if (!scoutIgnores(s, n)) push(s, { t: 'damage', p, amount: n.amount }); },
+  loseTopAgent(s, n, { p }) { if (!scoutIgnores(s, n)) loseTopCard(s, p); },
+  discardHand(s, n, { p }) { if (!scoutIgnores(s, n)) { const pl = s.players[p]; pl.discard.push(...pl.hand.splice(0)); } },
   dropHold(s, _, { p }) { for (const r of RESOURCES) s.players[p].hold[r] = 0; },
   choice(s, n, { p, cell }) {
     if (optionChoices(s, p, n.options).length) ask(s, { kind: 'nodeChoice', player: p, id: n.id, opts: n.options, cell });
@@ -184,6 +186,15 @@ const nodes: { [K in Node['n']]: Fn<K> } = {
   takeAgent(s, n, { p }) {
     for (let i = 0; i < n.amount; i++) { const c = takeCommon(s, n.agent); if (c) { s.players[p].discard.push(c); log(s, { e: 'gainAgent', p, agent: c }); } }
   },
+  damageShips(s, n, { p }) {
+    const rivals = s.players.map((_, q) => q).filter((q) => q !== p && !shipInEurope(s, q));
+    if (n.who === 'away') push(s, ...rivals.map((q) => ({ t: 'damage', p: q, amount: n.amount })));
+    else if (rivals.length) ask(s, { kind: 'damageShip', player: p, amount: n.amount });
+  },
+  allyFriendly(s, n, { p }) {
+    for (const x of s.settlements) if (x.alive && x.ally === null && isOpen(s, x.cell) && combinedHostility(s, p, x.tribe) <= n.max) { x.ally = p; log(s, { e: 'alliance', p, settlement: x.n }); }
+  },
+  nextColonyFree(s, _, { p }) { s.players[p].freeFound = (s.players[p].freeFound ?? 0) + 1; },
   freeColony(s, _, { p }) {
     if (coloniesOf(s, p).length < s.def.settings.colony.max) ask(s, { kind: 'freeColony', player: p });
   },
@@ -227,7 +238,7 @@ const nodes: { [K in Node['n']]: Fn<K> } = {
     const hit: number[] = [];
     for (const p of turnOrder(s)) {
       const pl = s.players[p];
-      if (inEurope(s, pl.ship)) continue;
+      if (shipInEurope(s, p)) continue;
       if (total(pl.hold)) for (const r of RESOURCES) pl.hold[r] = 0; else hit.push(p);
     }
     push(s, ...hit.map((p) => ({ t: 'damage', p, amount: 1 })));
@@ -269,7 +280,7 @@ const nodes: { [K in Node['n']]: Fn<K> } = {
     if (p !== null) ask(s, { kind: 'sacredForest', player: p, goods: n.goods, gold: n.gold, hostility: n.hostility });
   },
   boycott(s, n) { eachPlayer(s, 'boycott', { res: n.res, gold: n.goldPerUnit, ref: n.refPerUnit }, (p) => s.players[p].wh[n.res] > 0); },
-  blockade(s, n) { eachPlayer(s, 'blockade', { gold: n.gold, ref: n.refEach }, (p) => !inEurope(s, s.players[p].ship)); },
+  blockade(s, n) { eachPlayer(s, 'blockade', { gold: n.gold, ref: n.refEach }, (p) => !shipInEurope(s, p)); },
   activate(s, n) { push(s, { t: 'activate', n: n.settlement }); },
 };
 
@@ -310,8 +321,10 @@ task('raid', (s, t) => {
   const col = nearestColony(s, x.cell);
   if (!col || combinedHostility(s, col.owner, x.tribe) < s.def.settings.activation.raidMinHostility) return;
   const pl = s.players[col.owner];
-  log(s, { e: 'raid', settlement: x.n, p: col.owner });
-  if (pl.buildings.includes(s.def.settings.raid.stoppedBy)) return;
+  // Logged even when the stockade stops it, so that the table can say so.
+  const stopped = pl.buildings.includes(s.def.settings.raid.stoppedBy);
+  log(s, { e: 'raid', settlement: x.n, p: col.owner, ...(stopped && { stopped: true }) });
+  if (stopped) return;
   if (total(pl.wh) || pl.buildings.length) ask(s, { kind: 'raid', player: col.owner });
 });
 decision('raid', {
@@ -359,6 +372,10 @@ decision('takeFromPier', {
     s.players[d.player][d.to as 'discard' | 'hand'].push(takeFromPier(s, s.pier.findIndex((st) => st[0] === c.agent)));
     push(s, { t: 'takeFromPier', p: d.player, n: d.n - 1, to: d.to });
   },
+});
+decision('damageShip', {
+  options: (s, d) => s.players.map((_, q) => q).filter((q) => q !== d.player && !shipInEurope(s, q)).map((q) => ({ c: 'damage', target: q })),
+  resolve(s, d, c) { push(s, { t: 'damage', p: c.target as number, amount: d.amount as number }); },
 });
 decision('freeColony', {
   options(s, d) {

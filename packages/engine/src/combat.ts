@@ -7,7 +7,7 @@ import {
   addBells, addGold, agent, building, cardHas, colonyAt, drawCard, gainNative, holdFree, mods, reducePopulation, setHostility,
   settlementAt, stockKinds, total, uniq,
 } from './util.ts';
-import { colonyWater, inEurope, nb, nearestColony, nearestEurope, tokenAt } from './map.ts';
+import { colonyWater, inEurope, nb, nearestColony, nearestEurope, shipInEurope, tokenAt } from './map.ts';
 import { tokenStops } from './moves.ts';
 
 type Kind = 'infantry' | 'ship' | 'best';
@@ -15,6 +15,8 @@ const terrainOf = (s: State, c: number) => s.def.terrain[s.map.terrain[c]!];
 
 /** 🗡️ of one card for a token type, where it stands and whom it fights. */
 export function cardStrength(s: State, card: string, kind: Kind, vsNative: boolean, cell: number): number {
+  // A face-down card seen by another seat counts for nothing here; whoever reasons about it estimates it.
+  if (card === '?') return 0;
   const by = { infantry: 0, ship: 0 };
   for (const m of agent(s, card).mods) {
     if (m.mod !== 'combat' || (m.vs === 'native' && !vsNative) || (m.terrain && s.map.terrain[cell] !== m.terrain)) continue;
@@ -31,9 +33,7 @@ export function buildingDefence(s: State, p: number): Part[] {
   // Defences add up: a stockade and the fort beside it count both (DD-93).
   const list = pl.buildings.filter((b) => building(s, b).defence);
   const parts = list.map((b) => ({ label: b, value: building(s, b).defence! }));
-  // A Father's bonus for a building (Kościuszko: stockade or fort) counts once, the best one the player has.
-  const bonus = mods(s, p, 'colonyDefence').filter((m) => list.includes(m.building)).sort((a, b) => b.add - a.add)[0];
-  if (bonus) parts.push({ label: `fathers:${bonus.building}`, value: bonus.add });
+  for (const m of mods(s, p, 'colonyDefence')) if (list.includes(m.building)) parts.push({ label: `fathers:${m.building}`, value: m.add });
   return parts;
 }
 
@@ -49,7 +49,8 @@ export function attackOptions(s: State, p: number, card: string): AttackOption[]
     const t = tokenAt(s, c);
     return t && t.p !== p ? t.kind : null;
   };
-  const safe = (c: number) => s.def.settings.europe.safe && inEurope(s, c);
+  const ship = (c: number) => { const t = tokenAt(s, c); return t?.kind === 'ship' && shipInEurope(s, t.p); };
+  const safe = (c: number) => s.def.settings.europe.safe && (inEurope(s, c) || ship(c));
   const vs = (t: Combat['target']) => t === 'settlement';
   // Infantry, on land or aboard.
   if (pl.inf !== 'europe') {
@@ -155,13 +156,14 @@ task('resolveCombat', (s) => {
     const loot = s.def.tribes[st!.tribe].loot, f = mods(s, p, 'lootFactor').reduce((n2, m) => Math.max(n2, m.value), 1);
     reducePopulation(s, st!, 1);
     if (!st!.alive) {
-      if (loot.gold) addGold(s, p, loot.gold * f, 'loot');
+      const bonus = mods(s, p, 'lootGold').reduce((n2, m) => n2 + m.add, 0);
+      if (loot.gold || bonus) addGold(s, p, (loot.gold ?? 0) * f + bonus, 'loot');
       if (loot.res) s.players[p].wh[loot.res] += loot.amount! * f;
       log(s, { e: 'loot', p, tribe: st!.tribe });
     }
     if (s.nativesLeft > 0) push(s, { t: 'ask', d: { kind: 'takeNative', player: p } });
   } else if (c.target === 'infantry') {
-    s.players[c.defender!].inf = 'europe';
+    pawnAboard(s, c.defender!);
     log(s, { e: 'routed', p: c.defender! });
   } else if (c.target === 'ship') push(s, { t: 'shipLost', winner: p, loser: c.defender!, hits, token: c.token });
   else {
@@ -176,8 +178,14 @@ decision('takeNative', {
 });
 task('sendHome', (s, t) => {
   const home = nearestColony(s, t.cell, t.p);
-  s.players[t.p].inf = home ? home.cell : 'europe';
+  if (home) s.players[t.p].inf = home.cell;
+  else pawnAboard(s, t.p);
 });
+/** A beaten or returned pawn goes back aboard its own ship, wherever the ship is; cargo that no longer fits is discarded. */
+export function pawnAboard(s: State, p: number) {
+  s.players[p].inf = 'ship';
+  push(s, { t: 'overflow', p, from: 'hold' });
+}
 
 // Plundering a colony: one resource or one of the cheapest buildings per success.
 const destroyable = (s: State, p: number) => {
@@ -238,7 +246,7 @@ task('damage', (s, t) => {
   push(s, { t: 'overflow', p: t.p, from: 'hold' }, ...(t.forced || set.damage.sendsToEurope ? [{ t: 'refuge', p: t.p }] : []));
 });
 task('refuge', (s, t) => {
-  if (inEurope(s, s.players[t.p].ship)) return;
+  if (shipInEurope(s, t.p)) return;
   if (s.players[t.p].buildings.some((b) => building(s, b).work?.kind === 'repair') && colonyWater(s, t.p).length) ask(s, { kind: 'refuge', player: t.p });
   else shipToEurope(s, t.p);
 });

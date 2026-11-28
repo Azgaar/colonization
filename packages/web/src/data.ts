@@ -47,7 +47,9 @@ export const ACT: Record<string, Pair> = table('act');
 const WHY = new Map(Object.entries(LOCALES.en).filter(([k]) => k.startsWith("why.")).map(([k, v]) => [v, k]));
 export const why = (s: string) => { const k = WHY.get(s); return k ? t(k) : s; };
 export const art = {
-  agent: (id: string) => `art/agent/${D.agents[id].base}.webp`,
+  // Militia and mercenaries have no picture of their own yet: a colonist and a soldier stand in for them.
+  // War cards have pictures of their own: the militia a patriot with the flag, the mercenary a hired Highlander.
+  agent: (id: string) => (id === 'militia' ? 'art/role/patriot.webp' : `art/agent/${id === 'mercenary' ? 'highlander' : D.agents[id].base}.webp`),
   building: (id: string) => `art/building/${id === "blacksmith_shop" ? "blacksmiths_shop" : id}.webp`,
   father: (id: string) => `art/father/${id === "benedict_arnold" ? "edward_colston" : id}.webp`,
   tribe: (id: string) => `art/tribe/${id}.webp`,
