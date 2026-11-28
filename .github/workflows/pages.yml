@@ -1,5 +1,5 @@
 # Build the game and publish it to GitHub Pages on every push to main.
-# The page is static: index.html, favicon, styles, art, sound and the built dist/. Dev mode and the rules server stay local-only.
+# The page is static: index.html, favicon, the app manifest and icons, the service worker, styles, art, sound and the built dist/. Dev mode and the rules server stay local-only.
 name: Pages
 
 on:
@@ -34,7 +34,7 @@ jobs:
         run: |
           mkdir _site
           cd packages/web
-          cp -r index.html favicon.svg styles art sound dist ../../_site/
+          cp -r index.html favicon.svg manifest.webmanifest sw.js icons styles art sound dist ../../_site/
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site

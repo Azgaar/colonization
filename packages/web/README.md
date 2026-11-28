@@ -8,7 +8,7 @@ The game in the browser (milestones M3 and M4). It plays the real rules engine: 
 pnpm web
 ```
 
-Builds `dist/app.js`, the lab's worker `dist/lab-worker.js` and the list of sound files `dist/sounds.json`, and serves this package at http://localhost:8765. While working on it, run `pnpm web:watch` in one terminal and `node packages/web/tools/serve.ts` in another, then reload the page after a change.
+Builds `dist/app.js`, the lab's worker `dist/lab-worker.js`, the list of sound files `dist/sounds.json` and the service worker `sw.js`, and serves this package at http://localhost:8765. While working on it, run `pnpm web:watch` in one terminal and `node packages/web/tools/serve.ts` in another, then reload the page after a change.
 
 | Command | When |
 |---|---|
@@ -19,7 +19,7 @@ Builds `dist/app.js`, the lab's worker `dist/lab-worker.js` and the list of soun
 
 ## What it does
 
-- **Title screen**: Continue, New game, Load game, Rules, Design bench, Options, About, over a living map where bots play a game of their own under a still camera.
+- **Title screen**: Continue, New game, Load game, Rules, Design bench (dev mode only), Options, About, over a living map where bots play a game of their own under a still camera.
 - **New game**: your nation from a gallery with its starting agents, the seed, and for each rival its nation and who plays it: a person (hot-seat: the screen switches to whoever decides) or a bot at a difficulty (easy, normal, hard, expert: how well it thinks, never what it gets) with its character. A new game opens with a short film drawn in code (harbour, open sea, storm, landfall, first colony); Enter, Esc, Space or Skip end it.
 - **Saving**: the game is saved in the browser after every decision and taken up again on reload. Options → Save to a file / Open a file moves a game between browsers.
 - **Undo** takes back the player's own choices until something hidden shows: dice, a new tile, a card from a deck, or the bots' turns (FR-U-12).
@@ -28,20 +28,23 @@ Builds `dist/app.js`, the lab's worker `dist/lab-worker.js` and the list of soun
 - **Rules** (F1, or Rules in the game menu): the board game's rules in short, in both languages, with the numbers of the rules being played.
 - **Advice** next to Pass: the search bot's three best moves with its reasons; one click plays the whole action, a sail to its end (FR-A-8).
 - **Forecast** (dev mode): each governor's expected score and chance to keep a colony, the likely loyalist, and how each of your colonies would hold now and at the expected war.
-- **Design bench**: Rules (your own rulesets: every value with the rules' value, validation, reset, and each change's conversion label and table wording), Lab (compare two rulesets on paired seeds, sweep a value, find problems: bot games in the browser's workers), Export (conversion report, the cells to edit by sheet, row and column, the ruleset file; in dev mode also Toward the board game: add a change to `pc`, promote it to `board` or drop it, written to `rulesets/` and `docs/decisions.md` by the local server).
+- **Design bench** (dev mode only): Rules (your own rulesets: every value with the rules' value, validation, reset, and each change's conversion label and table wording), Lab (compare two rulesets on paired seeds, sweep a value, find problems: bot games in the browser's workers), Export (conversion report, the cells to edit by sheet, row and column, the ruleset file; in dev mode also Toward the board game: add a change to `pc`, promote it to `board` or drop it, written to `rulesets/` and `docs/decisions.md` by the local server).
 - **Sound**: effects for what happens, and music: a signature piece for the main menu, one rotation for the game, marches for the war, one piece for a win and one for a loss, from `sound/fx` and `sound/music` (see [docs/audio.md](../../docs/audio.md)); Music, Effects and Sound on/off in Options and the game menu. A missing file is silent.
 - **Dev mode** (Options → Dev mode, only when the game runs on this computer, not in a deployed copy): Options then offers the Forecast in the Governors sheet (FR-U-15) and the Dev menu, to edit the game, force the next event, agent and dice, give cards, take any seat, undo anything and change the rules mid-game (FR-U-19, FR-R-6).
 - Both languages, switchable at any time.
+- **App** (PWA): installable (Options → Play as an app, where the browser offers it), opens full screen when installed, Full screen in Options otherwise. The service worker keeps every file, so the game opens at once and plays offline: the page, styles, code, art and effects before it counts as installed, the music in the background after; an update downloads only the files that changed and is offered as Update next to the version on the title screen, or as a notice in the game. An installed game keeps its saves from being cleared and opens saved games from the system's files. On this computer the service worker stays off so a rebuild shows at once; add `?pwa` to the address to test it.
 
 ## Files
 
 | Path | What |
 |---|---|
 | `index.html` | The page: the empty elements, the styles, then `dist/app.js` |
+| `manifest.webmanifest`, `icons/` | The app's name, colours, display and icons (`icons/` drawn by `tools/icons.py`) |
+| `sw/sw.ts` | The service worker; `tools/pwa.ts` puts the list of files with their hashes in front of it as `sw.js` (built, not in git) |
 | `dist/` | Built, not in git |
 | `art/` | Web-sized art, made by `tools/art.py` |
 | `styles/` | One file per area, loaded in order. Later files may rely on earlier ones, as in one stylesheet |
-| `tools/` | `art.py` (art), `serve.ts` (the server; from this computer it also takes rule changes toward the board game), `sounds.ts` (lists the sound files), `fx.sh` and `music.sh` (build `sound/fx` and `sound/music` from `assets/Sound`) |
+| `tools/` | `art.py` (art), `serve.ts` (the server; from this computer it also takes rule changes toward the board game), `sounds.ts` (lists the sound files), `pwa.ts` (writes `sw.js`), `icons.py` (the app icons), `fx.sh` and `music.sh` (build `sound/fx` and `sound/music` from `assets/Sound`) |
 | `sound/` | Effects (`fx/`) and music (`music/`), `.ogg`, with `music.json`: each piece's title, performers, licence and mood; see docs/audio.md |
 | `test/` | Unit tests: what the view hides, the session's undo, replays |
 
@@ -50,6 +53,7 @@ Builds `dist/app.js`, the lab's worker `dist/lab-worker.js` and the list of soun
 | Module | What |
 |---|---|
 | `main.ts` | Start-up |
+| `pwa.ts` | The installed app: registers the service worker, offers updates, Install and Full screen |
 | `sim.ts` | The session: engine and bots, setup, people's seats, saving, undo, news since the last look, bots playing their turns, replays, the advisor, dev mode |
 | `sound.ts` | Effects from new log entries, music by mood with crossfades, volumes kept in the browser; plays only the files listed in `dist/sounds.json` |
 | `rules.ts` | The rulesets: built-in ones and the designer's own, kept in the browser, compiled once |

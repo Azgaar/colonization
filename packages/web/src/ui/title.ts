@@ -7,6 +7,7 @@ import MUSIC from "../../sound/music.json";
 import { $, D, lang, pick, t } from "../data.ts";
 import { Board } from "../map/board.ts";
 import { paint } from "../paint.ts";
+import { Pwa } from "../pwa.ts";
 import { Dev, Sim } from "../sim.ts";
 import { Sound } from "../sound.ts";
 import { type TitlePage, U } from "../state.ts";
@@ -56,8 +57,10 @@ const PAGES: Record<Exclude<TitlePage, "main" | "new" | "bench">, () => string> 
 let shown = "";
 /** The title screen. Called on every repaint, it redraws only when its page, the language, the saved game or the options change. */
 export function title() {
-  const el = $("title"),
-    page = U.title;
+  const el = $("title");
+  // The design bench is a dev-mode tool: without dev mode its page falls back to the main menu.
+  if (U.title === "bench" && !Dev.on) U.title = "main";
+  const page = U.title;
   document.body.classList.toggle("titled", !!page);
   if (!page || introPlaying()) {
     el.hidden = true;
@@ -72,8 +75,9 @@ export function title() {
       page,
       lang(),
       page === "new" ? "" : JSON.stringify(Sim.savedInfo()),
+      Pwa.update,
       page === "options"
-        ? [tutorialOn(), Sim.fast, Board.view.auto, Board.grid, Dev.on, Dev.forecast, Sound.mute].join()
+        ? [tutorialOn(), Sim.fast, Board.view.auto, Board.grid, Dev.on, Dev.forecast, Sound.mute, Pwa.key].join()
         : ""
     ].join("|"),
     was = shown.split("|")[0];
@@ -96,7 +100,7 @@ export function title() {
     ["data-t-new", t('newgame.new_game'), false],
     ['data-t-page="load"', t('title.load_game'), false],
     ["data-guide", t('newgame.rules'), false],
-    ['data-t-page="bench"', t('bench.design_bench'), false],
+    ...(Dev.on ? [['data-t-page="bench"', t('bench.design_bench'), false] as [string, string, boolean]] : []),
     ['data-t-page="options"', t('title.options'), false],
     ['data-t-page="about"', t('title.about'), false]
   ];
@@ -108,7 +112,7 @@ export function title() {
 <header class="brand${first ? " enter" : ""}"><h1>${t('title.colonization')}</h1><span class="rose">${ROSE}</span><p>${t('title.new_world')}</p></header>
 <nav class="menu-t${first ? " enter" : ""}">${items.map(([a, n, off], i) => `<button ${a} class="${page !== "main" && a.includes(`"${page}"`) ? "on" : ""}" ${off ? "disabled" : ""} style="--i:${i}"><b>${n}</b></button>`).join("")}</nav>
 ${page === "main" ? "" : `<section class="page${fresh ? " anim" : ""}">${PAGES[page]()}<button class="pback" data-t-page="main">${t('back')}</button></section>`}
-<small class="ver">v${version}</small>`;
+<small class="ver">v${version}${Pwa.update ? `<button data-sw-update>${t('pwa.update_now')}</button>` : ""}</small>`;
 }
 /** Open the title screen from the game. */
 export function openTitle(page: TitlePage = "main") {

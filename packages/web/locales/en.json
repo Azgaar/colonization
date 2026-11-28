@@ -501,6 +501,9 @@
   "settings.language": "Language",
   "settings.tutorial": "Tutorial",
   "settings.show_others": "Show others’ turns",
+  "settings.full_screen": "Full screen",
+  "settings.as_app": "Play as an app",
+  "settings.install": "Install",
   "settings.sound": "Sound",
   "settings.music": "Music",
   "settings.effects": "Effects",
@@ -1026,5 +1029,8 @@
   "war.others_raised": "Raised by the others",
   "war.on_to": "On to {x}",
   "war.redcoats_at": "{n, plural, one {# redcoat} other {# redcoats}}",
-  "war.redcoats_n": "{n, plural, one {redcoat} other {redcoats}}"
+  "war.redcoats_n": "{n, plural, one {redcoat} other {redcoats}}",
+  "pwa.new_version": "A new version of the game",
+  "pwa.update_now": "Update",
+  "pwa.update": "Click to update"
 }

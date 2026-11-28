@@ -5,6 +5,7 @@ import { inLang, LOCALES } from '../i18n.ts';
 import { Board } from '../map/board.ts';
 import { Dev, LOCAL, Sim } from '../sim.ts';
 import { Music, Sound } from '../sound.ts';
+import { Pwa } from '../pwa.ts';
 import { tutorialOn } from './tutorial.ts';
 
 /** A switch. It carries what a click sets: `on` when it is off, `off` when it is on. As a heading it also names its section. */
@@ -40,7 +41,9 @@ export function settings(inGame: boolean) {
   const general = `<section>${head(t('settings.general'))}
 ${seg(t('settings.language'), Object.keys(LOCALES).map((l) => [`data-lang="${l}"`, inLang(l, msg('lang.name')), lang() === l]))}
 ${row(t('settings.tutorial'), tutorialOn(), ['data-tutorial="1"', 'data-tutorial=""'])}
-${row(t('settings.show_others'), !Sim.fast, ['data-fast=""', 'data-fast="1"'])}</section>`;
+${row(t('settings.show_others'), !Sim.fast, ['data-fast=""', 'data-fast="1"'])}
+${Pwa.canFull ? row(t('settings.full_screen'), Pwa.full, ['data-full', 'data-full']) : ''}
+${Pwa.installable ? `<div class="orow"><span>${t('settings.as_app')}</span><button class="pill" data-install>${t('settings.install')}</button></div>` : ''}</section>`;
   const sound = `<section>${tog('ohead', t('settings.sound'), !Sound.mute, ['data-mute=""', 'data-mute="1"'])}
 <div class="orow player">${player()}</div>
 ${vol('music', t('settings.music'))}${vol('fx', t('settings.effects'))}</section>`;

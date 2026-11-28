@@ -5,8 +5,10 @@ import { onCell } from './input.ts';
 import { paint } from './paint.ts';
 import { Board } from './map/board.ts';
 import { Places } from './places.ts';
+import { Pwa } from './pwa.ts';
 import { Sim } from './sim.ts';
 import { S, X } from './state.ts';
+import { takeLaunched } from './ui/setup.ts';
 import { Toast } from './ui/toasts.ts';
 // Pictures that first appear when an agent is lifted or a screen opens, ready beforehand. Kept here, so they stay loaded.
 const ready: HTMLImageElement[] = [];
@@ -20,6 +22,8 @@ function start() {
   Board.open(onCell); paint(); void Board.land(true);
   // Names are fitted to the cards by measuring them, so measure again once the web fonts are in.
   void document.fonts?.ready.then(() => paint());
+  // Installed: offline files, install and full screen in the settings, and a saved game opened from the system's files.
+  Pwa.start(); document.addEventListener('pwa', () => paint()); takeLaunched();
 }
 requestAnimationFrame(() => requestAnimationFrame(start));
 setTimeout(start, 300);

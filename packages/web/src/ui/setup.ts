@@ -56,6 +56,11 @@ export function saveFile() {
   a.download = `colonization-${Sim.setup.seed}-${D.year}.json`; a.click(); URL.revokeObjectURL(a.href);
 }
 export function chooseFile() { ($('file') as HTMLInputElement).click(); }
+/** The installed game opened with a saved game from the system's files (the manifest's file handler): the game opens it. */
+export function takeLaunched() {
+  const q = (window as Window & { launchQueue?: { setConsumer(f: (p: { files: readonly FileSystemFileHandle[] }) => void): void } }).launchQueue;
+  q?.setConsumer(({ files }) => { if (files[0]) void files[0].getFile().then(openFile); });
+}
 
 document.addEventListener('click', (e) => {
   const t = e.target as HTMLElement, q = (s: string) => t.closest<HTMLElement>(s);

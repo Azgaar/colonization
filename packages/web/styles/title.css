@@ -39,6 +39,9 @@ body.loading .brand.enter,body.loading .menu-t.enter { animation-play-state:paus
 .title .page { position:absolute;left:calc(var(--left) + 380 * var(--u));top:50%;transform:translateY(-50%);width:min(600px,calc(100vw - 520px));max-height:84vh;overflow:auto;padding:26px 30px 24px;border-radius:22px;background:#0c2d33eb;backdrop-filter:blur(10px);box-shadow:0 20px 60px #0009 }
 /* the game's version, small in the corner */
 .title .ver { position:absolute;right:24px;bottom:18px;font:500 13px var(--ui);letter-spacing:.06em;opacity:.55;text-shadow:0 1px 4px #000a;pointer-events:none }
+.title .ver:has(button) { opacity:1 }
+.title .ver button { pointer-events:auto;margin-left:10px;padding:3px 10px;border:1px solid #edb44399;border-radius:999px;background:#0c3352cc;color:#edb443;font:inherit;cursor:pointer }
+.title .ver button:hover { background:#edb443;color:#0c3352 }
 .title .page.anim { animation:page-in .45s cubic-bezier(.2,.7,.2,1) both }
 @keyframes page-in { from { opacity:0;transform:translate(16px,-50%) } }
 .title .page h2 { font:800 34px/1 var(--sc);margin:0 0 14px }

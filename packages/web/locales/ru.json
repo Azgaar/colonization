@@ -501,6 +501,9 @@
   "settings.language": "Язык",
   "settings.tutorial": "Обучение",
   "settings.show_others": "Показывать чужие ходы",
+  "settings.full_screen": "Полный экран",
+  "settings.as_app": "Играть как приложение",
+  "settings.install": "Установить",
   "settings.sound": "Звук",
   "settings.music": "Музыка",
   "settings.effects": "Эффекты",
@@ -874,5 +877,8 @@
   "war.others_raised": "Собрали другие",
   "war.on_to": "Дальше: {x}",
   "war.redcoats_at": "{n, plural, one {# красный мундир} few {# красных мундира} many {# красных мундиров} other {# красного мундира}}",
-  "war.redcoats_n": "{n, plural, one {красный мундир} few {красных мундира} many {красных мундиров} other {красного мундира}}"
+  "war.redcoats_n": "{n, plural, one {красный мундир} few {красных мундира} many {красных мундиров} other {красного мундира}}",
+  "pwa.new_version": "Новая версия игры",
+  "pwa.update_now": "Обновить",
+  "pwa.update": "Нажмите, чтобы обновить"
 }
